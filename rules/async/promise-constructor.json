@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.constructor",
+  "category": "async",
+  "summary": "Lower the intrinsic Promise constructor while preserving synchronous executor invocation and JavaScript resolving functions.",
+  "source": {"pattern": "new Promise($executor)", "requirements": {"constructor": "intrinsic Promise", "constructor_not_overridden": true, "executor": "callable"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Create", "template": "JsPromise.Create($executor)", "notes": "Executor runs synchronously; helper resolve/reject functions implement JS first-call, self-resolution, and thenable adoption rules."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"executor_timing": "synchronous", "executor_this": "undefined", "executor_return": "ignored", "executor_throw": "reject promise"},
+  "caveats": ["TaskCompletionSource alone does not implement Promise resolution or microtask semantics."],
+  "references": ["ECMAScript 2026 Promise Constructor"],
+  "tests": [
+    {"name": "executor runs synchronously", "input": "new Promise(r=>{console.log(1);r(2)});console.log(3);", "expected_csharp": "var p = JsPromise.Create((resolve, reject) => { Console.WriteLine(1); resolve(JsValue.From(2d)); });", "expected_behavior": "prints 1 then 3"},
+    {"name": "executor throw becomes rejection", "input": "new Promise(()=>{throw 'x'}).catch(console.log);console.log('after');", "expected_behavior": "prints after before rejection handler logs x"}
+  ]
+}
