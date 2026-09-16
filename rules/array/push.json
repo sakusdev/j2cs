@@ -1,0 +1,47 @@
+{
+  "id": "array.prototype.push",
+  "category": "array",
+  "summary": "Lower Array.prototype.push when the receiver is proven to be a normal, non-overridden array representation.",
+  "source": {
+    "pattern": "$array.push($value)",
+    "requirements": {
+      "receiver": "Array",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Push",
+    "template": "JsArray.Push($array, $value)",
+    "notes": "The helper must append the value and return the new array length. A bare List<T>.Add call is not behaviorally equivalent because Add returns void."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return_value": "new_length",
+    "evaluation_order": "receiver then arguments left-to-right",
+    "notes": "Native List<T>.Add may be emitted only when the result is proven unused and all other array semantics are preserved by the selected representation."
+  },
+  "caveats": [
+    "JavaScript arrays may be sparse or heterogeneous.",
+    "Array.prototype.push or the receiver's push property may be overridden.",
+    "Very large lengths and generic use of Array.prototype.push require separate handling."
+  ],
+  "references": [
+    "ECMAScript Array.prototype.push semantics"
+  ],
+  "tests": [
+    {
+      "name": "appends and returns new length",
+      "input": "const a = [1, 2]; const n = a.push(3); console.log(n, a);",
+      "expected_csharp": "var n = JsArray.Push(a, 3d);",
+      "expected_behavior": "prints a length of 3 and an array containing 1,2,3"
+    },
+    {
+      "name": "result ignored optimization",
+      "input": "const a = [1]; a.push(2);",
+      "expected_behavior": "a contains 1,2; compiler may lower to the representation's native append operation if semantic analysis proves the return value is unused"
+    }
+  ]
+}
