@@ -1,0 +1,44 @@
+{
+  "id": "classes.static.field_direct",
+  "category": "classes",
+  "summary": "Lower a direct static field to C# storage only when access is through the defining class, subclass shadowing is impossible, reflection is absent, and initialization timing is explicitly preserved.",
+  "source": {
+    "pattern": "class $C { static $x = $init; }",
+    "requirements": {
+      "all_accesses_through_defining_class": true,
+      "no_subclass_static_access": true,
+      "no_static_reflection": true,
+      "initialization_invoked_at_class_evaluation_point": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit static C# storage but assign it from the generated eager class-initialization sequence rather than relying on CLR lazy field initialization."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_storage": "own property on constructor object",
+    "native_storage_safe_only_under_requirements": true
+  },
+  "caveats": [
+    "Initialization timing is still governed by `classes.static.initialization_order`."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "C# instance variable initializer order: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#15113-instance-variable-initializers"
+  ],
+  "tests": [
+    {
+      "name": "direct static read",
+      "input": "class C { static x=3; } console.log(C.x);",
+      "expected_csharp": "public static double x; /* class eval */ C.x = 3d;",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "edge: subclass access excludes native storage",
+      "input": "class C { static x=3; } class D extends C {} D.x=4; console.log(C.x,D.x);",
+      "expected_behavior": "prints 3 4; this rule must not match"
+    }
+  ]
+}

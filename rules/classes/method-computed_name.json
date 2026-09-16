@@ -1,0 +1,41 @@
+{
+  "id": "classes.method.computed_name",
+  "category": "classes",
+  "summary": "Preserve computed names of class instance methods/accessors, evaluating the key during class definition and defining it on the prototype object.",
+  "source": {
+    "pattern": "class $C { [$keyExpr]($params) { $body } }",
+    "requirements": {
+      "computed_method_name": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Evaluate and ToPropertyKey-convert the method key at class definition time, then define the method function on the runtime prototype with class-method descriptor attributes."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "key_evaluation": "once at class definition",
+    "definition_target": "prototype object",
+    "enumerable": false,
+    "configurable": true
+  },
+  "caveats": [
+    "A fixed C# method name cannot preserve arbitrary computed property keys."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "computed method key once",
+      "input": "let n=0; const k=()=>`m${++n}`; class C { [k()](){return 1;} } console.log(n,new C().m1());",
+      "expected_behavior": "prints 1 1"
+    },
+    {
+      "name": "edge: Symbol method",
+      "input": "const s=Symbol(); class C { [s](){return 9;} } console.log(new C()[s]());",
+      "expected_behavior": "prints 9"
+    }
+  ]
+}

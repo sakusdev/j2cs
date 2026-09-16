@@ -1,0 +1,46 @@
+{
+  "id": "classes.private.instance_field",
+  "category": "classes",
+  "summary": "Lower a private instance field to a C# private field only when receivers are statically proven branded instances created through the normal translated construction path.",
+  "source": {
+    "pattern": "class $C { #$x = $init; $uses }",
+    "requirements": {
+      "private_receiver_statically_exact": true,
+      "no_constructor_object_return_stamping": true,
+      "no_cross-realm_or_runtime_brand_checks": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a C# private field and rewrite same-class private accesses directly. Preserve initialization timing using the class-field ordering rules."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "lexically_declared": true,
+    "not_property_key": true,
+    "not_reflectable": true,
+    "brand_required_by_js_but_proven_statically": true
+  },
+  "caveats": [
+    "JavaScript private fields are based on private brands, not merely nominal visibility.",
+    "Unusual derived constructors can stamp private elements onto replacement objects; that case is excluded."
+  ],
+  "references": [
+    "ECMAScript Private Names / PrivateBrandCheck: https://tc39.es/ecma262/#sec-private-names",
+    "MDN Private elements: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_elements"
+  ],
+  "tests": [
+    {
+      "name": "private field read/write",
+      "input": "class C { #x=1; inc(){ this.#x++; return this.#x; } } console.log(new C().inc());",
+      "expected_csharp": "private double _x; public double inc(){ _x++; return _x; }",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: arbitrary receiver excludes native brand elision",
+      "input": "class C { #x=1; static read(o){ return o.#x; } } C.read({});",
+      "expected_behavior": "throws TypeError; direct field access is safe only when o is statically proven branded"
+    }
+  ]
+}

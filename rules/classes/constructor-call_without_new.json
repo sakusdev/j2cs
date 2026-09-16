@@ -1,0 +1,41 @@
+{
+  "id": "classes.constructor.call_without_new",
+  "category": "classes",
+  "summary": "Preserve the TypeError from calling a class constructor without new while still evaluating the call expression arguments in JavaScript order.",
+  "source": {
+    "pattern": "$C($args)",
+    "requirements": {
+      "callee_proven_class_constructor": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsClass.ThrowCalledWithoutNew",
+    "notes": "Evaluate receiver/callee and arguments normally, then invoke a helper that throws the JavaScript TypeError for [[Call]] on a class constructor."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "class_constructor_callable": false,
+    "argument_side_effects_before_throw": true
+  },
+  "caveats": [
+    "Turning the source into an ordinary C# method call would be invalid; rejecting it at C# compile time would also lose runtime side effects."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "plain call throws",
+      "input": "class C {} C();",
+      "expected_csharp": "JsClass.ThrowCalledWithoutNew(\"C\");",
+      "expected_behavior": "throws TypeError"
+    },
+    {
+      "name": "edge: argument evaluated before throw",
+      "input": "class C {} C(console.log('arg'));",
+      "expected_behavior": "prints arg and then throws TypeError"
+    }
+  ]
+}

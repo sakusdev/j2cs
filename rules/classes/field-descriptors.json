@@ -1,0 +1,41 @@
+{
+  "id": "classes.field.descriptors",
+  "category": "classes",
+  "summary": "Preserve public class field descriptor attributes when object reflection/enumeration is observable.",
+  "source": {
+    "pattern": "Object.getOwnPropertyDescriptor($obj, $field)",
+    "requirements": {
+      "public_field_descriptor_reflection": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Represent the field as an own JavaScript data property with writable/enumerable/configurable all true."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "own": true,
+    "writable": true,
+    "enumerable": true,
+    "configurable": true
+  },
+  "caveats": [
+    "A CLR field cannot be deleted and does not participate in Object.keys without an object-model layer."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield"
+  ],
+  "tests": [
+    {
+      "name": "field is enumerable own property",
+      "input": "class C { x=1; } console.log(Object.keys(new C()));",
+      "expected_behavior": "prints an array containing x"
+    },
+    {
+      "name": "edge: field configurable",
+      "input": "class C { x=1; } const c=new C(); console.log(delete c.x, 'x' in c);",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

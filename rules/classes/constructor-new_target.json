@@ -1,0 +1,41 @@
+{
+  "id": "classes.constructor.new_target",
+  "category": "classes",
+  "summary": "Preserve new.target inside class constructors, including the fact that a base constructor sees the most-derived constructor used by new.",
+  "source": {
+    "pattern": "constructor($params) { $use_new_target }",
+    "requirements": {
+      "new_target_observed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsClass.Construct",
+    "notes": "Thread an explicit constructor identity through the generated construction path; do not replace new.target with the statically declared class."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "base_called_from_subclass": "new.target is subclass constructor",
+    "direct_new": "new.target is the directly constructed class"
+  },
+  "caveats": [
+    "System.Type can be used as an internal token only if no JavaScript constructor-object behavior is expected from new.target."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "direct construction",
+      "input": "class A { constructor(){ console.log(new.target === A); } } new A();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge: base sees derived new target",
+      "input": "class A { constructor(){ console.log(new.target.name); } } class B extends A {} new B();",
+      "expected_csharp": "JsClass.Construct(typeof(B), /* args */);",
+      "expected_behavior": "prints B"
+    }
+  ]
+}

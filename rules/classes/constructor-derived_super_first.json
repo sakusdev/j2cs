@@ -1,0 +1,46 @@
+{
+  "id": "classes.constructor.derived_super_first",
+  "category": "classes",
+  "summary": "Lower a derived constructor to a C# base-constructor initializer only when super() is the first semantically observable constructor action.",
+  "source": {
+    "pattern": "class $D extends $B { constructor($params) { super($args); $rest } }",
+    "requirements": {
+      "base_class_statically_resolved": true,
+      "super_call_is_first_observable_action": true,
+      "super_arguments_do_not_reference_uninitialized_this": true,
+      "single_super_call": true,
+      "no_constructor_return_override": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit `: base(...)` and place derived-field initialization plus the remaining constructor body after the base constructor returns."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "this_before_super": "uninitialized",
+    "super_initializes_this": true,
+    "derived_fields_initialize_after_super_returns": true
+  },
+  "caveats": [
+    "Even side-effect-only statements before super make C# constructor-initializer lowering observably wrong."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "C# instance variable initializer order: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#15113-instance-variable-initializers"
+  ],
+  "tests": [
+    {
+      "name": "simple super forwarding",
+      "input": "class B { constructor(x){ this.x=x; } } class D extends B { constructor(x){ super(x); this.y=2; } }",
+      "expected_csharp": "public D(double x) : base(x) { /* derived JS fields */ this.y = 2d; }",
+      "expected_behavior": "x is set by B, then derived fields initialize, then y is assigned"
+    },
+    {
+      "name": "edge: work before super excludes base initializer",
+      "input": "class B { constructor(){ console.log('base'); } } class D extends B { constructor(){ console.log('before'); super(); } } new D();",
+      "expected_behavior": "prints before then base; direct C# `: base()` would run base before the derived constructor body and is therefore not equivalent"
+    }
+  ]
+}

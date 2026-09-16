@@ -1,0 +1,45 @@
+{
+  "id": "classes.method.instance_direct",
+  "category": "classes",
+  "summary": "Lower a direct call to a stable class instance method to a C# instance method call when method extraction, reflection, and prototype mutation are excluded.",
+  "source": {
+    "pattern": "$obj.$method($args)",
+    "requirements": {
+      "receiver_exact_class_known": true,
+      "method_resolves_to_builtin_class_definition": true,
+      "prototype_not_mutated": true,
+      "method_not_extracted_as_value": true,
+      "no_property_reflection": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit an instance method and a normal C# call. Methods should be virtual when subclass override behavior must remain observable."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_method_location": "prototype",
+    "this_on_direct_call": "receiver",
+    "class_method_code": "strict mode"
+  },
+  "caveats": [
+    "C# method placement is not a JavaScript prototype property; reflection and method-as-value cases require separate rules."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "direct method call",
+      "input": "class C { m(x){ return x+1; } } console.log(new C().m(2));",
+      "expected_csharp": "public double m(double x) => x + 1d;",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "edge: extraction excluded",
+      "input": "class C { m(){ return this; } } const f = new C().m; f();",
+      "expected_behavior": "detached call has undefined this and this rule must not be used"
+    }
+  ]
+}

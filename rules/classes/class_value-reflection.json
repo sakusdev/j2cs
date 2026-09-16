@@ -1,0 +1,43 @@
+{
+  "id": "classes.class_value.reflection",
+  "category": "classes",
+  "summary": "Fallback to a JavaScript-compatible constructor object when the class binding is used as a runtime value with function/prototype/reflection semantics.",
+  "source": {
+    "pattern": "$use($C)",
+    "requirements": {
+      "class_binding_used_as_runtime_value": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Materialize the class constructor object, its prototype object, property descriptors, name/length/prototype properties, static elements, and constructor-object inheritance."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "typeof": "function",
+    "callable_without_new": false,
+    "constructable": true,
+    "has_prototype_property": true,
+    "static_properties": "ordinary own properties",
+    "constructor_inheritance": "[[Prototype]] links subclass constructor to base constructor"
+  },
+  "caveats": [
+    "System.Type is not behaviorally equivalent to a JavaScript class constructor object."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "typeof class is function",
+      "input": "class C {} console.log(typeof C);",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "edge: prototype is observable object",
+      "input": "class C { m(){} } console.log(Object.hasOwn(C.prototype,'m'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "classes.private.shadow_name",
+  "category": "classes",
+  "summary": "Preserve that the same textual private name declared in a subclass is a distinct private name from the one in its superclass.",
+  "source": {
+    "pattern": "class $B { #$x; } class $D extends $B { #$x; }",
+    "requirements": {
+      "static_hierarchy": true,
+      "private_accesses_statically_resolved": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit separate private fields in each generated C# type. Same textual C# field names may be used because private members occupy separate declaring types."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "private_name_identity": "per class declaration",
+    "inherited_access": "subclass cannot access superclass private name unless exposed by superclass code"
+  },
+  "caveats": [
+    "Parser/early-error handling must reject undeclared private names before lowering."
+  ],
+  "references": [
+    "ECMAScript Private Names / PrivateBrandCheck: https://tc39.es/ecma262/#sec-private-names"
+  ],
+  "tests": [
+    {
+      "name": "distinct private slots",
+      "input": "class B { #x=1; getB(){return this.#x;} } class D extends B { #x=2; getD(){return this.#x;} } const d=new D(); console.log(d.getB(),d.getD());",
+      "expected_csharp": "class B { private double _x=1; } class D:B { private double _x=2; }",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "edge: subclass source cannot name base private slot",
+      "input": "class B { #x=1; } class D extends B { m(){ return this.#x; } }",
+      "expected_behavior": "early SyntaxError because #x is not declared in D"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "classes.declaration.tdz",
+  "category": "classes",
+  "summary": "Preserve the temporal dead zone of a class declaration when code may access the class binding before class evaluation completes.",
+  "source": {
+    "pattern": "$use_before; class $C { $elements }",
+    "requirements": {
+      "predeclaration_access_possible": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsLexicalBinding",
+    "notes": "Represent the class binding with a lexical slot that throws ReferenceError until initialized at the class evaluation point."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "before_initialization": "ReferenceError",
+    "binding_kind": "lexical",
+    "class_body_self_reference_before_initialization": "ReferenceError during computed-key/static initialization when applicable"
+  },
+  "caveats": [
+    "A plain C# type name is available independent of source textual order, so it cannot model this TDZ by itself."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "MDN Classes: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+  ],
+  "tests": [
+    {
+      "name": "predeclaration access throws",
+      "input": "console.log(C); class C {}",
+      "expected_csharp": "var C = JsLexicalBinding.Uninitialized(\"C\"); /* use */ JsLexicalBinding.Get(C); /* class eval */",
+      "expected_behavior": "throws ReferenceError before class declaration initializes"
+    },
+    {
+      "name": "edge: ordinary post-declaration use succeeds",
+      "input": "class C {} console.log(C.name);",
+      "expected_behavior": "does not throw for TDZ; later class-value semantics are handled separately"
+    }
+  ]
+}

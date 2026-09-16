@@ -1,0 +1,40 @@
+{
+  "id": "classes.field.computed_name",
+  "category": "classes",
+  "summary": "Preserve computed class field names, which are evaluated once during class definition while the field initializer is evaluated per instance.",
+  "source": {
+    "pattern": "class $C { [$keyExpr] = $init; }",
+    "requirements": {
+      "computed_field_name": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Use the JavaScript-compatible class/object model so the computed key is captured at class evaluation and later used to define an own field on each instance."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "key_evaluation": "once at class definition",
+    "initializer_evaluation": "once per instance",
+    "key_conversion": "ToPropertyKey"
+  },
+  "caveats": [
+    "C# member names are compile-time identifiers and cannot directly represent arbitrary JavaScript property keys or Symbols."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield"
+  ],
+  "tests": [
+    {
+      "name": "computed key evaluated once",
+      "input": "let n=0; const key=()=>('x'+(++n)); class C { [key()] = 1; } new C(); new C(); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: initializer remains per instance",
+      "input": "let n=0; class C { ['x'] = ++n; } console.log(new C().x, new C().x);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "classes.private.brand_check",
+  "category": "classes",
+  "summary": "Preserve runtime brand checking for private element access when the receiver type is not statically guaranteed.",
+  "source": {
+    "pattern": "$obj.#$name",
+    "requirements": {
+      "private_receiver_not_statically_branded": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsPrivate",
+    "notes": "Check the defining class's private brand on the receiver and throw JavaScript TypeError on failure before reading/writing the private slot."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "failure": "TypeError",
+    "brand_identity": "lexical private name identity",
+    "null_or_primitive_receiver": "TypeError"
+  },
+  "caveats": [
+    "Do not approximate private access with dictionary lookup by string '#x'; private names are not ordinary property keys."
+  ],
+  "references": [
+    "ECMAScript Private Names / PrivateBrandCheck: https://tc39.es/ecma262/#sec-private-names"
+  ],
+  "tests": [
+    {
+      "name": "wrong object throws",
+      "input": "class C { #x=1; static read(o){ return o.#x; } } C.read({});",
+      "expected_csharp": "JsPrivate.Get(o, C_Private_x_Brand)",
+      "expected_behavior": "throws TypeError"
+    },
+    {
+      "name": "edge: correct instance succeeds",
+      "input": "class C { #x=1; static read(o){ return o.#x; } } console.log(C.read(new C()));",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

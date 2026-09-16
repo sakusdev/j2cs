@@ -1,0 +1,42 @@
+{
+  "id": "classes.constructor.default_derived",
+  "category": "classes",
+  "summary": "Lower the implicit derived constructor when the base constructor signature and all construction sites are statically known.",
+  "source": {
+    "pattern": "class $D extends $B { $elements_without_constructor }",
+    "requirements": {
+      "base_class_statically_resolved": true,
+      "all_new_argument_lists_match_known_base_signature": true,
+      "no_dynamic_constructor_value": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a derived C# constructor that forwards the proven argument list to the base constructor. JavaScript's implicit constructor is effectively constructor(...args){ super(...args); }."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_default_constructor": "constructor(...args) { super(...args); }",
+    "argument_evaluation_order": "left-to-right at construction site"
+  },
+  "caveats": [
+    "C# constructor signatures are static while JavaScript constructors accept dynamic argument counts."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "forwards known arguments",
+      "input": "class B { constructor(x) { this.x=x; } } class D extends B {} console.log(new D(7).x);",
+      "expected_csharp": "public D(double x) : base(x) { }",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "edge: variable arity excludes direct constructor",
+      "input": "class B { constructor(...xs) { this.n=xs.length; } } class D extends B {} new D(1,2,3);",
+      "expected_behavior": "forwards all three arguments; this rule must not match unless rest/variable-arity construction is supported"
+    }
+  ]
+}

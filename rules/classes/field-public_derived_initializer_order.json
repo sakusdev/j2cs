@@ -1,0 +1,43 @@
+{
+  "id": "classes.field.public_derived_initializer_order",
+  "category": "classes",
+  "summary": "Lower derived-class instance fields after super() returns, avoiding C# field initializers whose execution order is earlier than JavaScript.",
+  "source": {
+    "pattern": "class $D extends $B { $f = $init; constructor($params) { super($args); $rest } }",
+    "requirements": {
+      "is_derived_class": true,
+      "super_lowering_supported": true,
+      "initializer_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit uninitialized C# storage and explicit assignments immediately after base construction returns and before the remainder of the JavaScript derived constructor. Do not use C# instance field initializers for these JS fields."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_order": "base constructor first, then derived fields, then constructor remainder",
+    "csharp_hazard": "C# derived field initializers run before base constructor"
+  },
+  "caveats": [
+    "This is a critical JavaScript/C# ordering difference; using `int x = 1;` or similar on the C# derived field is incorrect when the base constructor can observe the derived object."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield",
+    "C# instance variable initializer order: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#15113-instance-variable-initializers"
+  ],
+  "tests": [
+    {
+      "name": "base cannot see derived initialized value",
+      "input": "class B { constructor(){ console.log(this.x); } } class D extends B { x=1; } new D();",
+      "expected_csharp": "public D() : base() { this.x = 1d; }",
+      "expected_behavior": "base constructor observes undefined for x; x becomes 1 only after super returns"
+    },
+    {
+      "name": "edge: derived initializer before post-super body",
+      "input": "class B {} class D extends B { x=1; constructor(){ super(); console.log(this.x); } } new D();",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

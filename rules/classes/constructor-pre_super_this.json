@@ -1,0 +1,42 @@
+{
+  "id": "classes.constructor.pre_super_this",
+  "category": "classes",
+  "summary": "Preserve the ReferenceError produced by accessing this before super() in a derived constructor.",
+  "source": {
+    "pattern": "class $D extends $B { constructor($params) { $pre; super($args); $post } }",
+    "requirements": {
+      "pre_super_code_may_access_this": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsThisBinding",
+    "notes": "Represent the derived `this` binding as uninitialized until successful super construction; every pre-super access must check that state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "pre_super_this": "ReferenceError",
+    "post_super_this": "initialized receiver",
+    "super_twice": "ReferenceError"
+  },
+  "caveats": [
+    "C# requires the base constructor invocation before the derived constructor body, so arbitrary pre-super statements require restructuring beyond a normal C# constructor initializer."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "this before super throws",
+      "input": "class B {} class D extends B { constructor(){ console.log(this); super(); } } new D();",
+      "expected_csharp": "var __this = JsThisBinding.Uninitialized(); JsThisBinding.Get(__this);",
+      "expected_behavior": "throws ReferenceError before calling B"
+    },
+    {
+      "name": "edge: side effect before super without this is allowed",
+      "input": "class B {} class D extends B { constructor(){ console.log('x'); super(); } } new D();",
+      "expected_behavior": "prints x, then constructs D; a lowering must preserve this ordering"
+    }
+  ]
+}

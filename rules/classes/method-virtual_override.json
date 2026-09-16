@@ -1,0 +1,43 @@
+{
+  "id": "classes.method.virtual_override",
+  "category": "classes",
+  "summary": "Use C# virtual dispatch for a statically known JavaScript class method override hierarchy when prototypes are stable.",
+  "source": {
+    "pattern": "class $B { $m(){} } class $D extends $B { $m(){} }",
+    "requirements": {
+      "static_hierarchy": true,
+      "prototype_not_mutated": true,
+      "method_shapes_compatible_for_csharp_override": true,
+      "no_dynamic_property_redefinition": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit the base method as virtual and the derived method as override so calls through a base-typed receiver still dispatch to the derived implementation."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_lookup": "ordinary property lookup starting at derived prototype",
+    "override": "derived prototype property shadows base method"
+  },
+  "caveats": [
+    "JavaScript can replace methods at runtime; C# virtual tables are static."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "derived override dispatch",
+      "input": "class B { m(){ return 1; } } class D extends B { m(){ return 2; } } const x=new D(); console.log(x.m());",
+      "expected_csharp": "public class B { public virtual double m()=>1d; } public class D:B { public override double m()=>2d; }",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: prototype replacement excludes native virtual dispatch",
+      "input": "class B { m(){return 1;} } class D extends B {} D.prototype.m=function(){return 3}; console.log(new D().m());",
+      "expected_behavior": "prints 3; static C# vtable emission alone is not sufficient if prototype mutation is allowed"
+    }
+  ]
+}

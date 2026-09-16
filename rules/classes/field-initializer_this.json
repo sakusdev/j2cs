@@ -1,0 +1,44 @@
+{
+  "id": "classes.field.initializer_this",
+  "category": "classes",
+  "summary": "Lower instance field initializers that reference this into explicit constructor-time statements at the JavaScript-defined point.",
+  "source": {
+    "pattern": "class $C { $f = this.$expr; }",
+    "requirements": {
+      "initializer_uses_this": true,
+      "member_accesses_statically_lowerable": true,
+      "construction_order_supported": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Do not use a C# field initializer. Inject an assignment into the generated constructor at the JS field-initialization point so `this` is available and ordering is preserved."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "base_class": "initializer runs before base constructor body",
+    "derived_class": "initializer runs after super returns",
+    "method_dispatch": "this may call methods already present on the prototype"
+  },
+  "caveats": [
+    "C# instance field initializers cannot generally model JavaScript `this` use or derived ordering; constructor injection is required."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield",
+    "C# instance variable initializer order: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#15113-instance-variable-initializers"
+  ],
+  "tests": [
+    {
+      "name": "initializer uses another earlier field",
+      "input": "class C { a=2; b=this.a+1; } console.log(new C().b);",
+      "expected_csharp": "public C(){ this.a=2d; this.b=this.a+1d; }",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "edge: textual order matters",
+      "input": "class C { b=this.a; a=2; } console.log(new C().b);",
+      "expected_behavior": "b observes undefined because a is not initialized yet"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "classes.expression.anonymous",
+  "category": "classes",
+  "summary": "Lower an anonymous class expression to a generated C# type when its value is used only through statically known construction/member operations.",
+  "source": {
+    "pattern": "const $x = class { $elements };",
+    "requirements": {
+      "class_value_does_not_escape": true,
+      "no_dynamic_reflection": true,
+      "no_lexical_capture_requiring_js_environment": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Generate a uniquely named C# type and rewrite uses of the local class binding to that generated type. Do not materialize a System.Type as a substitute for the JavaScript class object."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "expression_value": "constructor object in JavaScript",
+    "generated_type_identity": "compile-time only under requirements"
+  },
+  "caveats": [
+    "Local class expressions may capture lexical variables; such captures need closure-aware lowering.",
+    "JavaScript class identity is a runtime object when it escapes."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "anonymous expression used only with new",
+      "input": "const C = class { m() { return 1; } }; console.log(new C().m());",
+      "expected_csharp": "private sealed class __J2csClass0 { public double m() => 1d; }",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: identity escapes",
+      "input": "function consume(x){ console.log(typeof x); } const C = class {}; consume(C);",
+      "expected_behavior": "prints function; this rule must not match because the JavaScript constructor object escapes"
+    }
+  ]
+}
