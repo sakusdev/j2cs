@@ -1,0 +1,9 @@
+{
+  "id": "operators.multiplication-assignment", "category": "operators", "summary": "Lower *= through a reference-aware helper so the LHS is evaluated once and JavaScript operator coercions are preserved.",
+  "source": {"pattern": "$ref *= $rhs", "requirements": {"lhs_is_assignable_reference": true}},
+  "target": {"kind": "helper", "template": "JsReference.MultiplyAssign($ref, () => $rhs)", "helper": "JsReference.MultiplyAssign", "notes": "Evaluate the LHS reference once, GetValue once, evaluate RHS once, apply the underlying operation with JsOperators.Multiply, SetValue once, and return the assigned result."},
+  "strategy": "helper", "confidence": "high", "semantics": {"reference_evaluation": "once", "get": "once", "rhs_evaluation": "once after GetValue", "underlying_operator_helper": "JsOperators.Multiply", "set": "once", "result": "assigned result"},
+  "caveats": ["Do not expand compound assignment into a source-level duplicated LHS.", "Getters, setters, proxies, computed keys, and coercion hooks are observable.", "The helper/compiler intrinsic must preserve numeric-kind errors such as Number/BigInt mixing."],
+  "references": ["https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html", "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"],
+  "tests": [{"name": "normal multiplication-assignment", "input": "let x=3; console.log(x *= 4, x);", "expected_csharp": "Console.WriteLine(JsReference.MultiplyAssign(ref x, () => JsValue.From(4)));", "expected_behavior": "prints 12 and x becomes 12"}, {"name": "edge multiplication-assignment semantics", "input": "let x=2n; x *= 3n; console.log(x.toString());", "expected_behavior": "prints 6"}]
+}

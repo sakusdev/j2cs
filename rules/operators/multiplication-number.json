@@ -1,0 +1,9 @@
+{
+  "id": "operators.multiplication.number", "category": "operators", "summary": "Use native double multiplication only when both operands are proven JavaScript Numbers.",
+  "source": {"pattern": "$left * $right", "requirements": {"left_type": "Number", "right_type": "Number", "no_to_numeric_required": true}},
+  "target": {"kind": "csharp", "template": "($left * $right)", "notes": "C# double * matches the corresponding JavaScript Number operation for already-numeric operands."},
+  "strategy": "native", "confidence": "high", "semantics": {"coercion": "none under this rule", "result_type": "Number", "evaluation_order": "left then right", "numeric_precision": "IEEE-754 binary64"},
+  "caveats": ["This native rule is valid only while the compiler preserves JavaScript Number as IEEE-754 binary64 and does not introduce integer overflow semantics.", "Do not use if BigInt or coercion is possible."],
+  "references": ["https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html", "https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html"],
+  "tests": [{"name": "normal multiplication", "input": "console.log(3 * 4);", "expected_csharp": "Console.WriteLine(3d * 4d);", "expected_behavior": "prints 12"}, {"name": "edge multiplication IEEE behavior", "input": "console.log(-0 * 5);", "expected_behavior": "prints -0"}]
+}
