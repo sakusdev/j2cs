@@ -1,0 +1,43 @@
+{
+  "id": "object.prototype.to-string",
+  "category": "object",
+  "summary": "Preserve Object.prototype.toString built-in tags, null/undefined handling, and Symbol.toStringTag lookup.",
+  "source": {
+    "pattern": "$obj.toString()",
+    "requirements": {
+      "receiver_method_resolves_to_builtin_Object_prototype_toString": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectPrototypeToString($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "null": "[object Null] when invoked with null this via call",
+    "undefined": "[object Undefined]",
+    "builtin_tag": "derived from internal slots",
+    "toStringTag": "Get(@@toStringTag); string value overrides builtin tag",
+    "side_effects": "@@toStringTag getter or Proxy may execute"
+  },
+  "caveats": [
+    "C# object.ToString() is not equivalent.",
+    "Array/Function/Date/RegExp and many other objects have distinct built-in tags."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.3.6 Object.prototype.toString"
+  ],
+  "tests": [
+    {
+      "name": "ordinary object tag",
+      "input": "console.log(Object.prototype.toString.call({}));",
+      "expected_behavior": "prints [object Object]"
+    },
+    {
+      "name": "custom toStringTag",
+      "input": "const x={[Symbol.toStringTag]:'Widget'}; console.log(Object.prototype.toString.call(x));",
+      "expected_behavior": "prints [object Widget]"
+    }
+  ]
+}

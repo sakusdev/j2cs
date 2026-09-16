@@ -1,0 +1,40 @@
+{
+  "id": "object.prototype.__proto__.get",
+  "category": "object",
+  "summary": "Support the legacy Object.prototype.__proto__ getter as dynamic prototype access.",
+  "source": {
+    "pattern": "$obj.__proto__ (built-in Annex B accessor)",
+    "requirements": {
+      "property_lookup_resolves_to_builtin_Object_prototype___proto___getter": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetPrototypeOf($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "this": "RequireObjectCoercible then ToObject",
+    "return_value": "[[GetPrototypeOf]] result"
+  },
+  "caveats": [
+    "An own __proto__ data property shadows the accessor.",
+    "This Annex B feature is legacy but common in web/Electron code."
+  ],
+  "references": [
+    "ECMAScript 2026 Annex B Object.prototype.__proto__ accessor"
+  ],
+  "tests": [
+    {
+      "name": "reads prototype",
+      "input": "const p={},x=Object.create(p); console.log(x.__proto__===p);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "own data property shadows",
+      "input": "const x={['__proto__']:7}; console.log(x.__proto__);",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

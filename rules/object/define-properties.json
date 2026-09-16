@@ -1,0 +1,41 @@
+{
+  "id": "object.define-properties",
+  "category": "object",
+  "summary": "Collect descriptors first, then define multiple properties using DefineProperties semantics.",
+  "source": {
+    "pattern": "Object.defineProperties($obj, $properties)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DefineProperties($obj, $properties)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "descriptor_collection": "all own keys (strings and Symbols) are visited in OwnPropertyKeys order; only enumerable descriptor-source properties are read and converted before definitions begin",
+    "definition_order": "converted descriptor list is applied in key order",
+    "return_value": "same object"
+  },
+  "caveats": [
+    "It is not equivalent to repeatedly calling a naive setter while reading descriptors because descriptor conversion happens first.",
+    "Symbol keys on the Properties object are valid property-definition keys and must not be dropped."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.3 Object.defineProperties"
+  ],
+  "tests": [
+    {
+      "name": "defines multiple descriptors",
+      "input": "const x={}; Object.defineProperties(x,{a:{value:1,enumerable:true},b:{value:2}}); console.log(Object.keys(x),x.b);",
+      "expected_behavior": "keys contains only a; x.b is 2"
+    },
+    {
+      "name": "symbol descriptor key is supported",
+      "input": "const s=Symbol(); const x={}; Object.defineProperties(x,{[s]:{value:2}}); console.log(x[s]);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

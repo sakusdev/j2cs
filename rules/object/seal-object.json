@@ -1,0 +1,42 @@
+{
+  "id": "object.seal.object",
+  "category": "object",
+  "summary": "Preserve Object.seal on objects using ECMAScript integrity/extensibility internal methods.",
+  "source": {
+    "pattern": "Object.seal($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "Object"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectSeal($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "non_object": "not covered by this specialization",
+    "return_value": "same object",
+    "effect": "prevents extensions and makes own properties non-configurable",
+    "proxy": "corresponding internal traps/invariants may apply"
+  },
+  "caveats": [
+    "C# readonly/sealed/type immutability does not match JavaScript per-object integrity levels."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.seal"
+  ],
+  "tests": [
+    {
+      "name": "returns same object",
+      "input": "const x={a:1}; console.log(Object.seal(x)===x);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "state changes",
+      "input": "const x={a:1}; Object.seal(x); console.log(Object.getOwnPropertyDescriptor(x,'a').configurable);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

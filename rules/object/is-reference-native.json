@@ -1,0 +1,43 @@
+{
+  "id": "object.is.object-reference-native",
+  "category": "object",
+  "summary": "Specialize Object.is to ReferenceEquals when both operands are proven object-or-null references.",
+  "source": {
+    "pattern": "Object.is($a, $b)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "left_type": "ObjectOrNullReference",
+      "right_type": "ObjectOrNullReference",
+      "no_boxed_primitive_union": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "object.ReferenceEquals($a, $b)"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "objects": "SameValue compares object identity; null equals null",
+    "coercion": "none"
+  },
+  "caveats": [
+    "Do not apply to JavaScript primitive strings/numbers/bigints/booleans or boxed union values."
+  ],
+  "references": [
+    "ECMAScript 2026 SameValue"
+  ],
+  "tests": [
+    {
+      "name": "same object",
+      "input": "const x={}; console.log(Object.is(x,x));",
+      "expected_csharp": "object.ReferenceEquals(x, x)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "distinct objects",
+      "input": "console.log(Object.is({},{}));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

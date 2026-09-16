@@ -1,0 +1,42 @@
+{
+  "id": "object.prevent-extensions.object",
+  "category": "object",
+  "summary": "Preserve Object.preventExtensions on objects using ECMAScript integrity/extensibility internal methods.",
+  "source": {
+    "pattern": "Object.preventExtensions($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "Object"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectPreventExtensions($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "non_object": "not covered by this specialization",
+    "return_value": "same object",
+    "effect": "sets [[Extensible]] false",
+    "proxy": "corresponding internal traps/invariants may apply"
+  },
+  "caveats": [
+    "C# readonly/sealed/type immutability does not match JavaScript per-object integrity levels."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.preventExtensions"
+  ],
+  "tests": [
+    {
+      "name": "returns same object",
+      "input": "const x={a:1}; console.log(Object.preventExtensions(x)===x);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "state changes",
+      "input": "const x={}; Object.preventExtensions(x); x.a=1; console.log('a' in x);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

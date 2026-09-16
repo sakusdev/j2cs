@@ -1,0 +1,46 @@
+{
+  "id": "object.keys",
+  "category": "object",
+  "summary": "Return own enumerable string keys in ECMAScript enumeration order.",
+  "source": {
+    "pattern": "Object.keys($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_not_proxy": true,
+      "object_representation_tracks_enumerability_and_order": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsObject.Keys($obj)",
+    "helper": "JsObject.Keys"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject",
+    "keys": "own enumerable strings only",
+    "symbols": "omitted",
+    "order": "integer indices ascending then other strings in creation order",
+    "getters": "property values are not read"
+  },
+  "caveats": [
+    "Object.keys does not invoke ordinary property getters, but Proxy traps can run.",
+    "C# reflection order is not a semantic substitute."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.19 Object.keys"
+  ],
+  "tests": [
+    {
+      "name": "key order",
+      "input": "console.log(Object.keys({100:'a',2:'b',x:1}).join(','));",
+      "expected_behavior": "prints 2,100,x"
+    },
+    {
+      "name": "nonenumerable and symbols omitted",
+      "input": "const s=Symbol(); const x={[s]:1}; Object.defineProperty(x,'a',{value:1}); console.log(Object.keys(x).length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

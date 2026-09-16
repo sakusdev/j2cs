@@ -1,0 +1,44 @@
+{
+  "id": "object.group-by",
+  "category": "object",
+  "summary": "Group iterable values by callback-derived property keys into a null-prototype result object.",
+  "source": {
+    "pattern": "Object.groupBy($items, $callback)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectGroupBy($items, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "iteration": "uses iterable protocol",
+    "callback": "called as callback(value,index) with undefined this in ordinary Call semantics",
+    "key": "callback result converted with ToPropertyKey",
+    "result_prototype": "null",
+    "groups": "arrays preserving encounter order",
+    "abrupt_completion": "iterator closing required"
+  },
+  "caveats": [
+    "A Dictionary is observably different because Object.groupBy returns a null-prototype ordinary object with property-key coercion.",
+    "Symbol keys are valid group keys."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.13 Object.groupBy"
+  ],
+  "tests": [
+    {
+      "name": "groups values",
+      "input": "const g=Object.groupBy([1,2,3],x=>x%2?'odd':'even'); console.log(g.odd.join(','),g.even.join(','));",
+      "expected_behavior": "prints 1,3 2"
+    },
+    {
+      "name": "result has null prototype",
+      "input": "const g=Object.groupBy([],()=>0); console.log(Object.getPrototypeOf(g)===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "object.language.closed-object-literal-native",
+  "category": "object",
+  "summary": "Lower a closed-shape ordinary object literal to a generated C# reference type only under strict escape/reflection restrictions.",
+  "source": {
+    "pattern": "{ $staticDataProperties }",
+    "requirements": {
+      "all_property_names_static_strings": true,
+      "data_properties_only": true,
+      "no_spread": true,
+      "no_methods_or_accessors": true,
+      "no_duplicate_semantically_observable_keys": true,
+      "no_dynamic_property_access": true,
+      "no_enumeration_or_descriptor_observation": true,
+      "prototype_not_observed_or_mutated": true,
+      "object_identity_preserved_by_generated_reference_type": true,
+      "no_proto_setter_definition": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "new $GeneratedRecord { $initializers }"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "evaluation_order": "property value expressions left-to-right",
+    "identity": "fresh reference object each evaluation",
+    "fields": "last duplicate definition semantics must already be normalized if duplicates allowed; this rule excludes observable duplicates"
+  },
+  "caveats": [
+    "The special object-literal form __proto__: expr changes [[Prototype]] and is excluded; a computed ['__proto__'] key is a normal data property.",
+    "Fallback is required if Object.keys/values/entries, delete, in, descriptors, prototypes, Symbols, computed keys, or dynamic access can observe JavaScript object semantics.",
+    "Generated C# properties must not reorder or duplicate initializer evaluation."
+  ],
+  "references": [
+    "ECMAScript 2026 Object Initializer"
+  ],
+  "tests": [
+    {
+      "name": "fresh identity",
+      "input": "const f=()=>({a:1,b:2}); console.log(f()===f());",
+      "expected_csharp": "new GeneratedRecord { a = 1d, b = 2d }",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "left to right evaluation",
+      "input": "let n=0; const x={a:++n,b:++n}; console.log(x.a,x.b);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

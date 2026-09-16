@@ -1,0 +1,42 @@
+{
+  "id": "object.create",
+  "category": "object",
+  "summary": "Create an object with an exact prototype, including null, and optionally define descriptors.",
+  "source": {
+    "pattern": "Object.create($proto, $properties?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectCreate($proto, $properties)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "prototype": "must be Object or null; otherwise TypeError",
+    "properties": "if supplied, processed as Object.defineProperties",
+    "return_value": "new object",
+    "mutation": false
+  },
+  "caveats": [
+    "A C# class or Dictionary has no JavaScript mutable prototype slot.",
+    "Object.create(null) must not inherit Object.prototype."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.2 Object.create"
+  ],
+  "tests": [
+    {
+      "name": "null prototype",
+      "input": "const x=Object.create(null); console.log(Object.getPrototypeOf(x)===null, 'toString' in x);",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "invalid prototype throws",
+      "input": "try{Object.create(1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

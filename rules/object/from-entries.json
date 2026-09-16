@@ -1,0 +1,43 @@
+{
+  "id": "object.from-entries",
+  "category": "object",
+  "summary": "Consume the iterable protocol, ToPropertyKey each entry key, and create own data properties.",
+  "source": {
+    "pattern": "Object.fromEntries($iterable)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectFromEntries($iterable)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "input": "must be iterable; null/undefined and non-iterables throw",
+    "entry": "each yielded item must be Object-like entry with indices 0 and 1",
+    "key": "ToPropertyKey supports strings and Symbols",
+    "definition": "CreateDataPropertyOrThrow on a new ordinary object",
+    "abrupt_completion": "IteratorClose is required when entry processing throws"
+  },
+  "caveats": [
+    "Dictionary construction does not implement arbitrary JavaScript iterables or IteratorClose.",
+    "The key '__proto__' becomes a normal own data property; it must not mutate the prototype."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.7 Object.fromEntries"
+  ],
+  "tests": [
+    {
+      "name": "creates object",
+      "input": "const x=Object.fromEntries([['a',1],['b',2]]); console.log(x.a,x.b);",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "proto key is data property",
+      "input": "const x=Object.fromEntries([['__proto__',7]]); console.log(Object.getPrototypeOf(x)===Object.prototype,x.__proto__);",
+      "expected_behavior": "prints true 7"
+    }
+  ]
+}

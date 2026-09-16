@@ -1,0 +1,41 @@
+{
+  "id": "object.get-own-property-descriptors",
+  "category": "object",
+  "summary": "Return descriptors for all own string and Symbol keys, preserving property attributes.",
+  "source": {
+    "pattern": "Object.getOwnPropertyDescriptors($obj)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetOwnPropertyDescriptors($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject",
+    "keys": "all own string and Symbol keys in OwnPropertyKeys order",
+    "result": "ordinary object mapping each key to a fresh descriptor object"
+  },
+  "caveats": [
+    "Non-enumerable and Symbol keys must be included.",
+    "Proxy traps can affect ownKeys and descriptors."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.9 Object.getOwnPropertyDescriptors"
+  ],
+  "tests": [
+    {
+      "name": "includes nonenumerable",
+      "input": "const x={}; Object.defineProperty(x,'a',{value:1}); console.log('a' in Object.getOwnPropertyDescriptors(x));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "includes symbols",
+      "input": "const s=Symbol(); const x={[s]:1}; console.log(Object.getOwnPropertyDescriptors(x)[s].value);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

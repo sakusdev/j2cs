@@ -1,0 +1,43 @@
+{
+  "id": "object.set-prototype-of",
+  "category": "object",
+  "summary": "Set [[Prototype]] with RequireObjectCoercible, prototype validation, cycle/invariant checks, and Proxy behavior.",
+  "source": {
+    "pattern": "Object.setPrototypeOf($obj, $proto)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.SetPrototypeOf($obj, $proto)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "RequireObjectCoercible first",
+    "proto": "must be Object or null, otherwise TypeError",
+    "primitive_target": "after proto validation, non-object target is returned unchanged",
+    "object_target": "[[SetPrototypeOf]]; false result causes TypeError",
+    "return_value": "original target"
+  },
+  "caveats": [
+    "Order matters: Object.setPrototypeOf(1, 2) throws for invalid proto even though target is primitive.",
+    "C# inheritance cannot model mutable per-object prototypes."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.23 Object.setPrototypeOf"
+  ],
+  "tests": [
+    {
+      "name": "sets prototype",
+      "input": "const p={x:1},o={}; console.log(Object.setPrototypeOf(o,p)===o,o.x);",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "invalid proto checked for primitive target",
+      "input": "try{Object.setPrototypeOf(1,2)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
