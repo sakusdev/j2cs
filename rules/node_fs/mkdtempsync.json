@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.mkdtempsync",
+  "category": "node_fs",
+  "summary": "Create a unique temporary directory by appending random characters directly to the supplied prefix.",
+  "source": {"pattern":"$fs.mkdtempSync($prefix, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.MkdtempSync","template":"NodeFs.MkdtempSync($prefix, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"created directory path as string/Buffer according to encoding","name_generation":"appends six random characters directly to prefix","mutation":"creates directory atomically enough to avoid collisions"},
+  "caveats": ["Path.GetTempPath/GetRandomFileName do not preserve prefix placement or Node return conventions.","To create inside a directory, the source prefix must itself include the trailing separator."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"prefix is preserved","input":"const p=fs.mkdtempSync('/tmp/j2cs-'); console.log(p.startsWith('/tmp/j2cs-'));","expected_csharp":"var p = NodeFs.MkdtempSync(prefix, NodeFsEncoding.Utf8);","expected_behavior":"creates a unique directory whose returned path begins with the exact prefix"},
+    {"name":"no implicit separator","input":"const p=fs.mkdtempSync('/tmp/j2cs');","expected_csharp":"var p = NodeFs.MkdtempSync(prefix, NodeFsEncoding.Utf8);","expected_behavior":"random suffix is appended directly to '/tmp/j2cs'; helper must not silently insert a path separator"}
+  ]
+}
