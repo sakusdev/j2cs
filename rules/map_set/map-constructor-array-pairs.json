@@ -1,0 +1,47 @@
+{
+  "id": "map.constructor.array-pairs",
+  "category": "map_set",
+  "summary": "Lower a proven builtin Array-of-pairs iterable through a helper that preserves Map constructor pair extraction and SameValueZero keys.",
+  "source": {
+    "pattern": "new Map($pairs)",
+    "requirements": {
+      "global_map_binding_builtin": true,
+      "new_target_is_builtin_map": true,
+      "iterable_inferred_builtin_array": true,
+      "array_iterator_builtin": true,
+      "map_set_adder_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsMap.FromArrayPairs($pairs)",
+    "helper": "JsMap.FromArrayPairs"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "iteration": "Array iterator order, including holes as undefined",
+    "pair_extraction": "Get element[0], then element[1]",
+    "duplicate_keys": "later values replace without moving original key position",
+    "abrupt_completion": "propagates and closes iterator"
+  },
+  "caveats": [
+    "A hole in the outer array is iterated as undefined and therefore causes TypeError because a Map entry must be an object.",
+    "Pair access may invoke getters; helper must preserve left-to-right property access."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "duplicates replace without reorder",
+      "input": "const m=new Map([['a',1],['b',2],['a',3]]); console.log([...m], m.size);",
+      "expected_behavior": "prints entries [['a',3],['b',2]] and size 2"
+    },
+    {
+      "name": "sparse outer array throws",
+      "input": "const a=[]; a.length=1; try { new Map(a); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}
