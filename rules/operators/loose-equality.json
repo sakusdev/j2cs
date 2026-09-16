@@ -1,0 +1,9 @@
+{
+  "id": "operators.loose-equality", "category": "operators", "summary": "Lower == through the ECMAScript IsLooselyEqual algorithm.",
+  "source": {"pattern": "$left == $right", "requirements": {"operator": "abstract equality"}},
+  "target": {"kind": "helper", "template": "JsOperators.LooseEquals($left, $right)", "helper": "JsOperators.LooseEquals", "notes": "Must implement null/undefined equivalence, Boolean-to-Number conversion, String/Number and String/BigInt rules, object ToPrimitive, and Number/BigInt mathematical comparison."},
+  "strategy": "helper", "confidence": "high", "semantics": {"coercion": "ECMAScript IsLooselyEqual", "result_type": "Boolean", "null_equals_undefined": true},
+  "caveats": ["Do not map to C# == or Convert.ChangeType.", "Object conversion can run user code and throw.", "Browser document.all/IsHTMLDDA is a normative-optional special case."],
+  "references": ["https://tc39.es/ecma262/2026/multipage/abstract-operations.html"],
+  "tests": [{"name": "normal string number coercion", "input": "console.log('5' == 5);", "expected_csharp": "Console.WriteLine(JsOperators.LooseEquals(\"5\", 5d));", "expected_behavior": "prints true"}, {"name": "edge null undefined equivalence", "input": "console.log(null == undefined, 0 == false);", "expected_behavior": "prints true true"}]
+}

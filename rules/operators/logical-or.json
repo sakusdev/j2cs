@@ -1,0 +1,9 @@
+{
+  "id": "operators.logical-or", "category": "operators", "summary": "Lower || with JavaScript truthiness, short-circuiting, and operand-value return semantics.",
+  "source": {"pattern": "$left || $right", "requirements": {"result_may_be_non_boolean": true}},
+  "target": {"kind": "helper", "template": "JsOperators.LogicalOr($left, () => $right)", "helper": "JsOperators.LogicalOr", "notes": "Evaluate left once. If ToBoolean(left) is true, return left unchanged; otherwise evaluate and return right."},
+  "strategy": "helper", "confidence": "high", "semantics": {"short_circuit": true, "coercion": "ToBoolean only for decision", "result": "one original operand value"},
+  "caveats": ["C# || is only equivalent when both operands and result are proven Boolean."],
+  "references": ["https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html", "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"],
+  "tests": [{"name": "normal returns fallback", "input": "console.log('' || 'fallback');", "expected_csharp": "Console.WriteLine(JsOperators.LogicalOr(\"\", () => \"fallback\"));", "expected_behavior": "prints fallback"}, {"name": "edge truthy empty array skips right", "input": "let x=0; const v=[] || ++x; console.log(Array.isArray(v), x);", "expected_behavior": "prints true 0"}]
+}

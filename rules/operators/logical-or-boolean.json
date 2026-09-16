@@ -1,0 +1,9 @@
+{
+  "id": "operators.logical-or.boolean", "category": "operators", "summary": "Use native C# || when both operands are proven JavaScript Booleans.",
+  "source": {"pattern": "$left || $right", "requirements": {"left_type": "Boolean", "right_type": "Boolean"}},
+  "target": {"kind": "csharp", "template": "($left || $right)", "notes": "For Boolean operands, JavaScript || short-circuits and returns a Boolean operand, so C# || is behaviorally equivalent."},
+  "strategy": "native", "confidence": "high", "semantics": {"short_circuit": true, "evaluation_order": "left then maybe right", "result_type": "Boolean"},
+  "caveats": ["Do not use when either operand may be non-Boolean because JavaScript || returns operand values rather than a coerced Boolean."],
+  "references": ["https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html"],
+  "tests": [{"name": "normal boolean or", "input": "console.log(false || true);", "expected_csharp": "Console.WriteLine(false || true);", "expected_behavior": "prints true"}, {"name": "edge boolean or short circuits", "input": "let x=0; console.log(true || (++x>0), x);", "expected_csharp": "bool r = true || (++x > 0);", "expected_behavior": "prints true 0"}]
+}
