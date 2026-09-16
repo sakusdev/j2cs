@@ -1,0 +1,44 @@
+{
+  "id": "function.new-target",
+  "category": "functions",
+  "summary": "Represent new.target explicitly in lowered function calling conventions.",
+  "source": {
+    "pattern": "new.target",
+    "requirements": {
+      "inside_function_or_class": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$newTarget",
+    "helper": "JsFunction.InvocationContext",
+    "notes": "Normal calls bind new.target to undefined. Construct calls bind it to the effective newTarget, which can differ from the current function under inheritance or Reflect.construct."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal_call": "undefined",
+    "construct_call": "effective newTarget",
+    "arrow_function": "lexically inherits surrounding new.target"
+  },
+  "caveats": [
+    "A simple boolean 'was called with new' loses the identity of the newTarget.",
+    "Reflect.construct can provide a distinct newTarget."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification GetNewTarget",
+    "MDN JavaScript reference new.target"
+  ],
+  "tests": [
+    {
+      "name": "distinguishes call from construction",
+      "input": "function F(){return new.target===undefined}; console.log(F(), new F());",
+      "expected_behavior": "plain call sees undefined; construction sees F"
+    },
+    {
+      "name": "arrow inherits",
+      "input": "function F(){return (()=>new.target)()}; console.log(new F()===F);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

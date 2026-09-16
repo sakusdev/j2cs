@@ -1,0 +1,50 @@
+{
+  "id": "function.parameters.default-undefined-only",
+  "category": "functions",
+  "summary": "Evaluate a default parameter initializer only when the bound argument value is undefined, not when it is null or another falsy value.",
+  "source": {
+    "pattern": "function $f($a = $init) { $body }",
+    "requirements": {
+      "default_parameter": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "if (JsValue.IsUndefined($a)) $a = $init;",
+    "helper": "JsValue.IsUndefined",
+    "notes": "Emit parameter-initialization logic in source order and in the parameter environment. Earlier parameters are visible; later parameter TDZ behavior must be preserved."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "argument missing or explicitly undefined",
+    "does_not_trigger": [
+      "null",
+      "false",
+      "0",
+      "empty string"
+    ],
+    "order": "left-to-right parameter initialization"
+  },
+  "caveats": [
+    "Default expressions may have side effects, throw, or reference earlier parameters.",
+    "Functions with non-simple parameter lists use unmapped arguments objects."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification FunctionDeclarationInstantiation",
+    "MDN JavaScript reference Default parameters"
+  ],
+  "tests": [
+    {
+      "name": "undefined triggers default",
+      "input": "function f(x=5){return x}; console.log(f(undefined));",
+      "expected_csharp": "if (JsValue.IsUndefined(x)) x = 5d;",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "null does not trigger",
+      "input": "function f(x=5){return x===null}; console.log(f(null));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

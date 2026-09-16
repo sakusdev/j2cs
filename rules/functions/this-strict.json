@@ -1,0 +1,43 @@
+{
+  "id": "function.this.strict",
+  "category": "functions",
+  "summary": "Pass strict-function this exactly as supplied, including undefined, null, and primitives.",
+  "source": {
+    "pattern": "function $f(){ 'use strict'; return this; }",
+    "requirements": {
+      "ordinary_strict_function": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.InvokeStrict($fn, $thisArg, $args)",
+    "helper": "JsFunction.InvokeStrict",
+    "notes": "The helper/calling convention must carry an explicit JS this value. It must not box primitives or substitute the global object."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined_this": "remains undefined",
+    "null_this": "remains null",
+    "primitive_this": "remains primitive"
+  },
+  "caveats": [
+    "C# instance methods always have a receiver and therefore are not a direct representation of arbitrary strict JS this."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification OrdinaryCallBindThis",
+    "MDN JavaScript reference Strict mode"
+  ],
+  "tests": [
+    {
+      "name": "plain strict call gets undefined",
+      "input": "function f(){'use strict'; return this===undefined} console.log(f());",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "strict call preserves primitive",
+      "input": "function f(){'use strict'; return this===2} console.log(f.call(2));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

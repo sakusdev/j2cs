@@ -1,0 +1,47 @@
+{
+  "id": "function.expression.anonymous-delegate",
+  "category": "functions",
+  "summary": "Lower a non-constructable use of an anonymous function expression to a C# delegate when JS function-object metadata is unobserved.",
+  "source": {
+    "pattern": "const $f = function($params) { $body };",
+    "requirements": {
+      "called_only": true,
+      "not_used_with_new": true,
+      "function_properties_unobserved": true,
+      "this_arguments_new_target_unused": true,
+      "no_eval_or_with": true,
+      "function_identity_unobserved": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "Func<$types> $f = ($csharpParams) => { $body };",
+    "notes": "This is a specialization: ordinary function expressions are constructable in JS, so delegate lowering is only valid when construction/prototype identity cannot be observed."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "creates_new_function_object_each_evaluation": true,
+    "closure": "captures lexical environment",
+    "constructability": "ignored only because analysis proves new/prototype are unobservable"
+  },
+  "caveats": [
+    "Do not use this rule if identity, prototype, name/length descriptors, caller/arguments, or construction are observable."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification"
+  ],
+  "tests": [
+    {
+      "name": "simple callback",
+      "input": "const inc = function(x){ return x + 1; }; console.log(inc(2));",
+      "expected_csharp": "Func<double,double> inc = x => x + 1d;",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "fresh identity must remain fresh",
+      "input": "function make(){ return function(x){return x}; } console.log(make() === make());",
+      "expected_behavior": "prints false; compiler must allocate distinct delegate objects or otherwise preserve identity"
+    }
+  ]
+}

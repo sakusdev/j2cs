@@ -1,0 +1,43 @@
+{
+  "id": "function.arguments.callee-strict-throws",
+  "category": "functions",
+  "summary": "Accessing arguments.callee in a strict/unmapped arguments object throws TypeError.",
+  "source": {
+    "pattern": "arguments.callee",
+    "requirements": {
+      "strict_function": true,
+      "arguments_binding_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsRuntime.ThrowTypeError(\"'callee' is not accessible on strict arguments\")",
+    "helper": "JsRuntime.ThrowTypeError",
+    "notes": "Preserve the throwing accessor instead of exposing the current C# delegate."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "TypeError on get",
+    "property": "non-configurable throwing accessor"
+  },
+  "caveats": [
+    "Non-strict mapped arguments has legacy callee semantics and is handled separately/runtime."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification CreateUnmappedArgumentsObject",
+    "ECMAScript 2026 Language Specification Strict Mode"
+  ],
+  "tests": [
+    {
+      "name": "strict callee throws",
+      "input": "function f(){'use strict'; return arguments.callee;} try{f()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "access itself throws",
+      "input": "function f(){'use strict'; void arguments.callee;}",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "function.prototype.call",
+  "category": "functions",
+  "summary": "Lower Function.prototype.call through JS call semantics when the builtin method is proven unmodified.",
+  "source": {
+    "pattern": "$fn.call($thisArg, ...$args)",
+    "requirements": {
+      "receiver_callable": true,
+      "builtin_function_prototype_call_not_overridden": true,
+      "call_property_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.Call($fn, $thisArg, new JsValue[] { $args })",
+    "helper": "JsFunction.Call",
+    "notes": "call checks callability then invokes with the provided thisArg and remaining arguments. The target's strict/sloppy/lexical this mode determines how thisArg is used."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "target call result",
+    "thisArg": "passed without modification to [[Call]]",
+    "arrow_or_bound": "their own call semantics may ignore supplied thisArg"
+  },
+  "caveats": [
+    "A property named call may be overridden on the function or prototype chain.",
+    "Non-callable receiver throws TypeError."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function.prototype.call"
+  ],
+  "tests": [
+    {
+      "name": "sets strict this",
+      "input": "function f(){'use strict';return this.x}; console.log(f.call({x:3}));",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "arrow ignores thisArg",
+      "input": "const x=()=>this; console.log(x.call({})===this);",
+      "expected_behavior": "prints true in the same enclosing this context"
+    }
+  ]
+}

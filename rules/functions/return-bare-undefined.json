@@ -1,0 +1,41 @@
+{
+  "id": "function.return.bare-undefined",
+  "category": "functions",
+  "summary": "A bare return from a JS function produces the undefined value; it is not equivalent to C# void when the call result is observable.",
+  "source": {
+    "pattern": "return;",
+    "requirements": {
+      "function_result_may_be_observed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "return JsUndefined.Value;",
+    "helper": "JsUndefined",
+    "notes": "Functions that fall off the end also return undefined. Use void only when whole-program analysis proves the result is never observed and function identity/calling convention allows it."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined"
+  },
+  "caveats": [
+    "C# null is not JavaScript undefined."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Return Statement Runtime Semantics"
+  ],
+  "tests": [
+    {
+      "name": "bare return",
+      "input": "function f(){return;} console.log(f()===undefined);",
+      "expected_csharp": "return JsUndefined.Value;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "fallthrough",
+      "input": "function f(){} console.log(f()===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

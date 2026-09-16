@@ -1,0 +1,45 @@
+{
+  "id": "function.arrow.lexical-arguments",
+  "category": "functions",
+  "summary": "An arrow function has no own arguments binding; references resolve to the enclosing function's arguments binding.",
+  "source": {
+    "pattern": "const $f = () => arguments[$index]",
+    "requirements": {
+      "arrow_function": true,
+      "enclosing_arguments_binding_known": true,
+      "no_eval_or_with": true,
+      "function_identity_unobserved": true,
+      "function_properties_unobserved": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "var __outerArguments = $enclosingArguments; Func<JsValue> $f = () => __outerArguments[$index];",
+    "notes": "Capture the enclosing lowered arguments object/cell. Do not synthesize a new arguments array for the arrow."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "own_arguments_binding": false,
+    "lookup": "lexical to enclosing non-arrow function"
+  },
+  "caveats": [
+    "At top level there may be no arguments binding.",
+    "If enclosing arguments is a mapped arguments exotic object, capture that object rather than a copy."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification"
+  ],
+  "tests": [
+    {
+      "name": "arrow sees outer arguments",
+      "input": "function f(x){ return (()=>arguments[0])(); } console.log(f(4));",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "arrow call arguments do not replace outer arguments",
+      "input": "function f(x){ const g=()=>arguments.length; return g(1,2,3); } console.log(f(9));",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

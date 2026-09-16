@@ -1,0 +1,44 @@
+{
+  "id": "function.call.missing-arguments",
+  "category": "functions",
+  "summary": "Supply JavaScript undefined for missing formal arguments; do not use C# default(T) or optional-parameter defaults.",
+  "source": {
+    "pattern": "$fn($fewerArgs)",
+    "requirements": {
+      "target_formals_known": true,
+      "provided_argument_count_less_than_formal_count": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.CallKnown($fn, new JsValue[] { $providedArgs })",
+    "helper": "JsFunction.CallKnown",
+    "notes": "The call adapter must bind absent formals to the distinct JS undefined value while preserving arguments.length as the number actually supplied."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "missing_formal_value": "undefined",
+    "arguments_length": "actual supplied count",
+    "default_parameters": "run only when binding value is undefined"
+  },
+  "caveats": [
+    "null is not a substitute for undefined.",
+    "Value-type C# parameters cannot represent omission without an explicit JS value layer."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification FunctionDeclarationInstantiation"
+  ],
+  "tests": [
+    {
+      "name": "missing becomes undefined",
+      "input": "function f(a,b){return [b,arguments.length]}; console.log(f(1));",
+      "expected_behavior": "b is undefined and arguments.length is 1"
+    },
+    {
+      "name": "default parameter observes missing",
+      "input": "function f(a=3){return a}; console.log(f());",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

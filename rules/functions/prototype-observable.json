@@ -1,0 +1,45 @@
+{
+  "id": "function.prototype.observable",
+  "category": "functions",
+  "summary": "Use the JS function-object runtime when an ordinary function's prototype property is read, written, or otherwise observed.",
+  "source": {
+    "pattern": "$fn.prototype",
+    "requirements": {
+      "ordinary_function": true,
+      "prototype_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Ordinary constructable functions have a mutable own prototype data property whose default object contains constructor. C# delegate/type metadata is not equivalent."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default_value": "object with constructor property referring back to function",
+    "writable": true,
+    "enumerable": false,
+    "configurable": false,
+    "used_by_new": true
+  },
+  "caveats": [
+    "Arrow/method/async functions differ in constructability and may lack prototype.",
+    "Changing prototype affects future new operations but not existing instance prototype chains."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function Instances prototype",
+    "MDN JavaScript reference Function prototype"
+  ],
+  "tests": [
+    {
+      "name": "prototype mutation affects future instances",
+      "input": "function C(){}; C.prototype.x=3; console.log(new C().x);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "replacing prototype",
+      "input": "function C(){}; const p={y:4}; C.prototype=p; console.log(Object.getPrototypeOf(new C())===p);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

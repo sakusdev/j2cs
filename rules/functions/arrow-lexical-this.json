@@ -1,0 +1,46 @@
+{
+  "id": "function.arrow.lexical-this",
+  "category": "functions",
+  "summary": "Lower an arrow function by capturing the enclosing JavaScript this binding; never create a new this binding for the arrow.",
+  "source": {
+    "pattern": "const $f = ($params) => $body",
+    "requirements": {
+      "arrow_function": true,
+      "enclosing_this_statically_represented": true,
+      "function_properties_unobserved": true,
+      "function_identity_unobserved": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "var __lexicalThis = $enclosingThis; Func<$types> $f = ($csharpParams) => $bodyUsing(__lexicalThis);",
+    "notes": "call/apply/bind cannot change arrow-function this. Capture the already-correct outer JS this value."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "this_binding": "lexical",
+    "call_apply_bind_thisArg": "ignored",
+    "constructable": false
+  },
+  "caveats": [
+    "At top level, the meaning of outer this differs between scripts and modules.",
+    "Do not map an arrow to an instance delegate that accidentally captures a C# receiver instead of the JS this value."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Arrow Function Definitions",
+    "MDN JavaScript reference this / arrow functions"
+  ],
+  "tests": [
+    {
+      "name": "captures method this",
+      "input": "const o={x:7,m(){ const f=()=>this.x; return f(); }}; console.log(o.m());",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "call cannot rebind arrow this",
+      "input": "const o={x:1,m(){ return (()=>this.x).call({x:9}); }}; console.log(o.m());",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "function.closure.capture-mutable-binding",
+  "category": "functions",
+  "summary": "Use shared closure cells for captured mutable bindings so later writes are observed by all closures.",
+  "source": {
+    "pattern": "let $x = $init; const $f = () => $x;",
+    "requirements": {
+      "no_eval_or_with": true,
+      "binding_is_lexical_or_var": true,
+      "per_iteration_binding_not_required": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "var $x = $init; Func<$type> $f = () => $x;",
+    "notes": "C# closures capture local variables rather than snapshots, which matches ordinary JS closure behavior for one binding."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "capture": "binding/cell, not value snapshot",
+    "lifetime": "binding survives while closure is reachable"
+  },
+  "caveats": [
+    "for(let ...) creates per-iteration bindings and needs a loop-specific rule.",
+    "TDZ and const assignment errors must already be enforced by scope lowering."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification"
+  ],
+  "tests": [
+    {
+      "name": "sees later write",
+      "input": "let x=1; const f=()=>x; x=2; console.log(f());",
+      "expected_csharp": "double x=1d; Func<double> f=()=>x; x=2d;",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "closures share binding",
+      "input": "let x=0; const a=()=>++x; const b=()=>++x; console.log(a(),b());",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

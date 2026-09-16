@@ -1,0 +1,41 @@
+{
+  "id": "function.legacy-caller-arguments-properties",
+  "category": "functions",
+  "summary": "Route deprecated Function.caller / Function.arguments observation through runtime compatibility rather than C# stack/delegate reflection.",
+  "source": {
+    "pattern": "$fn.caller",
+    "requirements": {
+      "legacy_function_introspection": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "These legacy properties have strict-mode restrictions and implementation-sensitive legacy behavior. They are not equivalent to C# reflection or StackTrace."
+  },
+  "strategy": "runtime",
+  "confidence": "medium",
+  "semantics": {
+    "strict_mode": "restricted/throwing accessors in relevant cases",
+    "legacy": "deprecated and host/implementation-sensitive"
+  },
+  "caveats": [
+    "Do not expose C# call stack as JS caller semantics.",
+    "Function.prototype has poison-pill accessor behavior for caller/arguments."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Restricted Function Properties / legacy caller",
+    "MDN JavaScript reference Function caller"
+  ],
+  "tests": [
+    {
+      "name": "strict caller restricted",
+      "input": "function f(){'use strict'; return f.caller;} try{f()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "throws TypeError in the restricted case"
+    },
+    {
+      "name": "do not synthesize stack trace",
+      "input": "function a(){return b()} function b(){return b.caller} console.log(a()===a);",
+      "expected_behavior": "legacy behavior must be supplied only by compatible runtime"
+    }
+  ]
+}

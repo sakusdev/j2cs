@@ -1,0 +1,42 @@
+{
+  "id": "function.method-extraction-loses-this",
+  "category": "functions",
+  "summary": "Extracting a method value and later calling it must not retain the original receiver as this.",
+  "source": {
+    "pattern": "const $f = $obj.$method; $f($args);",
+    "requirements": {
+      "property_value_is_js_function": true,
+      "ordinary_call_after_extraction": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "var $f = $methodValue; JsFunction.Call($f, JsUndefined.Value, $argsArray)",
+    "helper": "JsFunction.Call",
+    "notes": "A C# instance-method delegate would incorrectly capture the receiver. Store a JS function value independent of the property-reference base."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "this_binding_on_later_plain_call": "undefined in strict functions; converted according to callee's thisMode in sloppy functions"
+  },
+  "caveats": [
+    "If the function is an arrow, its lexical this is retained independently.",
+    "Module/strictness affects the callee's this conversion, not the extraction step."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Reference Records and EvaluateCall"
+  ],
+  "tests": [
+    {
+      "name": "strict detached method gets undefined this",
+      "input": "const o={m:function(){'use strict'; return this;}}; const f=o.m; console.log(f()===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "do not capture object",
+      "input": "const o={x:1,m:function(){'use strict';return this&&this.x}}; const f=o.m; console.log(f());",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

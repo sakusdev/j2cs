@@ -1,0 +1,44 @@
+{
+  "id": "function.expression.named-self-binding",
+  "category": "functions",
+  "summary": "Preserve the private self-name of a named function expression for recursion without leaking that name to the outer scope.",
+  "source": {
+    "pattern": "const $outer = function $inner($params) { $body };",
+    "requirements": {
+      "no_eval_or_with": true,
+      "inner_name_only_used_in_function_body": true,
+      "function_properties_unobserved": true,
+      "not_used_with_new": true,
+      "function_identity_unobserved": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$returnType $inner($csharpParams) { $body } Func<$types> $outer = $inner;",
+    "notes": "The inner name is visible only inside the function body; emit a private local function and assign it to the outer binding."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "inner_name_scope": "function body only",
+    "recursion": "self reference denotes the created function object"
+  },
+  "caveats": [
+    "If the inner function name is reassigned/observed via dynamic scope or function metadata, use a richer representation."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification"
+  ],
+  "tests": [
+    {
+      "name": "recursive named expression",
+      "input": "const fact = function inner(n){ return n<=1?1:n*inner(n-1); }; console.log(fact(5));",
+      "expected_behavior": "prints 120"
+    },
+    {
+      "name": "name does not leak",
+      "input": "const f = function hidden(){}; console.log(typeof hidden);",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}
