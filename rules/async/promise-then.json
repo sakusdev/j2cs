@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.then",
+  "category": "async",
+  "summary": "Lower Promise.prototype.then on a proven intrinsic Promise while preserving queued reactions and derived-promise resolution.",
+  "source": {"pattern": "$promise.then($onFulfilled, $onRejected)", "requirements": {"receiver": "proven intrinsic Promise representation", "builtin_then_not_overridden": true, "species": "intrinsic Promise"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Then", "template": "JsPromise.Then($promise, $onFulfilled, $onRejected)", "notes": "Handlers run as Promise jobs, non-callable handlers are ignored, returned values/thenables resolve the derived promise, and thrown values reject it."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"return": "new promise", "handler_timing": "asynchronous promise job", "handler_this": "undefined", "noncallable_onFulfilled": "identity", "noncallable_onRejected": "thrower", "handler_throw": "reject derived promise", "handler_return": "resolve/adopt derived promise"},
+  "caveats": ["ContinueWith is not a semantic substitute because scheduler, exception, and chaining behavior differ.", "Promise subclass/species cases require the runtime species rule."],
+  "references": ["ECMAScript 2026 Promise.prototype.then", "ECMAScript 2026 PerformPromiseThen"],
+  "tests": [
+    {"name": "fulfilled handler is asynchronous", "input": "Promise.resolve(2).then(console.log);console.log(1);", "expected_csharp": "var q = JsPromise.Then(p, onFulfilled, onRejected);", "expected_behavior": "prints 1 then 2"},
+    {"name": "missing handler propagates and throw rejects", "input": "Promise.resolve(5).then(null).then(()=>{throw 'e'}).catch(console.log);", "expected_behavior": "value 5 passes through the non-callable handler and derived promise rejects with e"}
+  ]
+}
