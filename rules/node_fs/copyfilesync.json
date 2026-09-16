@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.copyfilesync",
+  "category": "node_fs",
+  "summary": "Copy one file synchronously while preserving COPYFILE_EXCL/FICLONE flags and Node failure cleanup semantics.",
+  "source": {"pattern":"$fs.copyFileSync($src, $dest, $mode?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.CopyFileSync","template":"NodeFs.CopyFileSync($src, $dest, $mode)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","default":"destination is overwritten if it already exists","mode_flags":"COPYFILE_EXCL, COPYFILE_FICLONE, COPYFILE_FICLONE_FORCE combinations"},
+  "caveats": ["File.Copy overwrite behavior must be selected from Node flags, not hard-coded.","Clone/reflink flags require filesystem-specific support.","Node does not guarantee atomic copy; partial destination handling on failure must follow Node behavior."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"default overwrites destination","input":"fs.writeFileSync('a','A'); fs.writeFileSync('b','B'); fs.copyFileSync('a','b'); console.log(fs.readFileSync('b','utf8'));","expected_csharp":"NodeFs.CopyFileSync(src, dest, 0);","expected_behavior":"b contains A after the copy"},
+    {"name":"exclusive destination","input":"fs.writeFileSync('a','A'); fs.writeFileSync('b','B'); fs.copyFileSync('a','b',fs.constants.COPYFILE_EXCL);","expected_csharp":"NodeFs.CopyFileSync(src, dest, NodeFsConstants.COPYFILE_EXCL);","expected_behavior":"throws a Node-compatible EEXIST-style error and does not overwrite b"}
+  ]
+}
