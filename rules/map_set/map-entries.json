@@ -1,0 +1,13 @@
+{
+  "id": "map.prototype.entries",
+  "category": "map_set",
+  "summary": "Create a live Map iterator yielding fresh two-element [key,value] Arrays in insertion order.",
+  "source": {"pattern": "$map.entries()", "requirements": {"receiver_inferred_builtin_map": true, "builtin_member_not_overridden_or_shadowed": true, "receiver_not_proxy": true}},
+  "target": {"kind": "helper", "template": "JsMap.Entries($map)", "helper": "JsMap.Entries"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"iterator_kind": "key+value", "yield_shape": "new two-element Array for each visited entry", "order": "insertion order", "live": true},
+  "caveats": [],
+  "references": ["https://tc39.es/ecma262/multipage/keyed-collections.html"],
+  "tests": [{"name": "entry pairs", "input": "const m=new Map([['a',1]]); const e=m.entries().next().value; console.log(e[0],e[1],Array.isArray(e));", "expected_behavior": "prints a 1 true"}, {"name": "new entry added during iteration is visited", "input": "const m=new Map([['a',1]]); const it=m.entries(); console.log(it.next().value[0]); m.set('b',2); console.log(it.next().value[0]);", "expected_behavior": "prints a then b"}]
+}
