@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.unlinksync",
+  "category": "node_fs",
+  "summary": "Remove a filesystem directory entry with Node unlink semantics.",
+  "source": {"pattern":"$fs.unlinkSync($path)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.UnlinkSync","template":"NodeFs.UnlinkSync($path)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","mutation":"removes file/symlink directory entry; does not recursively remove directories"},
+  "caveats": ["File.Delete is not equivalent because .NET can silently succeed for a missing path.","Unlinking a symlink removes the link, not its target.","Directory unlink errors are platform-specific."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"removes file","input":"fs.writeFileSync('a','x'); fs.unlinkSync('a'); console.log(fs.existsSync('a'));","expected_csharp":"NodeFs.UnlinkSync(path);","expected_behavior":"returns undefined and the file entry no longer exists"},
+    {"name":"missing throws","input":"fs.unlinkSync('missing');","expected_csharp":"NodeFs.UnlinkSync(path);","expected_behavior":"throws a Node-compatible ENOENT-style error instead of silently succeeding"}
+  ]
+}
