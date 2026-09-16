@@ -1,0 +1,16 @@
+{
+  "id": "async.await.fulfillment",
+  "category": "async",
+  "summary": "Awaiting a proven j2cs Promise resumes with its fulfillment value through the JavaScript promise-job scheduler.",
+  "source": {"pattern": "await $promise", "requirements": {"operand": "proven builtin Promise representation", "then_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "JsAsync.Await", "template": "await JsAsync.Await($promise)", "notes": "The awaiter must preserve a JS microtask boundary even when the underlying promise is already settled."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"fulfillment": "resume with fulfillment value", "suspends": true, "continuation_queue": "promise job/microtask queue"},
+  "caveats": ["Direct Task await can synchronously continue for an already-completed awaitable and reorder observable effects."],
+  "references": ["ECMAScript 2026 Await abstract operation", "ECMAScript 2026 Promise Objects"],
+  "tests": [
+    {"name": "settled promise still resumes later", "input": "async function f(){ console.log(await Promise.resolve(4)); } f(); console.log('sync');", "expected_csharp": "var v = await JsAsync.Await(JsPromise.Resolve(JsValue.From(4d)));", "expected_behavior": "prints sync before 4"},
+    {"name": "sequential awaits keep order", "input": "async function f(){ console.log(await 1); console.log(await 2); } f(); console.log(0);", "expected_behavior": "prints 0,1,2 with a suspension boundary at each await"}
+  ]
+}
