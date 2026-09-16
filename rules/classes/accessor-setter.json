@@ -1,0 +1,46 @@
+{
+  "id": "classes.accessor.setter",
+  "category": "classes",
+  "summary": "Lower a stable class setter to a C# property setter only when JavaScript property-set semantics cannot be affected by own properties, prototype mutation, or descriptor reflection.",
+  "source": {
+    "pattern": "class $C { set $p($v) { $body } }",
+    "requirements": {
+      "prototype_not_mutated": true,
+      "no_accessor_reflection": true,
+      "no_shadowing_own_data_property": true,
+      "setter_body_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a C# property setter under the stated closed-world property-layout conditions."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_location": "prototype",
+    "descriptor_enumerable": false,
+    "descriptor_configurable": true,
+    "assignment_result": "assigned RHS value, not setter return"
+  },
+  "caveats": [
+    "C# assignment expressions and setter return conventions differ from JavaScript; expression-value handling belongs to assignment lowering."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield"
+  ],
+  "tests": [
+    {
+      "name": "setter invocation",
+      "input": "class C { set x(v){ this.y=v; } } const c=new C(); c.x=4; console.log(c.y);",
+      "expected_csharp": "public double x { set { this.y = value; } }",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "edge: own field shadows setter",
+      "input": "class B { set x(v){ console.log('setter'); } } class D extends B { x=1; } const d=new D(); d.x=2;",
+      "expected_behavior": "does not call the inherited setter because D instances already have an own writable data property x"
+    }
+  ]
+}

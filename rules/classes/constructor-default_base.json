@@ -1,0 +1,42 @@
+{
+  "id": "classes.constructor.default_base",
+  "category": "classes",
+  "summary": "Lower the implicit constructor of a base JavaScript class to a parameterless C# constructor when construction is statically parameterless and no class-constructor object semantics are observed.",
+  "source": {
+    "pattern": "class $C { $elements_without_constructor }",
+    "requirements": {
+      "is_base_class": true,
+      "construction_arguments": "none",
+      "no_constructor_return_override": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a public parameterless constructor. JavaScript accepts extra arguments even when the default constructor declares none, so this rule requires all construction sites to be proven argument-free."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_default_constructor": "constructor() {}",
+    "extra_arguments_ignored_by_js": true
+  },
+  "caveats": [
+    "C# constructor overload resolution would reject extra arguments that JavaScript simply evaluates and ignores."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "implicit base constructor",
+      "input": "class C {} const c = new C(); console.log(c instanceof C);",
+      "expected_csharp": "public sealed class C { public C() { } }",
+      "expected_behavior": "construction succeeds"
+    },
+    {
+      "name": "edge: extra arguments exclude native signature",
+      "input": "function sideEffect(){ console.log('arg'); return 1; } class C {} new C(sideEffect());",
+      "expected_behavior": "prints arg and construction succeeds; JavaScript evaluates and ignores the extra argument, so this rule must not match unless that behavior is separately lowered"
+    }
+  ]
+}

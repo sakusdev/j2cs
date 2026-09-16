@@ -1,0 +1,40 @@
+{
+  "id": "classes.static.computed_name",
+  "category": "classes",
+  "summary": "Preserve computed names of static fields/methods/accessors, whose key expressions are evaluated during class definition.",
+  "source": {
+    "pattern": "class $C { static [$keyExpr] $element }",
+    "requirements": {
+      "computed_static_name": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Evaluate the key expression at class definition, convert it with ToPropertyKey, and define the corresponding property on the runtime constructor object."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "key_evaluation": "once at class definition",
+    "supports_symbol_keys": true,
+    "definition_target": "class constructor object"
+  },
+  "caveats": [
+    "C# static member names are compile-time identifiers and cannot represent arbitrary string/Symbol property keys."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "computed static field key",
+      "input": "let n=0; const k=()=>`x${++n}`; class C { static [k()]=1; } console.log(n,C.x1);",
+      "expected_behavior": "prints 1 1"
+    },
+    {
+      "name": "edge: Symbol key",
+      "input": "const s=Symbol(); class C { static [s]=7; } console.log(C[s]);",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

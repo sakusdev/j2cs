@@ -1,0 +1,40 @@
+{
+  "id": "classes.extends.dynamic",
+  "category": "classes",
+  "summary": "Fallback when the extends expression is a runtime value or has observable evaluation/property-access semantics incompatible with a fixed C# base type.",
+  "source": {
+    "pattern": "class $D extends $expr { $elements }",
+    "requirements": {
+      "base_constructor_not_statically_fixed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Evaluate the extends expression at class definition time, validate it as JavaScript requires, and build constructor/prototype links in the runtime object model."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "extends_evaluation": "once at class definition",
+    "invalid_base": "TypeError during class definition",
+    "base_prototype_read": "observable and may invoke proxy/getter behavior"
+  },
+  "caveats": [
+    "C# base types are metadata fixed at compile time."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "runtime-selected base",
+      "input": "const B = Math.random() ? class {m(){return 1}} : class {m(){return 2}}; class D extends B {}",
+      "expected_behavior": "D inherits whichever constructor object B denotes at runtime"
+    },
+    {
+      "name": "edge: invalid extends value",
+      "input": "class D extends 1 {}",
+      "expected_behavior": "throws TypeError while evaluating the class definition"
+    }
+  ]
+}

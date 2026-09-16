@@ -1,0 +1,46 @@
+{
+  "id": "classes.declaration.simple",
+  "category": "classes",
+  "summary": "Lower a class declaration to a generated C# type only when the class binding is not observed as a first-class JavaScript value and no TDZ-sensitive access occurs.",
+  "source": {
+    "pattern": "class $C { $elements }",
+    "requirements": {
+      "binding_usage": "construct/member access only",
+      "no_predeclaration_access": true,
+      "no_dynamic_class_reflection": true,
+      "elements_supported_by_rules": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a generated C# class for the JavaScript class and rewrite statically resolved construction/member operations to that generated type. This rule does not model the JavaScript constructor object itself."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "binding": "lexical class binding",
+    "strict_body": true,
+    "constructor_object_not_materialized": true
+  },
+  "caveats": [
+    "C# types are not JavaScript constructor objects.",
+    "Class declarations are lexical and TDZ-sensitive; native type emission is allowed only when that distinction is unobservable."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "MDN Classes: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+  ],
+  "tests": [
+    {
+      "name": "simple declaration and construction",
+      "input": "class Point { constructor(x) { this.x = x; } } console.log(new Point(3).x);",
+      "expected_csharp": "public sealed class Point { public double x; public Point(double x) { this.x = x; } }",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "edge: class used as value requires another rule",
+      "input": "class Point {} console.log(typeof Point);",
+      "expected_behavior": "prints function; this rule must not match because the class binding is reflected as a JavaScript value"
+    }
+  ]
+}

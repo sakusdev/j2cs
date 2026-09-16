@@ -1,0 +1,43 @@
+{
+  "id": "classes.extends.static_base",
+  "category": "classes",
+  "summary": "Lower `extends` to C# inheritance only when the base constructor is statically resolved to a compatible translated class and prototype dynamics are excluded.",
+  "source": {
+    "pattern": "class $D extends $B { $elements }",
+    "requirements": {
+      "base_constructor_statically_resolved": true,
+      "base_is_translated_class": true,
+      "base_prototype_not_mutated": true,
+      "constructor_object_inheritance_not_reflected": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit `$D : $B` and apply constructor, field-order, method-override, static-member, and super rules independently."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "instance_prototype_chain": "represented by C# type inheritance only under closed-world requirements",
+    "constructor_prototype_chain": "not materialized by this rule"
+  },
+  "caveats": [
+    "JavaScript `extends` establishes both instance-prototype and constructor-object prototype relationships; C# inheritance covers only the closed-world instance/type portion."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "simple inheritance",
+      "input": "class B { m(){return 1;} } class D extends B {} console.log(new D().m());",
+      "expected_csharp": "public class D : B { }",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: dynamic base excluded",
+      "input": "function chooseBase(){ console.log('choose'); return class { m(){ return 1; } }; } const Base = chooseBase(); class D extends Base {} new D();",
+      "expected_behavior": "prints choose while evaluating Base; the chosen constructor is a runtime value and this rule must not match without stronger analysis"
+    }
+  ]
+}

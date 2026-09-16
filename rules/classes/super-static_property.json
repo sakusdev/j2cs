@@ -1,0 +1,42 @@
+{
+  "id": "classes.super.static_property",
+  "category": "classes",
+  "summary": "Preserve static `super.prop` lookup, which starts at the superclass constructor object but uses the current constructor object as Receiver.",
+  "source": {
+    "pattern": "static $m() { return super[$key]; }",
+    "requirements": {
+      "static_super_property_access": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSuper.GetStatic",
+    "notes": "Use JavaScript [[Get]]/[[Set]] with the superclass constructor object as lookup base and the current class-call receiver as Receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "lookup_base": "superclass constructor object",
+    "receiver": "current this constructor object",
+    "accessor_this": "current constructor object"
+  },
+  "caveats": [
+    "C# static members have no dynamic receiver equivalent to JavaScript constructor-object `this`."
+  ],
+  "references": [
+    "ECMAScript Super Calls and Super Property: https://tc39.es/ecma262/#sec-super-keyword"
+  ],
+  "tests": [
+    {
+      "name": "static super getter receiver",
+      "input": "class A { static get x(){ return this.y; } } class B extends A { static y=5; static m(){ return super.x; } } console.log(B.m());",
+      "expected_csharp": "JsSuper.GetStatic(__thisConstructor, AConstructor, \"x\")",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "edge: inherited caller changes receiver",
+      "input": "class A { static get x(){ return this.name; } } class B extends A { static m(){ return super.x; } } class C extends B {} console.log(C.m());",
+      "expected_behavior": "prints C"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "classes.method.detached_this",
+  "category": "classes",
+  "summary": "Preserve strict-mode this semantics when a class method is extracted and called without a receiver.",
+  "source": {
+    "pattern": "const $f = $obj.$method; $f($args)",
+    "requirements": {
+      "method_value_extracted": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Represent the method as a JavaScript function value carrying its [[HomeObject]] where needed but not automatically binding the original receiver. Ordinary detached calls supply undefined as this."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "class_methods_strict": true,
+    "detached_call_this": "undefined",
+    "method_extraction_does_not_bind_receiver": true
+  },
+  "caveats": [
+    "A C# delegate created from an instance method normally captures the receiver, which is the opposite of JavaScript method extraction semantics."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "detached method gets undefined this",
+      "input": "class C { m(){ return this; } } const f=new C().m; console.log(f()===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge: bind changes receiver explicitly",
+      "input": "class C { m(){ return this.x; } } const f=new C().m.bind({x:5}); console.log(f());",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "classes.field.public_base_initializer_order",
+  "category": "classes",
+  "summary": "Lower base-class instance field initializers so they execute before the user-written base constructor body and once per instance.",
+  "source": {
+    "pattern": "class $C { $f = $init; constructor($params) { $body } }",
+    "requirements": {
+      "is_base_class": true,
+      "initializer_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit the field storage without a C# initializer and inject the lowered JavaScript initializer assignments at the very start of every generated base constructor, before the user constructor body."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "initializer_frequency": "once per constructed instance",
+    "order": "textual field order before base constructor body",
+    "this_available": true
+  },
+  "caveats": [
+    "Do not hoist instance field initializer evaluation to class-definition time."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield",
+    "MDN Classes: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+  ],
+  "tests": [
+    {
+      "name": "initializer before constructor body",
+      "input": "class C { x = 1; constructor(){ console.log(this.x); } } new C();",
+      "expected_csharp": "public C() { this.x = 1d; Console.WriteLine(this.x); }",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: initializer runs per instance",
+      "input": "let n=0; class C { x=++n; } console.log(new C().x, new C().x);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

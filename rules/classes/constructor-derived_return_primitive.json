@@ -1,0 +1,43 @@
+{
+  "id": "classes.constructor.derived_return_primitive",
+  "category": "classes",
+  "summary": "Preserve the TypeError for a derived constructor that explicitly returns a primitive other than undefined.",
+  "source": {
+    "pattern": "class $D extends $B { constructor($params) { super($args); return $primitive; } }",
+    "requirements": {
+      "is_derived_class": true,
+      "explicit_return_may_be_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsClass.FinishDerivedConstructor",
+    "notes": "After evaluating the return expression, reject non-object, non-undefined values with JavaScript TypeError; undefined means return the initialized this binding."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object_return": "replacement result",
+    "undefined_return": "initialized this",
+    "other_primitive_return": "TypeError"
+  },
+  "caveats": [
+    "Base constructors treat primitive returns differently: primitive returns are ignored there."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "number return throws",
+      "input": "class B {} class D extends B { constructor(){ super(); return 1; } } new D();",
+      "expected_csharp": "return JsClass.FinishDerivedConstructor(__this, 1d);",
+      "expected_behavior": "throws TypeError"
+    },
+    {
+      "name": "edge: undefined return succeeds",
+      "input": "class B {} class D extends B { constructor(){ super(); return undefined; } } console.log(new D() instanceof D);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

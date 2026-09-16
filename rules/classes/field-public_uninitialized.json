@@ -1,0 +1,47 @@
+{
+  "id": "classes.field.public_uninitialized",
+  "category": "classes",
+  "summary": "Preserve that an uninitialized public class field is an own property whose JavaScript value is undefined.",
+  "source": {
+    "pattern": "class $C { $field; }",
+    "requirements": {
+      "public_instance_field": true,
+      "field_may_be_observed_before_assignment": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsValue.Undefined",
+    "notes": "Store a JavaScript undefined sentinel (or equivalent tagged value) and ensure the field exists as an own property in object-model operations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "initial_value": "undefined",
+    "own_property": true,
+    "enumerable": true,
+    "configurable": true,
+    "writable": true
+  },
+  "caveats": [
+    "C# default values such as 0, false, or null are not JavaScript undefined.",
+    "Native C# fields do not by themselves provide JavaScript property descriptors."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield",
+    "MDN Classes: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+  ],
+  "tests": [
+    {
+      "name": "reads undefined",
+      "input": "class C { x; } console.log(new C().x === undefined);",
+      "expected_csharp": "public JsValue x = JsValue.Undefined;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge: own property exists",
+      "input": "class C { x; } console.log(Object.hasOwn(new C(), 'x'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

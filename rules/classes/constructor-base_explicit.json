@@ -1,0 +1,45 @@
+{
+  "id": "classes.constructor.base_explicit",
+  "category": "classes",
+  "summary": "Lower an explicit base-class constructor to C# when it does not exploit JavaScript constructor return replacement or dynamic arguments semantics.",
+  "source": {
+    "pattern": "class $C { constructor($params) { $body } }",
+    "requirements": {
+      "is_base_class": true,
+      "no_explicit_object_return": true,
+      "arguments_and_parameters_statically_lowerable": true,
+      "no_new_target": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a C# instance constructor and lower the JavaScript constructor body after required instance-element initialization."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "this_available_at_entry": true,
+    "base_constructor_return": "normally this",
+    "parameter_semantics": "must be handled by parameter/coercion rules"
+  },
+  "caveats": [
+    "Field initialization ordering is governed by separate class-field rules.",
+    "JavaScript argument count/default/rest semantics must be preserved by parameter lowering."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "ordinary base constructor",
+      "input": "class C { constructor(x) { this.x = x; } } console.log(new C(4).x);",
+      "expected_csharp": "public C(double x) { this.x = x; }",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "edge: object return excluded",
+      "input": "class C { constructor() { return {x: 9}; } } console.log(new C().x);",
+      "expected_behavior": "prints 9; this rule must not match because C# constructors cannot replace the constructed object"
+    }
+  ]
+}

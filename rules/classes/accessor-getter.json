@@ -1,0 +1,45 @@
+{
+  "id": "classes.accessor.getter",
+  "category": "classes",
+  "summary": "Lower a stable class getter to a C# property getter when receiver and prototype layout are statically known and accessor reflection is absent.",
+  "source": {
+    "pattern": "class $C { get $p() { $body } }",
+    "requirements": {
+      "prototype_not_mutated": true,
+      "no_accessor_reflection": true,
+      "receiver_types_statically_known": true,
+      "getter_body_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a C# property getter, virtual when override semantics are required."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_location": "prototype",
+    "descriptor_enumerable": false,
+    "descriptor_configurable": true,
+    "this": "receiver used for property access"
+  },
+  "caveats": [
+    "Own data fields can shadow prototype accessors in JavaScript; receiver/property analysis must account for that."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "getter read",
+      "input": "class C { get x(){ return 3; } } console.log(new C().x);",
+      "expected_csharp": "public double x { get { return 3d; } }",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "edge: descriptor reflection excluded",
+      "input": "class C { get x(){return 1;} } console.log(Object.getOwnPropertyDescriptor(C.prototype,'x').enumerable);",
+      "expected_behavior": "prints false; native C# property reflection is not equivalent and this rule must not match if descriptor behavior is observed"
+    }
+  ]
+}

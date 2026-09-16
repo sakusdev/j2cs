@@ -1,0 +1,42 @@
+{
+  "id": "classes.super.returned_receiver",
+  "category": "classes",
+  "summary": "Preserve the case where super() returns a replacement object that becomes this for the derived constructor and receives derived instance fields.",
+  "source": {
+    "pattern": "super($args)",
+    "requirements": {
+      "base_constructor_may_return_object": true,
+      "derived_class_has_following_this_or_field_initialization": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Use JavaScript-compatible Construct semantics so the value returned from the base constructor initializes the derived this binding; then initialize derived instance elements on that receiver."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "super_result": "initializes derived this binding",
+    "derived_fields_target": "the receiver returned/created by super",
+    "base_object_return_can_replace_allocated_receiver": true
+  },
+  "caveats": [
+    "A C# `: base()` call cannot replace the derived receiver object."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "ECMAScript Super Calls and Super Property: https://tc39.es/ecma262/#sec-super-keyword"
+  ],
+  "tests": [
+    {
+      "name": "base replacement becomes derived this",
+      "input": "class B { constructor(){ return {fromBase:true}; } } class D extends B { x=1; } const d=new D(); console.log(d.fromBase,d.x);",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "edge: replacement may break instanceof D",
+      "input": "class B { constructor(){ return {}; } } class D extends B {} console.log(new D() instanceof D);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

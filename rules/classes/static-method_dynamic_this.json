@@ -1,0 +1,40 @@
+{
+  "id": "classes.static.method_dynamic_this",
+  "category": "classes",
+  "summary": "Preserve dynamic `this` in inherited JavaScript static methods.",
+  "source": {
+    "pattern": "class $A { static $m() { $uses_this } } class $B extends $A {} $B.$m()",
+    "requirements": {
+      "static_method_uses_this": true,
+      "method_can_be_called_through_subclass": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Dispatch static methods as JavaScript function-valued properties on constructor objects so `this` is the constructor object used as the call receiver."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "direct_A_call_this": "A constructor object",
+    "inherited_B_call_this": "B constructor object"
+  },
+  "caveats": [
+    "C# static member inheritance does not provide a runtime receiver corresponding to the subclass constructor object."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "inherited static this",
+      "input": "class A { static who(){ return this.name; } } class B extends A {} console.log(B.who());",
+      "expected_behavior": "prints B"
+    },
+    {
+      "name": "edge: extracted static method loses this",
+      "input": "class A { static who(){ return this; } } const f=A.who; console.log(f()===undefined);",
+      "expected_behavior": "prints true because class method code is strict"
+    }
+  ]
+}

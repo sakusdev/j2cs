@@ -1,0 +1,43 @@
+{
+  "id": "classes.static.initialization_order",
+  "category": "classes",
+  "summary": "Preserve eager class-evaluation timing and textual interleaving of JavaScript static fields and static blocks.",
+  "source": {
+    "pattern": "class $C { $static_elements }",
+    "requirements": {
+      "static_initializers_or_blocks_present": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsClass.Initialize",
+    "notes": "Generate an explicit class-initialization routine and invoke it exactly at the JavaScript class evaluation point; execute static elements in source order. Do not rely on CLR lazy static initialization timing."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "timing": "during class evaluation",
+    "order": "textual order across static fields and blocks",
+    "superclass_static_initialization": "superclass class evaluation has already occurred before subclass definition when referenced normally"
+  },
+  "caveats": [
+    "CLR static initialization may be lazy and has different base/derived ordering; direct C# static field initializers are not a general substitute."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "MDN static initialization blocks: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Static_initialization_blocks"
+  ],
+  "tests": [
+    {
+      "name": "interleaved order",
+      "input": "class C { static a=console.log('a'); static { console.log('b'); } static c=console.log('c'); }",
+      "expected_csharp": "JsClass.Initialize(/* C */, () => { /* a */ /* block b */ /* c */ });",
+      "expected_behavior": "prints a then b then c while evaluating the class declaration"
+    },
+    {
+      "name": "edge: class definition side effect is eager",
+      "input": "console.log('before'); class C { static x=console.log('init'); } console.log('after');",
+      "expected_behavior": "prints before, init, after"
+    }
+  ]
+}

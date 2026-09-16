@@ -1,0 +1,41 @@
+{
+  "id": "classes.constructor.derived_return_object",
+  "category": "classes",
+  "summary": "Preserve that a derived constructor may return an object without ever initializing this via super(), and that object becomes the construction result.",
+  "source": {
+    "pattern": "class $D extends $B { constructor($params) { return $obj; } }",
+    "requirements": {
+      "is_derived_class": true,
+      "object_return_may_bypass_super": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Use the JavaScript construction path; a normal C# derived constructor cannot skip base construction and return an unrelated object."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object_return_before_super": "allowed",
+    "result": "returned object",
+    "derived_instance_brand": "not necessarily present unless private elements are stamped by the class initialization path"
+  },
+  "caveats": [
+    "C# requires a base constructor chain for normal object creation and constructors cannot return replacement objects."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "derived object return without super",
+      "input": "class B {} class D extends B { constructor(){ return {x:1}; } } console.log(new D().x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: returned object is not D prototype instance",
+      "input": "class B {} class D extends B { constructor(){ return {}; } } console.log(new D() instanceof D);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

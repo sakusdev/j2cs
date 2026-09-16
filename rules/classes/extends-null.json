@@ -1,0 +1,40 @@
+{
+  "id": "classes.extends.null",
+  "category": "classes",
+  "summary": "Handle `extends null`, whose prototype topology and construction behavior cannot be represented by ordinary C# inheritance.",
+  "source": {
+    "pattern": "class $C extends null { $elements }",
+    "requirements": {
+      "extends_null": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Construct the JavaScript class/prototype objects with a null prototype for the instance prototype chain and apply JavaScript derived-constructor rules."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "prototype_parent": "null",
+    "class_is_derived": true,
+    "default_constructor": "attempts super(...args) and cannot normally construct because null is not a constructor"
+  },
+  "caveats": [
+    "Mapping this to `System.Object` changes the JavaScript prototype chain and construction semantics."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "prototype chain terminates at null",
+      "input": "class C extends null { constructor(){ return Object.create(null); } } const x=new C(); console.log(Object.getPrototypeOf(C.prototype)===null);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge: default constructor fails",
+      "input": "class C extends null {} new C();",
+      "expected_behavior": "throws TypeError because the implicit derived constructor attempts to call null as super"
+    }
+  ]
+}

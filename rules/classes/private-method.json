@@ -1,0 +1,43 @@
+{
+  "id": "classes.private.method",
+  "category": "classes",
+  "summary": "Lower a private instance method to a C# private method when all receivers are statically branded and method values do not escape.",
+  "source": {
+    "pattern": "class $C { #$m($params) { $body } $uses }",
+    "requirements": {
+      "private_receiver_statically_exact": true,
+      "private_method_not_extracted": true,
+      "no_unusual_brand_stamping": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a C# private instance method and rewrite statically proven `this.#m(...)` or same-brand calls directly."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "private_name": "lexical, not property key",
+    "brand_check": "elided only because statically proven",
+    "prototype_location": "private method is installed as a private element, not an ordinary public prototype property"
+  },
+  "caveats": [
+    "Private methods share the same brand constraints as private fields."
+  ],
+  "references": [
+    "ECMAScript Private Names / PrivateBrandCheck: https://tc39.es/ecma262/#sec-private-names"
+  ],
+  "tests": [
+    {
+      "name": "private method direct call",
+      "input": "class C { #m(){return 2;} run(){return this.#m();} } console.log(new C().run());",
+      "expected_csharp": "private double _m()=>2d; public double run()=>_m();",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: generic receiver needs brand check",
+      "input": "class C { #m(){return 2;} static run(o){return o.#m();} } C.run({});",
+      "expected_behavior": "throws TypeError; native direct call is not permitted when o is not statically branded"
+    }
+  ]
+}

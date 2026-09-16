@@ -1,0 +1,40 @@
+{
+  "id": "classes.method.prototype_mutation",
+  "category": "classes",
+  "summary": "Fallback to the JavaScript object model when class prototype methods may be replaced, deleted, or redefined after class evaluation.",
+  "source": {
+    "pattern": "$C.prototype.$name = $value",
+    "requirements": {
+      "prototype_mutation_possible": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Materialize and use the JavaScript prototype object for method lookup instead of compiling calls to fixed C# methods."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "lookup_time": "at each property access/call",
+    "delete_supported": true,
+    "descriptor_redefinition_supported": true
+  },
+  "caveats": [
+    "Do not mark a method native merely because its original class declaration is statically known."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "method replacement observed",
+      "input": "class C { m(){return 1;} } C.prototype.m=()=>2; console.log(new C().m());",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: deletion exposes ancestor method",
+      "input": "class B { m(){return 1;} } class D extends B { m(){return 2;} } delete D.prototype.m; console.log(new D().m());",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

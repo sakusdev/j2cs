@@ -1,0 +1,41 @@
+{
+  "id": "classes.constructor.return_override",
+  "category": "classes",
+  "summary": "Handle JavaScript constructors that explicitly return an object which replaces the newly allocated instance.",
+  "source": {
+    "pattern": "class $C { constructor($params) { $body; return $obj; } }",
+    "requirements": {
+      "explicit_return_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Use the JavaScript-compatible construction path because C# instance constructors cannot return a replacement object."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "base_constructor_object_return": "replacement object becomes result of new",
+    "base_constructor_primitive_return": "ignored and this is returned",
+    "derived_constructor_object_return": "replacement object allowed",
+    "derived_constructor_non_undefined_primitive_return": "TypeError"
+  },
+  "caveats": [
+    "Do not simulate this by factory conversion unless every `new`/subclassing/identity interaction is also rewritten consistently."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "base constructor returns object",
+      "input": "class C { constructor() { this.x = 1; return {x: 2}; } } console.log(new C().x);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: base constructor primitive return ignored",
+      "input": "class C { constructor() { this.x = 1; return 5; } } console.log(new C().x);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

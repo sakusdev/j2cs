@@ -1,0 +1,42 @@
+{
+  "id": "classes.prototype.descriptors",
+  "category": "classes",
+  "summary": "Preserve property descriptor attributes of class prototype methods and accessors when reflection/enumeration is observable.",
+  "source": {
+    "pattern": "Object.getOwnPropertyDescriptor($C.prototype, $name)",
+    "requirements": {
+      "prototype_descriptor_reflection": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Use the JavaScript prototype object representation with correct descriptor flags rather than CLR reflection metadata."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "method_enumerable": false,
+    "method_configurable": true,
+    "method_writable": true,
+    "accessor_enumerable": false,
+    "accessor_configurable": true
+  },
+  "caveats": [
+    "CLR method/property metadata does not expose ECMAScript property descriptor behavior."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "method is non-enumerable",
+      "input": "class C { m(){} } console.log(Object.keys(C.prototype).includes('m'));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "edge: descriptor is writable/configurable",
+      "input": "class C { m(){} } const d=Object.getOwnPropertyDescriptor(C.prototype,'m'); console.log(d.writable,d.configurable);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "classes.private.static_this",
+  "category": "classes",
+  "summary": "Preserve private static brand semantics when an inherited static method accesses `this.#x`.",
+  "source": {
+    "pattern": "class $A { static #$x = $v; static $m(){ return this.#$x; } }",
+    "requirements": {
+      "private_static_access_through_dynamic_this": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsPrivate.GetStatic",
+    "notes": "Perform a private-brand check against the runtime constructor object used as `this`; do not always read the defining class's CLR static field."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "A_m_call": "succeeds",
+    "subclass_inherited_m_call": "TypeError unless subclass carries the defining private brand (ordinary subclass does not)"
+  },
+  "caveats": [
+    "A C# base static method reading a private static field would incorrectly succeed when invoked through the derived type."
+  ],
+  "references": [
+    "ECMAScript Private Names / PrivateBrandCheck: https://tc39.es/ecma262/#sec-private-names"
+  ],
+  "tests": [
+    {
+      "name": "defining class succeeds",
+      "input": "class A { static #x=1; static m(){return this.#x;} } console.log(A.m());",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: subclass call brand-fails",
+      "input": "class A { static #x=1; static m(){return this.#x;} } class B extends A {} B.m();",
+      "expected_csharp": "JsPrivate.GetStatic(__thisConstructor, A_Private_x_Brand)",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

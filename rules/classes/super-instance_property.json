@@ -1,0 +1,43 @@
+{
+  "id": "classes.super.instance_property",
+  "category": "classes",
+  "summary": "Use a helper for `super.prop` reads/writes when JavaScript property descriptors or accessors are observable.",
+  "source": {
+    "pattern": "super[$key]",
+    "requirements": {
+      "super_property_access": true,
+      "property_not_proven_plain_stable_method": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSuper",
+    "notes": "Perform JavaScript [[Get]]/[[Set]] starting at the base prototype while using the current this value as Receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "read": "Get(basePrototype,key,this)",
+    "write": "Set(basePrototype,key,value,this)",
+    "getter_setter_receiver": "current this"
+  },
+  "caveats": [
+    "A simple C# `base.Property` can be used only under stronger closed-world accessor conditions; arbitrary JavaScript descriptor behavior requires the helper."
+  ],
+  "references": [
+    "ECMAScript Super Calls and Super Property: https://tc39.es/ecma262/#sec-super-keyword"
+  ],
+  "tests": [
+    {
+      "name": "super getter receives derived this",
+      "input": "class B { get x(){ return this.y; } } class D extends B { constructor(){ super(); this.y=5; } m(){ return super.x; } } console.log(new D().m());",
+      "expected_csharp": "JsSuper.Get(this, /* home object */, \"x\")",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "edge: super setter writes via receiver",
+      "input": "class B { set x(v){ this.y=v; } } class D extends B { m(){ super.x=7; } } const d=new D(); d.m(); console.log(d.y);",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

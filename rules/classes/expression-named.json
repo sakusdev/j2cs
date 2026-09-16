@@ -1,0 +1,44 @@
+{
+  "id": "classes.expression.named",
+  "category": "classes",
+  "summary": "Preserve the inner-only name of a named class expression when lowering a non-escaping class expression.",
+  "source": {
+    "pattern": "const $outer = class $Inner { $elements };",
+    "requirements": {
+      "class_value_does_not_escape": true,
+      "inner_name_references_are_internal": true,
+      "no_dynamic_reflection": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Generate one C# type and rewrite references to the named-expression binding inside the class body to that type. Do not expose the inner name outside the expression scope."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "inner_name_scope": "class body only",
+    "outer_binding": "receives class value",
+    "self_reference": "inner name denotes the class"
+  },
+  "caveats": [
+    "The named class expression binding has JavaScript lexical semantics and is not a C# namespace/type alias visible outside the expression."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "MDN Classes: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+  ],
+  "tests": [
+    {
+      "name": "internal self reference",
+      "input": "const C = class Inner { static make() { return new Inner(); } }; console.log(C.make() instanceof C);",
+      "expected_csharp": "private sealed class __J2csClass0 { public static __J2csClass0 make() => new __J2csClass0(); }",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge: inner name not visible outside",
+      "input": "const C = class Inner {}; console.log(typeof Inner);",
+      "expected_behavior": "prints undefined (or throws if directly referenced as an unbound identifier in another expression context); the generated inner name must not leak"
+    }
+  ]
+}

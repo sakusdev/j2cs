@@ -1,0 +1,45 @@
+{
+  "id": "classes.static.block",
+  "category": "classes",
+  "summary": "Lower a class static initialization block through explicit class-evaluation code while preserving block scope, private access, and synchronous execution.",
+  "source": {
+    "pattern": "class $C { static { $body } }",
+    "requirements": {
+      "static_block_body_statically_lowerable": true,
+      "class_initialization_framework_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsClass.Initialize",
+    "notes": "Execute the lowered block inside the generated class-initialization routine at class evaluation time with access to the class's private state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "this": "class constructor object",
+    "scope": "block-local including var",
+    "await_allowed": false,
+    "yield_allowed": false,
+    "multiple_blocks": "run in declaration order"
+  },
+  "caveats": [
+    "If the block uses constructor-object `this`, dynamic super property access, or other reflective behavior, the generated initializer must use the runtime class-object representation."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions",
+    "MDN static initialization blocks: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Static_initialization_blocks"
+  ],
+  "tests": [
+    {
+      "name": "block mutates static state",
+      "input": "class C { static x=1; static { this.x=2; } } console.log(C.x);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: var does not leak",
+      "input": "var x='outer'; class C { static { var x='inner'; } } console.log(x);",
+      "expected_behavior": "prints outer"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "classes.static.field_inheritance",
+  "category": "classes",
+  "summary": "Preserve JavaScript static field inheritance and shadow-on-write semantics across class constructor objects.",
+  "source": {
+    "pattern": "class $A { static $x = $v; } class $B extends $A {}",
+    "requirements": {
+      "static_field_access_through_subclass_possible": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Represent static fields as properties on JavaScript-compatible constructor objects with prototype linkage between subclass and superclass constructors."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "read_inherited": "B.x finds A.x through constructor [[Prototype]]",
+    "write_through_subclass": "B.x = v creates/updates B own property under ordinary Set semantics",
+    "base_storage_not_shared": true
+  },
+  "caveats": [
+    "A C# inherited static field is one shared storage location, so `B.x = 2` would incorrectly mutate A.x."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "inherited read",
+      "input": "class A { static x=1; } class B extends A {} console.log(B.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "edge: subclass write does not mutate base own field",
+      "input": "class A { static x=1; } class B extends A {} B.x=2; console.log(A.x,B.x);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

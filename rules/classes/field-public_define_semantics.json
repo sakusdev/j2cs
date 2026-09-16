@@ -1,0 +1,41 @@
+{
+  "id": "classes.field.public_define_semantics",
+  "category": "classes",
+  "summary": "Preserve public class field definition semantics: creating the own field must not invoke an inherited setter of the same name.",
+  "source": {
+    "pattern": "class $D extends $B { $name = $value; }",
+    "requirements": {
+      "field_name_may_collide_with_inherited_accessor": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsObject.DefineOwnDataProperty",
+    "notes": "Define an own data property directly through the JavaScript-compatible object model rather than lowering the field initializer to ordinary property assignment."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "operation": "DefineField / CreateDataProperty-like own definition",
+    "inherited_setter_called": false
+  },
+  "caveats": [
+    "A generated C# property setter or assignment is not a safe substitute for class-field definition semantics across inheritance."
+  ],
+  "references": [
+    "ECMAScript DefineField / InitializeInstanceElements: https://tc39.es/ecma262/#sec-definefield"
+  ],
+  "tests": [
+    {
+      "name": "inherited setter not invoked",
+      "input": "class B { set x(v){ console.log('setter'); } } class D extends B { x=1; } new D();",
+      "expected_csharp": "JsObject.DefineOwnDataProperty(this, \"x\", 1d);",
+      "expected_behavior": "does not print setter"
+    },
+    {
+      "name": "edge: later assignment can use normal Set semantics",
+      "input": "class B { set x(v){ console.log('setter'); } } class D extends B { x=1; m(){ delete this.x; this.x=2; } } const d=new D(); d.m();",
+      "expected_behavior": "after deleting the own field, assigning x can reach the inherited setter and prints setter"
+    }
+  ]
+}

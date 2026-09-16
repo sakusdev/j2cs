@@ -1,0 +1,42 @@
+{
+  "id": "classes.private.in_operator",
+  "category": "classes",
+  "summary": "Lower `#name in obj` to a JavaScript private-brand test with the required RHS object check.",
+  "source": {
+    "pattern": "#$name in $obj",
+    "requirements": {
+      "private_name_declared_in_enclosing_class": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsPrivate.HasBrand",
+    "notes": "Check that the RHS is an object and then test the defining private brand without reading the private value."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "boolean for object RHS",
+    "non_object_rhs": "TypeError",
+    "does_not_invoke_property_lookup": true
+  },
+  "caveats": [
+    "This is not equivalent to string-key membership such as `\"#x\" in obj`."
+  ],
+  "references": [
+    "ECMAScript Private Names / PrivateBrandCheck: https://tc39.es/ecma262/#sec-private-names"
+  ],
+  "tests": [
+    {
+      "name": "brand present",
+      "input": "class C { #x; static has(o){ return #x in o; } } console.log(C.has(new C()));",
+      "expected_csharp": "JsPrivate.HasBrand(o, C_Private_x_Brand)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge: primitive RHS throws",
+      "input": "class C { #x; static has(o){ return #x in o; } } C.has(1);",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

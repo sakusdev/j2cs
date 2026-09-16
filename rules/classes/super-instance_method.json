@@ -1,0 +1,44 @@
+{
+  "id": "classes.super.instance_method",
+  "category": "classes",
+  "summary": "Lower a stable `super.method(...)` call to C# `base.method(...)` only when the base prototype property is a known unmodified method.",
+  "source": {
+    "pattern": "super.$m($args)",
+    "requirements": {
+      "inside_instance_method_or_constructor": true,
+      "base_prototype_method_statically_known": true,
+      "base_prototype_not_mutated": true,
+      "property_is_data_method": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit `base.$m(...)`; this preserves the current receiver while selecting the known base implementation under closed-world prototype conditions."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "lookup_start": "base prototype of method home object",
+    "call_receiver": "current this",
+    "dynamic_replacement_not_supported_by_native_rule": true
+  },
+  "caveats": [
+    "JavaScript super lookup is property lookup, not a statically bound base call, unless the prototype is proven stable."
+  ],
+  "references": [
+    "ECMAScript Super Calls and Super Property: https://tc39.es/ecma262/#sec-super-keyword"
+  ],
+  "tests": [
+    {
+      "name": "base method call",
+      "input": "class B { m(){return 1;} } class D extends B { m(){return super.m()+1;} } console.log(new D().m());",
+      "expected_csharp": "public override double m() => base.m() + 1d;",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "edge: later base prototype patch excluded",
+      "input": "class B { m(){return 1;} } class D extends B { m(){return super.m();} } B.prototype.m=()=>3; console.log(new D().m());",
+      "expected_behavior": "prints 3; C# base.m() would still target compiled code, so this rule must not match"
+    }
+  ]
+}

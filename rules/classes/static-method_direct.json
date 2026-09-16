@@ -1,0 +1,44 @@
+{
+  "id": "classes.static.method_direct",
+  "category": "classes",
+  "summary": "Lower a static method that does not depend on dynamic constructor-object this/super semantics to a C# static method.",
+  "source": {
+    "pattern": "class $C { static $m($params) { $body } }",
+    "requirements": {
+      "static_method_does_not_use_this_as_constructor_object": true,
+      "no_static_super_dynamic_access": true,
+      "class_value_not_reflected": true,
+      "method_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "Emit a C# static method and rewrite statically resolved `$C.$m(...)` calls."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "js_location": "constructor object own property",
+    "descriptor_enumerable": false,
+    "descriptor_configurable": true
+  },
+  "caveats": [
+    "JavaScript static methods are ordinary properties of the constructor object, not intrinsically static CLR methods."
+  ],
+  "references": [
+    "ECMAScript Class Definitions: https://tc39.es/ecma262/#sec-class-definitions"
+  ],
+  "tests": [
+    {
+      "name": "static utility method",
+      "input": "class C { static add(a,b){ return a+b; } } console.log(C.add(2,3));",
+      "expected_csharp": "public static double add(double a, double b) => a + b;",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "edge: inherited call with this-sensitive body excluded",
+      "input": "class A { static who(){ return this.name; } } class B extends A {} console.log(B.who());",
+      "expected_behavior": "prints B; this rule must not match because C# static methods have no dynamic constructor receiver"
+    }
+  ]
+}
