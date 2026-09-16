@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.resolve",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.resolve using JavaScript PromiseResolve semantics rather than Task.FromResult.",
+  "source": {"pattern": "Promise.resolve($value)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "JsPromise.Resolve", "template": "JsPromise.Resolve($value)", "notes": "Preserve same-constructor Promise identity, otherwise fulfill/adopt through the Promise resolution procedure."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"plain_value": "fulfilled promise", "same_constructor_promise": "return identical promise", "thenable": "assimilate", "reaction_timing": "async promise jobs"},
+  "caveats": ["Arbitrary object thenables need the dynamic runtime path because then lookup can execute user code."],
+  "references": ["ECMAScript 2026 Promise.resolve", "ECMAScript 2026 PromiseResolve"],
+  "tests": [
+    {"name": "plain value reactions remain async", "input": "Promise.resolve(3).then(console.log);console.log(1);", "expected_csharp": "var p = JsPromise.Resolve(JsValue.From(3d));", "expected_behavior": "prints 1 before 3"},
+    {"name": "same intrinsic promise preserves identity", "input": "const p=Promise.resolve(1);console.log(Promise.resolve(p)===p);", "expected_behavior": "prints true"}
+  ]
+}
