@@ -1,0 +1,52 @@
+{
+  "id": "array.prototype.unshift",
+  "category": "array",
+  "summary": "Insert zero or more items at the start and return the new length.",
+  "source": {
+    "pattern": "$array.unshift(...$items)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Unshift",
+    "template": "JsArray.Unshift(...)",
+    "notes": "Move existing present properties upward without materializing holes, insert arguments in order, and return the new length as Number."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return_value": "new_length",
+    "argument_count": "variadic",
+    "evaluation_order": "receiver then arguments left-to-right"
+  },
+  "caveats": [
+    "InsertRange is only an internal dense-array fast path and does not by itself cover JS return/length semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "inserts in argument order",
+      "input": "const a=[3]; const n=a.unshift(1,2); console.log(n,a.join(','));",
+      "expected_behavior": "prints 3 1,2,3"
+    },
+    {
+      "name": "zero args returns existing length",
+      "input": "const a=[1,2]; console.log(a.unshift(),a.join(','));",
+      "expected_behavior": "prints 2 1,2"
+    },
+    {
+      "name": "sparse source stays sparse",
+      "input": "const a=Array(2); a.unshift('x'); console.log(a.length,0 in a,1 in a,2 in a);",
+      "expected_behavior": "prints 3 true false false"
+    }
+  ]
+}

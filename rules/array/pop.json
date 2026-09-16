@@ -1,0 +1,54 @@
+{
+  "id": "array.prototype.pop",
+  "category": "array",
+  "summary": "Remove and return the final element, returning undefined for an empty array.",
+  "source": {
+    "pattern": "$array.pop()",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Pop",
+    "template": "JsArray.Pop(...)",
+    "notes": "Return a JsValue so empty and trailing-hole results can be undefined; delete the final indexed property and decrement length."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return_value": "last value or undefined",
+    "empty_result": "undefined",
+    "length_change": "-1 when non-empty"
+  },
+  "caveats": [
+    "The generic method can observe inherited indexed properties; this rule excludes them.",
+    "RemoveAt alone loses the returned-value and empty-array semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "pops value",
+      "input": "const a=[1,2]; const x=a.pop(); console.log(x,a.length,a[1]);",
+      "expected_csharp": "var x = JsArray.Pop(a);",
+      "expected_behavior": "prints 2 1 undefined"
+    },
+    {
+      "name": "empty returns undefined",
+      "input": "const a=[]; console.log(a.pop()===undefined,a.length);",
+      "expected_behavior": "prints true 0"
+    },
+    {
+      "name": "trailing hole returns undefined and shrinks",
+      "input": "const a=[1]; a.length=2; console.log(a.pop()===undefined,a.length);",
+      "expected_behavior": "prints true 1"
+    }
+  ]
+}

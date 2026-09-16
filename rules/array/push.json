@@ -1,47 +1,63 @@
 {
   "id": "array.prototype.push",
   "category": "array",
-  "summary": "Lower Array.prototype.push when the receiver is proven to be a normal, non-overridden array representation.",
+  "summary": "Append zero or more items and return the new length.",
   "source": {
-    "pattern": "$array.push($value)",
+    "pattern": "$array.push(...$items)",
     "requirements": {
-      "receiver": "Array",
-      "builtin_not_overridden": true
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
     }
   },
   "target": {
     "kind": "helper",
     "helper": "JsArray.Push",
-    "template": "JsArray.Push($array, $value)",
-    "notes": "The helper must append the value and return the new array length. A bare List<T>.Add call is not behaviorally equivalent because Add returns void."
+    "template": "JsArray.Push(...)",
+    "notes": "Append all arguments in order and return the new length as Number. A bare List<T>.Add/AddRange is not equivalent because JavaScript push returns length and Array exotic length updates can fail."
   },
   "strategy": "helper",
   "confidence": "high",
   "semantics": {
     "mutates_receiver": true,
     "return_value": "new_length",
+    "argument_count": "variadic",
+    "zero_arguments": "returns current length without mutation",
     "evaluation_order": "receiver then arguments left-to-right",
-    "notes": "Native List<T>.Add may be emitted only when the result is proven unused and all other array semantics are preserved by the selected representation."
+    "overflow_partial_side_effects": "At length 2^32-1, push may create property '4294967295' before setting length throws RangeError; helper must preserve this ordering if this edge is supported."
   },
   "caveats": [
-    "JavaScript arrays may be sparse or heterogeneous.",
-    "Array.prototype.push or the receiver's push property may be overridden.",
-    "Very large lengths and generic use of Array.prototype.push require separate handling."
+    "At maximum Array length, push can leave a newly-created non-array-index property behind even though the final length write throws RangeError; do not preflight-and-throw if that would erase this observable side effect.",
+    "For ordinary Arrays, growing beyond the maximum Array length must fail according to Array exotic semantics.",
+    "The generic Array.prototype.push algorithm can target non-Arrays; this rule covers only proven builtin arrays.",
+    "Monkey-patched push is excluded by the static requirements."
   ],
   "references": [
-    "ECMAScript Array.prototype.push semantics"
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
   ],
   "tests": [
     {
-      "name": "appends and returns new length",
-      "input": "const a = [1, 2]; const n = a.push(3); console.log(n, a);",
-      "expected_csharp": "var n = JsArray.Push(a, 3d);",
-      "expected_behavior": "prints a length of 3 and an array containing 1,2,3"
+      "name": "appends multiple and returns length",
+      "input": "const a=[1]; const n=a.push(2,3); console.log(n,a.join(','));",
+      "expected_csharp": "var n = JsArray.Push(a, JsValue.From(2d), JsValue.From(3d));",
+      "expected_behavior": "prints 3 1,2,3"
     },
     {
-      "name": "result ignored optimization",
-      "input": "const a = [1]; a.push(2);",
-      "expected_behavior": "a contains 1,2; compiler may lower to the representation's native append operation if semantic analysis proves the return value is unused"
+      "name": "zero args returns current length",
+      "input": "const a=[1,2]; console.log(a.push(),a.join(','));",
+      "expected_behavior": "prints 2 1,2"
+    },
+    {
+      "name": "result ignored may admit later optimization",
+      "input": "const a=[1]; a.push(2);",
+      "expected_behavior": "a contains 1,2; native append is only legal if the return value and sparse/exotic semantics are proven unobservable"
+    },
+    {
+      "name": "maximum length overflow has observable partial side effect",
+      "input": "const a=[]; a.length=4294967295; try { a.push('x'); } catch(e) { console.log(e.name,a.length,a[4294967295],Object.prototype.hasOwnProperty.call(a,'4294967295')); }",
+      "expected_behavior": "prints RangeError 4294967295 x true"
     }
   ]
 }

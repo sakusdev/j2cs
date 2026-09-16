@@ -1,0 +1,57 @@
+{
+  "id": "array.prototype.tospliced",
+  "category": "array",
+  "summary": "Create a spliced copy without mutating the source; copied holes are materialized as undefined.",
+  "source": {
+    "pattern": "$array.toSpliced($start, $skipCount, ...$items)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.ToSpliced",
+    "template": "JsArray.ToSpliced(...)",
+    "notes": "Apply toSpliced argument rules, create a new intrinsic Array, copy source positions through Get, and leave the source unchanged."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "returns_new_array": true,
+    "holes_become_present_undefined": true,
+    "omitted_skipCount_differs_from_undefined": true
+  },
+  "caveats": [
+    "Do not implement as slice()+splice because that preserves holes during slice and introduces ArraySpeciesCreate behavior not used by toSpliced."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "copy with insertion",
+      "input": "const a=[1,2,3]; const b=a.toSpliced(1,1,'x'); console.log(a.join(','),b.join(','));",
+      "expected_behavior": "prints 1,2,3 1,x,3"
+    },
+    {
+      "name": "hole materialized",
+      "input": "const b=[,1].toSpliced(1,0); console.log(b.length,0 in b,b[0]===undefined);",
+      "expected_behavior": "prints 2 true true"
+    },
+    {
+      "name": "omitted skipCount deletes to end when start is present",
+      "input": "console.log([1,2,3].toSpliced(1).join(','));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "explicit undefined skipCount deletes zero",
+      "input": "console.log([1,2,3].toSpliced(1,undefined).join(','));",
+      "expected_behavior": "prints 1,2,3"
+    }
+  ]
+}

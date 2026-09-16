@@ -1,0 +1,65 @@
+{
+  "id": "array.prototype.sort",
+  "category": "array",
+  "summary": "Stable in-place JavaScript sort with default string ordering or comparator semantics.",
+  "source": {
+    "pattern": "$array.sort($comparator)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Sort",
+    "template": "JsArray.Sort(...)",
+    "notes": "Implement a stable sort. Default comparison uses ToString and lexicographic UTF-16 code-unit ordering. Comparator results are ToNumber-coerced and NaN is treated as +0. Undefined sorts after defined values; holes sort after undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "returns_same_object": true,
+    "stable": true,
+    "default_order": "lexicographic UTF-16 after ToString",
+    "undefined_order": "after defined values",
+    "holes_order": "after undefined",
+    "non_callable_comparator": "TypeError unless comparator is undefined"
+  },
+  "caveats": [
+    "List<T>.Sort is not a semantic substitute: default order, stability contract, callback coercion, undefined/hole handling, and side effects differ."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "default is lexicographic",
+      "input": "const a=[10,2,1]; a.sort(); console.log(a.join(','));",
+      "expected_behavior": "prints 1,10,2"
+    },
+    {
+      "name": "numeric comparator",
+      "input": "const a=[10,2,1]; const r=a.sort((x,y)=>x-y); console.log(r===a,a.join(','));",
+      "expected_behavior": "prints true 1,2,10"
+    },
+    {
+      "name": "NaN comparator means equal",
+      "input": "const a=[3,2,1]; a.sort(()=>NaN); console.log(a.join(','));",
+      "expected_behavior": "prints 3,2,1"
+    },
+    {
+      "name": "non-callable comparator throws",
+      "input": "try { [1,2].sort(0); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "undefined precedes holes at the end",
+      "input": "const a=[,undefined,'a']; a.sort(); console.log(a[0],a[1]===undefined,1 in a,2 in a);",
+      "expected_behavior": "prints a true true false"
+    }
+  ]
+}

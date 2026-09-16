@@ -1,0 +1,54 @@
+{
+  "id": "array.prototype.with",
+  "category": "array",
+  "summary": "Create a copy with one replaced index, supporting negative indices and RangeError on out-of-range.",
+  "source": {
+    "pattern": "$array.with($index, $value)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.With",
+    "template": "JsArray.With(...)",
+    "notes": "Coerce the index with ToIntegerOrInfinity and relative indexing, throw RangeError if out of range, create a new intrinsic Array, and read-through-copy all other positions."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "returns_new_array": true,
+    "negative_indexing": true,
+    "out_of_range_exception": "RangeError",
+    "holes_become_present_undefined": true
+  },
+  "caveats": [
+    "C# Index/Range APIs have different coercion and exception semantics.",
+    "Unmodified holes are materialized because the algorithm reads every source index."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "negative index replacement",
+      "input": "const a=[1,2,3]; const b=a.with(-1,9); console.log(a.join(','),b.join(','));",
+      "expected_behavior": "prints 1,2,3 1,2,9"
+    },
+    {
+      "name": "out of range RangeError",
+      "input": "try { [1].with(1,2); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints RangeError"
+    },
+    {
+      "name": "other hole materialized",
+      "input": "const b=[,1].with(1,2); console.log(0 in b,b[0]===undefined);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

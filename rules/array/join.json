@@ -1,0 +1,55 @@
+{
+  "id": "array.prototype.join",
+  "category": "array",
+  "summary": "Join after JS ToString coercion, treating null, undefined, and holes as empty fields.",
+  "source": {
+    "pattern": "$array.join($separator)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Join",
+    "template": "JsArray.Join(...)",
+    "notes": "Default separator is comma only when separator is omitted/undefined. Null separator becomes 'null'. Null/undefined elements and holes contribute empty strings."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "default_separator": ",",
+    "null_element": "",
+    "undefined_element": "",
+    "hole_element": "",
+    "separator_coercion": "ToString unless undefined"
+  },
+  "caveats": [
+    "string.Join does not reproduce arbitrary JavaScript ToString semantics.",
+    "Indexed getters/prototype values are excluded by the requirements."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "null undefined and hole are empty",
+      "input": "console.log([1,null,undefined,,2].join('|'));",
+      "expected_behavior": "prints 1||||2"
+    },
+    {
+      "name": "undefined separator means comma",
+      "input": "console.log([1,2].join(undefined));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "null separator stringifies",
+      "input": "console.log([1,2].join(null));",
+      "expected_behavior": "prints 1null2"
+    }
+  ]
+}

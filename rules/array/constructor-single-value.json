@@ -1,0 +1,45 @@
+{
+  "id": "array.constructor.single-non-number",
+  "category": "array",
+  "summary": "Create a one-element Array when the sole argument is not a JavaScript Number.",
+  "source": {
+    "pattern": "Array($value) | new Array($value)",
+    "requirements": {
+      "intrinsic_Array_binding": true,
+      "Array_constructor_not_overridden": true,
+      "argument_static_type_excludes": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.CreateSingle",
+    "template": "JsArray.CreateSingle(...)",
+    "notes": "Store the exact value at index 0 and set length to 1. Do not coerce strings that look numeric into lengths."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length": 1,
+    "creates_own_index_0": true,
+    "coercion": "none"
+  },
+  "caveats": [
+    "Dispatch is based on JavaScript type, not numeric-looking content."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "numeric-looking string is element",
+      "input": "const a = Array('3'); console.log(a.length, a[0]);",
+      "expected_csharp": "var a = JsArray.CreateSingle(JsValue.From(\"3\"));",
+      "expected_behavior": "prints 1 3"
+    },
+    {
+      "name": "undefined is a present element",
+      "input": "const a = Array(undefined); console.log(a.length, 0 in a, a[0] === undefined);",
+      "expected_behavior": "prints 1 true true"
+    }
+  ]
+}

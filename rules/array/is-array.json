@@ -1,0 +1,51 @@
+{
+  "id": "array.isarray",
+  "category": "array",
+  "summary": "Implement Array.isArray using JavaScript Array identity, not structural or collection-shape checks.",
+  "source": {
+    "pattern": "Array.isArray($value)",
+    "requirements": {
+      "intrinsic_Array_binding": true,
+      "Array_isArray_not_overridden": true,
+      "proxy_identity_supported_or_value_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.IsArray",
+    "template": "JsArray.IsArray(...)",
+    "notes": "Return true only for JavaScript Array exotic objects. Array-like objects and typed arrays are false. Proxy-wrapped arrays require proxy-target awareness to match ECMAScript."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "return_type": "Boolean",
+    "array_like_object_is_false": true,
+    "typed_array_is_false": true
+  },
+  "caveats": [
+    "IEnumerable/IList checks are too broad.",
+    "A revoked Proxy causes Array.isArray to throw TypeError and therefore needs runtime proxy state."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "array true",
+      "input": "console.log(Array.isArray([]));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "array-like object false",
+      "input": "console.log(Array.isArray({0:'x',length:1}));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "typed array false",
+      "input": "console.log(Array.isArray(new Uint8Array(1)));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}
