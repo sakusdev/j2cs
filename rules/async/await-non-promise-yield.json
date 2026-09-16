@@ -1,0 +1,16 @@
+{
+  "id": "async.await.non-promise-yield",
+  "category": "async",
+  "summary": "Awaiting a statically known non-thenable still suspends and resumes asynchronously with the same value.",
+  "source": {"pattern": "await $value", "requirements": {"operand": "proven primitive or non-thenable builtin value"}},
+  "target": {"kind": "helper", "helper": "JsAsync.AwaitValue", "template": "await JsAsync.AwaitValue($value)", "notes": "Wrap using PromiseResolve semantics and force the JS continuation boundary."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"result": "same value", "coercion": "no value coercion", "scheduling": "resume through promise job/microtask queue"},
+  "caveats": ["Task.FromResult plus ordinary C# await can continue synchronously and is observably different."],
+  "references": ["ECMAScript 2026 Await abstract operation"],
+  "tests": [
+    {"name": "await number yields", "input": "async function f(){console.log('a');await 1;console.log('b')} f();console.log('c');", "expected_csharp": "await JsAsync.AwaitValue(JsValue.From(1d));", "expected_behavior": "prints a,c,b"},
+    {"name": "await null returns null", "input": "async function f(){const x=await null;console.log(x===null)} f();", "expected_behavior": "eventually prints true"}
+  ]
+}
