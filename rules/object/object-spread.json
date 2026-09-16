@@ -1,0 +1,41 @@
+{
+  "id": "object.language.object-spread",
+  "category": "object",
+  "summary": "Copy own enumerable properties with CopyDataProperties semantics used by object spread.",
+  "source": {
+    "pattern": "{ ...$source }",
+    "requirements": {}
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.CopyDataProperties(JsRuntime.NewOrdinaryObject(), $source, excluded: null)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "null_undefined": "ignored without throwing",
+    "keys": "own enumerable string and Symbol keys",
+    "get": "source getters are invoked",
+    "target_write": "CreateDataProperty, so target setters are not invoked",
+    "order": "OwnPropertyKeys order"
+  },
+  "caveats": [
+    "Object spread is not exactly Object.assign: it defines data properties on the new object instead of using Set on an existing target.",
+    "Proxy traps can interpose."
+  ],
+  "references": [
+    "ECMAScript 2026 Object Initializer: PropertyDefinitionEvaluation / CopyDataProperties"
+  ],
+  "tests": [
+    {
+      "name": "null ignored",
+      "input": "console.log(JSON.stringify({...null,a:1}));",
+      "expected_behavior": "prints {\"a\":1}"
+    },
+    {
+      "name": "proto key stays data semantics when spread",
+      "input": "const s={['__proto__']:7}; const x={...s}; console.log(Object.getPrototypeOf(x)===Object.prototype,x.__proto__);",
+      "expected_behavior": "prints true 7"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "object.get-own-property-descriptor",
+  "category": "object",
+  "summary": "Return a fresh descriptor object for an own property without invoking that property's getter.",
+  "source": {
+    "pattern": "Object.getOwnPropertyDescriptor($obj, $key)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetOwnPropertyDescriptor($obj, $key)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject; null/undefined throw",
+    "key": "ToPropertyKey",
+    "missing": "returns undefined",
+    "descriptor": "fresh object containing data or accessor fields plus enumerable/configurable",
+    "getter_invocation": "the described getter is not called"
+  },
+  "caveats": [
+    "Requires property-attribute metadata absent from ordinary C# fields/properties.",
+    "Proxy getOwnPropertyDescriptor traps require runtime invariants."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.8 Object.getOwnPropertyDescriptor"
+  ],
+  "tests": [
+    {
+      "name": "getter not invoked",
+      "input": "let n=0; const x={get a(){n++;return 1}}; const d=Object.getOwnPropertyDescriptor(x,'a'); console.log(typeof d.get,n);",
+      "expected_behavior": "prints function 0"
+    },
+    {
+      "name": "missing returns undefined",
+      "input": "console.log(Object.getOwnPropertyDescriptor({},'x')===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

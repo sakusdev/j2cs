@@ -1,0 +1,41 @@
+{
+  "id": "object.get-prototype-of",
+  "category": "object",
+  "summary": "Return the ECMAScript [[Prototype]] after ToObject coercion.",
+  "source": {
+    "pattern": "Object.getPrototypeOf($obj)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetPrototypeOf($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject; null/undefined throw",
+    "primitive": "boxed before [[GetPrototypeOf]]",
+    "return_value": "Object or null"
+  },
+  "caveats": [
+    "C# inheritance metadata is not a mutable per-instance JavaScript prototype chain.",
+    "Proxy getPrototypeOf traps and invariants require runtime behavior."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.12 Object.getPrototypeOf"
+  ],
+  "tests": [
+    {
+      "name": "ordinary prototype",
+      "input": "console.log(Object.getPrototypeOf({})===Object.prototype);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive boxing",
+      "input": "console.log(Object.getPrototypeOf(1)===Number.prototype);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

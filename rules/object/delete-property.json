@@ -1,0 +1,44 @@
+{
+  "id": "object.language.delete-property",
+  "category": "object",
+  "summary": "Delete a property reference with ToPropertyKey, configurability, strict-mode, and Proxy semantics.",
+  "source": {
+    "pattern": "delete $obj[$key]",
+    "requirements": {
+      "operand_is_property_reference": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DeleteProperty($obj, $key, $strict)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "GetValue base/object rules; property key ToPropertyKey",
+    "configurable": "ordinary configurable own property is removed; non-configurable delete returns false",
+    "strict_mode": "failure throws TypeError instead of returning false",
+    "missing": "returns true",
+    "prototype": "inherited property is not removed",
+    "proxy": "deleteProperty trap may run"
+  },
+  "caveats": [
+    "C# cannot delete fields/properties.",
+    "Deleting an inherited property reports true while the inherited lookup remains visible."
+  ],
+  "references": [
+    "ECMAScript 2026 delete operator / [[Delete]]"
+  ],
+  "tests": [
+    {
+      "name": "delete configurable own property",
+      "input": "const x={a:1}; console.log(delete x.a,'a' in x);",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "inherited property remains",
+      "input": "const p={a:1},x=Object.create(p); console.log(delete x.a,x.a);",
+      "expected_behavior": "prints true 1"
+    }
+  ]
+}

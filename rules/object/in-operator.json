@@ -1,0 +1,40 @@
+{
+  "id": "object.language.in-operator",
+  "category": "object",
+  "summary": "Implement the in operator using ToPropertyKey and [[HasProperty]], including prototypes and Proxy traps.",
+  "source": {
+    "pattern": "$key in $obj",
+    "requirements": {}
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.HasProperty($obj, $key)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "right_operand": "must be Object; primitives throw TypeError",
+    "left_operand": "ToPropertyKey",
+    "prototype": "own and inherited properties count",
+    "getter": "property value getter is not invoked",
+    "proxy": "has trap may run"
+  },
+  "caveats": [
+    "Dictionary.ContainsKey checks own keys only and is not equivalent."
+  ],
+  "references": [
+    "ECMAScript 2026 Relational Operators: in / HasProperty"
+  ],
+  "tests": [
+    {
+      "name": "inherited counts",
+      "input": "const x=Object.create({a:1}); console.log('a' in x);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive rhs throws",
+      "input": "try{console.log('x' in 1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

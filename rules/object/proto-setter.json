@@ -1,0 +1,43 @@
+{
+  "id": "object.prototype.__proto__.set",
+  "category": "object",
+  "summary": "Support the legacy __proto__ setter, including silent ignore of invalid prototype values.",
+  "source": {
+    "pattern": "$obj.__proto__ = $proto (built-in Annex B accessor)",
+    "requirements": {
+      "property_lookup_resolves_to_builtin_Object_prototype___proto___setter": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.SetLegacyProto($obj, $proto)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "this": "RequireObjectCoercible",
+    "invalid_proto": "if value is neither Object nor null, return undefined without changing prototype",
+    "primitive_this": "after validation, non-object this returns undefined",
+    "object": "[[SetPrototypeOf]]; failure throws TypeError",
+    "return_value": "undefined from setter"
+  },
+  "caveats": [
+    "This differs from Object.setPrototypeOf, which throws on an invalid proto argument.",
+    "Assignment expression result is still the RHS due assignment-expression semantics, even though the setter itself returns undefined."
+  ],
+  "references": [
+    "ECMAScript 2026 Annex B Object.prototype.__proto__ setter"
+  ],
+  "tests": [
+    {
+      "name": "invalid proto ignored",
+      "input": "const x={}; const p=Object.getPrototypeOf(x); x.__proto__=1; console.log(Object.getPrototypeOf(x)===p);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "sets valid prototype",
+      "input": "const p={a:1},x={}; x.__proto__=p; console.log(x.a);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "object.is",
+  "category": "object",
+  "summary": "Implement SameValue equality, notably NaN equality and signed-zero distinction.",
+  "source": {
+    "pattern": "Object.is($a, $b)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsValue.SameValue($a, $b)",
+    "helper": "JsValue.SameValue"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "algorithm": "SameValue",
+    "nan": "NaN is SameValue to NaN",
+    "signed_zero": "+0 and -0 are different",
+    "objects": "identity only",
+    "coercion": "none"
+  },
+  "caveats": [
+    "C# == is not equivalent for NaN, signed zero, strings under boxed representations, or overloaded operators."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.15 Object.is / SameValue"
+  ],
+  "tests": [
+    {
+      "name": "nan equals nan",
+      "input": "console.log(Object.is(NaN,NaN));",
+      "expected_csharp": "JsValue.SameValue(double.NaN, double.NaN)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "signed zero differs",
+      "input": "console.log(Object.is(0,-0));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

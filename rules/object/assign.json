@@ -1,0 +1,44 @@
+{
+  "id": "object.assign",
+  "category": "object",
+  "summary": "Copy enumerable own string and Symbol properties in ECMAScript key order with Get/Set side effects.",
+  "source": {
+    "pattern": "Object.assign($target, ...$sources)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectAssign($target, $sources)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "ToObject(target); null/undefined target throws",
+    "sources": "null/undefined sources are skipped",
+    "keys": "own enumerable string and Symbol keys, OwnPropertyKeys order",
+    "side_effects": "source getters and target setters are invoked",
+    "failure": "abrupt completion leaves earlier writes applied",
+    "return_value": "boxed target object"
+  },
+  "caveats": [
+    "Dictionary assignment misses Symbol keys, property order, accessors, and partial mutation on failure.",
+    "Proxy traps require full runtime behavior."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.1 Object.assign"
+  ],
+  "tests": [
+    {
+      "name": "copies enumerable own properties",
+      "input": "const t={}; const r=Object.assign(t,{a:1},{b:2}); console.log(r===t,t.a,t.b);",
+      "expected_behavior": "prints true 1 2"
+    },
+    {
+      "name": "getter then throwing setter leaves prior mutation",
+      "input": "const t={a:0}; Object.defineProperty(t,'b',{set(){throw 7}}); try{Object.assign(t,{a:1,b:2,c:3})}catch(e){} console.log(t.a,'c' in t);",
+      "expected_behavior": "prints 1 false"
+    }
+  ]
+}

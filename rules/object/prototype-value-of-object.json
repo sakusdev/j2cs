@@ -1,0 +1,43 @@
+{
+  "id": "object.prototype.value-of.object",
+  "category": "object",
+  "summary": "Elide built-in Object.prototype.valueOf when the receiver is proven to be a non-null object; it returns the same object.",
+  "source": {
+    "pattern": "$obj.valueOf()",
+    "requirements": {
+      "receiver_method_resolves_to_builtin_Object_prototype_valueOf": true,
+      "receiver_static_type": "NonNullObject"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$obj"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same object identity",
+    "mutation": false,
+    "coercion": "ToObject(this), which is identity for an Object"
+  },
+  "caveats": [
+    "Do not apply to primitive receivers, which are boxed, or to null/undefined, which throw.",
+    "Preserve evaluation of the receiver expression exactly once."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.3.7 Object.prototype.valueOf"
+  ],
+  "tests": [
+    {
+      "name": "same object",
+      "input": "const x={}; console.log(x.valueOf()===x);",
+      "expected_csharp": "var result = x;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "receiver expression once",
+      "input": "let n=0; function f(){n++;return {}}; f().valueOf(); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

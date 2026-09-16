@@ -1,0 +1,44 @@
+{
+  "id": "object.prototype.has-own-property",
+  "category": "object",
+  "summary": "Lower the built-in Object.prototype.hasOwnProperty only when that method lookup is proven unmodified.",
+  "source": {
+    "pattern": "$obj.hasOwnProperty($key)",
+    "requirements": {
+      "receiver_method_resolves_to_builtin_Object_prototype_hasOwnProperty": true,
+      "receiver_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsObject.HasOwn($obj, $key)",
+    "helper": "JsObject.HasOwn"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "this": "ToObject(this); null/undefined throw",
+    "key": "ToPropertyKey",
+    "prototype": "not searched",
+    "getter": "target property getter not invoked"
+  },
+  "caveats": [
+    "The receiver may shadow hasOwnProperty or have a null prototype; prefer Object.hasOwn in source-independent transforms.",
+    "Method lookup itself can be dynamic."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.3.2 Object.prototype.hasOwnProperty"
+  ],
+  "tests": [
+    {
+      "name": "own property",
+      "input": "console.log(({a:1}).hasOwnProperty('a'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "inherited property excluded",
+      "input": "const x=Object.create({a:1}); console.log(x.hasOwnProperty('a'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

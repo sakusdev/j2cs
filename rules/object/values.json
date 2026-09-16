@@ -1,0 +1,46 @@
+{
+  "id": "object.values",
+  "category": "object",
+  "summary": "Return own enumerable string-keyed values in ECMAScript property order, invoking getters.",
+  "source": {
+    "pattern": "Object.values($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_not_proxy": true,
+      "object_representation_tracks_enumerability_and_order": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsObject.Values($obj)",
+    "helper": "JsObject.Values"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject",
+    "keys": "own enumerable strings only",
+    "symbols": "omitted",
+    "order": "same as Object.keys",
+    "getters": "Get is performed for each retained key"
+  },
+  "caveats": [
+    "Do not evaluate property values before confirming enumerability/order.",
+    "Proxy fallback is required."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.24 Object.values"
+  ],
+  "tests": [
+    {
+      "name": "ordered values",
+      "input": "console.log(Object.values({2:'b',1:'a',x:'c'}).join(','));",
+      "expected_behavior": "prints a,b,c"
+    },
+    {
+      "name": "getter runs",
+      "input": "let n=0; const x={get a(){n++;return 3}}; console.log(Object.values(x)[0],n);",
+      "expected_behavior": "prints 3 1"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "object.is-extensible.primitive",
+  "category": "object",
+  "summary": "Constant-fold Object.isExtensible for a statically proven primitive.",
+  "source": {
+    "pattern": "Object.isExtensible($value)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "PrimitiveNonObject"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "false"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "non_object_result": "false",
+    "coercion": "no boxing for this API"
+  },
+  "caveats": [
+    "null and undefined are also non-objects for these predicates; ensure the AST/type lattice matches ECMAScript values."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.isExtensible"
+  ],
+  "tests": [
+    {
+      "name": "number primitive",
+      "input": "console.log(Object.isExtensible(1));",
+      "expected_csharp": "false",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "null primitive-like nonobject",
+      "input": "console.log(Object.isExtensible(null));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

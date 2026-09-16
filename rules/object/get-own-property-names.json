@@ -1,0 +1,41 @@
+{
+  "id": "object.get-own-property-names",
+  "category": "object",
+  "summary": "Return all own string property keys, including non-enumerable ones, in OwnPropertyKeys order.",
+  "source": {
+    "pattern": "Object.getOwnPropertyNames($obj)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetOwnPropertyNames($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject; primitives are boxed",
+    "keys": "own string keys only, enumerable or not",
+    "symbols": "omitted"
+  },
+  "caveats": [
+    "String boxing exposes indexed character properties and a non-enumerable length property.",
+    "Proxy ownKeys invariants require runtime checks."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.10 Object.getOwnPropertyNames"
+  ],
+  "tests": [
+    {
+      "name": "nonenumerable included",
+      "input": "const x={}; Object.defineProperty(x,'a',{value:1}); console.log(Object.getOwnPropertyNames(x));",
+      "expected_behavior": "contains a"
+    },
+    {
+      "name": "string primitive exposes length",
+      "input": "console.log(Object.getOwnPropertyNames('ab').join(','));",
+      "expected_behavior": "prints 0,1,length"
+    }
+  ]
+}

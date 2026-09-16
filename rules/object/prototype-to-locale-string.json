@@ -1,0 +1,40 @@
+{
+  "id": "object.prototype.to-locale-string",
+  "category": "object",
+  "summary": "Invoke the receiver's current toString method as required by Object.prototype.toLocaleString.",
+  "source": {
+    "pattern": "$obj.toLocaleString()",
+    "requirements": {
+      "receiver_method_resolves_to_builtin_Object_prototype_toLocaleString": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectPrototypeToLocaleString($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "this": "ToObject(this)",
+    "dispatch": "Invoke(O, 'toString') dynamically",
+    "return_value": "whatever that call returns"
+  },
+  "caveats": [
+    "It must observe an own/overridden toString; calling C# ToString directly can change dispatch and result."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.3.5 Object.prototype.toLocaleString"
+  ],
+  "tests": [
+    {
+      "name": "delegates to overridden toString",
+      "input": "const x={toString(){return 'X'}}; console.log(Object.prototype.toLocaleString.call(x));",
+      "expected_behavior": "prints X"
+    },
+    {
+      "name": "null this throws",
+      "input": "try{Object.prototype.toLocaleString.call(null)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

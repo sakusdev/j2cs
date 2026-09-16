@@ -1,0 +1,45 @@
+{
+  "id": "object.entries",
+  "category": "object",
+  "summary": "Return own enumerable string-keyed [key,value] pairs in ECMAScript property order.",
+  "source": {
+    "pattern": "Object.entries($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_not_proxy": true,
+      "object_representation_tracks_enumerability_and_order": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsObject.Entries($obj)",
+    "helper": "JsObject.Entries"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToObject; null/undefined throw",
+    "keys": "own enumerable strings only; Symbols omitted",
+    "order": "integer-index keys ascending, then other strings in creation order",
+    "getters": "values are read with Get and may invoke getters"
+  },
+  "caveats": [
+    "Dictionary iteration order is not a sufficient language-level guarantee for ECMAScript key ordering.",
+    "Proxy ownKeys/getOwnPropertyDescriptor traps require runtime fallback."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.5 Object.entries"
+  ],
+  "tests": [
+    {
+      "name": "enumeration order",
+      "input": "const x={100:'a',2:'b',z:'c'}; console.log(JSON.stringify(Object.entries(x)));",
+      "expected_behavior": "prints [[\"2\",\"b\"],[\"100\",\"a\"],[\"z\",\"c\"]]"
+    },
+    {
+      "name": "symbols omitted and getter invoked",
+      "input": "let n=0; const s=Symbol(); const x={[s]:1,get a(){n++;return 2}}; console.log(Object.entries(x)[0][1],n);",
+      "expected_behavior": "prints 2 1"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "object.freeze.object",
+  "category": "object",
+  "summary": "Preserve Object.freeze on objects using ECMAScript integrity/extensibility internal methods.",
+  "source": {
+    "pattern": "Object.freeze($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "Object"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectFreeze($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "non_object": "not covered by this specialization",
+    "return_value": "same object",
+    "effect": "prevents extensions and makes own properties non-configurable; data properties become non-writable",
+    "proxy": "corresponding internal traps/invariants may apply"
+  },
+  "caveats": [
+    "C# readonly/sealed/type immutability does not match JavaScript per-object integrity levels."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.freeze"
+  ],
+  "tests": [
+    {
+      "name": "returns same object",
+      "input": "const x={a:1}; console.log(Object.freeze(x)===x);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "state changes",
+      "input": "const x={a:1}; Object.freeze(x); console.log(Object.getOwnPropertyDescriptor(x,'a').writable);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

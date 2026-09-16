@@ -1,0 +1,43 @@
+{
+  "id": "object.define-property",
+  "category": "object",
+  "summary": "Define or reconfigure one own property using full descriptor invariants.",
+  "source": {
+    "pattern": "Object.defineProperty($obj, $key, $descriptor)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DefineProperty($obj, $key, $descriptor)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object": "must be Object; primitives throw TypeError",
+    "key": "ToPropertyKey, including Symbol",
+    "descriptor": "ToPropertyDescriptor validates data/accessor exclusivity",
+    "return_value": "same object",
+    "side_effects": "descriptor getter fields may execute property access; Proxy defineProperty trap may run"
+  },
+  "caveats": [
+    "C# properties do not model configurable/enumerable/writable attributes.",
+    "Non-configurable invariants and accessor descriptors require runtime metadata."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.4 Object.defineProperty"
+  ],
+  "tests": [
+    {
+      "name": "defaults are false",
+      "input": "const x={}; Object.defineProperty(x,'a',{value:1}); const d=Object.getOwnPropertyDescriptor(x,'a'); console.log(d.writable,d.enumerable,d.configurable);",
+      "expected_behavior": "prints false false false"
+    },
+    {
+      "name": "mixed accessor and data descriptor throws",
+      "input": "try{Object.defineProperty({},'x',{value:1,get(){}})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

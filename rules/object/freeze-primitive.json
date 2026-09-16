@@ -1,0 +1,42 @@
+{
+  "id": "object.freeze.primitive",
+  "category": "object",
+  "summary": "Elide Object.freeze when the argument is statically proven non-object; ECMAScript returns it unchanged.",
+  "source": {
+    "pattern": "Object.freeze($value)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "PrimitiveNonObject"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$value"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "input unchanged",
+    "mutation": false,
+    "boxing": "none"
+  },
+  "caveats": [
+    "Preserve single evaluation of the argument expression; do not duplicate side effects."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.freeze"
+  ],
+  "tests": [
+    {
+      "name": "number unchanged",
+      "input": "console.log(Object.freeze(1)===1);",
+      "expected_csharp": "value",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "null unchanged",
+      "input": "console.log(Object.freeze(null)===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

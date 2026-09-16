@@ -1,0 +1,42 @@
+{
+  "id": "object.get-own-property-symbols",
+  "category": "object",
+  "summary": "Return all own Symbol property keys in OwnPropertyKeys order.",
+  "source": {
+    "pattern": "Object.getOwnPropertySymbols($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "symbol_support_enabled": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetOwnPropertySymbols($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject",
+    "keys": "own Symbol keys regardless of enumerability",
+    "strings": "omitted"
+  },
+  "caveats": [
+    "Requires a JavaScript Symbol representation distinct from strings.",
+    "Proxy ownKeys can interpose."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.11 Object.getOwnPropertySymbols"
+  ],
+  "tests": [
+    {
+      "name": "returns symbols only",
+      "input": "const s=Symbol('s'); const x={a:1,[s]:2}; console.log(Object.getOwnPropertySymbols(x)[0]===s);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "nonenumerable symbol included",
+      "input": "const s=Symbol(); const x={}; Object.defineProperty(x,s,{value:1}); console.log(Object.getOwnPropertySymbols(x).length);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

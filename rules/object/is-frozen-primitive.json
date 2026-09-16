@@ -1,0 +1,41 @@
+{
+  "id": "object.is-frozen.primitive",
+  "category": "object",
+  "summary": "Constant-fold Object.isFrozen for a statically proven primitive.",
+  "source": {
+    "pattern": "Object.isFrozen($value)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "PrimitiveNonObject"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "true"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "non_object_result": "true",
+    "coercion": "no boxing for this API"
+  },
+  "caveats": [
+    "null and undefined are also non-objects for these predicates; ensure the AST/type lattice matches ECMAScript values."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.isFrozen"
+  ],
+  "tests": [
+    {
+      "name": "number primitive",
+      "input": "console.log(Object.isFrozen(1));",
+      "expected_csharp": "true",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "null primitive-like nonobject",
+      "input": "console.log(Object.isFrozen(null));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

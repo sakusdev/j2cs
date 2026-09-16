@@ -1,0 +1,45 @@
+{
+  "id": "object.has-own",
+  "category": "object",
+  "summary": "Test own-property existence after ToObject and ToPropertyKey, excluding inherited properties.",
+  "source": {
+    "pattern": "Object.hasOwn($obj, $key)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_not_proxy": true,
+      "object_representation_supports_own_property_test": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsObject.HasOwn($obj, $key)",
+    "helper": "JsObject.HasOwn"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object": "ToObject; null/undefined throw",
+    "key": "ToPropertyKey",
+    "prototype": "not searched",
+    "getter": "property getter is not invoked"
+  },
+  "caveats": [
+    "Dictionary.ContainsKey is suitable only for an object representation that already preserves JavaScript own-property keys.",
+    "Proxy has/getOwnProperty traps need runtime fallback."
+  ],
+  "references": [
+    "ECMAScript 2026 §20.1.2.14 Object.hasOwn"
+  ],
+  "tests": [
+    {
+      "name": "own versus inherited",
+      "input": "const p={a:1}; const x=Object.create(p); x.b=2; console.log(Object.hasOwn(x,'a'),Object.hasOwn(x,'b'));",
+      "expected_behavior": "prints false true"
+    },
+    {
+      "name": "null throws",
+      "input": "try{Object.hasOwn(null,'x')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

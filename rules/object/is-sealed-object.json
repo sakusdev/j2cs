@@ -1,0 +1,42 @@
+{
+  "id": "object.is-sealed.object",
+  "category": "object",
+  "summary": "Preserve Object.isSealed for object receivers including descriptor/proxy semantics.",
+  "source": {
+    "pattern": "Object.isSealed($obj)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "receiver_static_type": "Object"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ObjectIsSealed($obj)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "object",
+    "result": "boolean",
+    "proxy": "corresponding internal method/traps may run",
+    "integrity_check": "own property descriptors and extensibility are consulted where required"
+  },
+  "caveats": [
+    "Cannot be inferred from C# mutability or class metadata."
+  ],
+  "references": [
+    "ECMAScript 2026 Object.isSealed"
+  ],
+  "tests": [
+    {
+      "name": "ordinary object state",
+      "input": "const x={}; console.log(Object.isSealed(x));",
+      "expected_behavior": "prints false for a fresh ordinary object"
+    },
+    {
+      "name": "after integrity operation",
+      "input": "const x=Object.seal({a:1}); console.log(Object.isSealed(x));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
