@@ -1,0 +1,44 @@
+{
+  "id": "coercion.to-uint8.number",
+  "category": "coercion",
+  "summary": "ToUint8 applies ECMAScript truncation and modulo-2^8 integer conversion.",
+  "source": {
+    "pattern": "[[ToUint8]]($number)",
+    "requirements": {
+      "semantic_operation": "ToUint8",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToUint8",
+    "template": "JsCoercion.ToUint8($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "nan_infinity_zero": "+0",
+    "fraction": "truncate toward zero",
+    "bits": 8,
+    "signed": false,
+    "wraps_modulo": 256
+  },
+  "tests": [
+    {
+      "name": "wraps at width",
+      "input": "// semantic IR: ToUint8(-1)",
+      "expected_behavior": "returns 255"
+    },
+    {
+      "name": "NaN maps to zero",
+      "input": "// semantic IR: ToUint8(NaN)",
+      "expected_behavior": "returns +0"
+    }
+  ],
+  "caveats": [
+    "A checked C# cast is not equivalent; unchecked casts also differ for NaN/infinity and must not be assumed portable for JS semantics."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

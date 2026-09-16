@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-bigint64.bigint",
+  "category": "coercion",
+  "summary": "Wrap a BigInt modulo 2^64 and interpret the result as signed two's-complement 64-bit.",
+  "source": {
+    "pattern": "[[ToBigInt64]]($bigint)",
+    "requirements": {
+      "semantic_operation": "ToBigInt64",
+      "input_already_bigint": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToBigInt64",
+    "template": "JsCoercion.ToBigInt64($bigint)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "modulus": "2^64",
+    "range": "-2^63..2^63-1"
+  },
+  "tests": [
+    {
+      "name": "wrap maximum unsigned",
+      "input": "// semantic IR: ToBigInt64(18446744073709551615n)",
+      "expected_behavior": "returns -1n"
+    },
+    {
+      "name": "wrap positive overflow",
+      "input": "// semantic IR: ToBigInt64(18446744073709551616n)",
+      "expected_behavior": "returns 0n"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

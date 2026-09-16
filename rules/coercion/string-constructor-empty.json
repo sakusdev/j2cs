@@ -1,0 +1,38 @@
+{
+  "id": "coercion.string-constructor.empty",
+  "category": "coercion",
+  "summary": "new String() boxes the empty string.",
+  "source": {
+    "pattern": "new String()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%String%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewStringObject",
+    "template": "JsCoercion.NewStringObject(string.Empty)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "boxed_value": "",
+    "return_type": "String object"
+  },
+  "tests": [
+    {
+      "name": "empty constructor",
+      "input": "new String().valueOf()",
+      "expected_behavior": "returns empty string"
+    },
+    {
+      "name": "boxed empty string truthy",
+      "input": "Boolean(new String())",
+      "expected_behavior": "returns true"
+    }
+  ],
+  "references": [
+    "ECMAScript String constructor semantics"
+  ]
+}

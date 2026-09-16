@@ -1,0 +1,38 @@
+{
+  "id": "coercion.number-constructor.empty",
+  "category": "coercion",
+  "summary": "new Number() boxes +0.",
+  "source": {
+    "pattern": "new Number()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewNumberObject",
+    "template": "JsCoercion.NewNumberObject(0d)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "boxed_value": "+0",
+    "return_type": "Number object"
+  },
+  "tests": [
+    {
+      "name": "empty constructor",
+      "input": "new Number().valueOf()",
+      "expected_behavior": "returns +0"
+    },
+    {
+      "name": "boxed zero truthy",
+      "input": "Boolean(new Number())",
+      "expected_behavior": "returns true"
+    }
+  ],
+  "references": [
+    "ECMAScript Number constructor semantics"
+  ]
+}

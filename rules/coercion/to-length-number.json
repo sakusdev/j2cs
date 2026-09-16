@@ -1,0 +1,43 @@
+{
+  "id": "coercion.to-length.number",
+  "category": "coercion",
+  "summary": "Clamp an already-Number value to an integer length in 0..2^53-1 after ToIntegerOrInfinity semantics.",
+  "source": {
+    "pattern": "[[ToLength]]($number)",
+    "requirements": {
+      "semantic_operation": "ToLength",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToLength",
+    "template": "JsCoercion.ToLength($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "negative_or_zero": 0,
+    "positive_infinity": 9007199254740991,
+    "maximum": 9007199254740991,
+    "fraction": "truncate toward zero"
+  },
+  "tests": [
+    {
+      "name": "negative clamps to zero",
+      "input": "// semantic IR: ToLength(-3)",
+      "expected_behavior": "returns 0"
+    },
+    {
+      "name": "infinity clamps max safe integer",
+      "input": "// semantic IR: ToLength(Infinity)",
+      "expected_behavior": "returns 9007199254740991"
+    }
+  ],
+  "caveats": [
+    "C# collection lengths are typically Int32; do not silently narrow JavaScript's 2^53-1 abstract length domain."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

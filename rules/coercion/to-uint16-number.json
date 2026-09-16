@@ -1,0 +1,44 @@
+{
+  "id": "coercion.to-uint16.number",
+  "category": "coercion",
+  "summary": "ToUint16 applies ECMAScript truncation and modulo-2^16 integer conversion.",
+  "source": {
+    "pattern": "[[ToUint16]]($number)",
+    "requirements": {
+      "semantic_operation": "ToUint16",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToUint16",
+    "template": "JsCoercion.ToUint16($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "nan_infinity_zero": "+0",
+    "fraction": "truncate toward zero",
+    "bits": 16,
+    "signed": false,
+    "wraps_modulo": 65536
+  },
+  "tests": [
+    {
+      "name": "wraps at width",
+      "input": "// semantic IR: ToUint16(-1)",
+      "expected_behavior": "returns 65535"
+    },
+    {
+      "name": "NaN maps to zero",
+      "input": "// semantic IR: ToUint16(NaN)",
+      "expected_behavior": "returns +0"
+    }
+  ],
+  "caveats": [
+    "A checked C# cast is not equivalent; unchecked casts also differ for NaN/infinity and must not be assumed portable for JS semantics."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "coercion.bigint-function.empty",
+  "category": "coercion",
+  "summary": "Intrinsic BigInt with no argument behaves as conversion of undefined and throws TypeError.",
+  "source": {
+    "pattern": "BigInt()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%BigInt%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ThrowBigIntUndefined",
+    "template": "JsCoercion.ThrowBigIntUndefined()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "no argument throws",
+      "input": "BigInt()",
+      "expected_behavior": "throws TypeError"
+    },
+    {
+      "name": "contrast empty string",
+      "input": "BigInt('')",
+      "expected_behavior": "returns 0n"
+    }
+  ],
+  "references": [
+    "ECMAScript BigInt constructor semantics",
+    "ECMAScript ToBigInt abstract operation"
+  ]
+}

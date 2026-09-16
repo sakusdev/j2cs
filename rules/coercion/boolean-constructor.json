@@ -1,0 +1,42 @@
+{
+  "id": "coercion.boolean-constructor",
+  "category": "coercion",
+  "summary": "new Boolean boxes the ToBoolean result into a distinct truthy Boolean object.",
+  "source": {
+    "pattern": "new Boolean($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Boolean%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewBooleanObject",
+    "template": "JsCoercion.NewBooleanObject($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Boolean object",
+    "boxed_value": "ToBoolean(value)",
+    "object_itself_truthy": true
+  },
+  "tests": [
+    {
+      "name": "boxes false",
+      "input": "const x=new Boolean(false); console.log(Boolean(x), x.valueOf());",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "boxes empty string",
+      "input": "new Boolean('').valueOf()",
+      "expected_behavior": "returns false"
+    }
+  ],
+  "caveats": [
+    "new Boolean(false) is truthy because the result is an object; replacing it with false changes semantics."
+  ],
+  "references": [
+    "ECMAScript Boolean constructor semantics"
+  ]
+}

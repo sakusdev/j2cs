@@ -1,0 +1,50 @@
+{
+  "id": "coercion.string-to-number",
+  "category": "coercion",
+  "summary": "Parse a JavaScript String according to ECMAScript StringNumericLiteral rules.",
+  "source": {
+    "pattern": "[[StringToNumber]]($string)",
+    "requirements": {
+      "semantic_operation": "StringToNumber",
+      "static_type": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.StringToNumber",
+    "template": "JsCoercion.StringToNumber($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty_or_whitespace": "+0",
+    "supports": [
+      "decimal",
+      "binary 0b",
+      "octal 0o",
+      "hex 0x",
+      "Infinity"
+    ],
+    "invalid": "NaN",
+    "numeric_separators_in_strings": "invalid"
+  },
+  "tests": [
+    {
+      "name": "hex and whitespace",
+      "input": "Number('  0x10  ')",
+      "expected_csharp": "var r = JsCoercion.StringToNumber(\"  0x10  \");",
+      "expected_behavior": "returns 16"
+    },
+    {
+      "name": "invalid string becomes NaN",
+      "input": "Number('1_000')",
+      "expected_behavior": "returns NaN rather than throwing"
+    }
+  ],
+  "caveats": [
+    "Do not use double.Parse directly: JavaScript whitespace, prefixes, Infinity, invalid-input-to-NaN behavior, and accepted grammar differ."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

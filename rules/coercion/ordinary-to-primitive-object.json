@@ -1,0 +1,48 @@
+{
+  "id": "coercion.ordinary-to-primitive.object",
+  "category": "coercion",
+  "summary": "OrdinaryToPrimitive must preserve valueOf/toString lookup order, calls, getters, and exceptions.",
+  "source": {
+    "pattern": "[[OrdinaryToPrimitive]]($object, $hint)",
+    "requirements": {
+      "semantic_operation": "OrdinaryToPrimitive",
+      "input_is_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.OrdinaryToPrimitive",
+    "template": "JsRuntime.OrdinaryToPrimitive($object, $hint)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "number_hint_order": [
+      "valueOf",
+      "toString"
+    ],
+    "string_hint_order": [
+      "toString",
+      "valueOf"
+    ],
+    "can_execute_user_code": true
+  },
+  "tests": [
+    {
+      "name": "number hint prefers valueOf",
+      "input": "Number({ valueOf(){ return 5; }, toString(){ return '9'; } })",
+      "expected_behavior": "result is 5"
+    },
+    {
+      "name": "object results cause TypeError",
+      "input": "Number({ valueOf(){ return {}; }, toString(){ return {}; } })",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "A method returning another object is ignored and the next method is tried; if neither yields a primitive, TypeError is thrown."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

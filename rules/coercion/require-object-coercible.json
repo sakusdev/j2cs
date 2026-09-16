@@ -1,0 +1,41 @@
+{
+  "id": "coercion.require-object-coercible",
+  "category": "coercion",
+  "summary": "Reject only null and undefined; return every other value unchanged.",
+  "source": {
+    "pattern": "[[RequireObjectCoercible]]($value)",
+    "requirements": {
+      "semantic_operation": "RequireObjectCoercible"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.RequireObjectCoercible",
+    "template": "JsCoercion.RequireObjectCoercible($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "null": "TypeError",
+    "undefined": "TypeError",
+    "other": "identity"
+  },
+  "tests": [
+    {
+      "name": "number remains primitive",
+      "input": "// semantic IR: RequireObjectCoercible(1)",
+      "expected_behavior": "returns primitive Number 1 unchanged"
+    },
+    {
+      "name": "undefined rejected",
+      "input": "// semantic IR: RequireObjectCoercible(undefined)",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "This is not ToObject: primitives are not boxed by RequireObjectCoercible."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

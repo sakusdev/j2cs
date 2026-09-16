@@ -1,0 +1,43 @@
+{
+  "id": "coercion.bigint-function.primitive",
+  "category": "coercion",
+  "summary": "Intrinsic BigInt(value) accepts integral Number values in addition to the types accepted by abstract ToBigInt.",
+  "source": {
+    "pattern": "BigInt($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%BigInt%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.BigIntFunctionPrimitive",
+    "template": "JsCoercion.BigIntFunctionPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "number": "NumberToBigInt (RangeError if non-integral)",
+    "other": "ToBigInt"
+  },
+  "tests": [
+    {
+      "name": "integral number accepted",
+      "input": "BigInt(42)",
+      "expected_behavior": "returns 42n"
+    },
+    {
+      "name": "fractional number rejected",
+      "input": "BigInt(1.25)",
+      "expected_behavior": "throws RangeError"
+    }
+  ],
+  "caveats": [
+    "Do not route Number arguments through abstract ToBigInt, which would throw TypeError instead of applying NumberToBigInt."
+  ],
+  "references": [
+    "ECMAScript BigInt constructor semantics",
+    "ECMAScript NumberToBigInt abstract operation"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "coercion.to-bigint.primitive-other",
+  "category": "coercion",
+  "summary": "ToBigInt accepts booleans and parseable strings, but rejects Number, Symbol, null, and undefined.",
+  "source": {
+    "pattern": "[[ToBigInt]]($value)",
+    "requirements": {
+      "semantic_operation": "ToBigInt",
+      "input_is_primitive": true,
+      "static_type_excludes": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToBigIntPrimitive",
+    "template": "JsCoercion.ToBigIntPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "boolean": "0n or 1n",
+    "string": "StringToBigInt; invalid syntax throws SyntaxError",
+    "number": "TypeError",
+    "symbol": "TypeError",
+    "null": "TypeError",
+    "undefined": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "boolean converts",
+      "input": "// semantic IR: ToBigInt(true)",
+      "expected_behavior": "returns 1n"
+    },
+    {
+      "name": "number rejected by abstract operation",
+      "input": "// semantic IR: ToBigInt(1)",
+      "expected_behavior": "throws TypeError"
+    },
+    {
+      "name": "invalid string is syntax error",
+      "input": "// semantic IR: ToBigInt('1.5')",
+      "expected_behavior": "throws SyntaxError"
+    }
+  ],
+  "caveats": [
+    "BigInt(number) is different: the BigInt function specially accepts integral Number values."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

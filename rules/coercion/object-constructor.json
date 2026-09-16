@@ -1,0 +1,42 @@
+{
+  "id": "coercion.object-constructor",
+  "category": "coercion",
+  "summary": "Direct new Object(value) with the intrinsic constructor mirrors Object(value): object identity, primitive boxing, or a fresh object for nullish input.",
+  "source": {
+    "pattern": "new Object($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Object%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewObject",
+    "template": "JsCoercion.NewObject($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object": "same identity may be returned by constructor",
+    "null_or_undefined": "new ordinary object",
+    "other_primitive": "boxed wrapper"
+  },
+  "tests": [
+    {
+      "name": "existing object returned",
+      "input": "const o={}; console.log(new Object(o)===o)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "number boxed",
+      "input": "new Object(3).valueOf()",
+      "expected_behavior": "returns Number 3"
+    }
+  ],
+  "caveats": [
+    "Apply only to direct intrinsic Object construction; subclassing/Reflect.construct with a different NewTarget requires separate semantics."
+  ],
+  "references": [
+    "ECMAScript Object constructor semantics"
+  ]
+}

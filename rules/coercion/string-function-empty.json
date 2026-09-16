@@ -1,0 +1,41 @@
+{
+  "id": "coercion.string-function.empty",
+  "category": "coercion",
+  "summary": "Intrinsic String called with no argument returns the empty string.",
+  "source": {
+    "pattern": "String()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%String%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "string.Empty"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "String",
+    "value": ""
+  },
+  "tests": [
+    {
+      "name": "no argument",
+      "input": "String()",
+      "expected_csharp": "var r = string.Empty;",
+      "expected_behavior": "returns empty string"
+    },
+    {
+      "name": "contrast explicit undefined",
+      "input": "String(undefined)",
+      "expected_behavior": "returns 'undefined'"
+    }
+  ],
+  "caveats": [
+    "This differs from String(undefined), which returns 'undefined'."
+  ],
+  "references": [
+    "ECMAScript String constructor semantics"
+  ]
+}

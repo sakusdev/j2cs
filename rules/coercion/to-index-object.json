@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-index.object",
+  "category": "coercion",
+  "summary": "ToIndex on objects can execute conversion hooks before range validation.",
+  "source": {
+    "pattern": "[[ToIndex]]($object)",
+    "requirements": {
+      "semantic_operation": "ToIndex",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToIndex",
+    "template": "JsRuntime.ToIndex($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "valid_range": "0..2^53-1"
+  },
+  "tests": [
+    {
+      "name": "object to valid index",
+      "input": "// semantic IR: ToIndex({valueOf(){return 2}})",
+      "expected_behavior": "returns 2"
+    },
+    {
+      "name": "object to negative index",
+      "input": "// semantic IR: ToIndex({valueOf(){return -1}})",
+      "expected_behavior": "throws RangeError after invoking valueOf"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

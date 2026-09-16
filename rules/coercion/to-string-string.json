@@ -1,0 +1,40 @@
+{
+  "id": "coercion.to-string.string",
+  "category": "coercion",
+  "summary": "ToString is identity for JavaScript String values.",
+  "source": {
+    "pattern": "[[ToString]]($string)",
+    "requirements": {
+      "semantic_operation": "ToString",
+      "static_type": "String"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$string"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "returns_input": true,
+    "encoding": "ECMAScript strings are UTF-16 code-unit sequences, matching .NET string storage model closely"
+  },
+  "tests": [
+    {
+      "name": "ordinary string unchanged",
+      "input": "// semantic IR: ToString('abc')",
+      "expected_behavior": "returns 'abc'"
+    },
+    {
+      "name": "lone surrogate preserved",
+      "input": "// semantic IR: ToString('\\uD800')",
+      "expected_behavior": "returns a one-code-unit string containing the lone surrogate"
+    }
+  ],
+  "caveats": [
+    "Do not assume Unicode scalar-value normalization; lone surrogates are valid JavaScript string code units and must be preserved."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

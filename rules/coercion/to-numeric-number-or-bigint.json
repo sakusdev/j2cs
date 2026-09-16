@@ -1,0 +1,39 @@
+{
+  "id": "coercion.to-numeric.number-or-bigint",
+  "category": "coercion",
+  "summary": "ToNumeric is identity when the value is already Number or BigInt.",
+  "source": {
+    "pattern": "[[ToNumeric]]($value)",
+    "requirements": {
+      "semantic_operation": "ToNumeric",
+      "static_type_one_of": [
+        "Number",
+        "BigInt"
+      ]
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$value"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "returns_input": true
+  },
+  "tests": [
+    {
+      "name": "number unchanged",
+      "input": "// semantic IR: ToNumeric(2.5)",
+      "expected_behavior": "returns the same Number"
+    },
+    {
+      "name": "bigint unchanged",
+      "input": "// semantic IR: ToNumeric(2n)",
+      "expected_behavior": "returns the same BigInt"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

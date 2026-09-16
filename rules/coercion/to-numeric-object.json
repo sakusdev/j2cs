@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-numeric.object",
+  "category": "coercion",
+  "summary": "Object ToNumeric requires ToPrimitive(number), which can invoke arbitrary JavaScript code.",
+  "source": {
+    "pattern": "[[ToNumeric]]($object)",
+    "requirements": {
+      "semantic_operation": "ToNumeric",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToNumeric",
+    "template": "JsRuntime.ToNumeric($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "result_type": "Number or BigInt"
+  },
+  "tests": [
+    {
+      "name": "object yields bigint",
+      "input": "let o={valueOf(){return 4n;}}; /* numeric context */",
+      "expected_behavior": "ToNumeric yields BigInt 4n"
+    },
+    {
+      "name": "throwing hook",
+      "input": "let o={valueOf(){throw 1;}}; /* numeric context */",
+      "expected_behavior": "propagates the thrown value"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

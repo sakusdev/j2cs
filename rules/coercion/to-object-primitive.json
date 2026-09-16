@@ -1,0 +1,47 @@
+{
+  "id": "coercion.to-object.primitive",
+  "category": "coercion",
+  "summary": "ToObject boxes non-nullish primitives and throws TypeError for null/undefined.",
+  "source": {
+    "pattern": "[[ToObject]]($value)",
+    "requirements": {
+      "semantic_operation": "ToObject",
+      "input_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToObject",
+    "template": "JsCoercion.ToObject($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined": "TypeError",
+    "null": "TypeError",
+    "boolean": "Boolean wrapper",
+    "number": "Number wrapper",
+    "string": "String wrapper with indexed character semantics",
+    "symbol": "Symbol wrapper",
+    "bigint": "BigInt wrapper"
+  },
+  "tests": [
+    {
+      "name": "number boxed",
+      "input": "// semantic IR: ToObject(3)",
+      "expected_csharp": "var o = JsCoercion.ToObject(3d);",
+      "expected_behavior": "returns a Number wrapper object"
+    },
+    {
+      "name": "null rejected",
+      "input": "// semantic IR: ToObject(null)",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "String wrapper objects expose special indexed own properties; a generic CLR box is insufficient."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

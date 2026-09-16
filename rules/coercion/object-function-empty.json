@@ -1,0 +1,38 @@
+{
+  "id": "coercion.object-function.empty",
+  "category": "coercion",
+  "summary": "Intrinsic Object() creates a fresh ordinary object.",
+  "source": {
+    "pattern": "Object()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Object%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewOrdinaryObject",
+    "template": "JsCoercion.NewOrdinaryObject()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "ordinary object",
+    "fresh_identity": true
+  },
+  "tests": [
+    {
+      "name": "creates object",
+      "input": "typeof Object()",
+      "expected_behavior": "returns 'object'"
+    },
+    {
+      "name": "fresh each call",
+      "input": "Object() === Object()",
+      "expected_behavior": "returns false"
+    }
+  ],
+  "references": [
+    "ECMAScript Object constructor semantics"
+  ]
+}

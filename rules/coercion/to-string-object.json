@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-string.object",
+  "category": "coercion",
+  "summary": "ToString on objects performs ToPrimitive with string hint and may execute user code.",
+  "source": {
+    "pattern": "[[ToString]]($object)",
+    "requirements": {
+      "semantic_operation": "ToString",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToString",
+    "template": "JsRuntime.ToString($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "first_step": "ToPrimitive(value, string)",
+    "can_execute_user_code": true
+  },
+  "tests": [
+    {
+      "name": "custom toString",
+      "input": "String({toString(){return 'ok';}})",
+      "expected_behavior": "returns 'ok'"
+    },
+    {
+      "name": "throwing getter",
+      "input": "String(Object.defineProperty({}, 'toString', {get(){throw 1;}}))",
+      "expected_behavior": "propagates the thrown value"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

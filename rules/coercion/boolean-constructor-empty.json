@@ -1,0 +1,38 @@
+{
+  "id": "coercion.boolean-constructor.empty",
+  "category": "coercion",
+  "summary": "new Boolean() boxes false because the missing value is undefined and ToBoolean(undefined) is false.",
+  "source": {
+    "pattern": "new Boolean()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Boolean%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewBooleanObject",
+    "template": "JsCoercion.NewBooleanObject(JsUndefined.Value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "boxed_value": false,
+    "return_type": "Boolean object"
+  },
+  "tests": [
+    {
+      "name": "empty constructor",
+      "input": "new Boolean().valueOf()",
+      "expected_behavior": "returns false"
+    },
+    {
+      "name": "object is truthy",
+      "input": "Boolean(new Boolean())",
+      "expected_behavior": "returns true"
+    }
+  ],
+  "references": [
+    "ECMAScript Boolean constructor semantics"
+  ]
+}

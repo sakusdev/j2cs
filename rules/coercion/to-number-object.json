@@ -1,0 +1,42 @@
+{
+  "id": "coercion.to-number.object",
+  "category": "coercion",
+  "summary": "ToNumber on objects first performs ToPrimitive with number hint, so arbitrary user code may run.",
+  "source": {
+    "pattern": "[[ToNumber]]($object)",
+    "requirements": {
+      "semantic_operation": "ToNumber",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToNumber",
+    "template": "JsRuntime.ToNumber($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "first_step": "ToPrimitive(value, number)",
+    "can_execute_user_code": true,
+    "can_throw": true
+  },
+  "tests": [
+    {
+      "name": "array converts through primitive",
+      "input": "Number([7])",
+      "expected_behavior": "returns 7 after object-to-primitive conversion"
+    },
+    {
+      "name": "custom valueOf side effect",
+      "input": "let n=0; Number({valueOf(){n++; return 3;}}); console.log(n)",
+      "expected_behavior": "prints 1"
+    }
+  ],
+  "caveats": [
+    "Use the primitive-only helper only after analysis proves no object value can arrive."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "coercion.boolean-function.empty",
+  "category": "coercion",
+  "summary": "Intrinsic Boolean called with no argument returns false.",
+  "source": {
+    "pattern": "Boolean()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Boolean%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "false"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Boolean",
+    "value": false,
+    "side_effects": "none after callee resolution"
+  },
+  "tests": [
+    {
+      "name": "empty call",
+      "input": "Boolean()",
+      "expected_csharp": "var r = false;",
+      "expected_behavior": "returns false"
+    },
+    {
+      "name": "explicit undefined is same result",
+      "input": "Boolean(undefined)",
+      "expected_behavior": "returns false; use the value-taking rule because the argument is evaluated"
+    }
+  ],
+  "caveats": [
+    "Do not apply when Boolean is shadowed or the global binding has been replaced."
+  ],
+  "references": [
+    "ECMAScript Boolean constructor semantics",
+    "ECMAScript ToBoolean abstract operation"
+  ]
+}

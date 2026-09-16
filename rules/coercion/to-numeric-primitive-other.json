@@ -1,0 +1,45 @@
+{
+  "id": "coercion.to-numeric.primitive-other",
+  "category": "coercion",
+  "summary": "ToNumeric preserves BigInt but otherwise applies ToNumber after primitive conversion.",
+  "source": {
+    "pattern": "[[ToNumeric]]($value)",
+    "requirements": {
+      "semantic_operation": "ToNumeric",
+      "input_is_primitive": true,
+      "static_type_excludes": [
+        "Number",
+        "BigInt"
+      ]
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToNumericPrimitive",
+    "template": "JsCoercion.ToNumericPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result_type": "Number for non-BigInt primitives",
+    "symbol": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "boolean to number",
+      "input": "// semantic IR: ToNumeric(true)",
+      "expected_behavior": "returns Number 1"
+    },
+    {
+      "name": "symbol rejected",
+      "input": "// semantic IR: ToNumeric(Symbol())",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "The result is a tagged Number-or-BigInt value unless static analysis narrows it further."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

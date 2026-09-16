@@ -1,0 +1,44 @@
+{
+  "id": "coercion.boolean-function.value",
+  "category": "coercion",
+  "summary": "Intrinsic Boolean(value) performs ToBoolean without invoking object conversion hooks.",
+  "source": {
+    "pattern": "Boolean($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Boolean%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsValue.IsTruthy",
+    "template": "JsValue.IsTruthy($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Boolean",
+    "objects": "truthy except normative-optional HTMLDDA",
+    "does_not_call_valueOf_or_toString": true
+  },
+  "tests": [
+    {
+      "name": "empty array truthy",
+      "input": "Boolean([])",
+      "expected_csharp": "var r = JsValue.IsTruthy(value);",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "NaN falsy",
+      "input": "Boolean(NaN)",
+      "expected_behavior": "returns false"
+    }
+  ],
+  "caveats": [
+    "This intentionally reuses the existing truthiness helper semantics rather than duplicating a second ToBoolean implementation."
+  ],
+  "references": [
+    "ECMAScript Boolean constructor semantics",
+    "ECMAScript ToBoolean abstract operation"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "coercion.to-number.primitive-other",
+  "category": "coercion",
+  "summary": "ToNumber for non-Number primitives needs JavaScript conversion rules rather than CLR conversion rules.",
+  "source": {
+    "pattern": "[[ToNumber]]($value)",
+    "requirements": {
+      "semantic_operation": "ToNumber",
+      "input_is_primitive": true,
+      "static_type_excludes": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToNumberPrimitive",
+    "template": "JsCoercion.ToNumberPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined": "NaN",
+    "null": "+0",
+    "false": "+0",
+    "true": "1",
+    "string": "StringToNumber",
+    "bigint": "TypeError",
+    "symbol": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "null becomes positive zero",
+      "input": "// semantic IR: ToNumber(null)",
+      "expected_csharp": "var r = JsCoercion.ToNumberPrimitive(JsNull.Value);",
+      "expected_behavior": "returns +0"
+    },
+    {
+      "name": "BigInt rejected",
+      "input": "// semantic IR: ToNumber(1n)",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "Number(BigInt) is different: the Number function explicitly accepts BigInt, while abstract ToNumber does not."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

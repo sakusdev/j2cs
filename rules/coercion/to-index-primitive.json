@@ -1,0 +1,44 @@
+{
+  "id": "coercion.to-index.primitive",
+  "category": "coercion",
+  "summary": "ToIndex converts a primitive to a non-negative integer index and throws RangeError when outside 0..2^53-1.",
+  "source": {
+    "pattern": "[[ToIndex]]($value)",
+    "requirements": {
+      "semantic_operation": "ToIndex",
+      "input_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToIndexPrimitive",
+    "template": "JsCoercion.ToIndexPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined": 0,
+    "nan": 0,
+    "negative": "RangeError",
+    "positive_infinity": "RangeError",
+    "maximum": 9007199254740991
+  },
+  "tests": [
+    {
+      "name": "undefined becomes zero",
+      "input": "// semantic IR: ToIndex(undefined)",
+      "expected_behavior": "returns 0"
+    },
+    {
+      "name": "negative rejected",
+      "input": "// semantic IR: ToIndex(-1)",
+      "expected_behavior": "throws RangeError"
+    }
+  ],
+  "caveats": [
+    "If an object is possible, conversion can execute user code and should use a runtime-capable path."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

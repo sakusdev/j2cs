@@ -1,0 +1,41 @@
+{
+  "id": "coercion.number-function.empty",
+  "category": "coercion",
+  "summary": "Intrinsic Number called with no argument returns +0.",
+  "source": {
+    "pattern": "Number()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "0d"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Number",
+    "value": "+0"
+  },
+  "tests": [
+    {
+      "name": "no argument",
+      "input": "Number()",
+      "expected_csharp": "var r = 0d;",
+      "expected_behavior": "returns +0"
+    },
+    {
+      "name": "contrast explicit undefined",
+      "input": "Number(undefined)",
+      "expected_behavior": "returns NaN via the value-taking rule"
+    }
+  ],
+  "caveats": [
+    "This differs from Number(undefined), which returns NaN."
+  ],
+  "references": [
+    "ECMAScript Number constructor semantics"
+  ]
+}

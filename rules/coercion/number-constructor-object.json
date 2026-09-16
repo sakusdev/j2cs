@@ -1,0 +1,39 @@
+{
+  "id": "coercion.number-constructor.object",
+  "category": "coercion",
+  "summary": "new Number(object) must preserve object-to-primitive hooks before boxing the converted Number.",
+  "source": {
+    "pattern": "new Number($object)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NewNumberObject",
+    "template": "JsRuntime.NewNumberObject($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "return_type": "Number object"
+  },
+  "tests": [
+    {
+      "name": "custom valueOf",
+      "input": "new Number({valueOf(){return 8}}).valueOf()",
+      "expected_behavior": "returns 8"
+    },
+    {
+      "name": "throws from hook",
+      "input": "new Number({valueOf(){throw 1}})",
+      "expected_behavior": "propagates thrown value"
+    }
+  ],
+  "references": [
+    "ECMAScript Number constructor semantics"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "coercion.to-bigint.bigint",
+  "category": "coercion",
+  "summary": "ToBigInt is identity for BigInt values.",
+  "source": {
+    "pattern": "[[ToBigInt]]($bigint)",
+    "requirements": {
+      "semantic_operation": "ToBigInt",
+      "static_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$bigint"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "returns_input": true
+  },
+  "tests": [
+    {
+      "name": "positive bigint unchanged",
+      "input": "// semantic IR: ToBigInt(42n)",
+      "expected_behavior": "returns 42n"
+    },
+    {
+      "name": "negative bigint unchanged",
+      "input": "// semantic IR: ToBigInt(-1n)",
+      "expected_behavior": "returns -1n"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

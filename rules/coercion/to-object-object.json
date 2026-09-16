@@ -1,0 +1,36 @@
+{
+  "id": "coercion.to-object.object",
+  "category": "coercion",
+  "summary": "ToObject returns Object inputs unchanged.",
+  "source": {
+    "pattern": "[[ToObject]]($object)",
+    "requirements": {
+      "semantic_operation": "ToObject",
+      "static_type": "Object"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$object"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "returns_same_identity": true
+  },
+  "tests": [
+    {
+      "name": "object identity",
+      "input": "// semantic IR: ToObject(o) where o is Object",
+      "expected_behavior": "returns the identical object reference"
+    },
+    {
+      "name": "array identity",
+      "input": "// semantic IR: ToObject([])",
+      "expected_behavior": "returns the same Array object"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

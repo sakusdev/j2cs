@@ -1,0 +1,42 @@
+{
+  "id": "coercion.bigint-constructor",
+  "category": "coercion",
+  "summary": "Intrinsic BigInt is not constructible; new BigInt(...) always throws TypeError after normal callee/argument evaluation.",
+  "source": {
+    "pattern": "new BigInt($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%BigInt%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ThrowBigIntNotConstructor",
+    "template": "JsCoercion.ThrowBigIntNotConstructor($value)",
+    "notes": "Argument expressions are evaluated before the constructor call fails; emit a helper/call site that preserves evaluation order then throws TypeError."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "always abrupt TypeError",
+    "argument_evaluation": "must occur first"
+  },
+  "tests": [
+    {
+      "name": "always throws",
+      "input": "new BigInt(1)",
+      "expected_behavior": "throws TypeError"
+    },
+    {
+      "name": "argument side effect preserved",
+      "input": "let x=0; try{new BigInt(x++)}catch{} console.log(x)",
+      "expected_behavior": "prints 1"
+    }
+  ],
+  "caveats": [
+    "Do not constant-fold the entire expression to an immediate throw if that would skip argument side effects."
+  ],
+  "references": [
+    "ECMAScript BigInt constructor semantics"
+  ]
+}

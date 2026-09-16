@@ -1,0 +1,40 @@
+{
+  "id": "coercion.bigint-function.object",
+  "category": "coercion",
+  "summary": "Intrinsic BigInt(object) performs ToPrimitive(number), then accepts an integral Number or applies ToBigInt.",
+  "source": {
+    "pattern": "BigInt($object)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%BigInt%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.BigIntFunction",
+    "template": "JsRuntime.BigIntFunction($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "number_primitive": "NumberToBigInt",
+    "other_primitive": "ToBigInt"
+  },
+  "tests": [
+    {
+      "name": "object yields integral number",
+      "input": "BigInt({valueOf(){return 7}})",
+      "expected_behavior": "returns 7n"
+    },
+    {
+      "name": "object yields fraction",
+      "input": "BigInt({valueOf(){return 1.5}})",
+      "expected_behavior": "throws RangeError"
+    }
+  ],
+  "references": [
+    "ECMAScript BigInt constructor semantics"
+  ]
+}

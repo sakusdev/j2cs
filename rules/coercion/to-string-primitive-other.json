@@ -1,0 +1,46 @@
+{
+  "id": "coercion.to-string.primitive-other",
+  "category": "coercion",
+  "summary": "ToString for non-String primitives uses ECMAScript formatting and throws for Symbol.",
+  "source": {
+    "pattern": "[[ToString]]($value)",
+    "requirements": {
+      "semantic_operation": "ToString",
+      "input_is_primitive": true,
+      "static_type_excludes": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToStringPrimitive",
+    "template": "JsCoercion.ToStringPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined": "'undefined'",
+    "null": "'null'",
+    "boolean": "'true'/'false'",
+    "number": "ECMAScript Number::toString base 10",
+    "bigint": "decimal digits",
+    "symbol": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "negative zero stringifies as zero",
+      "input": "String(-0)",
+      "expected_behavior": "returns '0'"
+    },
+    {
+      "name": "abstract symbol tostring throws",
+      "input": "// semantic IR: ToString(Symbol('x'))",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "C# ToString is culture-sensitive for numbers by default and formats NaN/infinity differently; it also does not model Symbol errors."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}
