@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.mkdirsync",
+  "category": "node_fs",
+  "summary": "Create a directory synchronously, preserving recursive return value, existing-path errors, and mode semantics.",
+  "source": {"pattern":"$fs.mkdirSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"options_shape":"statically known or represented by NodeFsOptions"}},
+  "target": {"kind":"helper","helper":"NodeFs.MkdirSync","template":"NodeFs.MkdirSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined normally; with recursive:true, first directory path created or undefined","default_mode":"0o777 subject to process umask/platform","recursive":"creates missing parents"},
+  "caveats": ["Directory.CreateDirectory alone loses the recursive:true return value.","With recursive:false, an existing directory is an error; .NET CreateDirectory is idempotent.","Windows root and permission semantics differ from POSIX."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"nonrecursive existing directory throws","input":"fs.mkdirSync('d'); fs.mkdirSync('d');","expected_csharp":"NodeFs.MkdirSync(path, NodeFsMkdirOptions.Default);","expected_behavior":"second call throws a Node-compatible EEXIST-style error"},
+    {"name":"recursive returns first created path","input":"const x=fs.mkdirSync('a/b/c',{recursive:true}); console.log(x);","expected_csharp":"var x = NodeFs.MkdirSync(path, NodeFsMkdirOptions.Recursive);","expected_behavior":"returns the first directory path that had to be created, or undefined if none were created"}
+  ]
+}

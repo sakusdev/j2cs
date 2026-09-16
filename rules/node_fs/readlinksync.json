@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.readlinksync",
+  "category": "node_fs",
+  "summary": "Read the stored symbolic-link target text without resolving the link target.",
+  "source": {"pattern":"$fs.readlinkSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.ReadLinkSync","template":"NodeFs.ReadLinkSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"link target string by default; Buffer with encoding='buffer'","resolution":"returns link payload, not canonical target path"},
+  "caveats": ["Do not replace with realpath; relative symlink payloads must remain relative text.","Windows junction/reparse-point behavior may require platform-specific handling."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"preserves relative link text","input":"fs.symlinkSync('../target','ln'); console.log(fs.readlinkSync('ln'));","expected_csharp":"var target = NodeFs.ReadLinkSync(path, NodeFsEncoding.Utf8);","expected_behavior":"returns '../target' rather than resolving it"},
+    {"name":"nonlink errors","input":"fs.writeFileSync('a','x'); fs.readlinkSync('a');","expected_csharp":"var target = NodeFs.ReadLinkSync(path, NodeFsEncoding.Utf8);","expected_behavior":"throws a Node-compatible error when the path is not a symbolic link"}
+  ]
+}

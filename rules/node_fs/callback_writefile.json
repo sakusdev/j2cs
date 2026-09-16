@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.callback.writefile",
+  "category": "node_fs",
+  "summary": "Preserve Node error-first callback, asynchronous completion, flags, and partial-write-on-abort semantics for fs.writeFile.",
+  "source": {"pattern":"$fs.writeFile($file, $data, $options?, $callback)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"callback":"JS callable"}},
+  "target": {"kind":"runtime","template":"NodeFsRuntime.WriteFileCallback($file, $data, $options, $callback)"},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"async":true,"return_value":"undefined","callback_signature":"(err)","default_flag":"w","abort_signal":"best effort; callback receives AbortError if cancellation wins","ordering":"completion order with other async fs calls is not guaranteed"},
+  "caveats": ["Callback exceptions must flow through the JS runtime/event-loop semantics, not be wrapped as .NET task exceptions.","Multiple overlapping writeFile calls to the same file can race/corrupt; do not serialize unless source does.","Cancellation is not atomic rollback."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"callback after write","input":"fs.writeFile('a','x',(err)=>{if(err) throw err; console.log(fs.readFileSync('a','utf8'));});","expected_behavior":"callback runs asynchronously after successful completion and reads x"},
+    {"name":"exclusive flag callback error","input":"fs.writeFile('a','x',{flag:'wx'},(err)=>console.log(err && err.code));","expected_behavior":"when a exists, callback receives a Node-compatible EEXIST-style error rather than a synchronous success"}
+  ]
+}

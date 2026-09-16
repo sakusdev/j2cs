@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.existssync",
+  "category": "node_fs",
+  "summary": "Check synchronous path existence without converting the operation into a throwing stat call.",
+  "source": {"pattern":"$fs.existsSync($path)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.ExistsSync","template":"NodeFs.ExistsSync($path)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"boolean","missing":"false","deprecated":"fs.exists is deprecated; existsSync is not"},
+  "caveats": ["File.Exists alone returns false for directories, so it is not equivalent.","Existence checks are inherently racy; do not use this rule to justify a later operation's success.","Path-kind and symlink behavior must match Node rather than .NET convenience APIs."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"file exists","input":"fs.writeFileSync('a','x'); console.log(fs.existsSync('a'));","expected_csharp":"var exists = NodeFs.ExistsSync(path);","expected_behavior":"returns true for the created filesystem entry"},
+    {"name":"missing returns false","input":"console.log(fs.existsSync('definitely-missing'));","expected_csharp":"var exists = NodeFs.ExistsSync(path);","expected_behavior":"returns false rather than throwing merely because the entry is absent"}
+  ]
+}

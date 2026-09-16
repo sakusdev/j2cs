@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.linksync",
+  "category": "node_fs",
+  "summary": "Create a hard link without copying file contents.",
+  "source": {"pattern":"$fs.linkSync($existingPath, $newPath)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.LinkSync","template":"NodeFs.LinkSync($existingPath, $newPath)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","mutation":"creates another directory entry for the same underlying file"},
+  "caveats": ["File.Copy is not equivalent: a hard link aliases the same file identity/content.","Hard links can fail across filesystems and have platform/filesystem restrictions."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"aliases same content","input":"fs.writeFileSync('a','x'); fs.linkSync('a','b'); fs.writeFileSync('a','y'); console.log(fs.readFileSync('b','utf8'));","expected_csharp":"NodeFs.LinkSync(existingPath, newPath);","expected_behavior":"reading b observes y because a and b are hard links to the same file"},
+    {"name":"existing destination errors","input":"fs.writeFileSync('a','x'); fs.writeFileSync('b','z'); fs.linkSync('a','b');","expected_csharp":"NodeFs.LinkSync(existingPath, newPath);","expected_behavior":"throws rather than replacing the existing destination"}
+  ]
+}

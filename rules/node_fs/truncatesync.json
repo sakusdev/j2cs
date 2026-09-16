@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.truncatesync",
+  "category": "node_fs",
+  "summary": "Resize a file synchronously, including zero-length default and zero-filled extension behavior.",
+  "source": {"pattern":"$fs.truncateSync($path, $len?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.TruncateSync","template":"NodeFs.TruncateSync($path, $len)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","default_length":0,"mutation":"shrinks or extends file to requested byte length; extension reads as zero-filled bytes"},
+  "caveats": ["Length validation and Node error types must be preserved.","Opening and rewriting the file is not equivalent; metadata/races and sparse-file behavior can differ."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"default truncates to zero","input":"fs.writeFileSync('a','abc'); fs.truncateSync('a'); console.log(fs.statSync('a').size);","expected_csharp":"NodeFs.TruncateSync(path, 0L);","expected_behavior":"file size becomes 0"},
+    {"name":"extension yields zero bytes","input":"fs.writeFileSync('a',Buffer.from([1])); fs.truncateSync('a',3); console.log([...fs.readFileSync('a')]);","expected_csharp":"NodeFs.TruncateSync(path, 3L);","expected_behavior":"file length is 3 and newly extended bytes read as zero"}
+  ]
+}

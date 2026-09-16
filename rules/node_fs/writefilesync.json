@@ -1,0 +1,36 @@
+{
+  "id": "node.fs.writefilesync",
+  "category": "node_fs",
+  "summary": "Synchronously replace/create a file while preserving Node flags, mode, flush, Buffer/string encoding, and undefined return.",
+  "source": {
+    "pattern": "$fs.writeFileSync($file, $data, $options?)",
+    "requirements": {
+      "module_binding": "node:fs builtin",
+      "builtin_not_shadowed": true,
+      "options_shape": "statically known or represented by NodeFsOptions"
+    }
+  },
+  "target": {"kind":"helper","helper":"NodeFs.WriteFileSync","template":"NodeFs.WriteFileSync($file, $data, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "blocks_caller": true,
+    "return_value": "undefined",
+    "default_flag": "w",
+    "default_encoding": "utf8",
+    "mutation": "creates or replaces file contents",
+    "buffer_encoding": "encoding ignored for Buffer/TypedArray data",
+    "mode": "only affects a newly created file",
+    "flush": "when true, fsync-like flush occurs before return"
+  },
+  "caveats": [
+    "File.WriteAllText does not preserve Node open-flag semantics or Buffer behavior.",
+    "Mode/permission behavior is OS-dependent, especially on Windows.",
+    "If file is an fd, descriptor ownership and current-position behavior must be preserved."
+  ],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"replace existing file","input":"fs.writeFileSync('a.txt', 'new'); console.log(fs.readFileSync('a.txt','utf8'));","expected_csharp":"NodeFs.WriteFileSync(path, JsValue.FromString(\"new\"), NodeFsWriteFileOptions.Default);","expected_behavior":"file contains exactly 'new' and the call evaluates to undefined"},
+    {"name":"exclusive create flag","input":"fs.writeFileSync('a.txt', 'x', {flag:'wx'});","expected_csharp":"NodeFs.WriteFileSync(path, JsValue.FromString(\"x\"), NodeFsWriteFileOptions.FromFlag(\"wx\"));","expected_behavior":"throws a Node-compatible EEXIST-style error when the destination already exists"}
+  ]
+}

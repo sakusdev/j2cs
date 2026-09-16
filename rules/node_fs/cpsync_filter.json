@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.cpsync.filter",
+  "category": "node_fs",
+  "summary": "Preserve dynamic cpSync filter callback invocation and its effect on which paths are copied.",
+  "source": {"pattern":"$fs.cpSync($src, $dest, { filter: $fn, ...$options })","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"filter":"present callable"}},
+  "target": {"kind":"runtime","template":"NodeFsRuntime.CpSyncWithFilter($src, $dest, $fn, $options)"},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"callback":"filter receives source and destination paths and may run for multiple tree entries","side_effects":"filter side effects and thrown exceptions are observable","return_value":"undefined when completed"},
+  "caveats": ["A C# predicate is safe only after full JS callable/closure lowering.","Filter invocation order follows traversal and must not be invented as sorted/deterministic if Node does not promise it.","Thrown JS values/callback state may require the JS compatibility runtime."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"filter excludes file","input":"fs.cpSync('src','dst',{recursive:true,filter:(s)=>!s.endsWith('.tmp')});","expected_behavior":"entries rejected by the JS filter are not copied; callback side effects are preserved"},
+    {"name":"filter throw aborts","input":"fs.cpSync('src','dst',{recursive:true,filter:()=>{throw new Error('stop')}});","expected_behavior":"the thrown JS exception escapes according to Node/JS semantics and copying stops accordingly"}
+  ]
+}

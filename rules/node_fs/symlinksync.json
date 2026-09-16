@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.symlinksync",
+  "category": "node_fs",
+  "summary": "Create a symbolic link while preserving Node target text, destination semantics, and Windows type behavior.",
+  "source": {"pattern":"$fs.symlinkSync($target, $path, $type?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.SymlinkSync","template":"NodeFs.SymlinkSync($target, $path, $type)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","target":"stored link target text may be relative","type":"null by default; Node may auto-detect target type, with Windows-specific junction/file/dir handling"},
+  "caveats": ["C# symbolic-link APIs have platform and privilege differences.","Normalizing a relative target before link creation changes semantics.","Existing destination should raise Node-compatible error rather than silently overwrite."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"relative target stored","input":"fs.symlinkSync('../t','ln'); console.log(fs.readlinkSync('ln'));","expected_csharp":"NodeFs.SymlinkSync(target, path, NodeFsSymlinkType.Auto);","expected_behavior":"creates a link whose stored target is ../t"},
+    {"name":"destination exists","input":"fs.writeFileSync('ln','x'); fs.symlinkSync('t','ln');","expected_csharp":"NodeFs.SymlinkSync(target, path, NodeFsSymlinkType.Auto);","expected_behavior":"throws a Node-compatible EEXIST-style error"}
+  ]
+}

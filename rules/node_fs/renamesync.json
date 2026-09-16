@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.renamesync",
+  "category": "node_fs",
+  "summary": "Rename/move a filesystem entry with Node/OS rename semantics rather than generic copy-delete behavior.",
+  "source": {"pattern":"$fs.renameSync($oldPath, $newPath)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.RenameSync","template":"NodeFs.RenameSync($oldPath, $newPath)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","mutation":"moves/renames source path","atomicity":"inherits underlying OS rename behavior where supported"},
+  "caveats": ["Cross-device renames can fail instead of transparently copying.","Replacement behavior differs for files/directories and across OSes.","Do not emulate with copy+delete; that changes atomicity, metadata, links, and failure behavior."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"source moves","input":"fs.writeFileSync('a','x'); fs.renameSync('a','b'); console.log(fs.existsSync('a'),fs.readFileSync('b','utf8'));","expected_csharp":"NodeFs.RenameSync(oldPath, newPath);","expected_behavior":"a is gone and b refers to the moved file containing x"},
+    {"name":"missing source throws","input":"fs.renameSync('missing','b');","expected_csharp":"NodeFs.RenameSync(oldPath, newPath);","expected_behavior":"throws a Node-compatible filesystem error"}
+  ]
+}

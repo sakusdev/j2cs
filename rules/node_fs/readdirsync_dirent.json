@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.readdirsync.dirent",
+  "category": "node_fs",
+  "summary": "Synchronously list fs.Dirent values for readdirSync({withFileTypes:true}) without eagerly following every entry.",
+  "source": {"pattern":"$fs.readdirSync($path, { withFileTypes: true, ...$options })","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"with_file_types":true}},
+  "target": {"kind":"helper","helper":"NodeFs.ReadDirentsSync","template":"NodeFs.ReadDirentsSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"array of Node-compatible Dirent objects","dirent_methods":"isFile/isDirectory/isSymbolicLink and other type tests reflect directory-entry metadata","ordering":"unspecified"},
+  "caveats": ["Mapping to FileSystemInfo alone can accidentally follow links or lose unknown entry types.","Some filesystems do not provide reliable d_type information; helper may need lstat-compatible fallback while preserving errors."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"directory entry type","input":"const e=fs.readdirSync('d',{withFileTypes:true}).find(x=>x.name==='sub'); console.log(e.isDirectory());","expected_csharp":"var entries = NodeFs.ReadDirentsSync(path, NodeFsReadDirOptions.WithFileTypes);","expected_behavior":"the Dirent for a real subdirectory reports isDirectory() true"},
+    {"name":"symlink is not followed for Dirent kind","input":"const e=fs.readdirSync('d',{withFileTypes:true}).find(x=>x.name==='ln'); console.log(e.isSymbolicLink());","expected_csharp":"var entries = NodeFs.ReadDirentsSync(path, NodeFsReadDirOptions.WithFileTypes);","expected_behavior":"a symbolic-link directory entry can report isSymbolicLink() true rather than being converted to its target type"}
+  ]
+}

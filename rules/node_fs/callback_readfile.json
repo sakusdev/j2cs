@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.callback.readfile",
+  "category": "node_fs",
+  "summary": "Preserve Node error-first callback and event-loop/threadpool completion semantics for fs.readFile.",
+  "source": {"pattern":"$fs.readFile($path, $options?, $callback)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"callback":"JS callable"}},
+  "target": {"kind":"runtime","template":"NodeFsRuntime.ReadFileCallback($path, $options, $callback)"},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"async":true,"return_value":"undefined","callback_signature":"(err, data)","success":"err is null; data is Buffer or string according to encoding","ordering":"completion order relative to other async fs operations is not guaranteed"},
+  "caveats": ["Invoking the callback synchronously is incorrect.","Mapping directly to Task.Run without the JS event-loop bridge can change callback ordering and exception behavior.","Missing/invalid callback itself can throw synchronously before I/O starts."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"callback is asynchronous","input":"let x=0; fs.readFile('a',()=>console.log(x)); x=1;","expected_behavior":"callback is not invoked inline; it observes subsequent synchronous assignment under normal completion"},
+    {"name":"error-first missing file","input":"fs.readFile('missing',(err,data)=>console.log(!!err,data));","expected_behavior":"callback receives an error and no successful data value according to Node callback conventions"}
+  ]
+}

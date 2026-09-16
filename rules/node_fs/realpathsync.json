@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.realpathsync",
+  "category": "node_fs",
+  "summary": "Resolve a path synchronously to Node's canonical real path, including symlink resolution and Buffer encoding option.",
+  "source": {"pattern":"$fs.realpathSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.RealPathSync","template":"NodeFs.RealPathSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"resolved pathname string, or Buffer with encoding='buffer'","resolves_symlinks":true,"requires_entry":true},
+  "caveats": ["Path.GetFullPath is only lexical normalization and does not resolve symlinks; it is not equivalent.","Case normalization, mount behavior, and network filesystems are platform-dependent."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"resolves symlink target","input":"console.log(fs.realpathSync('ln'));","expected_csharp":"var p = NodeFs.RealPathSync(path, NodeFsEncoding.Utf8);","expected_behavior":"returns the canonical resolved path rather than merely an absolute lexical path"},
+    {"name":"missing path throws","input":"fs.realpathSync('missing');","expected_csharp":"var p = NodeFs.RealPathSync(path, NodeFsEncoding.Utf8);","expected_behavior":"throws a Node-compatible filesystem error for an unresolvable missing path"}
+  ]
+}

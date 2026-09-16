@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.promises.readfile.awaited",
+  "category": "node_fs",
+  "summary": "Lower awaited fs/promises readFile to async C# I/O only when a JS-compatible Promise scheduler preserves fulfillment/rejection ordering.",
+  "source": {"pattern":"await $fsp.readFile($path, $options?)","requirements":{"module_binding":"node:fs/promises builtin","builtin_not_shadowed":true,"usage":"directly awaited or otherwise lowered through JS-compatible Promise machinery"}},
+  "target": {"kind":"helper","helper":"NodeFsPromises.ReadFileAsync","template":"await NodeFsPromises.ReadFileAsync($path, $options, $jsPromiseScheduler)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"async":true,"return_value":"Promise fulfillment with Buffer/string; rejection with Node-compatible error","abort_signal":"supported; abort rejects with AbortError, while underlying OS requests may already have progressed","ordering":"promise settlement must enter JS-compatible microtask scheduling"},
+  "caveats": ["Task completion timing is not by itself ECMAScript Promise microtask semantics.","Reading a directory remains platform-specific.","No encoding means Buffer, not string."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"await utf8 read","input":"const s = await fsp.readFile('a.txt','utf8'); console.log(s);","expected_csharp":"var s = await NodeFsPromises.ReadFileAsync(path, opts, jsPromiseScheduler);","expected_behavior":"await observes the decoded string or a Node-compatible rejection"},
+    {"name":"abort rejects","input":"const c=new AbortController(); const p=fsp.readFile('big',{signal:c.signal}); c.abort(); await p;","expected_behavior":"the promise rejects with an AbortError-compatible JS error when cancellation wins"}
+  ]
+}
