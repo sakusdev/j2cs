@@ -1,0 +1,45 @@
+{
+  "id": "string.bracket-index",
+  "category": "string",
+  "summary": "Lower indexed access on a primitive string while preserving undefined and UTF-16 behavior.",
+  "source": {
+    "pattern": "$string[$index]",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Index",
+    "template": "JsString.Index($string, $index)",
+    "notes": "Must perform JavaScript property-key/index behavior and return a one-code-unit string or undefined; C# char indexing throws out of range and returns char, not string."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "one UTF-16 code-unit string for canonical in-range integer index; otherwise ordinary property lookup/undefined",
+    "mutation": false,
+    "encoding": "code-unit indexing"
+  },
+  "caveats": [
+    "Bracket access is property access, not the same operation as charAt; non-canonical keys such as \"01\" are not string indices."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "in range returns string",
+      "input": "console.log(\"abc\"[1], typeof \"abc\"[1]);",
+      "expected_csharp": "Console.WriteLine(JsString.Index(\"abc\", 1d));",
+      "expected_behavior": "prints b and the JS type is string"
+    },
+    {
+      "name": "out of range is undefined",
+      "input": "console.log(\"abc\"[9] === undefined);",
+      "expected_csharp": "Console.WriteLine(JsValue.StrictEquals(JsString.Index(\"abc\", 9d), JsUndefined.Value));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

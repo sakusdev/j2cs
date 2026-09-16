@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.tolowercase",
+  "category": "string",
+  "summary": "Perform locale-insensitive ECMAScript lowercase conversion.",
+  "source": {
+    "pattern": "$string.toLowerCase()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ToLowerCase",
+    "template": "JsString.ToLowerCase($string)",
+    "notes": "Use Unicode Default Case Conversion including SpecialCasing context rules. Pin/match the JS engine Unicode data version where exact differential behavior matters."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "algorithm": "Unicode Default Case Conversion",
+    "locale_sensitive": false,
+    "length_may_change": true
+  },
+  "caveats": [
+    "Do not assume current .NET ToLowerInvariant is byte-for-byte equivalent across Unicode versions."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "ascii",
+      "input": "console.log(\"ABC\".toLowerCase());",
+      "expected_csharp": "Console.WriteLine(JsString.ToLowerCase(\"ABC\"));",
+      "expected_behavior": "prints abc"
+    },
+    {
+      "name": "context sensitive sigma",
+      "input": "console.log(\"ΟΣ\".toLowerCase());",
+      "expected_csharp": "Console.WriteLine(JsString.ToLowerCase(\"ΟΣ\"));",
+      "expected_behavior": "uses Unicode default context-sensitive lowercase mapping"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.towellformed",
+  "category": "string",
+  "summary": "Repair ill-formed UTF-16 according to String.prototype.toWellFormed.",
+  "source": {
+    "pattern": "$string.toWellFormed()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ToWellFormed",
+    "template": "JsString.ToWellFormed($string)",
+    "notes": "Scan UTF-16 and replace each unpaired surrogate code unit with U+FFFD, preserving valid surrogate pairs unchanged."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "replacement": "each unpaired leading/trailing surrogate becomes U+FFFD",
+    "valid_pairs": "preserved",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "already well formed",
+      "input": "console.log(\"😄\".toWellFormed() === \"😄\");",
+      "expected_csharp": "Console.WriteLine(JsString.ToWellFormed(\"😄\") == \"😄\");",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "lone surrogate replacement",
+      "input": "console.log(\"\\uD800\".toWellFormed() === \"\\uFFFD\");",
+      "expected_csharp": "Console.WriteLine(JsString.ToWellFormed(\"\\uD800\") == \"\\uFFFD\");",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

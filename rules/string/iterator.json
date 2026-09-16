@@ -1,0 +1,44 @@
+{
+  "id": "string.prototype.iterator",
+  "category": "string",
+  "summary": "Implement JavaScript string iteration used by for...of and spread.",
+  "source": {
+    "pattern": "$string[Symbol.iterator]()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.GetIterator",
+    "template": "JsString.GetIterator($string)",
+    "notes": "Yield substrings representing UTF-16 encoded code points: valid surrogate pairs are yielded together, unpaired surrogates are yielded as one-code-unit strings. This is not grapheme iteration."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "iteration_unit": "Unicode code point encoded as one or two UTF-16 code units",
+    "unpaired_surrogate": "yielded unchanged as one string element",
+    "graphemes": "not combined"
+  },
+  "caveats": [
+    ".NET char enumeration is code-unit based; Rune enumeration may replace invalid surrogate data, so neither is automatically exact."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "astral pair is one iteration item",
+      "input": "console.log([...\"😄\"].length);",
+      "expected_csharp": "Console.WriteLine(JsString.GetIterator(\"😄\").Count());",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "zwj sequence is multiple items",
+      "input": "console.log([...\"👨‍👦\"].length);",
+      "expected_behavior": "iterates code points, not one grapheme cluster"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.localecompare",
+  "category": "string",
+  "summary": "Preserve locale-sensitive JavaScript comparison via the Intl-compatible runtime.",
+  "source": {
+    "pattern": "$string.localeCompare($that, $locales, $options)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsIntl.LocaleCompare",
+    "template": "JsIntl.LocaleCompare($args)",
+    "notes": "ECMA-402 collation, locale negotiation, Unicode canonical equivalence, and implementation data cannot be assumed equal to the host .NET culture defaults."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "negative, zero, or positive Number; exact magnitude is not portable",
+    "locale": "ECMA-402 / host locale semantics",
+    "canonical_equivalence": "must be honored"
+  },
+  "caveats": [
+    "Do not translate to string.Compare and depend on its exact numeric return value."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "sign only",
+      "input": "console.log(Math.sign(\"a\".localeCompare(\"b\", \"en\")));",
+      "expected_behavior": "prints a negative number sign under ordinary English collation"
+    },
+    {
+      "name": "canonical equivalents",
+      "input": "console.log(\"\\u212B\".localeCompare(\"A\\u030A\") === 0);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

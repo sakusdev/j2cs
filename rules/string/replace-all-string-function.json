@@ -1,0 +1,48 @@
+{
+  "id": "string.prototype.replaceall.string-function",
+  "category": "string",
+  "summary": "Implement replaceAll with a function replacer and primitive string search.",
+  "source": {
+    "pattern": "$string.replaceAll($searchString, $replacer)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "search_inferred_as": "primitive string",
+      "replacement_inferred_as": "callable"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ReplaceAllFunc",
+    "template": "JsString.ReplaceAllFunc($string, $searchString, $replacer)",
+    "notes": "Invoke the replacer once per string match, including every code-unit boundary for empty search, with JavaScript callback arguments and ToString conversion of callback results."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "callback_args": [
+      "matched substring",
+      "UTF-16 offset",
+      "whole string"
+    ],
+    "empty_search": "callback runs length+1 times",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "offsets",
+      "input": "console.log(\"aba\".replaceAll(\"a\", (m,i)=>String(i)));",
+      "expected_csharp": "Console.WriteLine(JsString.ReplaceAllFunc(\"aba\", \"a\", replacer));",
+      "expected_behavior": "prints 0b2"
+    },
+    {
+      "name": "empty search callback count",
+      "input": "let n=0; \"ab\".replaceAll(\"\",()=>{n++; return \"\";}); console.log(n);",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.iswellformed",
+  "category": "string",
+  "summary": "Check whether a JavaScript string contains only valid surrogate pairing.",
+  "source": {
+    "pattern": "$string.isWellFormed()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.IsWellFormed",
+    "template": "JsString.IsWellFormed($string)",
+    "notes": "Scan UTF-16 code units and reject any unpaired leading or trailing surrogate without replacing data."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "encoding": "true iff every surrogate belongs to a valid pair",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "well formed astral",
+      "input": "console.log(\"😄\".isWellFormed());",
+      "expected_csharp": "Console.WriteLine(JsString.IsWellFormed(\"😄\"));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "lone surrogate",
+      "input": "console.log(\"\\uD800\".isWellFormed());",
+      "expected_csharp": "Console.WriteLine(JsString.IsWellFormed(\"\\uD800\"));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

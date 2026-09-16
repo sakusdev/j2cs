@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.concat",
+  "category": "string",
+  "summary": "Concatenate using JavaScript String.prototype.concat semantics.",
+  "source": {
+    "pattern": "$string.concat($args...)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Concat",
+    "template": "JsString.Concat($string, $args)",
+    "notes": "Arguments are ToString-converted left-to-right before concatenation. Native string.Concat is safe only when all operands are already proven primitive strings and evaluation order is preserved."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "receiver and each argument ToString left-to-right",
+    "return_value": "new primitive string",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "string args",
+      "input": "console.log(\"a\".concat(\"b\", \"c\"));",
+      "expected_csharp": "Console.WriteLine(JsString.Concat(\"a\", \"b\", \"c\"));",
+      "expected_behavior": "prints abc"
+    },
+    {
+      "name": "coerces number",
+      "input": "console.log(\"x\".concat(12));",
+      "expected_csharp": "Console.WriteLine(JsString.Concat(\"x\", 12d));",
+      "expected_behavior": "prints x12"
+    }
+  ]
+}

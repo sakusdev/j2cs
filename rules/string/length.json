@@ -1,0 +1,41 @@
+{
+  "id": "string.length",
+  "category": "string",
+  "summary": "Read JavaScript string length without changing UTF-16 code-unit semantics.",
+  "source": {
+    "pattern": "$string.length",
+    "requirements": {
+      "receiver_inferred_as": "primitive string"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$string.Length",
+    "notes": "C# string.Length counts UTF-16 code units, matching ECMAScript String length for a proven primitive string."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "number of UTF-16 code units",
+    "mutation": false,
+    "encoding": "UTF-16 code units; astral code points count as two"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "ascii length",
+      "input": "console.log(\"abc\".length);",
+      "expected_csharp": "Console.WriteLine(\"abc\".Length);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "astral character counts two code units",
+      "input": "console.log(\"😄\".length);",
+      "expected_csharp": "Console.WriteLine(\"😄\".Length);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

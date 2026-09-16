@@ -1,0 +1,42 @@
+{
+  "id": "string.from-char-code",
+  "category": "string",
+  "summary": "Implement String.fromCharCode exactly at the UTF-16 code-unit level.",
+  "source": {
+    "pattern": "String.fromCharCode($codeUnits...)",
+    "requirements": {
+      "callee_resolved_as": "builtin String.fromCharCode"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.FromCharCode",
+    "template": "JsString.FromCharCode($codeUnits)",
+    "notes": "Each argument is ToUint16 then appended as one UTF-16 code unit; values wrap modulo 65536 and lone surrogates are allowed."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToUint16 for every argument left-to-right",
+    "encoding": "may create lone surrogates",
+    "return_value": "primitive string"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic code units",
+      "input": "console.log(String.fromCharCode(65, 66));",
+      "expected_csharp": "Console.WriteLine(JsString.FromCharCode(65d, 66d));",
+      "expected_behavior": "prints AB"
+    },
+    {
+      "name": "wraps modulo 65536",
+      "input": "console.log(String.fromCharCode(65536 + 65));",
+      "expected_csharp": "Console.WriteLine(JsString.FromCharCode(65601d));",
+      "expected_behavior": "prints A"
+    }
+  ]
+}

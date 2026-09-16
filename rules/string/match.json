@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.match",
+  "category": "string",
+  "summary": "Handle String.prototype.match through the JavaScript-compatible RegExp/runtime layer.",
+  "source": {
+    "pattern": "$string.match($regexp)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.StringMatch",
+    "template": "JsRuntime.StringMatch($args)",
+    "notes": "JavaScript RegExp syntax/flags, Symbol hooks, lastIndex interactions, captures, Unicode sets, and result shapes are not equivalent to System.Text.RegularExpressions."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "regexp": "ECMAScript RegExp semantics and Symbol protocol",
+    "mutation": "input string is not mutated",
+    "edge": "global RegExp returns an array of full matches; non-global includes captures and index/input metadata"
+  },
+  "caveats": [
+    "System.Text.RegularExpressions differs in grammar, Unicode behavior, captures, backtracking details, and flags."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic regexp",
+      "input": "console.log(\"aba\".match(/a/g));",
+      "expected_behavior": "produces the JavaScript-defined match/search result"
+    },
+    {
+      "name": "symbol hook or flag edge",
+      "input": "const x = { [Symbol.match](s) { return \"hook\"; } }; console.log(\"abc\".match(x));",
+      "expected_behavior": "invokes the custom Symbol hook when defined"
+    }
+  ]
+}

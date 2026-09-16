@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.valueof",
+  "category": "string",
+  "summary": "Elide builtin String.prototype.valueOf on a proven primitive string.",
+  "source": {
+    "pattern": "$string.valueOf()",
+    "requirements": {
+      "receiver_inferred_as": "primitive string",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$string",
+    "notes": "For a proven primitive string with the builtin method intact, the result is exactly the same primitive string; no allocation or culture operation is needed."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same primitive string value",
+    "mutation": false,
+    "generic": false
+  },
+  "caveats": [
+    "Do not apply to borrowed calls on non-String receivers or boxed String runtime objects without proving equivalent internal [[StringData]] semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "primitive identity value",
+      "input": "console.log(\"abc\".valueOf() === \"abc\");",
+      "expected_csharp": "Console.WriteLine(\"abc\" == \"abc\");",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "non generic caveat",
+      "input": "try { String.prototype.valueOf.call(1); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "throws TypeError; this test is outside the native fast-path requirements"
+    }
+  ]
+}

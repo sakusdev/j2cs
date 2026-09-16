@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.charcodeat",
+  "category": "string",
+  "summary": "Lower string.prototype.charcodeat with exact JavaScript index and UTF-16 semantics.",
+  "source": {
+    "pattern": "$string.charCodeAt($pos)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.CharCodeAt",
+    "template": "JsString.CharCodeAt($string, $pos)",
+    "notes": "Return the numeric UTF-16 code unit; out of range must return JavaScript NaN rather than throw."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "index": "ToIntegerOrInfinity",
+    "return_value": "double in 0..65535 or NaN",
+    "encoding": "code unit, not code point"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic",
+      "input": "console.log(\"A\".charCodeAt(0));",
+      "expected_csharp": "Console.WriteLine(JsString.CharCodeAt(\"A\", 0d));",
+      "expected_behavior": "prints 65"
+    },
+    {
+      "name": "out of range is NaN",
+      "input": "console.log(Number.isNaN(\"A\".charCodeAt(9)));",
+      "expected_csharp": "Console.WriteLine(double.IsNaN(JsString.CharCodeAt(\"A\", 9d)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

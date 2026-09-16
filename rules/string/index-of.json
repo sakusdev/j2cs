@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.indexof",
+  "category": "string",
+  "summary": "Lower indexOf with JavaScript coercion, clamping, and UTF-16 ordinal matching.",
+  "source": {
+    "pattern": "$string.indexOf($search, $position)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.IndexOf",
+    "template": "JsString.IndexOf($string, $search, $position)",
+    "notes": "Must apply JavaScript coercion/clamping and ordinal UTF-16 matching; do not use culture-sensitive .NET defaults."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "search": "code-unit exact ordinal substring",
+    "position": "ToIntegerOrInfinity then clamp",
+    "return_value": "smallest index or -1"
+  },
+  "caveats": [
+    "C# string search overloads can be culture-sensitive unless StringComparison.Ordinal is selected."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic match",
+      "input": "console.log(\"abcabc\".indexOf(\"bc\"));",
+      "expected_csharp": "Console.WriteLine(JsString.IndexOf(\"abcabc\", \"bc\", JsUndefined.Value));",
+      "expected_behavior": "matches according to JavaScript semantics"
+    },
+    {
+      "name": "edge position",
+      "input": "console.log(\"abc\".indexOf(\"\", 99));",
+      "expected_csharp": "Console.WriteLine(JsString.IndexOf(\"abc\", \"\", 99d));",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

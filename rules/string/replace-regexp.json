@@ -1,0 +1,41 @@
+{
+  "id": "string.prototype.replace.regexp",
+  "category": "string",
+  "summary": "Route RegExp or Symbol.replace based String.prototype.replace through the JS runtime.",
+  "source": {
+    "pattern": "$string.replace($regexp, $replacement)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "search_may_be_regexp_or_symbol_replace": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.StringReplace",
+    "template": "JsRuntime.StringReplace($args)",
+    "notes": "RegExp replacement dispatches through Symbol.replace and ECMAScript RegExp semantics; custom objects may override Symbol.replace."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "dispatch": "GetMethod(searchValue, Symbol.replace) before ordinary string search",
+    "regexp": "ECMAScript flags/captures/named groups/replacement semantics"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "global regexp",
+      "input": "console.log(\"aba\".replace(/a/g, \"x\"));",
+      "expected_behavior": "prints xbx"
+    },
+    {
+      "name": "custom symbol replace",
+      "input": "const x={ [Symbol.replace](){return \"ok\";} }; console.log(\"abc\".replace(x,\"x\"));",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

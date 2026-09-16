@@ -1,0 +1,48 @@
+{
+  "id": "string.prototype.replace.string-function",
+  "category": "string",
+  "summary": "Handle function replacement for a primitive string search value.",
+  "source": {
+    "pattern": "$string.replace($searchString, $replacer)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "search_inferred_as": "primitive string",
+      "replacement_inferred_as": "callable"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ReplaceFirstFunc",
+    "template": "JsString.ReplaceFirstFunc($string, $searchString, $replacer)",
+    "notes": "Find first string occurrence and invoke replacer with (matched, offset, wholeString), using JavaScript call/return-ToString semantics and exactly once when matched."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "callback_args": [
+      "matched substring",
+      "UTF-16 offset",
+      "whole string"
+    ],
+    "callback_this": "undefined at Call level",
+    "search": "first occurrence only"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "callback offset",
+      "input": "console.log(\"aba\".replace(\"b\", (m, i) => m + i));",
+      "expected_csharp": "Console.WriteLine(JsString.ReplaceFirstFunc(\"aba\", \"b\", replacer));",
+      "expected_behavior": "prints ab1a"
+    },
+    {
+      "name": "no match no callback",
+      "input": "let n=0; \"a\".replace(\"x\",()=>{n++;}); console.log(n);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

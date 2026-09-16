@@ -1,0 +1,50 @@
+{
+  "id": "string.prototype.normalize",
+  "category": "string",
+  "summary": "Normalize according to ECMAScript/Unicode normalization forms.",
+  "source": {
+    "pattern": "$string.normalize($form)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Normalize",
+    "template": "JsString.Normalize($string, $form)",
+    "notes": "Accept only NFC/NFD/NFKC/NFKD after ToString; throw JavaScript RangeError for other forms. Preserve JavaScript handling of lone surrogates even if the selected .NET normalization API rejects ill-formed UTF-16."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default_form": "NFC",
+    "valid_forms": [
+      "NFC",
+      "NFD",
+      "NFKC",
+      "NFKD"
+    ],
+    "exception": "RangeError for any other form"
+  },
+  "caveats": [
+    "Unicode-version differences between JS engine and .NET can affect newly assigned characters."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "nfc composition",
+      "input": "console.log(\"e\\u0301\".normalize(\"NFC\") === \"é\");",
+      "expected_csharp": "Console.WriteLine(JsString.Normalize(\"e\\u0301\", \"NFC\") == \"é\");",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "invalid form throws",
+      "input": "try { \"x\".normalize(\"BAD\"); } catch (e) { console.log(e.name); }",
+      "expected_csharp": "JsString.Normalize(\"x\", \"BAD\");",
+      "expected_behavior": "throws RangeError"
+    }
+  ]
+}

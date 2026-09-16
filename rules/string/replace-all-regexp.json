@@ -1,0 +1,42 @@
+{
+  "id": "string.prototype.replaceall.regexp",
+  "category": "string",
+  "summary": "Route RegExp/Symbol.replace replaceAll through the runtime.",
+  "source": {
+    "pattern": "$string.replaceAll($regexp, $replacement)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "search_may_be_regexp_or_symbol_replace": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.StringReplaceAll",
+    "template": "JsRuntime.StringReplaceAll($args)",
+    "notes": "RegExp must be global or TypeError, then replacement dispatches through Symbol.replace with ECMAScript regex semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "regexp_global_required": true,
+    "dispatch": "Symbol.replace may execute user code",
+    "exception": "TypeError for RegExp without g flag"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "global regexp",
+      "input": "console.log(\"aba\".replaceAll(/a/g, \"x\"));",
+      "expected_behavior": "prints xbx"
+    },
+    {
+      "name": "non global throws",
+      "input": "try { \"aba\".replaceAll(/a/, \"x\"); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

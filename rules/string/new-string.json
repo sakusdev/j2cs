@@ -1,0 +1,44 @@
+{
+  "id": "string.constructor.new",
+  "category": "string",
+  "summary": "Construct a boxed JavaScript String object.",
+  "source": {
+    "pattern": "new String($value)",
+    "requirements": {
+      "callee_resolved_as": "builtin String constructor",
+      "called_with_new": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NewStringObject",
+    "template": "JsRuntime.NewStringObject($args)",
+    "notes": "A boxed String is a String exotic object with [[StringData]], virtual indexed properties, length semantics, prototype behavior, and identity; do not collapse it to System.String."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "distinct String object",
+    "mutation": "object properties can be added; indexed string data properties have exotic constraints",
+    "identity": "new String(\"x\") !== new String(\"x\")"
+  },
+  "caveats": [
+    "A C# string cannot model boxed-string object identity or exotic indexed properties."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "boxed value is object",
+      "input": "const s = new String(\"x\"); console.log(typeof s, s.valueOf());",
+      "expected_csharp": "var s = JsRuntime.NewStringObject(\"x\");",
+      "expected_behavior": "typeof is object and valueOf is x"
+    },
+    {
+      "name": "identity is preserved",
+      "input": "console.log(new String(\"x\") === new String(\"x\"));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

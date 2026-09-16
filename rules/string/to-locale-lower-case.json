@@ -1,0 +1,41 @@
+{
+  "id": "string.prototype.tolocalelowercase",
+  "category": "string",
+  "summary": "Preserve locale-sensitive toLocaleLowerCase through the Intl runtime.",
+  "source": {
+    "pattern": "$string.toLocaleLowerCase($locales)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsIntl.ToLocaleLowerCase",
+    "template": "JsIntl.ToLocaleLowerCase($args)",
+    "notes": "Locale negotiation and locale-sensitive case rules are defined by ECMA-402 in Intl-capable engines and depend on locale data."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "locale": "ECMA-402 locale processing",
+    "coercion": "receiver ToString and locale list processing",
+    "host_data": "locale/Unicode data dependent"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "turkish i",
+      "input": "console.log(\"I\".toLocaleLowerCase(\"tr\"));",
+      "expected_behavior": "uses Turkish-specific casing"
+    },
+    {
+      "name": "locale list validation",
+      "input": "console.log(\"ABC\".toLocaleLowerCase([\"en-US\"]));",
+      "expected_behavior": "uses the requested canonicalized locale"
+    }
+  ]
+}

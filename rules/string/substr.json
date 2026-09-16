@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.substr",
+  "category": "string",
+  "summary": "Support common legacy String.prototype.substr used by older web/Electron code.",
+  "source": {
+    "pattern": "$string.substr($start, $length)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Substr",
+    "template": "JsString.Substr($string, $start, $length)",
+    "notes": "Implement Annex B web-legacy substr: start uses ToIntegerOrInfinity with negative relative indexing; length is ToIntegerOrInfinity and non-positive yields empty string; end is clamped."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "status": "Annex B web legacy",
+    "start": "negative values count from end after coercion",
+    "length": "omitted means through end; <=0 yields empty string"
+  },
+  "caveats": [
+    "Annex B is web-legacy compatibility behavior; target hosts may choose not to expose it, but Electron/V8 compatibility generally requires it."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string.prototype.substr"
+  ],
+  "tests": [
+    {
+      "name": "negative start",
+      "input": "console.log(\"abcd\".substr(-2,1));",
+      "expected_csharp": "Console.WriteLine(JsString.Substr(\"abcd\", -2d, 1d));",
+      "expected_behavior": "prints c"
+    },
+    {
+      "name": "negative length empty",
+      "input": "console.log(\"abcd\".substr(1,-1) === \"\");",
+      "expected_csharp": "Console.WriteLine(JsString.Substr(\"abcd\", 1d, -1d) == \"\");",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
