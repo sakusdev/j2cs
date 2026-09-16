@@ -1,0 +1,13 @@
+{
+  "id": "map.prototype.delete",
+  "category": "map_set",
+  "summary": "Delete a builtin Map entry and return whether an entry existed.",
+  "source": {"pattern": "$map.delete($key)", "requirements": {"receiver_inferred_builtin_map": true, "builtin_member_not_overridden_or_shadowed": true, "receiver_not_proxy": true}},
+  "target": {"kind": "helper", "template": "JsMap.Delete($map, $key)", "helper": "JsMap.Delete"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"key_equality": "SameValueZero", "return_value": "true iff entry removed", "iteration": "deletion leaves existing iterators semantically positioned in the ordered entry sequence"},
+  "caveats": [],
+  "references": ["https://tc39.es/ecma262/multipage/keyed-collections.html"],
+  "tests": [{"name": "delete present", "input": "const m=new Map([['x',1]]); console.log(m.delete('x'),m.size);", "expected_behavior": "prints true 0"}, {"name": "delete absent", "input": "const m=new Map(); console.log(m.delete('x'));", "expected_behavior": "prints false"}]
+}
