@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.rmsync",
+  "category": "node_fs",
+  "summary": "Remove files/directories synchronously while preserving recursive, force, and retry semantics.",
+  "source": {"pattern":"$fs.rmSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.RmSync","template":"NodeFs.RmSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","recursive":"required for non-empty directory trees","force":"suppresses missing-path error but does not mean ignore all errors","retries":"maxRetries/retryDelay apply only to selected errors in recursive mode"},
+  "caveats": ["File.Delete/Directory.Delete do not jointly reproduce Node rm semantics.","force:true must not swallow arbitrary permission or I/O errors.","Retry behavior is observable in timing/error outcomes and is platform-sensitive."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"force missing succeeds","input":"fs.rmSync('missing',{force:true}); console.log('ok');","expected_csharp":"NodeFs.RmSync(path, NodeFsRmOptions.Force);","expected_behavior":"returns undefined without throwing solely because the path is absent"},
+    {"name":"nonrecursive nonempty directory fails","input":"fs.rmSync('nonempty-dir');","expected_csharp":"NodeFs.RmSync(path, NodeFsRmOptions.Default);","expected_behavior":"does not silently recursively delete a non-empty directory without recursive:true"}
+  ]
+}
