@@ -1,0 +1,16 @@
+{
+  "id": "async.for-await-of",
+  "category": "async",
+  "summary": "Lower for-await-of using JavaScript async-iterator lookup, synchronous-iterator fallback, per-step awaiting, and iterator close semantics.",
+  "source": {"pattern": "for await (const $x of $iterable) { $body }", "requirements": {"iterable": "supported compiled JS iterator/async-iterator abstraction", "dynamic_symbol_lookup": false}},
+  "target": {"kind": "helper", "helper": "JsAsyncIterator.ForAwait", "template": "await JsAsyncIterator.ForAwait($iterable, async $x => { $body })", "notes": "Prefer Symbol.asyncIterator; if absent, wrap Symbol.iterator via Async-from-Sync Iterator. Abrupt loop completion must perform iterator close/return."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"lookup": "async iterator first, sync iterator fallback", "next": "each next result is awaited", "value": "iterator result value follows async-from-sync semantics", "break_throw_return": "close iterator when required"},
+  "caveats": ["IAsyncEnumerable alone does not model JS synchronous-iterator fallback or arbitrary iterator result objects.", "Dynamic Symbol.asyncIterator/Symbol.iterator getters require runtime handling."],
+  "references": ["ECMAScript 2026 GetIterator async", "ECMAScript 2026 for-await-of"],
+  "tests": [
+    {"name": "sync iterable fallback", "input": "async function f(){for await(const x of [1,2])console.log(x)} f();", "expected_csharp": "await JsAsyncIterator.ForAwait(values, async x => { Console.WriteLine(x); });", "expected_behavior": "prints 1 then 2 through async-from-sync semantics"},
+    {"name": "break closes async iterator", "input": "const it={i:0,[Symbol.asyncIterator](){return this},next(){return Promise.resolve({value:++this.i,done:false})},return(){console.log('closed');return Promise.resolve({done:true})}};(async()=>{for await(const x of it){break}})();", "expected_behavior": "prints closed"}
+  ]
+}
