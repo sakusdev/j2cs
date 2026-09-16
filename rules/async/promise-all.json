@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.all",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.all while preserving input iteration order, per-element Promise resolution, and aggregate rejection semantics.",
+  "source": {"pattern": "Promise.all($iterable)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true, "promise_resolve_not_overridden": true, "iterable": "supported compiled JS iterable"}},
+  "target": {"kind": "helper", "helper": "JsPromise.All", "template": "JsPromise.All($iterable)", "notes": "Enumerate synchronously, resolve each element, store fulfillment values by input index, and reject on the first observed rejection/abrupt iteration failure."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"result_order": "input iteration order", "completion_order": "does not reorder result array", "empty": "already fulfilled with empty array", "elements": "Promise.resolve semantics", "iterator_side_effects": "occur during call"},
+  "caveats": ["Iterator acquisition/next and the constructor's resolve property are observable and may throw.", "LINQ enumeration deferred into a Task would move side effects to the wrong time."],
+  "references": ["ECMAScript 2026 Promise.all", "ECMAScript 2026 PerformPromiseAll"],
+  "tests": [
+    {"name": "keeps input order", "input": "Promise.all([Promise.resolve(2),1]).then(v=>console.log(v.join(',')));", "expected_csharp": "var p = JsPromise.All(values);", "expected_behavior": "prints 2,1"},
+    {"name": "iteration side effect is synchronous", "input": "const it={*[Symbol.iterator](){console.log('iter');yield 1}};Promise.all(it);console.log('after');", "expected_behavior": "prints iter before after"}
+  ]
+}
