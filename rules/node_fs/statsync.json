@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.statsync",
+  "category": "node_fs",
+  "summary": "Retrieve Node fs.Stats synchronously while following symbolic links and preserving bigint/throwIfNoEntry options.",
+  "source": {"pattern":"$fs.statSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.StatSync","template":"NodeFs.StatSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"follows_symlinks":true,"return_value":"Node-compatible Stats or undefined when throwIfNoEntry:false and entry absent","bigint_option":"numeric Stats fields become JS BigInt-compatible values when requested","exceptions":"missing entry throws by default"},
+  "caveats": ["System.IO FileInfo/DirectoryInfo do not expose the full Node Stats surface or identical timestamps/type predicates.","Filesystem timestamp precision and birthtime availability vary by OS/filesystem."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"follows symlink","input":"console.log(fs.statSync('ln').isFile());","expected_csharp":"var st = NodeFs.StatSync(path, NodeFsStatOptions.Default);","expected_behavior":"if ln points to a regular file, isFile() is true"},
+    {"name":"missing can return undefined","input":"console.log(fs.statSync('missing',{throwIfNoEntry:false}) === undefined);","expected_csharp":"var st = NodeFs.StatSync(path, NodeFsStatOptions.NoThrowIfMissing);","expected_behavior":"returns JS undefined rather than throwing when the path is absent"}
+  ]
+}
