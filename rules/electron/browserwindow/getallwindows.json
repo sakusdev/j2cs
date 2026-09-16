@@ -1,0 +1,45 @@
+{
+  "id": "electron.browserwindow.getallwindows",
+  "category": "electron.browserwindow",
+  "summary": "Return all live BrowserWindow instances.",
+  "source": {
+    "pattern": "BrowserWindow.getAllWindows()",
+    "requirements": {
+      "constructor_binding": "electron.BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.BrowserWindow.GetAllWindows()",
+    "helper": "ElectronCompat.BrowserWindow.GetAllWindows",
+    "notes": "Return wrappers for all currently open BrowserWindows tracked by the compatibility host."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "BrowserWindow[]",
+    "excludes_destroyed": true
+  },
+  "caveats": [
+    "Preserve object identity; do not create fresh unrelated wrappers each call if translated code compares window references."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "list live windows",
+      "input": "const all = BrowserWindow.getAllWindows();",
+      "expected_csharp": "var all = ElectronCompat.BrowserWindow.GetAllWindows();",
+      "expected_behavior": "contains all live BrowserWindow wrappers"
+    },
+    {
+      "name": "destroyed excluded",
+      "input": "const w=new BrowserWindow(); w.destroy(); console.log(BrowserWindow.getAllWindows().includes(w));",
+      "expected_behavior": "false after destruction"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "electron.browserwindow.isdestroyed",
+  "category": "electron.browserwindow",
+  "summary": "Read whether the window has been destroyed.",
+  "source": {
+    "pattern": "$win.isDestroyed()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.IsDestroyed",
+    "helper": "ElectronCompat.BrowserWindow.IsDestroyed",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "live window",
+      "input": "console.log(win.isDestroyed());",
+      "expected_csharp": "Console.WriteLine(win.IsDestroyed);",
+      "expected_behavior": "false for a live window"
+    },
+    {
+      "name": "destroyed window",
+      "input": "win.destroy(); console.log(win.isDestroyed());",
+      "expected_behavior": "true after destroy"
+    }
+  ]
+}

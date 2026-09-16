@@ -1,0 +1,45 @@
+{
+  "id": "electron.dialog.showopendialog",
+  "category": "electron.dialog",
+  "summary": "Show a native open dialog and return Electron's result object.",
+  "source": {
+    "pattern": "dialog.showOpenDialog($browserWindow, $options)",
+    "requirements": {
+      "module_binding": "electron.dialog",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.Dialog.ShowOpenDialogAsync($browserWindow, $options)",
+    "helper": "ElectronCompat.Dialog.ShowOpenDialogAsync",
+    "notes": "Requires native platform dialog services; no Chromium dependency is inherently required."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "Promise<{canceled:boolean,filePaths:string[],bookmarks?:string[]}>",
+    "modal_parent_optional": true
+  },
+  "caveats": [
+    "Result shape is observable; do not collapse cancellation to null alone.",
+    "Platform security-scoped bookmarks may be present on macOS when requested."
+  ],
+  "references": [
+    "Electron dialog API"
+  ],
+  "tests": [
+    {
+      "name": "choose file",
+      "input": "const r=await dialog.showOpenDialog({properties:['openFile']});",
+      "expected_csharp": "var r = await ElectronCompat.Dialog.ShowOpenDialogAsync(null, options);",
+      "expected_behavior": "returns canceled=false and selected filePaths when a selection is accepted"
+    },
+    {
+      "name": "cancel dialog",
+      "input": "const r=await dialog.showOpenDialog({properties:['openFile']});",
+      "expected_behavior": "returns an Electron-compatible result with canceled=true and no selected paths when user cancels"
+    }
+  ]
+}

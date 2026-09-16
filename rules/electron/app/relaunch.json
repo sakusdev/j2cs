@@ -1,0 +1,47 @@
+{
+  "id": "electron.app.relaunch",
+  "category": "electron.app",
+  "summary": "Schedule a new application instance to launch after the current instance exits.",
+  "source": {
+    "pattern": "app.relaunch($options)",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.Relaunch($options)",
+    "helper": "ElectronCompat.App.Relaunch",
+    "notes": "Record a relaunch request; do not implicitly quit the current process."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "does_not_quit_current_instance": true,
+    "multiple_calls": "schedule multiple instances",
+    "defaults": "same cwd and command-line arguments"
+  },
+  "caveats": [
+    "A naive Process.Start at call time is observably wrong because Electron launches the replacement after the current instance exits.",
+    "args and execPath options alter the relaunch command."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "relaunch then exit",
+      "input": "app.relaunch(); app.exit(0);",
+      "expected_csharp": "ElectronCompat.App.Relaunch(null); ElectronCompat.App.Exit(0);",
+      "expected_behavior": "a replacement instance starts after the current instance exits"
+    },
+    {
+      "name": "does not quit",
+      "input": "app.relaunch(); console.log('still running');",
+      "expected_behavior": "the current process keeps running and prints still running until separately exited"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "electron.browserwindow.isvisible",
+  "category": "electron.browserwindow",
+  "summary": "Read whether the window is visible to the user.",
+  "source": {
+    "pattern": "$win.isVisible()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.IsVisible",
+    "helper": "ElectronCompat.BrowserWindow.IsVisible",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [
+    "Visibility is an OS/window-manager state and should not be inferred solely from whether Show was last called."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "visible state",
+      "input": "win.show(); console.log(win.isVisible());",
+      "expected_behavior": "true when visible"
+    },
+    {
+      "name": "hidden state",
+      "input": "win.hide(); console.log(win.isVisible());",
+      "expected_behavior": "false when hidden"
+    }
+  ]
+}

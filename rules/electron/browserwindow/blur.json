@@ -1,0 +1,45 @@
+{
+  "id": "electron.browserwindow.blur",
+  "category": "electron.browserwindow",
+  "summary": "Remove focus from the window when supported.",
+  "source": {
+    "pattern": "$win.blur()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.Blur()",
+    "helper": "ElectronCompat.BrowserWindow.Blur",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "undefined",
+    "side_effects": "OS focus change"
+  },
+  "caveats": [
+    "Electron documents blur as unsupported on Wayland; backend must preserve/report platform limitation."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "blur focused window",
+      "input": "win.blur();",
+      "expected_csharp": "win.Blur();",
+      "expected_behavior": "removes focus where supported"
+    },
+    {
+      "name": "wayland limitation",
+      "input": "win.blur();",
+      "expected_behavior": "backend must not promise a focus change on platforms where Electron itself cannot support it"
+    }
+  ]
+}

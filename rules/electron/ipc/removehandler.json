@@ -1,0 +1,44 @@
+{
+  "id": "electron.ipcmain.removehandler",
+  "category": "electron.ipc",
+  "summary": "Remove the invoke handler for a channel.",
+  "source": {
+    "pattern": "ipcMain.removeHandler($channel)",
+    "requirements": {
+      "module_binding": "electron.ipcMain",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.IpcMain.RemoveHandler($channel)",
+    "notes": "Remove only the invoke handler for the channel, not unrelated EventEmitter listeners."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutation": "removes invoke handler"
+  },
+  "caveats": [
+    "ipcMain.on listeners are a different registration mechanism and must not be removed by removeHandler."
+  ],
+  "references": [
+    "Electron ipcMain API",
+    "Electron IPC tutorial / Structured Clone semantics"
+  ],
+  "tests": [
+    {
+      "name": "remove existing handler",
+      "input": "ipcMain.handle('x',fn); ipcMain.removeHandler('x');",
+      "expected_csharp": "ElectronRuntime.Current.IpcMain.RemoveHandler(\"x\");",
+      "expected_behavior": "future invoke calls no longer use fn"
+    },
+    {
+      "name": "channel event listener remains",
+      "input": "ipcMain.on('x',fn); ipcMain.removeHandler('x');",
+      "expected_behavior": "the ordinary ipcMain.on listener remains registered"
+    }
+  ]
+}

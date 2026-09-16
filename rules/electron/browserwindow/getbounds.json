@@ -1,0 +1,46 @@
+{
+  "id": "electron.browserwindow.getbounds",
+  "category": "electron.browserwindow",
+  "summary": "Return current outer window bounds.",
+  "source": {
+    "pattern": "$win.getBounds()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.GetBounds()",
+    "helper": "ElectronCompat.BrowserWindow.GetBounds",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "Rectangle object",
+    "side_effects": false,
+    "platform_adjusted": true
+  },
+  "caveats": [
+    "On Wayland Electron may return x=0,y=0 because global position introspection is prohibited."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "read bounds",
+      "input": "const b = win.getBounds();",
+      "expected_csharp": "var b = win.GetBounds();",
+      "expected_behavior": "returns x, y, width and height for the current outer bounds"
+    },
+    {
+      "name": "wayland coordinates",
+      "input": "console.log(win.getBounds().x);",
+      "expected_behavior": "backend must preserve platform restrictions rather than invent reliable global coordinates"
+    }
+  ]
+}

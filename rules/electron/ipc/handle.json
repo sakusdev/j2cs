@@ -1,0 +1,46 @@
+{
+  "id": "electron.ipcmain.handle",
+  "category": "electron.ipc",
+  "summary": "Register an invoke handler whose result or Promise result is serialized back to the renderer.",
+  "source": {
+    "pattern": "ipcMain.handle($channel, $listener)",
+    "requirements": {
+      "module_binding": "electron.ipcMain",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.IpcMain.Handle($channel, $listener)",
+    "notes": "Preserve invoke routing, awaiting of Promise-like results, and Electron error serialization."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "handler_result": "value or Promise<any>",
+    "reply": "structured cloned",
+    "errors": "renderer receives rejection; original Error identity/details are not transparent"
+  },
+  "caveats": [
+    "Do not expose the original C# exception object to renderer code; Electron does not preserve the original Error object across the boundary."
+  ],
+  "references": [
+    "Electron ipcMain API",
+    "Electron IPC tutorial / Structured Clone semantics"
+  ],
+  "tests": [
+    {
+      "name": "sync handler value",
+      "input": "ipcMain.handle('sum',(e,a,b)=>a+b);",
+      "expected_csharp": "ElectronRuntime.Current.IpcMain.Handle(\"sum\", listener);",
+      "expected_behavior": "ipcRenderer.invoke receives the handler result asynchronously"
+    },
+    {
+      "name": "handler throws",
+      "input": "ipcMain.handle('x',()=>{throw new Error('boom')});",
+      "expected_behavior": "renderer invoke rejects with Electron-compatible serialized error information, not the original object identity"
+    }
+  ]
+}

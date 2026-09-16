@@ -1,0 +1,44 @@
+{
+  "id": "electron.browserwindow.getfocusedwindow",
+  "category": "electron.browserwindow",
+  "summary": "Return the focused BrowserWindow or null/undefined-equivalent when none is focused.",
+  "source": {
+    "pattern": "BrowserWindow.getFocusedWindow()",
+    "requirements": {
+      "constructor_binding": "electron.BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.BrowserWindow.GetFocusedWindow()",
+    "helper": "ElectronCompat.BrowserWindow.GetFocusedWindow",
+    "notes": "Return the compatibility wrapper corresponding to the OS-focused BrowserWindow."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "BrowserWindow | null-like",
+    "side_effects": false
+  },
+  "caveats": [
+    "The internal C# representation must preserve the JS absence semantics expected by the compiler (null vs undefined policy)."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "focused window",
+      "input": "win.focus(); const f = BrowserWindow.getFocusedWindow();",
+      "expected_behavior": "returns win if the OS actually focuses it"
+    },
+    {
+      "name": "no focused window",
+      "input": "const f = BrowserWindow.getFocusedWindow();",
+      "expected_behavior": "returns the Electron-compatible no-window value when none is focused"
+    }
+  ]
+}

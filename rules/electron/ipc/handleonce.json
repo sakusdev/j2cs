@@ -1,0 +1,44 @@
+{
+  "id": "electron.ipcmain.handleonce",
+  "category": "electron.ipc",
+  "summary": "Register an invoke handler that is removed after handling one invocation.",
+  "source": {
+    "pattern": "ipcMain.handleOnce($channel, $listener)",
+    "requirements": {
+      "module_binding": "electron.ipcMain",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.IpcMain.HandleOnce($channel, $listener)",
+    "notes": "Removal must occur with Electron-compatible one-shot semantics even when handler execution is asynchronous."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "max_invocations": 1
+  },
+  "caveats": [
+    "Concurrent invocations must not accidentally run the one-shot handler more than Electron would."
+  ],
+  "references": [
+    "Electron ipcMain API",
+    "Electron IPC tutorial / Structured Clone semantics"
+  ],
+  "tests": [
+    {
+      "name": "single invoke",
+      "input": "ipcMain.handleOnce('x',()=>1);",
+      "expected_csharp": "ElectronRuntime.Current.IpcMain.HandleOnce(\"x\", listener);",
+      "expected_behavior": "first invoke is handled and the handler is then removed"
+    },
+    {
+      "name": "second invoke",
+      "input": "ipcMain.handleOnce('x',()=>1); await ipcRenderer.invoke('x'); await ipcRenderer.invoke('x');",
+      "expected_behavior": "second invocation has no registered handler and must fail according to Electron semantics"
+    }
+  ]
+}

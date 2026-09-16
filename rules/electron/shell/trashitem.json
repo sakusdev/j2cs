@@ -1,0 +1,45 @@
+{
+  "id": "electron.shell.trashitem",
+  "category": "electron.shell",
+  "summary": "Move a filesystem item to the OS-specific trash/recycle location.",
+  "source": {
+    "pattern": "shell.trashItem($path)",
+    "requirements": {
+      "module_binding": "electron.shell",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.Shell.TrashItemAsync($path)",
+    "helper": "ElectronCompat.Shell.TrashItemAsync",
+    "notes": "Uses native OS integration without requiring Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<void>",
+    "destructive": true,
+    "platform_trash": true
+  },
+  "caveats": [
+    "This is not equivalent to File.Delete/Directory.Delete because trash/recycle behavior is observable and recoverable.",
+    "Input path separator semantics are platform-specific."
+  ],
+  "references": [
+    "Electron shell API"
+  ],
+  "tests": [
+    {
+      "name": "trash file",
+      "input": "await shell.trashItem(file);",
+      "expected_csharp": "await ElectronCompat.Shell.TrashItemAsync(file);",
+      "expected_behavior": "moves the item to the platform trash and fulfills on completion"
+    },
+    {
+      "name": "trash failure",
+      "input": "await shell.trashItem(missing);",
+      "expected_behavior": "rejects when the requested item cannot be trashed"
+    }
+  ]
+}

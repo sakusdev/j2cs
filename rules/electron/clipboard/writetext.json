@@ -1,0 +1,44 @@
+{
+  "id": "electron.clipboard.writetext",
+  "category": "electron.clipboard",
+  "summary": "Write plain text to the selected clipboard.",
+  "source": {
+    "pattern": "clipboard.writeText($text, $type)",
+    "requirements": {
+      "module_binding": "electron.clipboard",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Clipboard.WriteText($text, $type)",
+    "helper": "ElectronCompat.Clipboard.WriteText",
+    "notes": "Use a native clipboard service; preserve Electron type selection and data-format behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "default_type": "clipboard",
+    "linux_selection_supported": true
+  },
+  "caveats": [
+    "Preserve selection-vs-clipboard distinction on Linux."
+  ],
+  "references": [
+    "Electron clipboard API"
+  ],
+  "tests": [
+    {
+      "name": "write and read",
+      "input": "clipboard.writeText('hi'); console.log(clipboard.readText());",
+      "expected_csharp": "ElectronCompat.Clipboard.WriteText(\"hi\", ClipboardType.Clipboard);",
+      "expected_behavior": "subsequent plain-text read returns hi unless another process changes the clipboard"
+    },
+    {
+      "name": "selection target",
+      "input": "clipboard.writeText('x','selection');",
+      "expected_behavior": "targets Linux selection rather than the normal clipboard"
+    }
+  ]
+}

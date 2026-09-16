@@ -1,0 +1,46 @@
+{
+  "id": "electron.webcontents.send",
+  "category": "electron.ipc",
+  "summary": "Send an asynchronous main-to-renderer message from a WebContents.",
+  "source": {
+    "pattern": "$contents.send($channel, ...$args)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.WebContents.Send($contents, $channel, $args)",
+    "notes": "Use renderer routing plus Structured Clone serialization."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "serialization": "Structured Clone Algorithm",
+    "async_delivery": true
+  },
+  "caveats": [
+    "Prototype chains are not transferred.",
+    "Functions, Promises, Symbols, WeakMaps and WeakSets must throw on serialization.",
+    "Sending via event.sender.send always targets the main frame of that WebContents; event.reply has different frame routing semantics."
+  ],
+  "references": [
+    "Electron webContents API"
+  ],
+  "tests": [
+    {
+      "name": "send cloneable payload",
+      "input": "win.webContents.send('state',{ok:true});",
+      "expected_csharp": "ElectronRuntime.Current.WebContents.Send(win.WebContents, \"state\", args);",
+      "expected_behavior": "renderer receives a cloned payload asynchronously"
+    },
+    {
+      "name": "send function fails",
+      "input": "win.webContents.send('bad',()=>{});",
+      "expected_behavior": "throws due to structured-clone restrictions"
+    }
+  ]
+}

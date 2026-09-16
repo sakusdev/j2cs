@@ -1,0 +1,43 @@
+{
+  "id": "electron.app.hassingleinstancelock",
+  "category": "electron.app",
+  "summary": "Query whether this instance currently holds the single-instance lock.",
+  "source": {
+    "pattern": "app.hasSingleInstanceLock()",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.HasSingleInstanceLock",
+    "helper": "ElectronCompat.App.HasSingleInstanceLock",
+    "notes": "Read ownership from the same lock service used by request/release."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [
+    "Must change to false after releaseSingleInstanceLock."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "after acquire",
+      "input": "app.requestSingleInstanceLock(); console.log(app.hasSingleInstanceLock());",
+      "expected_behavior": "true if this instance acquired the lock"
+    },
+    {
+      "name": "after release",
+      "input": "app.requestSingleInstanceLock(); app.releaseSingleInstanceLock(); console.log(app.hasSingleInstanceLock());",
+      "expected_behavior": "false after release"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "electron.app.whenready",
+  "category": "electron.app",
+  "summary": "Map app.whenReady() to a native host readiness task without changing the one-time readiness boundary.",
+  "source": {
+    "pattern": "app.whenReady()",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.App.WhenReadyAsync()",
+    "helper": "ElectronCompat.App.WhenReadyAsync",
+    "notes": "The helper completes only after the native application host reaches the same initialization boundary represented by Electron's ready event."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<void>",
+    "async": true,
+    "ready_event": "emitted once",
+    "ordering": "must not complete before host initialization"
+  },
+  "caveats": [
+    "Electron ready is emitted after the main process finishes its first event-loop tick; native host timing must define an equivalent boundary."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "await readiness",
+      "input": "await app.whenReady(); console.log('ready');",
+      "expected_csharp": "await ElectronCompat.App.WhenReadyAsync();",
+      "expected_behavior": "ready is observed only after the application host is initialized"
+    },
+    {
+      "name": "already ready",
+      "input": "await app.whenReady(); await app.whenReady();",
+      "expected_behavior": "both awaits fulfill; the second call does not reinitialize the application"
+    }
+  ]
+}

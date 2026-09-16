@@ -1,0 +1,47 @@
+{
+  "id": "electron.ipcrenderer.sendsync",
+  "category": "electron.ipc",
+  "summary": "Perform synchronous renderer-to-main IPC and block until event.returnValue is set.",
+  "source": {
+    "pattern": "ipcRenderer.sendSync($channel, ...$args)",
+    "requirements": {
+      "module_binding": "electron.ipcRenderer",
+      "builtin_not_overridden": true,
+      "renderer_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.IpcRenderer.SendSync($channel, $args)",
+    "notes": "Must block the calling renderer execution context until a reply is available and use Electron-compatible serialization."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "any",
+    "blocking": true,
+    "reply_source": "IpcMainEvent.returnValue",
+    "serialization": "Structured Clone Algorithm"
+  },
+  "caveats": [
+    "Replacing sendSync with await invoke changes reentrancy and event-loop behavior.",
+    "This API can deadlock; do not hide that semantic risk in an async lowering."
+  ],
+  "references": [
+    "Electron ipcRenderer API",
+    "Structured Clone Algorithm"
+  ],
+  "tests": [
+    {
+      "name": "sync reply",
+      "input": "const x = ipcRenderer.sendSync('x');",
+      "expected_csharp": "var x = ElectronRuntime.Current.IpcRenderer.SendSync(\"x\", args);",
+      "expected_behavior": "renderer blocks until main supplies returnValue"
+    },
+    {
+      "name": "uncloneable payload",
+      "input": "ipcRenderer.sendSync('x',()=>{});",
+      "expected_behavior": "throws rather than transferring the function"
+    }
+  ]
+}

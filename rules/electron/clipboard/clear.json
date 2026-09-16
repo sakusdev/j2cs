@@ -1,0 +1,43 @@
+{
+  "id": "electron.clipboard.clear",
+  "category": "electron.clipboard",
+  "summary": "Clear clipboard content.",
+  "source": {
+    "pattern": "clipboard.clear($type)",
+    "requirements": {
+      "module_binding": "electron.clipboard",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Clipboard.Clear($type)",
+    "helper": "ElectronCompat.Clipboard.Clear",
+    "notes": "Use a native clipboard service; preserve Electron type selection and data-format behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "default_type": "clipboard"
+  },
+  "caveats": [
+    "The selected clipboard type must be honored; Linux selection is separate."
+  ],
+  "references": [
+    "Electron clipboard API"
+  ],
+  "tests": [
+    {
+      "name": "clear default",
+      "input": "clipboard.writeText('x'); clipboard.clear();",
+      "expected_csharp": "ElectronCompat.Clipboard.Clear(ClipboardType.Clipboard);",
+      "expected_behavior": "normal clipboard content is cleared"
+    },
+    {
+      "name": "clear selection only",
+      "input": "clipboard.clear('selection');",
+      "expected_behavior": "clears Linux selection without necessarily clearing the normal clipboard"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "electron.shell.openexternal",
+  "category": "electron.shell",
+  "summary": "Open an external-protocol URL using the OS default handler.",
+  "source": {
+    "pattern": "shell.openExternal($url, $options)",
+    "requirements": {
+      "module_binding": "electron.shell",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.Shell.OpenExternalAsync($url, $options)",
+    "helper": "ElectronCompat.Shell.OpenExternalAsync",
+    "notes": "Uses native OS integration without requiring Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<void>",
+    "platform_integration": true
+  },
+  "caveats": [
+    "Treat untrusted URL inputs as a security-sensitive sink; preserve Electron's platform limits/options.",
+    "Windows documents a URL length limit."
+  ],
+  "references": [
+    "Electron shell API"
+  ],
+  "tests": [
+    {
+      "name": "open https URL",
+      "input": "await shell.openExternal('https://example.com');",
+      "expected_csharp": "await ElectronCompat.Shell.OpenExternalAsync(url, null);",
+      "expected_behavior": "requests opening in the OS default handler and fulfills on success"
+    },
+    {
+      "name": "handler failure",
+      "input": "await shell.openExternal('unknown-protocol:x');",
+      "expected_behavior": "Promise rejects/fails according to OS/Electron behavior rather than silently succeeding"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "electron.browserwindow.setsize",
+  "category": "electron.browserwindow",
+  "summary": "Resize the window while honoring Electron minimum-size behavior.",
+  "source": {
+    "pattern": "$win.setSize($width, $height, $animate)",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.SetSize($width, $height, $animate)",
+    "helper": "ElectronCompat.BrowserWindow.SetSize",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "arguments": [
+      "integer width",
+      "integer height",
+      "optional animate on macOS"
+    ],
+    "minimum_size": "snaps to configured minimum"
+  },
+  "caveats": [
+    "Do not bypass min-size constraints when lowering to toolkit APIs."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "resize",
+      "input": "win.setSize(640,480);",
+      "expected_csharp": "win.SetSize(640, 480, false);",
+      "expected_behavior": "window client host is resized according to outer-window semantics"
+    },
+    {
+      "name": "below minimum",
+      "input": "win.setMinimumSize(400,300); win.setSize(10,10);",
+      "expected_behavior": "resulting size is clamped/snapped to the configured minimum"
+    }
+  ]
+}

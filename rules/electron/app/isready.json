@@ -1,0 +1,44 @@
+{
+  "id": "electron.app.isready",
+  "category": "electron.app",
+  "summary": "Read the application host readiness state.",
+  "source": {
+    "pattern": "app.isReady()",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.IsReady",
+    "helper": "ElectronCompat.App.IsReady",
+    "notes": "Backed by the same readiness state used by WhenReadyAsync."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [
+    "Must use the same readiness boundary as app.whenReady()."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "before ready",
+      "input": "console.log(app.isReady());",
+      "expected_csharp": "Console.WriteLine(ElectronCompat.App.IsReady);",
+      "expected_behavior": "false before application initialization completes"
+    },
+    {
+      "name": "after ready",
+      "input": "await app.whenReady(); console.log(app.isReady());",
+      "expected_behavior": "true after whenReady fulfills"
+    }
+  ]
+}

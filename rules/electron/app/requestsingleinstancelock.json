@@ -1,0 +1,46 @@
+{
+  "id": "electron.app.requestsingleinstancelock",
+  "category": "electron.app",
+  "summary": "Acquire Electron-compatible single-instance ownership and forward secondary-instance data.",
+  "source": {
+    "pattern": "app.requestSingleInstanceLock($additionalData)",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.RequestSingleInstanceLock($additionalData)",
+    "helper": "ElectronCompat.App.RequestSingleInstanceLock",
+    "notes": "Use an OS inter-process lock plus a channel capable of delivering argv/working-directory/additionalData semantics to the primary instance."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "true_means": "current process acquired primary-instance lock",
+    "false_means": "another instance holds the lock"
+  },
+  "caveats": [
+    "A process-local Mutex object is insufficient unless it is named/OS-visible and paired with secondary-instance data delivery.",
+    "additionalData must be serializable according to the compatibility contract."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "first instance",
+      "input": "const primary = app.requestSingleInstanceLock();",
+      "expected_csharp": "var primary = ElectronCompat.App.RequestSingleInstanceLock(null);",
+      "expected_behavior": "true when no other compatible instance holds the lock"
+    },
+    {
+      "name": "second instance",
+      "input": "const primary = app.requestSingleInstanceLock({source:'cli'});",
+      "expected_behavior": "false in a secondary instance and the primary can receive equivalent second-instance data"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "electron.ipcmain.on",
+  "category": "electron.ipc",
+  "summary": "Register a main-side listener for asynchronous renderer IPC messages.",
+  "source": {
+    "pattern": "ipcMain.on($channel, $listener)",
+    "requirements": {
+      "module_binding": "electron.ipcMain",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.IpcMain.On($channel, $listener)",
+    "notes": "Requires an IPC runtime preserving channel routing, event objects, listener identity and message ordering."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "ipcMain EventEmitter",
+    "listener_args": [
+      "IpcMainEvent",
+      "...structured-cloned args"
+    ],
+    "async_delivery": true
+  },
+  "caveats": [
+    "Listener registration order matters.",
+    "event.reply must target the sending frame, while event.sender.send targets the sender WebContents main frame."
+  ],
+  "references": [
+    "Electron ipcMain API",
+    "Electron IPC tutorial / Structured Clone semantics"
+  ],
+  "tests": [
+    {
+      "name": "receive async message",
+      "input": "ipcMain.on('ping',(event,x)=>console.log(x));",
+      "expected_csharp": "ElectronRuntime.Current.IpcMain.On(\"ping\", listener);",
+      "expected_behavior": "listener runs for async renderer messages on ping with an IpcMainEvent and cloned arguments"
+    },
+    {
+      "name": "multiple listeners",
+      "input": "ipcMain.on('x',a); ipcMain.on('x',b);",
+      "expected_behavior": "both listeners remain registered in EventEmitter order"
+    }
+  ]
+}

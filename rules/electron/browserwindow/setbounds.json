@@ -1,0 +1,47 @@
+{
+  "id": "electron.browserwindow.setbounds",
+  "category": "electron.browserwindow",
+  "summary": "Move/resize a window using partial Rectangle semantics.",
+  "source": {
+    "pattern": "$win.setBounds($bounds, $animate)",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.SetBounds($bounds, $animate)",
+    "helper": "ElectronCompat.BrowserWindow.SetBounds",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "undefined",
+    "partial_object": "omitted fields preserve current values",
+    "animate": "macOS-only optional behavior"
+  },
+  "caveats": [
+    "A direct assignment of a full Rectangle is wrong when the source passes only one property.",
+    "Wayland global coordinates can be unavailable; macOS may clamp y below menu/tray area."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "partial width update",
+      "input": "win.setBounds({width:100});",
+      "expected_csharp": "win.SetBounds(bounds, false);",
+      "expected_behavior": "only width changes; current x, y and height are preserved"
+    },
+    {
+      "name": "platform coordinate clamp",
+      "input": "win.setBounds({x:25,y:0,width:800,height:600});",
+      "expected_behavior": "reported bounds may be OS-adjusted; do not assume byte-for-byte equality with requested coordinates"
+    }
+  ]
+}

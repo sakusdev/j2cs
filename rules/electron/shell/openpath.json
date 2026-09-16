@@ -1,0 +1,44 @@
+{
+  "id": "electron.shell.openpath",
+  "category": "electron.shell",
+  "summary": "Open a path with the desktop default application and return Electron's error-string convention.",
+  "source": {
+    "pattern": "shell.openPath($path)",
+    "requirements": {
+      "module_binding": "electron.shell",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.Shell.OpenPathAsync($path)",
+    "helper": "ElectronCompat.Shell.OpenPathAsync",
+    "notes": "Uses native OS integration without requiring Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<string>",
+    "success_value": "",
+    "failure_value": "error message string"
+  },
+  "caveats": [
+    "Do not translate to Task with exception-only failure: Electron resolves to an error string for ordinary openPath failure."
+  ],
+  "references": [
+    "Electron shell API"
+  ],
+  "tests": [
+    {
+      "name": "open success",
+      "input": "const err = await shell.openPath(file);",
+      "expected_csharp": "var err = await ElectronCompat.Shell.OpenPathAsync(file);",
+      "expected_behavior": "resolves to empty string on success"
+    },
+    {
+      "name": "open failure string",
+      "input": "const err = await shell.openPath(missing);",
+      "expected_behavior": "resolves to a non-empty failure message rather than necessarily rejecting"
+    }
+  ]
+}

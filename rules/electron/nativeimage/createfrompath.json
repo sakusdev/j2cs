@@ -1,0 +1,43 @@
+{
+  "id": "electron.nativeimage.createfrompath",
+  "category": "electron.nativeimage",
+  "summary": "Create a NativeImage from a filesystem path.",
+  "source": {
+    "pattern": "nativeImage.createFromPath($path)",
+    "requirements": {
+      "module_binding": "electron.nativeImage",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.NativeImage.CreateFromPath($path)",
+    "helper": "ElectronCompat.NativeImage.CreateFromPath",
+    "notes": "Requires an image codec/native image wrapper, not Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "NativeImage",
+    "failure": "returns empty image rather than throwing for unreadable/invalid image in common Electron semantics"
+  },
+  "caveats": [
+    "Image codec support and scale-factor resource conventions are platform/backend dependent."
+  ],
+  "references": [
+    "Electron nativeImage API"
+  ],
+  "tests": [
+    {
+      "name": "load image",
+      "input": "const img=nativeImage.createFromPath(iconPath);",
+      "expected_csharp": "var img = ElectronCompat.NativeImage.CreateFromPath(iconPath);",
+      "expected_behavior": "returns a NativeImage-compatible object for a valid image"
+    },
+    {
+      "name": "invalid path",
+      "input": "const img=nativeImage.createFromPath('/missing.png'); console.log(img.isEmpty());",
+      "expected_behavior": "returns an empty NativeImage-compatible object rather than translating blindly to File.ReadAllBytes exception semantics"
+    }
+  ]
+}

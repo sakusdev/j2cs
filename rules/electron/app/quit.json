@@ -1,0 +1,51 @@
+{
+  "id": "electron.app.quit",
+  "category": "electron.app",
+  "summary": "Request a graceful quit that runs Electron-style quit/window shutdown hooks and can be cancelled.",
+  "source": {
+    "pattern": "app.quit()",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.Quit()",
+    "helper": "ElectronCompat.App.Quit",
+    "notes": "Must initiate graceful shutdown rather than Environment.Exit."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "side_effects": "closes windows and begins app shutdown",
+    "cancelable": true,
+    "events": [
+      "before-quit",
+      "will-quit"
+    ],
+    "dom_unload": "must be honored by compatible renderer"
+  },
+  "caveats": [
+    "A bare Environment.Exit is not equivalent: Electron app.quit can be cancelled by window beforeunload and emits quit lifecycle events.",
+    "window-all-closed is not emitted as part of the normal app.quit path described by Electron."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "graceful quit",
+      "input": "app.quit();",
+      "expected_csharp": "ElectronCompat.App.Quit();",
+      "expected_behavior": "before-quit is emitted, windows are asked to close, then will-quit occurs if not cancelled"
+    },
+    {
+      "name": "cancelled quit",
+      "input": "win.webContents.on('will-prevent-unload', e => {}); app.quit();",
+      "expected_behavior": "a compatible unload/beforeunload cancellation can prevent termination"
+    }
+  ]
+}

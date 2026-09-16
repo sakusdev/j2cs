@@ -1,0 +1,48 @@
+{
+  "id": "electron.ipcrenderer.send",
+  "category": "electron.ipc",
+  "summary": "Send an asynchronous renderer-to-main IPC message using structured-clone serialization.",
+  "source": {
+    "pattern": "ipcRenderer.send($channel, ...$args)",
+    "requirements": {
+      "module_binding": "electron.ipcRenderer",
+      "builtin_not_overridden": true,
+      "renderer_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "ElectronRuntime.Current.IpcRenderer.Send($channel, $args)",
+    "notes": "Validate and structured-clone arguments before enqueueing the asynchronous message."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "serialization": "Structured Clone Algorithm",
+    "async_delivery": true,
+    "prototype_chains_preserved": false
+  },
+  "caveats": [
+    "Functions, Promises, Symbols, WeakMaps and WeakSets cannot be cloned and must throw.",
+    "DOM/special Electron objects that main cannot decode must throw.",
+    "Do not pass object references directly between translated components."
+  ],
+  "references": [
+    "Electron ipcRenderer API",
+    "Structured Clone Algorithm"
+  ],
+  "tests": [
+    {
+      "name": "send cloneable data",
+      "input": "ipcRenderer.send('ping',{x:1});",
+      "expected_csharp": "ElectronRuntime.Current.IpcRenderer.Send(\"ping\", args);",
+      "expected_behavior": "main receives a cloned data object asynchronously"
+    },
+    {
+      "name": "reject function argument",
+      "input": "ipcRenderer.send('bad',()=>{});",
+      "expected_behavior": "throws because functions are not structured-cloneable"
+    }
+  ]
+}

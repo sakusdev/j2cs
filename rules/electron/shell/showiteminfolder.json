@@ -1,0 +1,43 @@
+{
+  "id": "electron.shell.showiteminfolder",
+  "category": "electron.shell",
+  "summary": "Reveal a filesystem item in the platform file manager.",
+  "source": {
+    "pattern": "shell.showItemInFolder($fullPath)",
+    "requirements": {
+      "module_binding": "electron.shell",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Shell.ShowItemInFolder($fullPath)",
+    "helper": "ElectronCompat.Shell.ShowItemInFolder",
+    "notes": "Uses native OS integration without requiring Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "platform_integration": true
+  },
+  "caveats": [
+    "Selection is best-effort; file managers differ."
+  ],
+  "references": [
+    "Electron shell API"
+  ],
+  "tests": [
+    {
+      "name": "reveal file",
+      "input": "shell.showItemInFolder('/tmp/a.txt');",
+      "expected_csharp": "ElectronCompat.Shell.ShowItemInFolder(path);",
+      "expected_behavior": "opens file manager and selects the item when supported"
+    },
+    {
+      "name": "missing target",
+      "input": "shell.showItemInFolder('/definitely/missing');",
+      "expected_behavior": "preserve Electron/backend best-effort behavior; do not fabricate success metadata"
+    }
+  ]
+}

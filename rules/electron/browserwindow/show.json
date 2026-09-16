@@ -1,0 +1,46 @@
+{
+  "id": "electron.browserwindow.show",
+  "category": "electron.browserwindow",
+  "summary": "Show the window and give it focus.",
+  "source": {
+    "pattern": "$win.show()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.Show()",
+    "helper": "ElectronCompat.BrowserWindow.Show",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "visibility": "shown",
+    "focus": "requested"
+  },
+  "caveats": [
+    "OS focus-stealing rules can prevent an application from receiving focus exactly as requested."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "show hidden window",
+      "input": "win.hide(); win.show();",
+      "expected_csharp": "win.Show();",
+      "expected_behavior": "window becomes visible and Electron requests focus"
+    },
+    {
+      "name": "show destroyed window",
+      "input": "win.destroy(); win.show();",
+      "expected_behavior": "must not silently recreate a destroyed BrowserWindow"
+    }
+  ]
+}

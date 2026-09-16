@@ -1,0 +1,47 @@
+{
+  "id": "electron.ipcrenderer.invoke",
+  "category": "electron.ipc",
+  "summary": "Invoke a main-side handler and return a Promise for its structured-cloned response.",
+  "source": {
+    "pattern": "ipcRenderer.invoke($channel, ...$args)",
+    "requirements": {
+      "module_binding": "electron.ipcRenderer",
+      "builtin_not_overridden": true,
+      "renderer_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "await ElectronRuntime.Current.IpcRenderer.InvokeAsync($channel, $args)",
+    "notes": "Preserve request/reply correlation, structured cloning and Promise rejection behavior."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<any>",
+    "serialization": "Structured Clone Algorithm",
+    "handler": "ipcMain.handle/handleOnce",
+    "error": "Promise rejection with serialized error"
+  },
+  "caveats": [
+    "The resolved result is not the same object identity as a main-process object.",
+    "Thrown main errors are not transparently transferred as the original Error object."
+  ],
+  "references": [
+    "Electron ipcRenderer API",
+    "Structured Clone Algorithm"
+  ],
+  "tests": [
+    {
+      "name": "invoke result",
+      "input": "const n = await ipcRenderer.invoke('sum',1,2);",
+      "expected_csharp": "var n = await ElectronRuntime.Current.IpcRenderer.InvokeAsync(\"sum\", args);",
+      "expected_behavior": "resolves with the main handler result after serialization"
+    },
+    {
+      "name": "invoke rejection",
+      "input": "await ipcRenderer.invoke('fails');",
+      "expected_behavior": "rejects when the registered main handler throws/rejects"
+    }
+  ]
+}
