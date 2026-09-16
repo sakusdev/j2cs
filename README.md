@@ -18,7 +18,7 @@ The long-term goal is to support tooling that can remove as much of the JavaScri
 schema/          JSON Schema for rule files
 rules/           Translation rules grouped by domain
 tests/           Differential/behavior tests
-prompts/         Worker and reviewer instructions for parallel generation
+prompts/         Autonomous worker/reviewer instructions
 .github/         CI
 ```
 
@@ -33,13 +33,26 @@ prompts/         Worker and reviewer instructions for parallel generation
 
 `Array.prototype.push` cannot simply become `List<T>.Add`: JavaScript `push()` returns the new length, while `Add()` returns `void`. Rules in j2cs record this semantic difference explicitly and test it.
 
-## Parallel workflow
+## Autonomous parallel workflow
 
-1. Pick one narrow domain (Array, String, Promise, coercion, Node fs, Electron IPC, etc.).
-2. Create a branch such as `rules/array-core`.
-3. Add or update rules conforming to `schema/rule.schema.json`.
-4. Add tests for normal and edge behavior.
-5. Open a PR.
-6. A separate reviewer should verify JavaScript semantics, C# validity, conflicts with existing rules, and fallback decisions.
+Rule-generation work is queued as GitHub Issues containing `WORKSTREAM:` and `STATUS: READY`.
+
+An autonomous worker must read `prompts/worker.md`, select one ready issue, and atomically claim it by creating the deterministic branch:
+
+```text
+work/issue-<ISSUE_NUMBER>
+```
+
+That branch name is the concurrency lock. If it already exists, another worker owns the issue and the worker must choose another ready issue.
+
+After claiming, the worker completes the workstream, validates all rules, opens a PR targeting `main` with `Closes #<ISSUE_NUMBER>`, and marks the issue ready for review. Workers must not merge their own PR unless explicitly instructed.
+
+A new ChatGPT conversation therefore only needs a minimal launcher such as:
+
+```text
+sakusdev/j2cs の自律Workerとして prompts/worker.md に従い、未担当の READY Issue を1つ取得してPR作成まで完遂して。
+```
+
+Use `prompts/workstream-issue-template.md` when adding new workstream tasks.
 
 The repository is intentionally a knowledge base first. A compiler can consume this data later through an AST/type-analysis pipeline.
