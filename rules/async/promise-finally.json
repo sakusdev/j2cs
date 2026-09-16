@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.finally",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.prototype.finally while preserving original value/reason pass-through and callback failure override semantics.",
+  "source": {"pattern": "$promise.finally($onFinally)", "requirements": {"receiver": "proven intrinsic Promise representation", "builtin_finally_not_overridden": true, "builtin_then_not_overridden": true, "species": "intrinsic Promise"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Finally", "template": "JsPromise.Finally($promise, $onFinally)", "notes": "Callable onFinally receives no arguments; fulfilled callback results are ignored, but a throw/rejection replaces the original outcome."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"callback_args": "none", "fulfilled_input": "original value passes through", "rejected_input": "original reason passes through", "callback_throw_or_reject": "overrides outcome", "species": "derived promise constructor observable"},
+  "caveats": ["Subclass or custom Symbol.species behavior needs runtime handling."],
+  "references": ["ECMAScript 2026 Promise.prototype.finally"],
+  "tests": [
+    {"name": "fulfilled value passes through", "input": "Promise.resolve(8).finally(()=>99).then(console.log);", "expected_behavior": "prints 8"},
+    {"name": "finally rejection overrides", "input": "Promise.resolve(8).finally(()=>Promise.reject('x')).catch(console.log);", "expected_behavior": "prints x"}
+  ]
+}
