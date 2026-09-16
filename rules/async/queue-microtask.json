@@ -1,0 +1,16 @@
+{
+  "id": "async.queue-microtask",
+  "category": "async",
+  "summary": "Lower the builtin queueMicrotask host API to the same microtask queue used by Promise reactions.",
+  "source": {"pattern": "queueMicrotask($callback)", "requirements": {"global": "builtin queueMicrotask", "not_overridden": true}},
+  "target": {"kind": "helper", "helper": "JsMicrotaskQueue.Enqueue", "template": "JsMicrotaskQueue.Enqueue($callback)", "notes": "Enqueue after the current stack/task unwinds and before the next task; callback exceptions are host-reported exceptions rather than Promise rejections."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"return": "undefined", "queue": "microtask", "ordering": "FIFO with Promise jobs in the same host microtask queue", "recursive_enqueue": "drain before next task", "callback_throw": "host exception reporting"},
+  "caveats": ["Task.Run and ThreadPool scheduling do not preserve microtask ordering.", "A recursive microtask chain can starve later tasks."],
+  "references": ["HTML queue a microtask", "MDN Using microtasks"],
+  "tests": [
+    {"name": "runs after current stack", "input": "queueMicrotask(()=>console.log(2));console.log(1);", "expected_csharp": "JsMicrotaskQueue.Enqueue(() => Console.WriteLine(2));", "expected_behavior": "prints 1 then 2"},
+    {"name": "shares ordering with Promise reaction", "input": "Promise.resolve().then(()=>console.log('p'));queueMicrotask(()=>console.log('q'));", "expected_behavior": "prints p then q when enqueued in that order"}
+  ]
+}
