@@ -1,0 +1,47 @@
+{
+  "id": "function.constructor.new-ordinary",
+  "category": "functions",
+  "summary": "Construct an ordinary JS function with new using its current prototype and JS constructor-return rules.",
+  "source": {
+    "pattern": "new $ctor($args)",
+    "requirements": {
+      "constructor_is_ordinary_js_function": true,
+      "constructable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.Construct($ctor, new JsValue[] { $args }, $ctor)",
+    "helper": "JsFunction.Construct",
+    "notes": "Construction creates an object whose prototype comes from ctor.prototype when that value is an object, invokes ctor with the new object as this, then returns an explicit object result or the created object."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "prototype_lookup": "observable current ctor.prototype",
+    "this": "fresh object",
+    "return_object": "overrides fresh object",
+    "return_primitive": "ignored",
+    "new_target": "constructor/newTarget"
+  },
+  "caveats": [
+    "Prototype may be mutated between calls.",
+    "C# new T(...) is only safe after proving prototype/constructor-return behavior unobservable and mapping to a real C# type."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification [[Construct]] for ECMAScript Function Objects",
+    "MDN JavaScript reference new operator"
+  ],
+  "tests": [
+    {
+      "name": "constructor initializes this",
+      "input": "function C(x){this.x=x}; console.log(new C(3).x);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "primitive return ignored",
+      "input": "function C(){this.x=1; return 7}; console.log(new C().x);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "function.declaration.hoisted-binding",
+  "category": "functions",
+  "summary": "Lower an ordinary function declaration to a C# local/static function only when declaration-instantiation semantics are resolved and JS function-object behavior is unobservable.",
+  "source": {
+    "pattern": "function $name($params) { $body }",
+    "requirements": {
+      "ordinary_function": true,
+      "no_eval_or_with": true,
+      "scope_binding_conflicts_resolved": true,
+      "block_level_annex_b_not_applicable": true,
+      "function_identity_unobserved": true,
+      "function_properties_unobserved": true,
+      "not_used_with_new": true,
+      "this_arguments_new_target_unused": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$returnType $name($csharpParams) { $body }",
+    "notes": "C# local functions may be referenced before their textual declaration, matching the useful hoisting property after JS declaration-instantiation conflicts have been resolved."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "binding_creation": "function binding exists before statement execution in its scope",
+    "callable": true,
+    "constructable": "ordinary functions may be constructable unless syntax form says otherwise"
+  },
+  "caveats": [
+    "Global-script declarations and Annex B block-function rules need separate environment handling.",
+    "The function object itself has observable properties (name, length, prototype)."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification"
+  ],
+  "tests": [
+    {
+      "name": "call before declaration",
+      "input": "console.log(add(2,3)); function add(a,b){ return a+b; }",
+      "expected_csharp": "static double add(double a, double b) => a + b; Console.WriteLine(add(2d, 3d));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "declaration creates one binding",
+      "input": "function f(){ return 1; } console.log(f());",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

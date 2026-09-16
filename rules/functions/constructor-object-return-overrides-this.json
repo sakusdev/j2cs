@@ -1,0 +1,42 @@
+{
+  "id": "function.constructor.object-return-overrides-this",
+  "category": "functions",
+  "summary": "Preserve the special rule that an ordinary constructor's explicit object return value replaces the allocated this object.",
+  "source": {
+    "pattern": "new $ctor($args)",
+    "requirements": {
+      "ordinary_constructor": true,
+      "constructor_may_return_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.Construct($ctor, $args, $newTarget)",
+    "helper": "JsFunction.Construct",
+    "notes": "After calling the constructor, return its result if that result is an Object; otherwise return the originally allocated receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object_return": "wins",
+    "primitive_return": "ignored"
+  },
+  "caveats": [
+    "This differs fundamentally from C# constructors, which cannot replace the instance being constructed."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification [[Construct]] for ECMAScript Function Objects"
+  ],
+  "tests": [
+    {
+      "name": "object return replaces instance",
+      "input": "function C(){this.x=1; return {x:9}}; console.log(new C().x);",
+      "expected_behavior": "prints 9"
+    },
+    {
+      "name": "null return ignored",
+      "input": "function C(){this.x=1; return null}; console.log(new C().x);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

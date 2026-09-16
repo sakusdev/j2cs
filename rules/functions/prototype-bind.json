@@ -1,0 +1,48 @@
+{
+  "id": "function.prototype.bind",
+  "category": "functions",
+  "summary": "Create a bound function object preserving bound this, leading arguments, length/name metadata, and target call/construct behavior.",
+  "source": {
+    "pattern": "$fn.bind($thisArg, ...$boundArgs)",
+    "requirements": {
+      "receiver_callable": true,
+      "builtin_function_prototype_bind_not_overridden": true,
+      "bind_property_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.Bind($fn, $thisArg, new JsValue[] { $boundArgs })",
+    "helper": "JsFunction.Bind",
+    "notes": "The helper must create a new bound function exotic object. On ordinary calls it prepends bound args; if constructable and invoked with new, bound this is ignored and the target is constructed."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "fresh_function_object": true,
+    "bound_arguments": "prepended",
+    "length": "max(target length - bound argument count, 0)",
+    "name": "bound + target name",
+    "own_prototype_property": false
+  },
+  "caveats": [
+    "Bound functions can still be constructable if their target is constructable.",
+    "Using a C# closure alone misses new/instanceof/prototype/name/length behavior."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function.prototype.bind",
+    "MDN JavaScript reference Function.prototype.bind"
+  ],
+  "tests": [
+    {
+      "name": "partial application",
+      "input": "function f(a,b){return this.x+a+b}; const g=f.bind({x:1},2); console.log(g(3));",
+      "expected_behavior": "prints 6"
+    },
+    {
+      "name": "bound constructor ignores bound this",
+      "input": "function C(x){this.x=x}; const B=C.bind({bad:true},4); const o=new B(); console.log(o.x,o.bad);",
+      "expected_behavior": "prints 4 undefined"
+    }
+  ]
+}

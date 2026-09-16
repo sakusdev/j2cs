@@ -1,0 +1,43 @@
+{
+  "id": "function.call.spread-iterable",
+  "category": "functions",
+  "summary": "Expand call spread arguments using the iterable protocol while preserving argument order and this binding.",
+  "source": {
+    "pattern": "$fn(...$iterable)",
+    "requirements": {
+      "spread_in_call": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.CallSpread($fn, $thisArg, $segments)",
+    "helper": "JsFunction.CallSpread",
+    "notes": "Each spread operand is iterated via GetIterator; non-spread arguments and iterated values are appended in source order. Iterator side effects/errors are observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "spread_protocol": "iterable, not merely array-like",
+    "order": "left-to-right",
+    "iterator_close": "must follow abrupt-completion rules when required"
+  },
+  "caveats": [
+    "Do not implement call spread using apply's CreateListFromArrayLike.",
+    "Strings and custom iterables must work; plain array-like non-iterables must fail."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification ArgumentList Evaluation"
+  ],
+  "tests": [
+    {
+      "name": "custom iterable spread",
+      "input": "const it={[Symbol.iterator]:function*(){yield 2;yield 3}}; function f(a,b){return a+b}; console.log(f(...it));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "array-like non-iterable is not enough",
+      "input": "function f(){}; f(...{0:1,length:1});",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

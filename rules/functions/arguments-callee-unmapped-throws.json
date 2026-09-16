@@ -1,0 +1,44 @@
+{
+  "id": "function.arguments.callee-unmapped-throws",
+  "category": "functions",
+  "summary": "Accessing arguments.callee on an unmapped arguments object throws TypeError, including strict functions and non-strict functions with non-simple parameter lists.",
+  "source": {
+    "pattern": "arguments.callee",
+    "requirements": {
+      "arguments_object_unmapped": true,
+      "arguments_binding_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsRuntime.ThrowTypeError(\"'callee' is not accessible on unmapped arguments\")",
+    "helper": "JsRuntime.ThrowTypeError",
+    "notes": "CreateUnmappedArgumentsObject installs the restricted callee accessor. This applies beyond strict mode: non-simple parameter lists also use an unmapped arguments object."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "TypeError on get",
+    "property": "non-configurable throwing accessor",
+    "applies_to": "strict functions and non-strict functions whose arguments object is unmapped"
+  },
+  "caveats": [
+    "Non-strict functions with a simple parameter list use a mapped arguments object and have legacy callee semantics handled separately/runtime."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification CreateUnmappedArgumentsObject",
+    "ECMAScript 2026 Language Specification CreateMappedArgumentsObject"
+  ],
+  "tests": [
+    {
+      "name": "strict callee throws",
+      "input": "function f(){'use strict'; return arguments.callee;} try{f()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "non-simple sloppy parameters are also unmapped",
+      "input": "function f(a=1){try{return arguments.callee}catch(e){return e.name}} console.log(f());",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

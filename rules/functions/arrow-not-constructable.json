@@ -1,0 +1,42 @@
+{
+  "id": "function.arrow.not-constructable",
+  "category": "functions",
+  "summary": "An arrow function is callable but not constructable; using new with a known arrow must throw TypeError.",
+  "source": {
+    "pattern": "new $arrow($args)",
+    "requirements": {
+      "target_statically_known_arrow": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsRuntime.ThrowTypeError(\"Arrow function is not a constructor\")",
+    "helper": "JsRuntime.ThrowTypeError",
+    "notes": "Do not map an arrow to a C# delegate and then invent construction semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "constructable": false,
+    "prototype_property": "absent by default"
+  },
+  "caveats": [
+    "Assigning a property named prototype to an arrow does not make it constructable."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Arrow Function Definitions",
+    "MDN JavaScript reference Function.prototype property"
+  ],
+  "tests": [
+    {
+      "name": "new arrow throws",
+      "input": "const f=()=>{}; try{new f()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "prototype assignment does not help",
+      "input": "const f=()=>{}; f.prototype={}; new f();",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

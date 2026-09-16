@@ -1,0 +1,45 @@
+{
+  "id": "function.this.sloppy",
+  "category": "functions",
+  "summary": "Apply non-strict this substitution: undefined/null become the global this value and primitives are boxed.",
+  "source": {
+    "pattern": "function $f(){ return this; }",
+    "requirements": {
+      "ordinary_non_strict_function": true,
+      "script_or_host_global_this_known": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.InvokeSloppy($fn, $thisArg, $args, $globalThis)",
+    "helper": "JsFunction.InvokeSloppy",
+    "notes": "OrdinaryCallBindThis converts the supplied this value according to non-strict thisMode. The host's global this value must be represented explicitly."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined_or_null_this": "global this value",
+    "primitive_this": "ToObject boxing",
+    "object_this": "unchanged"
+  },
+  "caveats": [
+    "ECMAScript modules are strict, so this rule mainly applies to sloppy script/function code.",
+    "Browser WindowProxy/globalThis details can require host runtime support."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification OrdinaryCallBindThis",
+    "MDN JavaScript reference Strict mode"
+  ],
+  "tests": [
+    {
+      "name": "null substituted",
+      "input": "function f(){return this===globalThis} console.log(f.call(null));",
+      "expected_behavior": "prints true in ordinary script host semantics"
+    },
+    {
+      "name": "primitive boxed",
+      "input": "function f(){return typeof this} console.log(f.call(2));",
+      "expected_behavior": "prints object"
+    }
+  ]
+}

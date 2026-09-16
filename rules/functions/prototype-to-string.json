@@ -1,0 +1,43 @@
+{
+  "id": "function.prototype.to-string",
+  "category": "functions",
+  "summary": "Preserve Function.prototype.toString via runtime/source metadata because ECMAScript functions expose original source text when available.",
+  "source": {
+    "pattern": "$fn.toString()",
+    "requirements": {
+      "builtin_function_prototype_toString_not_overridden": true,
+      "toString_property_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Runtime function objects must retain source text or a spec-permitted native-function representation. Reconstructing from generated C# is not semantically valid."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ecmascript_function": "returns original source text when host source is available",
+    "builtin_or_no_source": "native-function-style implementation-defined representation",
+    "non_callable": "TypeError"
+  },
+  "caveats": [
+    "Whitespace and comments can be observable in returned source.",
+    "Bound functions generally stringify as native-function style rather than target source."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function.prototype.toString",
+    "MDN JavaScript reference Function.prototype.toString"
+  ],
+  "tests": [
+    {
+      "name": "comments and spacing observable",
+      "input": "function f /*x*/ ( ) { return 1; } console.log(f.toString().includes('/*x*/'));",
+      "expected_behavior": "prints true when source text is available"
+    },
+    {
+      "name": "non-callable receiver throws",
+      "input": "Function.prototype.toString.call({});",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "function.call.direct-known-exact-arity",
+  "category": "functions",
+  "summary": "Directly invoke a statically known compiled function only when ordinary JS call machinery is observationally irrelevant.",
+  "source": {
+    "pattern": "$fn($args)",
+    "requirements": {
+      "target_statically_known": true,
+      "exact_arity": true,
+      "this_unused": true,
+      "arguments_unused": true,
+      "no_default_or_rest_params": true,
+      "not_proxy_or_bound": true,
+      "callee_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$fn($args)",
+    "notes": "Arguments are evaluated left-to-right before the call. This specialization excludes missing/extra argument and this semantics."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "evaluation_order": "callee then arguments left-to-right",
+    "return_value": "callee result",
+    "exceptions": "propagate"
+  },
+  "caveats": [
+    "A JS callable may be a Proxy or bound function; dynamic callables need runtime dispatch.",
+    "Preserve evaluation order with temporaries when lowering complex callee/argument expressions."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification"
+  ],
+  "tests": [
+    {
+      "name": "known pure function",
+      "input": "function add(a,b){return a+b;} console.log(add(2,3));",
+      "expected_csharp": "Console.WriteLine(add(2d,3d));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "argument evaluation order",
+      "input": "let x=0; function f(a,b){return a*10+b;} console.log(f(++x,++x));",
+      "expected_behavior": "prints 12"
+    }
+  ]
+}

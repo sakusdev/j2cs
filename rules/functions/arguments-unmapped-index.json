@@ -1,0 +1,45 @@
+{
+  "id": "function.arguments.unmapped-index",
+  "category": "functions",
+  "summary": "Use an unmapped arguments object for strict functions and for functions with non-simple parameter lists.",
+  "source": {
+    "pattern": "arguments[$i]",
+    "requirements": {
+      "arguments_binding_not_shadowed": true,
+      "arguments_object_unmapped": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$arguments.Get($i)",
+    "helper": "JsArguments",
+    "notes": "The unmapped arguments object stores the originally supplied values independently from later writes to named parameters. Out-of-range property reads produce undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parameter_aliasing": false,
+    "index_read": "ordinary property semantics over captured supplied values",
+    "missing_index": "undefined"
+  },
+  "caveats": [
+    "Default/rest/destructured parameter lists cause unmapped arguments even in non-strict code.",
+    "If the arguments object escapes and is mutated with descriptors, helper must model ordinary-object property semantics."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification CreateUnmappedArgumentsObject",
+    "MDN JavaScript reference arguments"
+  ],
+  "tests": [
+    {
+      "name": "strict param write does not update arguments",
+      "input": "function f(a){'use strict'; a=9; return arguments[0]}; console.log(f(1));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "default parameter is unmapped",
+      "input": "function f(a=0){a=9; return arguments[0]}; console.log(f(1));",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

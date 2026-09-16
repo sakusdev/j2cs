@@ -1,0 +1,46 @@
+{
+  "id": "function.arguments.length",
+  "category": "functions",
+  "summary": "Lower arguments.length to the actual number of arguments supplied to the current non-arrow function.",
+  "source": {
+    "pattern": "arguments.length",
+    "requirements": {
+      "inside_non_arrow_function": true,
+      "arguments_binding_not_shadowed": true,
+      "length_property_unmodified": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$arguments.Count",
+    "helper": "JsArguments",
+    "notes": "Count must reflect actual supplied argument count, including extras, and must differ from the number of formal parameters."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "actual argument count",
+    "type": "Number",
+    "arrow_functions": "no own arguments"
+  },
+  "caveats": [
+    "Deleting or redefining the arguments length property is observable if the arguments object escapes; this rule assumes canonical lowered arguments representation.",
+    "If code mutates or redefines arguments.length, use the full arguments-object helper rather than Count."
+  ],
+  "references": [
+    "MDN JavaScript reference arguments"
+  ],
+  "tests": [
+    {
+      "name": "fewer than formals",
+      "input": "function f(a,b){return arguments.length}; console.log(f(1));",
+      "expected_csharp": "return (double)__arguments.Count;",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "more than formals",
+      "input": "function f(a){return arguments.length}; console.log(f(1,2,3));",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

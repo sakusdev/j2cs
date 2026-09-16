@@ -1,0 +1,45 @@
+{
+  "id": "function.length.static",
+  "category": "functions",
+  "summary": "Constant-fold a function's length property when the exact function definition is statically known and the property was not redefined.",
+  "source": {
+    "pattern": "$fn.length",
+    "requirements": {
+      "exact_function_definition_known": true,
+      "own_length_not_redefined_or_deleted": true,
+      "no_proxy": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$computedLength",
+    "notes": "Count parameters before the first default-valued parameter; rest is excluded; each destructuring pattern counts as one parameter."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "value": "non-negative Number for ordinary functions",
+    "count_rule": "parameters before first default; rest excluded"
+  },
+  "caveats": [
+    "Function length is configurable and can be redefined/deleted.",
+    "Bound functions compute a new length from target length and number of bound arguments."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function Instances length",
+    "MDN JavaScript reference Function length"
+  ],
+  "tests": [
+    {
+      "name": "default stops count",
+      "input": "function f(a,b=1,c){} console.log(f.length);",
+      "expected_csharp": "Console.WriteLine(1d);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "rest excluded",
+      "input": "const f=(a,...r)=>{}; console.log(f.length);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

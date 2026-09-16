@@ -1,0 +1,46 @@
+{
+  "id": "function.method-call.this-binding",
+  "category": "functions",
+  "summary": "Preserve Reference-based method-call this binding instead of compiling a function-valued property to a receiver-capturing delegate.",
+  "source": {
+    "pattern": "$obj.$method($args)",
+    "requirements": {
+      "property_resolves_to_known_js_function": true,
+      "getter_side_effects_accounted_for": true,
+      "method_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.Call($fn, $obj, $argsArray)",
+    "helper": "JsFunction.Call",
+    "notes": "Evaluate the base/property lookup once, then call the function with the base object as this. This is distinct from extracting the function and calling it later."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "this_binding": "base object of property reference",
+    "evaluation_order": "base, property lookup, arguments, call"
+  },
+  "caveats": [
+    "Property access may invoke getters or Proxy traps.",
+    "Optional chaining and super calls require separate rules."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification EvaluateCall / Call",
+    "MDN JavaScript reference this"
+  ],
+  "tests": [
+    {
+      "name": "method receives receiver",
+      "input": "const o={x:4,m(){return this.x}}; console.log(o.m());",
+      "expected_csharp": "var r = JsFunction.Call(m, o, Array.Empty<JsValue>());",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "getter producing function evaluated once",
+      "input": "let n=0; const o={get m(){n++; return function(){return this===o}}}; console.log(o.m(),n);",
+      "expected_behavior": "prints true 1"
+    }
+  ]
+}

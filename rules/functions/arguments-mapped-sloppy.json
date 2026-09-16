@@ -1,0 +1,45 @@
+{
+  "id": "function.arguments.mapped-sloppy",
+  "category": "functions",
+  "summary": "Model the parameter aliasing of a mapped arguments exotic object in non-strict functions with a simple parameter list.",
+  "source": {
+    "pattern": "arguments[$i]",
+    "requirements": {
+      "non_strict_function": true,
+      "simple_parameter_list": true,
+      "arguments_binding_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$mappedArguments.Get($i)",
+    "helper": "JsMappedArguments",
+    "notes": "Mapped indices and corresponding parameter bindings share state until mapping is broken by specified property operations. A copied C# array is not equivalent."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parameter_aliasing": true,
+    "direction": "arguments[index] writes can update parameter and parameter writes can update mapped index"
+  },
+  "caveats": [
+    "Deleting/redefining an index can sever the parameter map.",
+    "Duplicate parameter names have subtle mapping rules; helper construction must follow CreateMappedArgumentsObject."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification CreateMappedArgumentsObject",
+    "MDN JavaScript reference arguments"
+  ],
+  "tests": [
+    {
+      "name": "parameter write updates arguments",
+      "input": "function f(a){a=7; return arguments[0]}; console.log(f(1));",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "arguments write updates parameter",
+      "input": "function f(a){arguments[0]=8; return a}; console.log(f(1));",
+      "expected_behavior": "prints 8"
+    }
+  ]
+}

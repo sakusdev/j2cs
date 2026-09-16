@@ -1,0 +1,46 @@
+{
+  "id": "function.prototype.apply",
+  "category": "functions",
+  "summary": "Lower Function.prototype.apply with array-like argument extraction, not iterable spread semantics.",
+  "source": {
+    "pattern": "$fn.apply($thisArg, $argArray)",
+    "requirements": {
+      "receiver_callable": true,
+      "builtin_function_prototype_apply_not_overridden": true,
+      "apply_property_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.Apply($fn, $thisArg, $argArray)",
+    "helper": "JsFunction.Apply",
+    "notes": "apply accepts null/undefined as no arguments; otherwise it CreateListFromArrayLike, reading length and indexed properties. This differs from call spread, which consumes an iterable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argArray": "array-like, or null/undefined for empty list",
+    "property_reads": "length then indices may invoke getters",
+    "return_value": "target result"
+  },
+  "caveats": [
+    "Do not replace blindly with fn(...argArray); iterable and array-like are different protocols.",
+    "Proxy/getter effects during array-like extraction are observable."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function.prototype.apply",
+    "MDN JavaScript reference Function.prototype.apply"
+  ],
+  "tests": [
+    {
+      "name": "array-like object accepted",
+      "input": "function f(a,b){return a+b}; console.log(f.apply(null,{0:2,1:3,length:2}));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "null means no arguments",
+      "input": "function f(){return arguments.length}; console.log(f.apply(null,null));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

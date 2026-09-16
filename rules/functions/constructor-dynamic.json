@@ -1,0 +1,42 @@
+{
+  "id": "function.constructor.dynamic",
+  "category": "functions",
+  "summary": "Treat Function(...) / new Function(...) as unsupported without a JavaScript parser/compiler/runtime because it dynamically parses and executes source text.",
+  "source": {
+    "pattern": "Function($parts) | new Function($parts)",
+    "requirements": {
+      "dynamic_function_constructor": true
+    }
+  },
+  "target": {
+    "kind": "unsupported",
+    "notes": "This is eval-like dynamic code generation. A future full JS runtime fallback may support it, but static C# lowering cannot preserve arbitrary runtime-provided source."
+  },
+  "strategy": "unsupported",
+  "confidence": "high",
+  "semantics": {
+    "scope": "created function uses global environment rather than caller lexical scope",
+    "parsing": "parameter strings and body are parsed at runtime",
+    "call_and_new": "Function(...) and new Function(...) are equivalent for creation"
+  },
+  "caveats": [
+    "Constant source could theoretically be pre-parsed as a separate optimization, but must preserve global-scope semantics and toString source.",
+    "Never execute untrusted strings during compilation."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Function Constructor / CreateDynamicFunction",
+    "MDN JavaScript reference Function constructor"
+  ],
+  "tests": [
+    {
+      "name": "dynamic body",
+      "input": "const f=new Function('a','return a+1'); console.log(f(2));",
+      "expected_behavior": "unsupported unless a JS runtime/dynamic compiler fallback is enabled"
+    },
+    {
+      "name": "call form equivalent",
+      "input": "const f=Function('return 3'); console.log(f());",
+      "expected_behavior": "unsupported for static lowering"
+    }
+  ]
+}

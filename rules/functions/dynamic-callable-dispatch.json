@@ -1,0 +1,41 @@
+{
+  "id": "function.dynamic-callable-dispatch",
+  "category": "functions",
+  "summary": "Use runtime dispatch when the callee is an arbitrary JS value whose callability, proxy behavior, or call target cannot be statically resolved.",
+  "source": {
+    "pattern": "$callee($args)",
+    "requirements": {
+      "callee_type": "unknown_or_dynamic"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Runtime dispatch must perform IsCallable/[[Call]], preserve Reference this binding, support callable Proxy/bound/function objects, and throw TypeError for non-callables."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callability": "runtime property of value",
+    "proxy_apply_trap": "observable",
+    "exception": "TypeError if not callable"
+  },
+  "caveats": [
+    "C# dynamic is not a JS semantics implementation.",
+    "Property-reference vs value-call distinction still affects this."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Call abstract operation / Proxy [[Call]]"
+  ],
+  "tests": [
+    {
+      "name": "non-callable throws",
+      "input": "const x=3; try{x()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "callable proxy trap",
+      "input": "const f=new Proxy(()=>1,{apply(){return 9}}); console.log(f());",
+      "expected_behavior": "prints 9"
+    }
+  ]
+}

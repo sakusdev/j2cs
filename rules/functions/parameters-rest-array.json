@@ -1,0 +1,45 @@
+{
+  "id": "function.parameters.rest-array",
+  "category": "functions",
+  "summary": "Collect remaining supplied arguments into a fresh JavaScript Array for a rest parameter.",
+  "source": {
+    "pattern": "function $f($head, ...$rest) { $body }",
+    "requirements": {
+      "rest_parameter": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "var $rest = JsArguments.Rest($arguments, $headCount);",
+    "helper": "JsArguments.Rest",
+    "notes": "The helper must create a fresh dense JS Array containing only arguments after the named parameters; with none, it returns an empty array."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "rest_is_real_array": true,
+    "contains": "remaining supplied arguments only",
+    "fresh_each_call": true,
+    "length_property": "not counted in Function.length"
+  },
+  "caveats": [
+    "Rest differs from arguments: it is a real Array and is never parameter-mapped.",
+    "Caller packing must still preserve left-to-right argument evaluation."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Binding RestElement",
+    "MDN JavaScript reference Rest parameters"
+  ],
+  "tests": [
+    {
+      "name": "collects extras",
+      "input": "function f(a,...r){return [a,r.length,r[0]]}; console.log(f(1,2,3));",
+      "expected_behavior": "result corresponds to [1,2,2]"
+    },
+    {
+      "name": "empty rest is array",
+      "input": "function f(...r){return [Array.isArray(r),r.length]}; console.log(f());",
+      "expected_behavior": "true and 0"
+    }
+  ]
+}

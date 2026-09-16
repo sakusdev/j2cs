@@ -1,0 +1,45 @@
+{
+  "id": "function.name.static",
+  "category": "functions",
+  "summary": "Constant-fold Function.name only when the function's inferred/explicit name and property integrity are statically known.",
+  "source": {
+    "pattern": "$fn.name",
+    "requirements": {
+      "function_identity_known": true,
+      "own_name_not_redefined_or_deleted": true,
+      "no_proxy": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$nameLiteral",
+    "notes": "Function names can be explicit or inferred from syntactic context. Bound functions prefix the target name with 'bound '."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "property": "own configurable non-writable name data property for ordinary functions",
+    "inference": "syntax-dependent"
+  },
+  "caveats": [
+    "The name property is configurable and may be redefined.",
+    "Anonymous function name inference is context-sensitive; do not guess from a C# symbol name."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification SetFunctionName / Function Instances name",
+    "MDN JavaScript reference Function name"
+  ],
+  "tests": [
+    {
+      "name": "declaration name",
+      "input": "function hello(){} console.log(hello.name);",
+      "expected_csharp": "Console.WriteLine(\"hello\");",
+      "expected_behavior": "prints hello"
+    },
+    {
+      "name": "inferred variable name",
+      "input": "const f = function(){}; console.log(f.name);",
+      "expected_behavior": "prints f"
+    }
+  ]
+}

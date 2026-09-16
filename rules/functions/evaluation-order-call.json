@@ -1,0 +1,45 @@
+{
+  "id": "function.evaluation-order.call",
+  "category": "functions",
+  "summary": "Preserve JavaScript call evaluation order by introducing temporaries when a direct C# expression would reorder base lookup, getter calls, or argument side effects.",
+  "source": {
+    "pattern": "$callee($arg1, $arg2, ...)",
+    "requirements": {
+      "side_effectful_callee_or_arguments": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "var __callee = $evaluateCalleeOnce; var __a0 = $arg1; var __a1 = $arg2; var __result = $invoke(__callee, __a0, __a1);",
+    "notes": "ECMAScript evaluates the callee/reference first, then argument expressions left-to-right, then invokes. C# is also left-to-right for ordinary calls, but lowering transformations must not duplicate or hoist effects across this boundary."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "order": [
+      "callee/reference",
+      "arguments left-to-right",
+      "invoke"
+    ],
+    "evaluate_once": true
+  },
+  "caveats": [
+    "Property getters and Proxy traps during callee lookup are effects.",
+    "Spread operands interleave iterator effects with argument-list construction."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification EvaluateCall / ArgumentList Evaluation"
+  ],
+  "tests": [
+    {
+      "name": "callee getter before args",
+      "input": "let s=[]; const o={get f(){s.push('g'); return x=>x}}; o.f((s.push('a'),1)); console.log(s.join(','));",
+      "expected_behavior": "prints g,a"
+    },
+    {
+      "name": "args left to right",
+      "input": "let s=[]; function f(a,b){} f((s.push(1),1),(s.push(2),2)); console.log(s.join(','));",
+      "expected_behavior": "prints 1,2"
+    }
+  ]
+}

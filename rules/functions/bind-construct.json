@@ -1,0 +1,45 @@
+{
+  "id": "function.bind.construct",
+  "category": "functions",
+  "summary": "Constructing a bound function must forward construction to its target, prepend bound arguments, ignore bound this, and preserve new.target transparency.",
+  "source": {
+    "pattern": "new $bound($args)",
+    "requirements": {
+      "callee_is_bound_function": true,
+      "bound_target_constructable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.ConstructBound($bound, new JsValue[] { $args })",
+    "helper": "JsFunction.ConstructBound",
+    "notes": "Bound [[Construct]] calls the target constructor. When newTarget is the bound function itself, the effective newTarget becomes the target."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "bound_this": "ignored during construction",
+    "arguments": "bound prefix then call-site arguments",
+    "new_target": "transparent when directly constructing bound function"
+  },
+  "caveats": [
+    "A bound function whose target is not constructable is itself not constructable.",
+    "Bound functions lack an own prototype property but may still be constructable."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification Bound Function Exotic Objects",
+    "MDN JavaScript reference Function.prototype.bind"
+  ],
+  "tests": [
+    {
+      "name": "new.target transparent",
+      "input": "function C(){return new.target}; const B=C.bind(null); console.log(new B()===C);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "bound args prepended",
+      "input": "function C(a,b){this.v=a+b}; const B=C.bind(null,2); console.log(new B(3).v);",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

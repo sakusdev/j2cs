@@ -1,0 +1,41 @@
+{
+  "id": "function.arguments.callee-sloppy",
+  "category": "functions",
+  "summary": "Legacy arguments.callee in a non-strict mapped arguments object denotes the currently executing function and requires a JS function-object representation.",
+  "source": {
+    "pattern": "arguments.callee",
+    "requirements": {
+      "non_strict_function": true,
+      "simple_parameter_list": true,
+      "arguments_binding_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Supporting this legacy property requires the arguments object to retain the exact current function object; it also interacts with property redefinition/deletion."
+  },
+  "strategy": "runtime",
+  "confidence": "medium",
+  "semantics": {
+    "value": "current function object in mapped legacy arguments object"
+  },
+  "caveats": [
+    "Deprecated legacy feature; do not substitute a generated C# method handle if JS function identity/properties are observable."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification CreateMappedArgumentsObject",
+    "MDN JavaScript reference arguments.callee"
+  ],
+  "tests": [
+    {
+      "name": "recursive legacy callee",
+      "input": "function f(n){return n?arguments.callee(n-1):1} console.log(f(2));",
+      "expected_behavior": "prints 1 under compatible sloppy runtime"
+    },
+    {
+      "name": "identity",
+      "input": "function f(){return arguments.callee===f} console.log(f());",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

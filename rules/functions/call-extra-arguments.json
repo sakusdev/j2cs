@@ -1,0 +1,44 @@
+{
+  "id": "function.call.extra-arguments",
+  "category": "functions",
+  "summary": "Preserve extra argument evaluation and availability through arguments/rest even when there are fewer named formals.",
+  "source": {
+    "pattern": "$fn($moreArgs)",
+    "requirements": {
+      "target_statically_known": true,
+      "provided_argument_count_greater_than_formal_count": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsFunction.CallKnown($fn, new JsValue[] { $allArgs })",
+    "helper": "JsFunction.CallKnown",
+    "notes": "All argument expressions are evaluated. Extra values may be ignored by named parameters but remain observable via arguments/rest."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "extra_arguments": "evaluated and supplied",
+    "named_formals": "bind prefix only",
+    "arguments_length": "all supplied arguments"
+  },
+  "caveats": [
+    "Do not simply drop extra argument expressions; they may have side effects.",
+    "A fixed C# signature cannot preserve arguments/rest observation without an adapter."
+  ],
+  "references": [
+    "ECMAScript 2026 Language Specification EvaluateCall and FunctionDeclarationInstantiation"
+  ],
+  "tests": [
+    {
+      "name": "extra visible via arguments",
+      "input": "function f(a){return arguments[2]}; console.log(f(1,2,3));",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "extra expression still evaluated",
+      "input": "let x=0; function f(a){} f(1,++x); console.log(x);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}
