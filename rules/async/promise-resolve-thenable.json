@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.resolve-thenable",
+  "category": "async",
+  "summary": "Use runtime fallback when Promise.resolve may assimilate an arbitrary object through dynamic then lookup.",
+  "source": {"pattern": "Promise.resolve($value)", "requirements": {"operand": "object with unknown then property semantics"}},
+  "target": {"kind": "runtime", "template": "JsRuntime.PromiseResolveDynamic($value)", "notes": "Perform JavaScript Get(value, 'then'), callability testing, queued thenable invocation, and one-shot resolve/reject semantics."},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"then_get": "observable and read once", "getter_throw": "reject", "then_call_this": "thenable object", "multiple_calls": "only first resolution call counts"},
+  "caveats": ["Getter, Proxy, or monkey-patched then semantics cannot be represented by a simple Task conversion."],
+  "references": ["ECMAScript 2026 NewPromiseResolveThenableJob"],
+  "tests": [
+    {"name": "custom thenable fulfills", "input": "Promise.resolve({then(r){r(10)}}).then(console.log);", "expected_behavior": "prints 10"},
+    {"name": "then getter throw rejects", "input": "Promise.resolve(Object.defineProperty({},'then',{get(){throw 7}})).catch(console.log);", "expected_behavior": "rejects with 7"}
+  ]
+}
