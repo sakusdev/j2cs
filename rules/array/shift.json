@@ -1,0 +1,51 @@
+{
+  "id": "array.prototype.shift",
+  "category": "array",
+  "summary": "Remove and return the first element while shifting later present properties toward zero.",
+  "source": {
+    "pattern": "$array.shift()",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Shift",
+    "template": "JsArray.Shift(...)",
+    "notes": "Preserve holes while shifting. On an empty array set length to 0 and return undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return_value": "first value or undefined",
+    "reindexes": true
+  },
+  "caveats": [
+    "List<T>.RemoveAt(0) is only an internal fast path for a proven dense array and still needs explicit return/empty handling."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "shifts dense array",
+      "input": "const a=[1,2,3]; const x=a.shift(); console.log(x,a.join(','));",
+      "expected_behavior": "prints 1 2,3"
+    },
+    {
+      "name": "empty returns undefined",
+      "input": "const a=[]; console.log(a.shift()===undefined,a.length);",
+      "expected_behavior": "prints true 0"
+    },
+    {
+      "name": "hole movement preserved",
+      "input": "const a=[,2]; a.shift(); console.log(a.length,a[0],0 in a);",
+      "expected_behavior": "prints 1 2 true"
+    }
+  ]
+}

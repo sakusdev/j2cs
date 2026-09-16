@@ -1,0 +1,46 @@
+{
+  "id": "array.constructor.empty",
+  "category": "array",
+  "summary": "Create an empty intrinsic Array when Array is called or constructed with no arguments.",
+  "source": {
+    "pattern": "Array() | new Array()",
+    "requirements": {
+      "intrinsic_Array_binding": true,
+      "Array_constructor_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.CreateEmpty",
+    "template": "JsArray.CreateEmpty(...)",
+    "notes": "Use the canonical JS-array representation rather than a bare List<T>, so later holes, undefined, and length semantics remain representable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length": 0,
+    "creates_array_exotic": true,
+    "call_and_construct_equivalent": true,
+    "mutates_receiver": false
+  },
+  "caveats": [
+    "A plain List<T> is only a valid later optimization if whole-program analysis proves sparse/exotic array behavior cannot become observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "function call creates empty array",
+      "input": "const a = Array(); console.log(a.length, Array.isArray(a));",
+      "expected_csharp": "var a = JsArray.CreateEmpty();",
+      "expected_behavior": "prints 0 true"
+    },
+    {
+      "name": "constructor call equivalent",
+      "input": "const a = new Array(); console.log(a.length);",
+      "expected_csharp": "var a = JsArray.CreateEmpty();",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

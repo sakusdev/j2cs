@@ -1,0 +1,46 @@
+{
+  "id": "array.prototype.toreversed",
+  "category": "array",
+  "summary": "Create a reversed copy without mutating the source; holes are materialized as undefined.",
+  "source": {
+    "pattern": "$array.toReversed()",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.ToReversed",
+    "template": "JsArray.ToReversed(...)",
+    "notes": "Create a new intrinsic Array and read each source position with Get; absent own positions become present undefined values under the no-prototype-index requirement."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "returns_new_array": true,
+    "holes_become_present_undefined": true
+  },
+  "caveats": [
+    "Do not implement as slice().reverse(): slice preserves holes, while toReversed creates data properties for every index."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "source unchanged",
+      "input": "const a=[1,2,3]; const b=a.toReversed(); console.log(a.join(','),b.join(','));",
+      "expected_behavior": "prints 1,2,3 3,2,1"
+    },
+    {
+      "name": "hole materialized",
+      "input": "const b=[,1].toReversed(); console.log(b.length,1 in b,b[1]===undefined);",
+      "expected_behavior": "prints 2 true true"
+    }
+  ]
+}

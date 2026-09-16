@@ -1,0 +1,44 @@
+{
+  "id": "array.length.read",
+  "category": "array",
+  "summary": "Read Array length as a JavaScript Number.",
+  "source": {
+    "pattern": "$array.length",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "receiver_not_proxy": true,
+      "representation_exposes_exact_js_length": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "notes": "For the canonical JsArray representation this can be a direct C# property read converted to double. A List<T>.Count fast path is valid only if analysis proves Count equals JavaScript length."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Number",
+    "range": "0..2^32-1",
+    "side_effects": "none for ordinary arrays"
+  },
+  "caveats": [
+    "Do not use the count of materialized elements for sparse arrays; JavaScript length includes holes."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "dense length",
+      "input": "console.log([1,2,3].length);",
+      "expected_csharp": "double n = array.Length;",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "sparse length counts holes",
+      "input": "const a = Array(5); console.log(a.length);",
+      "expected_behavior": "prints 5",
+      "notes": "Length counts holes even though no indexed elements are materialized."
+    }
+  ]
+}

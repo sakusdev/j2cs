@@ -1,0 +1,45 @@
+{
+  "id": "array.of",
+  "category": "array",
+  "summary": "Create an Array whose elements are exactly the supplied arguments.",
+  "source": {
+    "pattern": "Array.of(...$items)",
+    "requirements": {
+      "intrinsic_Array_binding": true,
+      "Array_of_not_overridden": true,
+      "this_value_is_intrinsic_Array": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Of",
+    "template": "JsArray.Of(...)",
+    "notes": "Create a new intrinsic Array of argument-count length and copy arguments without coercion. A sole numeric argument is an element, unlike Array(number)."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "returns_new_array": true,
+    "length": "argument_count",
+    "single_number_is_element": true
+  },
+  "caveats": [
+    "Array.of is generic over its this constructor; custom this constructors require runtime handling."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "single number is element",
+      "input": "const a=Array.of(3); console.log(a.length,a[0]);",
+      "expected_behavior": "prints 1 3"
+    },
+    {
+      "name": "undefined is present element",
+      "input": "const a=Array.of(undefined); console.log(a.length,0 in a,a[0]===undefined);",
+      "expected_behavior": "prints 1 true true"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "array.prototype.at",
+  "category": "array",
+  "summary": "Index with positive or negative integer semantics and return undefined when out of range.",
+  "source": {
+    "pattern": "$array.at($index)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.At",
+    "template": "JsArray.At(...)",
+    "notes": "Apply ToIntegerOrInfinity and relative indexing. Negative indices count from the end; out-of-range indices return undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "negative_indexing": true,
+    "out_of_range": "undefined",
+    "index_coercion": "ToIntegerOrInfinity"
+  },
+  "caveats": [
+    "Direct C# indexing throws out of range and does not accept JS numeric coercions."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "negative index",
+      "input": "console.log([10,20,30].at(-1));",
+      "expected_behavior": "prints 30"
+    },
+    {
+      "name": "out of range returns undefined",
+      "input": "console.log([1].at(9)===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "fraction truncates toward zero",
+      "input": "console.log([10,20].at(1.9));",
+      "expected_behavior": "prints 20"
+    }
+  ]
+}

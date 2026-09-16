@@ -1,0 +1,49 @@
+{
+  "id": "array.prototype.slice",
+  "category": "array",
+  "summary": "Create a shallow selected-range copy while preserving holes.",
+  "source": {
+    "pattern": "$array.slice($start, $end)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true,
+      "array_species_is_builtin_array": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Slice",
+    "template": "JsArray.Slice(...)",
+    "notes": "Coerce/clamp start and end, preserve absent indexed properties as holes in the result, and create an intrinsic Array under the stated species requirement."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "returns_new_array": true,
+    "preserves_holes": true,
+    "index_coercion": "ToIntegerOrInfinity"
+  },
+  "caveats": [
+    "GetRange/LINQ materialization does not preserve sparse holes.",
+    "Custom Symbol.species is excluded and requires runtime fallback."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "negative range",
+      "input": "console.log([1,2,3,4].slice(-3,-1).join(','));",
+      "expected_behavior": "prints 2,3"
+    },
+    {
+      "name": "holes preserved",
+      "input": "const a=[,1]; const b=a.slice(0,1); console.log(b.length,0 in b,b[0]);",
+      "expected_behavior": "prints 1 false undefined"
+    }
+  ]
+}

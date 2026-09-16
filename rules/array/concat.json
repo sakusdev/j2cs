@@ -1,0 +1,56 @@
+{
+  "id": "array.prototype.concat",
+  "category": "array",
+  "summary": "Concatenate using JavaScript spreadability and hole-preserving semantics.",
+  "source": {
+    "pattern": "$array.concat(...$items)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true,
+      "array_species_is_builtin_array": true,
+      "no_custom_symbol_isConcatSpreadable": true,
+      "spreadable_inputs_are_builtin_arrays": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Concat",
+    "template": "JsArray.Concat(...)",
+    "notes": "Spread intrinsic arrays, append non-array values as single elements, preserve holes, and return a new intrinsic Array."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "returns_new_array": true,
+    "preserves_holes": true,
+    "spreadability": "IsConcatSpreadable under requirements"
+  },
+  "caveats": [
+    "Do not map directly to LINQ Concat: strings are not spread here and hole/species semantics differ.",
+    "Custom Symbol.isConcatSpreadable requires runtime fallback."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "array argument is spread",
+      "input": "console.log([1].concat([2,3],4).join(','));",
+      "expected_behavior": "prints 1,2,3,4"
+    },
+    {
+      "name": "string is one element",
+      "input": "const a=[1].concat('ab'); console.log(a.length,a[1]);",
+      "expected_behavior": "prints 2 ab"
+    },
+    {
+      "name": "holes preserved",
+      "input": "const a=[,1].concat([,2]); console.log(a.length,0 in a,2 in a);",
+      "expected_behavior": "prints 4 false false"
+    }
+  ]
+}

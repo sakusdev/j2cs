@@ -1,0 +1,53 @@
+{
+  "id": "array.prototype.indexof",
+  "category": "array",
+  "summary": "Search forward using JavaScript strict equality while skipping holes.",
+  "source": {
+    "pattern": "$array.indexOf($searchElement, $fromIndex)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.IndexOf",
+    "template": "JsArray.IndexOf(...)",
+    "notes": "Use IsStrictlyEqual, ToIntegerOrInfinity for fromIndex, and property-presence checks so holes are skipped."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "comparison": "IsStrictlyEqual",
+    "nan_matches_nan": false,
+    "skips_holes": true,
+    "not_found": -1
+  },
+  "caveats": [
+    "EqualityComparer<T>.Default is not general JS strict equality: object values require identity and Number NaN must not equal itself."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "NaN does not match",
+      "input": "console.log([NaN].indexOf(NaN));",
+      "expected_behavior": "prints -1"
+    },
+    {
+      "name": "hole does not match undefined",
+      "input": "console.log(Array(1).indexOf(undefined));",
+      "expected_behavior": "prints -1"
+    },
+    {
+      "name": "negative fromIndex",
+      "input": "console.log([1,2,1].indexOf(1,-1));",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

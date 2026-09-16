@@ -1,0 +1,51 @@
+{
+  "id": "array.custom-species.runtime",
+  "category": "array",
+  "summary": "Fall back when an Array-producing method can invoke a custom @@species constructor with observable user code.",
+  "source": {
+    "pattern": "$array.$speciesSensitiveMethod(...)",
+    "requirements": {
+      "receiver_inferred_as_array": true,
+      "custom_symbol_species_possible": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "ArraySpeciesCreate can execute user-defined constructor/species getters and constructors. Runtime handling must preserve their side effects, exceptions, and returned-object behavior."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "applies_to": [
+      "concat",
+      "slice",
+      "splice",
+      "flat",
+      "flatMap",
+      "map",
+      "filter"
+    ],
+    "observable_user_code": true,
+    "may_return_non_array_object": true
+  },
+  "caveats": [
+    "Do not force a builtin Array result when Symbol.species is customized.",
+    "Change-by-copy methods such as toReversed, toSorted, toSpliced, and with create intrinsic Arrays and do not use ArraySpeciesCreate."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "slice invokes custom species",
+      "input": "class A extends Array { static get [Symbol.species]() { console.log('species'); return Array; } } new A(1,2).slice(0);",
+      "expected_behavior": "prints species",
+      "notes": "The species getter runs before slice returns."
+    },
+    {
+      "name": "species getter may throw",
+      "input": "class A extends Array { static get [Symbol.species]() { throw new Error('x'); } } try { new A(1).slice(); } catch(e) { console.log(e.message); }",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

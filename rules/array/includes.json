@@ -1,0 +1,52 @@
+{
+  "id": "array.prototype.includes",
+  "category": "array",
+  "summary": "Search using SameValueZero, so NaN matches NaN and holes behave like undefined.",
+  "source": {
+    "pattern": "$array.includes($searchElement, $fromIndex)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Includes",
+    "template": "JsArray.Includes(...)",
+    "notes": "Use SameValueZero and ToIntegerOrInfinity for fromIndex. The algorithm reads every index; absent indices therefore compare as undefined under the rule's no-prototype-index requirement."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": false,
+    "comparison": "SameValueZero",
+    "nan_matches_nan": true,
+    "holes_treated_as_undefined": true
+  },
+  "caveats": [
+    "Do not share this implementation with indexOf: indexOf uses strict equality and skips holes."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "NaN matches",
+      "input": "console.log([NaN].includes(NaN));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "hole matches undefined",
+      "input": "console.log(Array(1).includes(undefined));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "negative fromIndex",
+      "input": "console.log([1,2,1].includes(1,-1));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

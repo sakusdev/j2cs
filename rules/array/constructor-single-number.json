@@ -1,0 +1,53 @@
+{
+  "id": "array.constructor.single-number-length",
+  "category": "array",
+  "summary": "Handle the one-Number Array constructor form as a length, producing holes rather than elements.",
+  "source": {
+    "pattern": "Array($number) | new Array($number)",
+    "requirements": {
+      "intrinsic_Array_binding": true,
+      "Array_constructor_not_overridden": true,
+      "argument_static_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.CreateWithLength",
+    "template": "JsArray.CreateWithLength(...)",
+    "notes": "Validate the numeric length exactly as the Array constructor does and create a sparse array with no own indexed elements."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "single_number_is_length": true,
+    "holes_created": true,
+    "valid_length": "integral Number in [0, 2^32-1]; -0 is accepted as 0",
+    "invalid_length_exception": "RangeError"
+  },
+  "caveats": [
+    "new Array(3) is not [3]; indices 0..2 are absent properties.",
+    "NaN, infinities, fractional values, negative values, and 2^32 or larger throw RangeError.",
+    "Filling a C# list with null/default values is observably wrong because holes are not present undefined elements."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "numeric argument creates holes",
+      "input": "const a = Array(3); console.log(a.length, 0 in a, a[0]);",
+      "expected_csharp": "var a = JsArray.CreateWithLength(3d);",
+      "expected_behavior": "prints 3 false undefined"
+    },
+    {
+      "name": "fractional length throws",
+      "input": "try { Array(3.5); } catch (e) { console.log(e.name); }",
+      "expected_behavior": "prints RangeError"
+    },
+    {
+      "name": "too-large length throws",
+      "input": "try { Array(4294967296); } catch (e) { console.log(e.name); }",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "array.constructor.multiple-items",
+  "category": "array",
+  "summary": "Create an intrinsic Array containing all two-or-more constructor arguments without coercion.",
+  "source": {
+    "pattern": "Array($a, $b, ...$rest) | new Array($a, $b, ...$rest)",
+    "requirements": {
+      "intrinsic_Array_binding": true,
+      "Array_constructor_not_overridden": true,
+      "argument_count_min": 2
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.CreateMany",
+    "template": "JsArray.CreateMany(...)",
+    "notes": "Preserve left-to-right argument evaluation and store every argument as an element; numeric arguments have no special length meaning once there are at least two arguments."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length": "argument_count",
+    "coercion": "none",
+    "evaluation_order": "left-to-right"
+  },
+  "caveats": [
+    "Heterogeneous arguments require a JS-value-capable representation unless static typing proves a semantics-preserving specialized representation."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "two numbers are elements",
+      "input": "const a = Array(2, 3); console.log(a.length, a[0], a[1]);",
+      "expected_behavior": "prints 2 2 3"
+    },
+    {
+      "name": "mixed values preserved",
+      "input": "const a = Array(1, 'x', undefined); console.log(a.length, a[1], a[2] === undefined);",
+      "expected_behavior": "prints 3 x true"
+    }
+  ]
+}
