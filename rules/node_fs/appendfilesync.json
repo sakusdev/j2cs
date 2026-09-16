@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.appendfilesync",
+  "category": "node_fs",
+  "summary": "Synchronously append data, creating the file when necessary and preserving append flags and encoding.",
+  "source": {"pattern":"$fs.appendFileSync($file, $data, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"options_shape":"statically known or represented by NodeFsOptions"}},
+  "target": {"kind":"helper","helper":"NodeFs.AppendFileSync","template":"NodeFs.AppendFileSync($file, $data, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","default_flag":"a","default_encoding":"utf8","mutation":"appends without truncating; creates file if absent","mode":"only affects newly created file"},
+  "caveats": ["Append-mode descriptor semantics are OS-specific; on Linux positional writes to an append fd still append.","Do not lower to read-concatenate-write; that changes atomicity/races and can lose concurrent appends."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"append preserves prior bytes","input":"fs.writeFileSync('a.txt','A'); fs.appendFileSync('a.txt','B'); console.log(fs.readFileSync('a.txt','utf8'));","expected_csharp":"NodeFs.AppendFileSync(path, JsValue.FromString(\"B\"), NodeFsAppendFileOptions.Default);","expected_behavior":"final content is AB"},
+    {"name":"creates when absent","input":"fs.appendFileSync('new.txt','x');","expected_csharp":"NodeFs.AppendFileSync(path, JsValue.FromString(\"x\"), NodeFsAppendFileOptions.Default);","expected_behavior":"creates the file if absent and appends x"}
+  ]
+}
