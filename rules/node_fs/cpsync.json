@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.cpsync",
+  "category": "node_fs",
+  "summary": "Recursively/non-recursively copy paths with Node cpSync options when no dynamic filter callback is supplied.",
+  "source": {"pattern":"$fs.cpSync($src, $dest, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"filter":"absent","options_shape":"statically known or NodeFsCpOptions"}},
+  "target": {"kind":"helper","helper":"NodeFs.CpSync","template":"NodeFs.CpSync($src, $dest, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined","recursive":"required to copy directories recursively","options":"force, errorOnExist, preserveTimestamps, dereference, verbatimSymlinks are semantically significant"},
+  "caveats": ["Directory-copy defaults are not equivalent to a generic recursive Directory copy helper.","Symlink dereference/verbatim behavior must match options.","Timestamp preservation has filesystem precision/platform limits."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"recursive directory copy","input":"fs.cpSync('src','dst',{recursive:true});","expected_csharp":"NodeFs.CpSync(src, dest, NodeFsCpOptions.Recursive);","expected_behavior":"copies the directory tree according to Node cpSync recursive semantics"},
+    {"name":"nonrecursive directory rejects","input":"fs.cpSync('srcDir','dstDir');","expected_csharp":"NodeFs.CpSync(src, dest, NodeFsCpOptions.Default);","expected_behavior":"a directory source is not silently recursively copied when recursive is false"}
+  ]
+}
