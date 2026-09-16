@@ -1,0 +1,11 @@
+{
+  "id": "binary.typedarray.set",
+  "category": "binary",
+  "summary": "Bulk-copy values into a TypedArray with overlap-safe semantics and range checks.",
+  "source": {"pattern": "$target.set($source, $offset)", "requirements": {"receiver": "builtin TypedArray", "builtin_method_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.TypedArraySet", "template": "JsBinary.TypedArraySet($target, $source, $offset)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"mutates_receiver": true, "return": "undefined", "offset": "ToIntegerOrInfinity then range validation", "overlap": "must behave as if source values are captured before destructive overlap", "content_type_mismatch": "TypeError for Number vs BigInt typed arrays"},
+  "tests": [{"name": "overlap safe", "input": "const a=new Uint8Array([1,2,3,4]); a.set(a.subarray(0,3),1); console.log([...a]);", "expected_behavior": "prints 1,1,2,3"}, {"name": "range error no partial writes", "input": "const a=new Uint8Array([1,2]); try{a.set([7,8],1)}catch(e){console.log(e.name,[...a])}", "expected_behavior": "prints RangeError and 1,2"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

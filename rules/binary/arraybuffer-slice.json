@@ -1,0 +1,45 @@
+{
+  "id": "binary.arraybuffer.slice",
+  "category": "binary",
+  "summary": "Copy a byte range into a distinct ArrayBuffer, honoring species and resize/detach rechecks.",
+  "source": {
+    "pattern": "$buffer.slice($start, $end)",
+    "requirements": {
+      "receiver": "builtin ArrayBuffer",
+      "builtin_method_not_overridden": true,
+      "builtin_species": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsBinary.SliceArrayBuffer",
+    "template": "JsBinary.SliceArrayBuffer($buffer, $start, $end)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "copies_bytes": true,
+    "shares_memory": false,
+    "indices": "ToClampedIndex",
+    "species_sensitive": true,
+    "source_rechecked_after_species": true
+  },
+  "tests": [
+    {
+      "name": "copies bytes",
+      "input": "const b=Uint8Array.from([1,2,3]).buffer; const c=b.slice(1); new Uint8Array(b)[1]=9; console.log([...new Uint8Array(c)]);",
+      "expected_behavior": "prints 2,3"
+    },
+    {
+      "name": "negative start",
+      "input": "const b=Uint8Array.from([1,2,3]).buffer; console.log([...new Uint8Array(b.slice(-2))]);",
+      "expected_behavior": "prints 2,3"
+    }
+  ],
+  "caveats": [
+    "Custom Symbol.species requires runtime fallback because constructor execution can detach or resize the source."
+  ],
+  "references": [
+    "ECMAScript 2026 binary data semantics"
+  ]
+}

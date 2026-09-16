@@ -1,0 +1,9 @@
+{
+  "id": "binary.dataview.set", "category": "binary", "summary": "Write DataView scalar values with width-specific conversion, bounds checks, and explicit endian semantics.",
+  "source": {"pattern": "$view.set{Int,Uint,Float,BigInt,BigUint}{8,16,32,64}($byteOffset, $value, $littleEndian)", "requirements": {"receiver": "builtin DataView", "builtin_method_not_overridden": true, "method_family_resolved": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.DataViewSet", "template": "JsBinary.DataViewSet($view, $kind, $byteOffset, $value, $littleEndian)", "notes": "Numeric integer setters use Number conversion plus width-specific modulo semantics; BigInt setters use ToBigInt and reject Number values."},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"return": "undefined", "mutates_backing_store": true, "byteOffset": "ToIndex", "littleEndian_default": false, "integer_number_conversion": "ToNumber then target-width conversion", "float_conversion": "ToNumber then IEEE-754 rounding", "bigint_conversion": "ToBigInt then modulo 2^64", "bounds_error": "RangeError"},
+  "references": ["ECMAScript 2026 DataView SetViewValue"],
+  "tests": [{"name": "integer wrapping and endian", "input": "const b=new ArrayBuffer(2); const v=new DataView(b); v.setUint16(0,0x1234); console.log([...new Uint8Array(b)]); v.setUint8(0,257); console.log(v.getUint8(0));", "expected_behavior": "prints 18,52 then 1"}, {"name": "bigint modulo", "input": "const b=new ArrayBuffer(8); const v=new DataView(b); v.setBigUint64(0,(1n<<64n)+5n); console.log(v.getBigUint64(0));", "expected_behavior": "prints 5n"}, {"name": "BigInt setter rejects Number", "input": "try{new DataView(new ArrayBuffer(8)).setBigInt64(0,1)}catch(e){console.log(e.name)}", "expected_behavior": "prints TypeError"}]
+}

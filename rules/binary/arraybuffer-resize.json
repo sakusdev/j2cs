@@ -1,0 +1,45 @@
+{
+  "id": "binary.arraybuffer.resize",
+  "category": "binary",
+  "summary": "Resize a resizable ArrayBuffer while preserving backing-store identity and zero-filling growth.",
+  "source": {
+    "pattern": "$buffer.resize($newLength)",
+    "requirements": {
+      "receiver": "builtin ArrayBuffer",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsBinary.ResizeArrayBuffer",
+    "template": "JsBinary.ResizeArrayBuffer($buffer, $newLength)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "undefined",
+    "coercion": "ToIndex(newLength)",
+    "growth": "new bytes are zero",
+    "shrink": "bytes beyond new length are discarded",
+    "throws": [
+      "TypeError for fixed/detached buffer",
+      "RangeError above maxByteLength"
+    ]
+  },
+  "tests": [
+    {
+      "name": "grow zero fills",
+      "input": "const b=new ArrayBuffer(2,{maxByteLength:5}); new Uint8Array(b)[0]=7; b.resize(4); console.log([...new Uint8Array(b)]);",
+      "expected_behavior": "prints 7,0,0,0"
+    },
+    {
+      "name": "fixed rejects",
+      "input": "try{new ArrayBuffer(2).resize(1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ],
+  "references": [
+    "ECMAScript 2026 binary data semantics"
+  ]
+}

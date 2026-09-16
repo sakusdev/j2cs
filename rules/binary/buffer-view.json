@@ -1,0 +1,10 @@
+{
+  "id": "binary.buffer.view", "category": "binary", "summary": "Preserve Buffer backing-store metadata and sharing behavior of subarray and deprecated slice.",
+  "source": {"pattern": "$buffer.{buffer,byteOffset,byteLength,length,subarray,slice}", "requirements": {"receiver": "Node Buffer", "builtin_method_not_overridden_when_called": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.View", "template": "NodeBuffer.View($operation, $buffer, $start, $end)", "notes": "Buffer.subarray and Buffer.slice both create sharing views. Buffer.slice must not be lowered to Uint8Array.prototype.slice, which copies."},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"buffer": "underlying ArrayBuffer identity", "byteOffset": "visible view offset; may be nonzero for pooled buffers", "byteLength_and_length": "visible bytes", "subarray": "shares memory", "slice": "deprecated but also shares memory", "typedarray_difference": "Uint8Array.prototype.slice copies"},
+  "caveats": ["When reconstructing from buf.buffer, apply buf.byteOffset and buf.byteLength or pooled bytes outside the Buffer may become visible."],
+  "references": ["Node.js Buffer API: buf.subarray, buf.slice, buffer/byteOffset/byteLength"],
+  "tests": [{"name": "subarray shares", "input": "const {Buffer}=require(\"node:buffer\"); const a=Buffer.from([1,2]); const b=a.subarray(1); b[0]=9; console.log(a[1]);", "expected_behavior": "prints 9"}, {"name": "Buffer slice shares unlike Uint8Array slice", "input": "const {Buffer}=require(\"node:buffer\"); const a=Buffer.from([1,2]); const b=a.slice(1); b[0]=9; const c=Uint8Array.prototype.slice.call(a,0,1); c[0]=7; console.log(a[1],a[0]);", "expected_behavior": "prints 9 1"}, {"name": "metadata respects explicit view", "input": "const {Buffer}=require(\"node:buffer\"); const a=new ArrayBuffer(8); const b=Buffer.from(a,2,3); console.log(b.buffer===a,b.byteOffset,b.byteLength,b.length);", "expected_behavior": "prints true 2 3 3"}]
+}

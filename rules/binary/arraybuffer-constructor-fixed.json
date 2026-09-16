@@ -1,0 +1,40 @@
+{
+  "id": "binary.arraybuffer.constructor.fixed",
+  "category": "binary",
+  "summary": "Construct a fixed-length ArrayBuffer with zero-initialized bytes.",
+  "source": {
+    "pattern": "new ArrayBuffer($length)",
+    "requirements": {
+      "builtin_constructor_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsBinary.NewArrayBuffer",
+    "template": "JsBinary.NewArrayBuffer($length)",
+    "notes": "Helper must use JavaScript ToIndex semantics and produce a distinct zero-filled backing store."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length_coercion": "ToIndex",
+    "zero_initialized": true,
+    "resizable": false,
+    "throws": "RangeError when length cannot be allocated or ToIndex fails as applicable"
+  },
+  "tests": [
+    {
+      "name": "zero initialized",
+      "input": "const b=new ArrayBuffer(3); console.log(b.byteLength, [...new Uint8Array(b)]);",
+      "expected_behavior": "prints 3 and 0,0,0"
+    },
+    {
+      "name": "fraction truncates via ToIndex",
+      "input": "console.log(new ArrayBuffer(3.9).byteLength);",
+      "expected_behavior": "prints 3"
+    }
+  ],
+  "references": [
+    "ECMAScript 2026 binary data semantics"
+  ]
+}

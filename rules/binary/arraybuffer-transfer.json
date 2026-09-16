@@ -1,0 +1,44 @@
+{
+  "id": "binary.arraybuffer.transfer",
+  "category": "binary",
+  "summary": "Transfer ArrayBuffer contents and detach the source.",
+  "source": {
+    "pattern": "$buffer.transfer($newLength)",
+    "requirements": {
+      "receiver": "builtin ArrayBuffer",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsBinary.TransferArrayBuffer",
+    "template": "JsBinary.TransferArrayBuffer($buffer, $newLength)"
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "detaches_source": true,
+    "copies_or_moves_backing_store": true,
+    "new_length": "old length when omitted; ToIndex when present",
+    "growth": "zero-filled",
+    "result_resizable": "preserves maxByteLength subject to requested length"
+  },
+  "tests": [
+    {
+      "name": "detaches source",
+      "input": "const b=Uint8Array.from([1,2]).buffer; const c=b.transfer(); console.log(b.byteLength,c.byteLength,[...new Uint8Array(c)]);",
+      "expected_behavior": "prints 0 2 1,2"
+    },
+    {
+      "name": "grow on transfer",
+      "input": "const b=Uint8Array.from([7]).buffer; const c=b.transfer(3); console.log([...new Uint8Array(c)]);",
+      "expected_behavior": "prints 7,0,0"
+    }
+  ],
+  "caveats": [
+    "Host transferability restrictions and detach keys must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 binary data semantics"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "binary.dataview.get", "category": "binary", "summary": "Read DataView scalar values with JavaScript offset coercion, bounds checks, endian defaults, and Number/BigInt result types.",
+  "source": {"pattern": "$view.get{Int,Uint,Float,BigInt,BigUint}{8,16,32,64}($byteOffset, $littleEndian)", "requirements": {"receiver": "builtin DataView", "builtin_method_not_overridden": true, "method_family_resolved": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.DataViewGet", "template": "JsBinary.DataViewGet($view, $kind, $byteOffset, $littleEndian)", "notes": "For multi-byte methods, omitted littleEndian means false (big-endian). BigInt methods return BigInt; numeric methods return Number."},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"byteOffset": "ToIndex", "littleEndian_default": false, "one_byte_endianness": "irrelevant", "bounds_error": "RangeError", "out_of_bounds_view": "TypeError", "float": "IEEE-754 width decoding including NaN/infinities", "bigint": "signed/unsigned 64-bit BigInt"},
+  "references": ["ECMAScript 2026 DataView GetViewValue"],
+  "tests": [{"name": "default big endian", "input": "const v=new DataView(Uint8Array.from([1,2,3,4]).buffer); console.log(v.getUint16(0),v.getUint16(0,true));", "expected_behavior": "prints 258 513"}, {"name": "signed and BigInt results", "input": "const a=new DataView(Uint8Array.from([255,255,255,255,255,255,255,255]).buffer); console.log(a.getInt8(0),a.getBigInt64(0));", "expected_behavior": "prints -1 -1n"}, {"name": "bounds", "input": "try{new DataView(new ArrayBuffer(1)).getUint16(0)}catch(e){console.log(e.name)}", "expected_behavior": "prints RangeError"}]
+}

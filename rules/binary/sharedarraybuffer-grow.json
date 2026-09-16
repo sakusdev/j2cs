@@ -1,0 +1,9 @@
+{
+  "id": "binary.sharedarraybuffer.grow", "category": "binary", "summary": "Grow a growable SharedArrayBuffer without detachment and with zeroed new memory.",
+  "source": {"pattern": "$buffer.grow($newLength)", "requirements": {"receiver": "builtin SharedArrayBuffer", "builtin_method_not_overridden": true}},
+  "target": {"kind": "runtime", "helper": "JsRuntime.Binary.GrowSharedArrayBuffer", "template": "JsRuntime.Binary.GrowSharedArrayBuffer($buffer, $newLength)"},
+  "strategy": "runtime", "confidence": "high",
+  "semantics": {"mutates_receiver": true, "only_grows": true, "never_detaches": true, "growth_zeroed": true, "cross_agent_visibility": "synchronizing length update per ECMAScript memory model"},
+  "tests": [{"name": "grow", "input": "const b=new SharedArrayBuffer(2,{maxByteLength:4}); b.grow(4); console.log(b.byteLength,[...new Uint8Array(b)]);", "expected_behavior": "prints 4 and four zero bytes"}, {"name": "cannot shrink", "input": "const b=new SharedArrayBuffer(2,{maxByteLength:4}); try{b.grow(1)}catch(e){console.log(e.name)}", "expected_behavior": "prints RangeError"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

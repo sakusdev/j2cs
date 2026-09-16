@@ -1,0 +1,9 @@
+{
+  "id": "binary.buffer.read", "category": "binary", "summary": "Read Node Buffer integer, BigInt, float, and double values with method-specific width/endian/bounds semantics.",
+  "source": {"pattern": "$buffer.read{Int,UInt,BigInt64,BigUInt64,Float,Double}*($offset, $byteLength)", "requirements": {"receiver": "Node Buffer", "builtin_method_not_overridden": true, "method_resolved": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.Read", "template": "NodeBuffer.Read($kind, $buffer, $offset, $byteLength, $endian)", "notes": "Modern Node validates offsets as integers and does not perform the old implicit uint32 offset coercion. Variable-width integer methods support only documented byte lengths."},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"endianness": "method-specific LE/BE", "number_integer_widths": "1/2/4 fixed, or documented variable widths up to 6 bytes", "bigint_width": 8, "float_widths": "4/8 IEEE-754", "bounds": "Node Buffer error categories must be preserved", "return": "Number for numeric methods; BigInt for BigInt methods"},
+  "references": ["Node.js Buffer API read methods"],
+  "tests": [{"name": "integer endian", "input": "const {Buffer}=require(\"node:buffer\"); const b=Buffer.from([0x12,0x34]); console.log(b.readUInt16BE(0),b.readUInt16LE(0));", "expected_behavior": "prints 4660 13330"}, {"name": "BigInt and float", "input": "const {Buffer}=require(\"node:buffer\"); const b=Buffer.alloc(8); b.writeBigUInt64LE(5n); console.log(b.readBigUInt64LE()); b.writeDoubleLE(1.5); console.log(b.readDoubleLE());", "expected_behavior": "prints 5n then 1.5"}, {"name": "bounds error", "input": "const {Buffer}=require(\"node:buffer\"); try{Buffer.alloc(1).readUInt16BE(0)}catch(e){console.log(e.code)}", "expected_behavior": "prints Node buffer bounds error code"}]
+}

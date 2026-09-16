@@ -1,0 +1,9 @@
+{
+  "id": "binary.typedarray.subarray", "category": "binary", "summary": "Create a TypedArray subarray view sharing the same backing store.",
+  "source": {"pattern": "$array.subarray($begin, $end)", "requirements": {"receiver": "builtin TypedArray", "builtin_method_not_overridden": true, "builtin_species": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.TypedArraySubarray", "template": "JsBinary.TypedArraySubarray($array, $begin, $end)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"shares_backing_store": true, "indices": "relative index coercion", "species_sensitive": true, "length_tracking": "may remain length-tracking when end omitted and source is length-tracking"},
+  "tests": [{"name": "shares storage", "input": "const a=new Uint8Array([1,2,3]); const b=a.subarray(1); b[0]=9; console.log(a[1],b.buffer===a.buffer);", "expected_behavior": "prints 9 true"}, {"name": "negative begin", "input": "console.log([...new Uint8Array([1,2,3]).subarray(-2)]);", "expected_behavior": "prints 2,3"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

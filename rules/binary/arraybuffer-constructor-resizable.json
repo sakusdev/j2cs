@@ -1,0 +1,41 @@
+{
+  "id": "binary.arraybuffer.constructor.resizable",
+  "category": "binary",
+  "summary": "Construct a resizable ArrayBuffer with maxByteLength.",
+  "source": {
+    "pattern": "new ArrayBuffer($length, { maxByteLength: $max })",
+    "requirements": {
+      "builtin_constructor_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsBinary.NewResizableArrayBuffer",
+    "template": "JsBinary.NewResizableArrayBuffer($length, $max)",
+    "notes": "Preserve resizable backing-store identity across resize operations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length_coercion": "ToIndex",
+    "max_coercion": "ToIndex",
+    "zero_initialized": true,
+    "resizable": true,
+    "constraint": "initial length <= maxByteLength"
+  },
+  "tests": [
+    {
+      "name": "resizable metadata",
+      "input": "const b=new ArrayBuffer(4,{maxByteLength:8}); console.log(b.byteLength,b.maxByteLength,b.resizable);",
+      "expected_behavior": "prints 4 8 true"
+    },
+    {
+      "name": "initial exceeds max",
+      "input": "try{new ArrayBuffer(9,{maxByteLength:8})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ],
+  "references": [
+    "ECMAScript 2026 binary data semantics"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "binary.typedarray.indexed-write-bigint", "category": "binary", "summary": "Write BigInt-content TypedArray elements with ToBigInt and modulo conversion.",
+  "source": {"pattern": "$array[$index] = $value", "requirements": {"receiver": "BigInt-content builtin TypedArray", "indexed_access_not_intercepted_by_outer_proxy": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.TypedArraySetBigInt", "template": "JsBinary.TypedArraySetBigInt($array, $index, $value)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"value_coercion": "ToBigInt", "stored_conversion": "BigInt64/BigUint64 modulo 2^64", "number_value": "TypeError", "assignment_expression_result": "original RHS when successful"},
+  "tests": [{"name": "biguint modulo", "input": "const a=new BigUint64Array(1); a[0]=(1n<<64n)+3n; console.log(a[0]);", "expected_behavior": "prints 3n"}, {"name": "number rejected", "input": "const a=new BigInt64Array(1); try{a[0]=1}catch(e){console.log(e.name)}", "expected_behavior": "prints TypeError"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}
