@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.lstatsync",
+  "category": "node_fs",
+  "summary": "Retrieve Node fs.Stats for the link itself rather than following symbolic links.",
+  "source": {"pattern":"$fs.lstatSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.LStatSync","template":"NodeFs.LStatSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"follows_symlinks":false,"return_value":"Node-compatible Stats or undefined with throwIfNoEntry:false","bigint_option":"numeric Stats fields can be JS BigInt-compatible"},
+  "caveats": ["Using FileInfo on a symlink may expose target-oriented metadata depending on API usage; helper must use link-aware primitives.","Windows reparse points and POSIX symlinks are not identical."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"reports symlink itself","input":"console.log(fs.lstatSync('ln').isSymbolicLink());","expected_csharp":"var st = NodeFs.LStatSync(path, NodeFsStatOptions.Default);","expected_behavior":"returns stats for the symbolic link itself and isSymbolicLink() is true"},
+    {"name":"differs from stat","input":"console.log(fs.lstatSync('ln').isFile(), fs.statSync('ln').isFile());","expected_csharp":"var lst = NodeFs.LStatSync(path, NodeFsStatOptions.Default);","expected_behavior":"lstat does not follow the link while stat does"}
+  ]
+}
