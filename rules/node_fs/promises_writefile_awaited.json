@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.promises.writefile.awaited",
+  "category": "node_fs",
+  "summary": "Lower awaited fs/promises writeFile only with Promise scheduling plus Node write flags, encodings, and best-effort abort semantics.",
+  "source": {"pattern":"await $fsp.writeFile($file, $data, $options?)","requirements":{"module_binding":"node:fs/promises builtin","builtin_not_shadowed":true,"usage":"directly awaited or otherwise lowered through JS-compatible Promise machinery"}},
+  "target": {"kind":"helper","helper":"NodeFsPromises.WriteFileAsync","template":"await NodeFsPromises.WriteFileAsync($file, $data, $options, $jsPromiseScheduler)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"async":true,"fulfillment_value":"undefined","default_flag":"w","default_encoding":"utf8","abort_signal":"best effort; some data may already have been written when rejection occurs","concurrency":"overlapping writeFile calls to same file without awaiting are unsafe"},
+  "caveats": ["Cancellation must not be modeled as transactional rollback.","Iterable/AsyncIterable data requires JS iteration semantics and may need broader runtime support.","Task continuation ordering must be adapted to JS Promise microtasks."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"await write fulfills undefined","input":"console.log(await fsp.writeFile('a','x'));","expected_csharp":"await NodeFsPromises.WriteFileAsync(path, data, opts, jsPromiseScheduler);","expected_behavior":"fulfills with JS undefined after the write completes"},
+    {"name":"abort is best effort","input":"const c=new AbortController(); const p=fsp.writeFile('a',big,{signal:c.signal}); c.abort(); await p;","expected_behavior":"may reject with AbortError after some bytes were already written; helper must not promise rollback"}
+  ]
+}
