@@ -1,0 +1,48 @@
+{
+  "id": "semantics.truthiness",
+  "category": "semantics",
+  "summary": "Lower JavaScript truthiness checks through a compatibility helper when the static type is not already boolean.",
+  "source": {
+    "pattern": "if ($expr)",
+    "requirements": {
+      "expression_may_be_non_boolean": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsValue.IsTruthy",
+    "template": "if (JsValue.IsTruthy($expr))",
+    "notes": "The helper must implement JavaScript ToBoolean semantics for all supported runtime values. A direct C# condition is valid only when type analysis proves the expression is boolean."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "falsy_values": ["undefined", "null", "false", "+0", "-0", "NaN", "empty string"],
+    "truthy_note": "Objects, including empty arrays and empty objects, are truthy in JavaScript."
+  },
+  "caveats": [
+    "BigInt zero is also falsy and must be handled when BigInt support is enabled.",
+    "The exact internal representation of undefined and boxed/dynamic values affects the helper implementation."
+  ],
+  "references": [
+    "ECMAScript ToBoolean abstract operation"
+  ],
+  "tests": [
+    {
+      "name": "zero is falsy",
+      "input": "if (0) console.log('bad'); else console.log('ok');",
+      "expected_csharp": "if (JsValue.IsTruthy(0d)) { /* bad */ } else { /* ok */ }",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "empty string is falsy",
+      "input": "if ('') console.log('bad'); else console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "empty array is truthy",
+      "input": "if ([]) console.log('ok');",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}
