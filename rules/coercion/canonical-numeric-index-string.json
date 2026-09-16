@@ -1,0 +1,42 @@
+{
+  "id": "coercion.canonical-numeric-index-string",
+  "category": "coercion",
+  "summary": "Recognize the exact string form of a Number used by integer-indexed exotic objects, with a special '-0' case.",
+  "source": {
+    "pattern": "[[CanonicalNumericIndexString]]($string)",
+    "requirements": {
+      "semantic_operation": "CanonicalNumericIndexString",
+      "static_type": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.CanonicalNumericIndexString",
+    "template": "JsCoercion.CanonicalNumericIndexString($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "special_minus_zero": "returns -0",
+    "otherwise": "n = ToNumber(s); succeeds only if ToString(n) exactly equals s"
+  },
+  "tests": [
+    {
+      "name": "minus zero special case",
+      "input": "// semantic IR: CanonicalNumericIndexString('-0')",
+      "expected_behavior": "returns Number -0"
+    },
+    {
+      "name": "noncanonical decimal spelling",
+      "input": "// semantic IR: CanonicalNumericIndexString('1.0')",
+      "expected_behavior": "returns undefined sentinel"
+    }
+  ],
+  "caveats": [
+    "'1.0' is not canonical even though it numerically equals 1.",
+    "'NaN' and 'Infinity' are canonical numeric index strings because they round-trip through ToNumber/ToString."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

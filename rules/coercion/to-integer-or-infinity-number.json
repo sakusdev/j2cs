@@ -1,0 +1,44 @@
+{
+  "id": "coercion.to-integer-or-infinity.number",
+  "category": "coercion",
+  "summary": "Truncate a Number toward zero while preserving infinities and mapping NaN and both zeros to +0.",
+  "source": {
+    "pattern": "[[ToIntegerOrInfinity]]($number)",
+    "requirements": {
+      "semantic_operation": "ToIntegerOrInfinity",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToIntegerOrInfinity",
+    "template": "JsCoercion.ToIntegerOrInfinity($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "nan": "+0",
+    "positive_infinity": "+Infinity",
+    "negative_infinity": "-Infinity",
+    "fraction": "truncate toward zero",
+    "negative_zero": "+0"
+  },
+  "tests": [
+    {
+      "name": "fraction truncates toward zero",
+      "input": "// semantic IR: ToIntegerOrInfinity(-3.9)",
+      "expected_behavior": "returns -3"
+    },
+    {
+      "name": "NaN becomes zero",
+      "input": "// semantic IR: ToIntegerOrInfinity(NaN)",
+      "expected_behavior": "returns +0"
+    }
+  ],
+  "caveats": [
+    "Math.Truncate alone is not equivalent because NaN remains NaN and -0 remains signed zero."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

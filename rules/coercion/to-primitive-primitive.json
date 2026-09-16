@@ -1,0 +1,42 @@
+{
+  "id": "coercion.to-primitive.primitive",
+  "category": "coercion",
+  "summary": "ToPrimitive is an identity operation when static analysis proves the input is already a primitive.",
+  "source": {
+    "pattern": "[[ToPrimitive]]($value)",
+    "requirements": {
+      "semantic_operation": "ToPrimitive",
+      "input_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$value",
+    "notes": "ToPrimitive returns primitive inputs unchanged."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "returns_input": true,
+    "side_effects": "none"
+  },
+  "tests": [
+    {
+      "name": "string primitive unchanged",
+      "input": "// semantic IR: ToPrimitive('x')",
+      "expected_csharp": "var r = value;",
+      "expected_behavior": "returns the same string primitive"
+    },
+    {
+      "name": "symbol primitive unchanged",
+      "input": "// semantic IR: ToPrimitive(Symbol('x'))",
+      "expected_behavior": "returns the same Symbol without invoking user code"
+    }
+  ],
+  "caveats": [
+    "This specialization must not match objects, including boxed primitives."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

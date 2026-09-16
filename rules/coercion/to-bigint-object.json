@@ -1,0 +1,37 @@
+{
+  "id": "coercion.to-bigint.object",
+  "category": "coercion",
+  "summary": "Object ToBigInt performs ToPrimitive(number), allowing user code and exceptions.",
+  "source": {
+    "pattern": "[[ToBigInt]]($object)",
+    "requirements": {
+      "semantic_operation": "ToBigInt",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToBigInt",
+    "template": "JsRuntime.ToBigInt($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true
+  },
+  "tests": [
+    {
+      "name": "object string bigint",
+      "input": "BigInt({toString(){return '12';}})",
+      "expected_behavior": "returns 12n"
+    },
+    {
+      "name": "object primitive number via abstract ToBigInt",
+      "input": "// semantic IR: ToBigInt({ valueOf(){ return 1; } })",
+      "expected_behavior": "throws TypeError after valueOf returns Number 1"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

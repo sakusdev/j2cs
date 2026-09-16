@@ -1,0 +1,44 @@
+{
+  "id": "coercion.to-int32.number",
+  "category": "coercion",
+  "summary": "ToInt32 applies ECMAScript truncation and modulo-2^32 integer conversion.",
+  "source": {
+    "pattern": "[[ToInt32]]($number)",
+    "requirements": {
+      "semantic_operation": "ToInt32",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToInt32",
+    "template": "JsCoercion.ToInt32($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "nan_infinity_zero": "+0",
+    "fraction": "truncate toward zero",
+    "bits": 32,
+    "signed": true,
+    "wraps_modulo": 4294967296
+  },
+  "tests": [
+    {
+      "name": "wraps at width",
+      "input": "// semantic IR: ToInt32(4294967295)",
+      "expected_behavior": "returns -1"
+    },
+    {
+      "name": "NaN maps to zero",
+      "input": "// semantic IR: ToInt32(NaN)",
+      "expected_behavior": "returns +0"
+    }
+  ],
+  "caveats": [
+    "A checked C# cast is not equivalent; unchecked casts also differ for NaN/infinity and must not be assumed portable for JS semantics."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

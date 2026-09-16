@@ -1,0 +1,39 @@
+{
+  "id": "coercion.string-constructor.object",
+  "category": "coercion",
+  "summary": "new String(object) performs user-observable ToString conversion then creates a String wrapper with indexed string properties.",
+  "source": {
+    "pattern": "new String($object)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%String%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NewStringObject",
+    "template": "JsRuntime.NewStringObject($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "return_type": "String object"
+  },
+  "tests": [
+    {
+      "name": "custom toString",
+      "input": "new String({toString(){return 'xy'}}).valueOf()",
+      "expected_behavior": "returns 'xy'"
+    },
+    {
+      "name": "object produces symbol",
+      "input": "new String({[Symbol.toPrimitive](){return Symbol()}})",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "references": [
+    "ECMAScript String constructor semantics"
+  ]
+}

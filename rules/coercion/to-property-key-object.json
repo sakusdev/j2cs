@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-property-key.object",
+  "category": "coercion",
+  "summary": "Object property-key coercion uses ToPrimitive with string hint and can run arbitrary user code.",
+  "source": {
+    "pattern": "[[ToPropertyKey]]($object)",
+    "requirements": {
+      "semantic_operation": "ToPropertyKey",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToPropertyKey",
+    "template": "JsRuntime.ToPropertyKey($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "first_step": "ToPrimitive(value, string)",
+    "can_execute_user_code": true
+  },
+  "tests": [
+    {
+      "name": "object key custom string",
+      "input": "let k={toString(){return 'x'}}; let o={}; o[k]=1; console.log(o.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "symbol-producing key",
+      "input": "let s=Symbol(); let k={[Symbol.toPrimitive](){return s}}; let o={}; o[k]=1; console.log(o[s]);",
+      "expected_behavior": "prints 1"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

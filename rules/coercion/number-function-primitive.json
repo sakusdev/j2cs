@@ -1,0 +1,44 @@
+{
+  "id": "coercion.number-function.primitive",
+  "category": "coercion",
+  "summary": "Intrinsic Number(value) on a primitive uses ToNumeric and uniquely permits BigInt-to-Number conversion.",
+  "source": {
+    "pattern": "Number($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NumberFunctionPrimitive",
+    "template": "JsCoercion.NumberFunctionPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "bigint": "convert mathematical BigInt value to IEEE-754 Number, possibly losing precision",
+    "other": "ToNumeric result as Number"
+  },
+  "tests": [
+    {
+      "name": "bigint accepted",
+      "input": "Number(1n)",
+      "expected_behavior": "returns Number 1"
+    },
+    {
+      "name": "large bigint rounds",
+      "input": "Number(9007199254740993n)",
+      "expected_behavior": "returns the nearest representable Number (9007199254740992)"
+    }
+  ],
+  "caveats": [
+    "Do not implement as abstract ToNumber: ToNumber(1n) throws, but Number(1n) returns 1.",
+    "BigInt conversion can lose precision."
+  ],
+  "references": [
+    "ECMAScript Number constructor semantics",
+    "ECMAScript ToNumeric abstract operation"
+  ]
+}

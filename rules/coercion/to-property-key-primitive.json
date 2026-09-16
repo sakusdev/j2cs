@@ -1,0 +1,42 @@
+{
+  "id": "coercion.to-property-key.primitive",
+  "category": "coercion",
+  "summary": "Primitive property keys preserve Symbol values and stringify every other primitive.",
+  "source": {
+    "pattern": "[[ToPropertyKey]]($value)",
+    "requirements": {
+      "semantic_operation": "ToPropertyKey",
+      "input_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToPropertyKeyPrimitive",
+    "template": "JsCoercion.ToPropertyKeyPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "symbol": "identity",
+    "other_primitives": "ToString"
+  },
+  "tests": [
+    {
+      "name": "number becomes string key",
+      "input": "let o={}; o[1]=2; console.log(Object.keys(o)[0]);",
+      "expected_behavior": "prints '1'"
+    },
+    {
+      "name": "symbol stays symbol",
+      "input": "let s=Symbol('x'), o={}; o[s]=1; console.log(Object.keys(o).length);",
+      "expected_behavior": "prints 0 because the key is a Symbol, not a string"
+    }
+  ],
+  "caveats": [
+    "Numeric property keys become strings, so -0 becomes '0'.",
+    "Symbols must remain distinct from strings with similar descriptions."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

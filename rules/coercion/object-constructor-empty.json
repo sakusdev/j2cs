@@ -1,0 +1,38 @@
+{
+  "id": "coercion.object-constructor.empty",
+  "category": "coercion",
+  "summary": "Direct new Object() creates a fresh ordinary object.",
+  "source": {
+    "pattern": "new Object()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Object%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewOrdinaryObject",
+    "template": "JsCoercion.NewOrdinaryObject()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "ordinary object",
+    "fresh_identity": true
+  },
+  "tests": [
+    {
+      "name": "creates object",
+      "input": "typeof new Object()",
+      "expected_behavior": "returns 'object'"
+    },
+    {
+      "name": "fresh each call",
+      "input": "new Object() === new Object()",
+      "expected_behavior": "returns false"
+    }
+  ],
+  "references": [
+    "ECMAScript Object constructor semantics"
+  ]
+}

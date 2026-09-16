@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-biguint64.bigint",
+  "category": "coercion",
+  "summary": "Wrap a BigInt modulo 2^64 into the unsigned 0..2^64-1 range.",
+  "source": {
+    "pattern": "[[ToBigUint64]]($bigint)",
+    "requirements": {
+      "semantic_operation": "ToBigUint64",
+      "input_already_bigint": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToBigUint64",
+    "template": "JsCoercion.ToBigUint64($bigint)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "modulus": "2^64",
+    "range": "0..2^64-1"
+  },
+  "tests": [
+    {
+      "name": "negative wraps",
+      "input": "// semantic IR: ToBigUint64(-1n)",
+      "expected_behavior": "returns 18446744073709551615n"
+    },
+    {
+      "name": "overflow wraps",
+      "input": "// semantic IR: ToBigUint64(18446744073709551616n)",
+      "expected_behavior": "returns 0n"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

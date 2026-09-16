@@ -1,0 +1,44 @@
+{
+  "id": "coercion.string-constructor.primitive",
+  "category": "coercion",
+  "summary": "new String(value) uses ordinary ToString and boxes the result; unlike String(value), Symbol input throws.",
+  "source": {
+    "pattern": "new String($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%String%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewStringObjectPrimitive",
+    "template": "JsCoercion.NewStringObjectPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "String object",
+    "symbol": "TypeError",
+    "other": "ToString then StringCreate"
+  },
+  "tests": [
+    {
+      "name": "boxes text",
+      "input": "const x=new String('a'); console.log(Boolean(x), x.valueOf());",
+      "expected_behavior": "prints true a"
+    },
+    {
+      "name": "symbol rejected",
+      "input": "new String(Symbol('x'))",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "String(Symbol()) succeeds, but new String(Symbol()) throws TypeError."
+  ],
+  "references": [
+    "ECMAScript String constructor semantics",
+    "ECMAScript ToString abstract operation"
+  ]
+}

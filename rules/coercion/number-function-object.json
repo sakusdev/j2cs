@@ -1,0 +1,40 @@
+{
+  "id": "coercion.number-function.object",
+  "category": "coercion",
+  "summary": "Intrinsic Number(object) requires ToNumeric, which first performs user-observable ToPrimitive(number).",
+  "source": {
+    "pattern": "Number($object)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NumberFunction",
+    "template": "JsRuntime.NumberFunction($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "bigint_from_object": "allowed if ToPrimitive yields BigInt"
+  },
+  "tests": [
+    {
+      "name": "object yields bigint",
+      "input": "Number({valueOf(){return 3n;}})",
+      "expected_behavior": "returns Number 3"
+    },
+    {
+      "name": "throwing primitive hook",
+      "input": "Number({[Symbol.toPrimitive](){throw new Error('x')}})",
+      "expected_behavior": "propagates the exception"
+    }
+  ],
+  "references": [
+    "ECMAScript Number constructor semantics",
+    "ECMAScript ToNumeric abstract operation"
+  ]
+}

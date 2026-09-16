@@ -1,0 +1,39 @@
+{
+  "id": "coercion.string-function.object",
+  "category": "coercion",
+  "summary": "Intrinsic String(object) performs ToString after user-observable object-to-primitive conversion.",
+  "source": {
+    "pattern": "String($object)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%String%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.StringFunction",
+    "template": "JsRuntime.StringFunction($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true
+  },
+  "tests": [
+    {
+      "name": "custom toString",
+      "input": "String({toString(){return 'x'}})",
+      "expected_behavior": "returns 'x'"
+    },
+    {
+      "name": "object converts to Symbol",
+      "input": "String({[Symbol.toPrimitive](){return Symbol('x')}})",
+      "expected_behavior": "throws TypeError because the Symbol special-case applies only when the original argument is a Symbol"
+    }
+  ],
+  "references": [
+    "ECMAScript String constructor semantics",
+    "ECMAScript ToString abstract operation"
+  ]
+}

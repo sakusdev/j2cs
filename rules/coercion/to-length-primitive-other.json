@@ -1,0 +1,42 @@
+{
+  "id": "coercion.to-length.primitive-other",
+  "category": "coercion",
+  "summary": "ToLength on a non-Number primitive composes ToNumber, ToIntegerOrInfinity, then clamps to 0..2^53-1.",
+  "source": {
+    "pattern": "[[ToLength]]($value)",
+    "requirements": {
+      "semantic_operation": "ToLength",
+      "input_is_primitive": true,
+      "static_type_excludes": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToLengthPrimitive",
+    "template": "JsCoercion.ToLengthPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToNumber -> ToIntegerOrInfinity -> clamp",
+    "maximum": 9007199254740991
+  },
+  "tests": [
+    {
+      "name": "numeric string length",
+      "input": "// semantic IR: ToLength('3.9')",
+      "expected_behavior": "returns 3"
+    },
+    {
+      "name": "bigint rejected",
+      "input": "// semantic IR: ToLength(1n)",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "caveats": [
+    "BigInt and Symbol inputs throw TypeError through ToNumber."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

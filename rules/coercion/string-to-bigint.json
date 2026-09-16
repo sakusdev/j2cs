@@ -1,0 +1,42 @@
+{
+  "id": "coercion.string-to-bigint",
+  "category": "coercion",
+  "summary": "Parse ECMAScript StringIntegerLiteral and return BigInt or an internal failure sentinel.",
+  "source": {
+    "pattern": "[[StringToBigInt]]($string)",
+    "requirements": {
+      "semantic_operation": "StringToBigInt",
+      "static_type": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.StringToBigInt",
+    "template": "JsCoercion.StringToBigInt($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "invalid": "undefined sentinel",
+    "whitespace_only": "0n",
+    "supports_non_decimal_prefixes": true
+  },
+  "tests": [
+    {
+      "name": "hex string",
+      "input": "BigInt('0x10')",
+      "expected_behavior": "returns 16n"
+    },
+    {
+      "name": "invalid decimal",
+      "input": "// semantic IR: StringToBigInt('1.5')",
+      "expected_behavior": "returns the operation's failure/undefined sentinel"
+    }
+  ],
+  "caveats": [
+    "The abstract operation itself returns an undefined sentinel on invalid syntax; ToBigInt converts that sentinel to SyntaxError."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

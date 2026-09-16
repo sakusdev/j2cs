@@ -1,0 +1,38 @@
+{
+  "id": "coercion.number-to-bigint",
+  "category": "coercion",
+  "summary": "Convert an integral Number to BigInt; reject fractional, NaN, and infinite Numbers with RangeError.",
+  "source": {
+    "pattern": "[[NumberToBigInt]]($number)",
+    "requirements": {
+      "semantic_operation": "NumberToBigInt",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NumberToBigInt",
+    "template": "JsCoercion.NumberToBigInt($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "integral": "exact mathematical integer converted to BigInt",
+    "non_integral": "RangeError"
+  },
+  "tests": [
+    {
+      "name": "integral number succeeds",
+      "input": "BigInt(9007199254740992)",
+      "expected_behavior": "returns the BigInt corresponding to the already-rounded Number value"
+    },
+    {
+      "name": "fraction rejected",
+      "input": "BigInt(1.5)",
+      "expected_behavior": "throws RangeError"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

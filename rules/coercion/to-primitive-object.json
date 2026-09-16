@@ -1,0 +1,45 @@
+{
+  "id": "coercion.to-primitive.object",
+  "category": "coercion",
+  "summary": "General ToPrimitive on an object requires JavaScript-compatible dynamic property lookup and calls.",
+  "source": {
+    "pattern": "[[ToPrimitive]]($object, $hint)",
+    "requirements": {
+      "semantic_operation": "ToPrimitive",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToPrimitive",
+    "template": "JsRuntime.ToPrimitive($object, $hint)",
+    "notes": "General object coercion can perform property lookup, invoke @@toPrimitive/valueOf/toString, run getters, and throw."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "evaluation": "checks @@toPrimitive first; otherwise OrdinaryToPrimitive",
+    "can_execute_user_code": true,
+    "can_throw": true
+  },
+  "tests": [
+    {
+      "name": "custom Symbol.toPrimitive",
+      "input": "Number({ [Symbol.toPrimitive]() { return '41'; } })",
+      "expected_csharp": "var p = JsRuntime.ToPrimitive(obj, JsPrimitiveHint.Number);",
+      "expected_behavior": "invokes @@toPrimitive and ultimately produces 41"
+    },
+    {
+      "name": "throwing coercion hook",
+      "input": "Number({ valueOf(){ throw new Error('x'); } })",
+      "expected_behavior": "propagates the thrown exception before trying later conversion steps"
+    }
+  ],
+  "caveats": [
+    "The default hint is generally number, but Date and Symbol objects have special behavior.",
+    "Do not replace with C# ToString(), Convert.ChangeType, or casts."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

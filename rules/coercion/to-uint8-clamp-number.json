@@ -1,0 +1,43 @@
+{
+  "id": "coercion.to-uint8-clamp.number",
+  "category": "coercion",
+  "summary": "ToUint8Clamp clamps to 0..255 and rounds .5 ties to the nearest even integer.",
+  "source": {
+    "pattern": "[[ToUint8Clamp]]($number)",
+    "requirements": {
+      "semantic_operation": "ToUint8Clamp",
+      "input_already_number": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ToUint8Clamp",
+    "template": "JsCoercion.ToUint8Clamp($number)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "nan": 0,
+    "below_zero": 0,
+    "above_255": 255,
+    "rounding": "nearest, ties to even"
+  },
+  "tests": [
+    {
+      "name": "half ties to even lower",
+      "input": "// semantic IR: ToUint8Clamp(254.5)",
+      "expected_behavior": "returns 254"
+    },
+    {
+      "name": "half ties to even upper",
+      "input": "// semantic IR: ToUint8Clamp(253.5)",
+      "expected_behavior": "returns 254"
+    }
+  ],
+  "caveats": [
+    "This is not equivalent to Math.Round with an arbitrary rounding mode or a byte cast."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

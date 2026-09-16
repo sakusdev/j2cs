@@ -1,0 +1,38 @@
+{
+  "id": "coercion.to-length.object",
+  "category": "coercion",
+  "summary": "ToLength on an object requires ToNumber and therefore user-observable ToPrimitive(number).",
+  "source": {
+    "pattern": "[[ToLength]]($object)",
+    "requirements": {
+      "semantic_operation": "ToLength",
+      "input_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ToLength",
+    "template": "JsRuntime.ToLength($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "can_execute_user_code": true,
+    "maximum": 9007199254740991
+  },
+  "tests": [
+    {
+      "name": "object numeric primitive",
+      "input": "// semantic IR: ToLength({valueOf(){return 4.8}})",
+      "expected_behavior": "invokes valueOf and returns 4"
+    },
+    {
+      "name": "throwing conversion",
+      "input": "// semantic IR: ToLength({valueOf(){throw 1}})",
+      "expected_behavior": "propagates the thrown value"
+    }
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "coercion.number-constructor.primitive",
+  "category": "coercion",
+  "summary": "new Number(value) performs Number conversion, including BigInt acceptance, then boxes the resulting Number.",
+  "source": {
+    "pattern": "new Number($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.NewNumberObjectPrimitive",
+    "template": "JsCoercion.NewNumberObjectPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Number object",
+    "conversion": "same numeric conversion as Number(value)"
+  },
+  "tests": [
+    {
+      "name": "boxes zero",
+      "input": "const x=new Number(0); console.log(Boolean(x), x.valueOf());",
+      "expected_behavior": "prints true 0"
+    },
+    {
+      "name": "boxes bigint-converted number",
+      "input": "new Number(1n).valueOf()",
+      "expected_behavior": "returns Number 1"
+    }
+  ],
+  "caveats": [
+    "The result is an object and therefore truthy even when it boxes 0 or NaN."
+  ],
+  "references": [
+    "ECMAScript Number constructor semantics"
+  ]
+}

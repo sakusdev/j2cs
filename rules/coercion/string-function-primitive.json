@@ -1,0 +1,43 @@
+{
+  "id": "coercion.string-function.primitive",
+  "category": "coercion",
+  "summary": "Intrinsic String(value) mostly performs ToString, but has a special non-throwing Symbol descriptive-string path.",
+  "source": {
+    "pattern": "String($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%String%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.StringFunctionPrimitive",
+    "template": "JsCoercion.StringFunctionPrimitive($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "symbol": "SymbolDescriptiveString instead of ToString TypeError",
+    "other": "ToString(value)"
+  },
+  "tests": [
+    {
+      "name": "symbol is allowed",
+      "input": "String(Symbol('x'))",
+      "expected_behavior": "returns 'Symbol(x)'"
+    },
+    {
+      "name": "negative zero",
+      "input": "String(-0)",
+      "expected_behavior": "returns '0'"
+    }
+  ],
+  "caveats": [
+    "Do not compile String(symbol) through the generic ToString(Symbol) rule; the function call is intentionally different."
+  ],
+  "references": [
+    "ECMAScript String constructor semantics",
+    "ECMAScript ToString abstract operation"
+  ]
+}

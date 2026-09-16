@@ -1,0 +1,43 @@
+{
+  "id": "coercion.object-function",
+  "category": "coercion",
+  "summary": "Intrinsic Object(value) returns objects unchanged, boxes non-nullish primitives, and creates a new ordinary object for null/undefined.",
+  "source": {
+    "pattern": "Object($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Object%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsCoercion.ObjectFunction",
+    "template": "JsCoercion.ObjectFunction($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "object": "same identity",
+    "null_or_undefined": "new ordinary object",
+    "other_primitive": "boxed wrapper"
+  },
+  "tests": [
+    {
+      "name": "null creates object",
+      "input": "typeof Object(null)",
+      "expected_behavior": "returns 'object' without throwing"
+    },
+    {
+      "name": "object identity preserved",
+      "input": "const o={}; console.log(Object(o)===o)",
+      "expected_behavior": "prints true"
+    }
+  ],
+  "caveats": [
+    "This is not the same as abstract ToObject: ToObject(null/undefined) throws, while Object(null/undefined) creates a new object."
+  ],
+  "references": [
+    "ECMAScript Object constructor semantics",
+    "ECMAScript ToObject abstract operation"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "coercion.to-number.number",
+  "category": "coercion",
+  "summary": "ToNumber is identity for an ECMAScript Number value.",
+  "source": {
+    "pattern": "[[ToNumber]]($number)",
+    "requirements": {
+      "semantic_operation": "ToNumber",
+      "static_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$number"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "returns_input": true,
+    "preserves_nan_infinity_negative_zero": true
+  },
+  "tests": [
+    {
+      "name": "NaN stays NaN",
+      "input": "// semantic IR: ToNumber(NaN)",
+      "expected_csharp": "var r = n;",
+      "expected_behavior": "r is NaN"
+    },
+    {
+      "name": "negative zero preserved",
+      "input": "// semantic IR: ToNumber(-0)",
+      "expected_behavior": "returns -0, including its sign bit"
+    }
+  ],
+  "caveats": [
+    "Generated representation must be IEEE-754 binary64 compatible."
+  ],
+  "references": [
+    "ECMAScript Language Specification, Type Conversion abstract operations (living specification)"
+  ]
+}
