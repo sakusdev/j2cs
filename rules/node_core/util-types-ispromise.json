@@ -1,0 +1,43 @@
+{
+  "id": "node.util.types.ispromise",
+  "category": "node_core",
+  "summary": "Detect built-in Promise instances with Node util.types.isPromise semantics rather than generic thenables.",
+  "source": {
+    "pattern": "$util.types.isPromise($value)",
+    "requirements": {
+      "module_binding": "node:util builtin",
+      "builtin_not_shadowed": true,
+      "runtime_value_tags": "available"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeUtilTypes.IsPromise($value)",
+    "helper": "NodeUtilTypes.IsPromise"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "true_for": "built-in Promise instances recognized by the JS runtime",
+    "false_for": "plain thenable objects that are not built-in Promise instances",
+    "return_type": "boolean"
+  },
+  "caveats": [
+    "Checking for a callable .then property is too broad."
+  ],
+  "references": [
+    "https://nodejs.org/api/util.html"
+  ],
+  "tests": [
+    {
+      "name": "normal Promise",
+      "input": "types.isPromise(Promise.resolve(42))",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "edge thenable is not promise",
+      "input": "types.isPromise({then(){}})",
+      "expected_behavior": "returns false"
+    }
+  ]
+}

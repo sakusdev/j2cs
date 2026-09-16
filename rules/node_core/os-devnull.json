@@ -1,0 +1,42 @@
+{
+  "id": "node.os.devnull",
+  "category": "node_core",
+  "summary": "Expose Node's platform-specific null-device path.",
+  "source": {
+    "pattern": "$os.devNull",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.DevNull",
+    "helper": "NodeOs.DevNull"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "windows": "\\\\.\\nul",
+    "posix": "/dev/null",
+    "return_type": "string"
+  },
+  "caveats": [
+    "The literal is a Node platform contract and should not be guessed from ordinary filesystem roots."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal posix value",
+      "input": "process.platform === 'win32' ? 'skip' : os.devNull",
+      "expected_behavior": "on POSIX returns \"/dev/null\""
+    },
+    {
+      "name": "edge windows value",
+      "input": "process.platform === 'win32' ? os.devNull : 'skip'",
+      "expected_behavior": "on Windows returns \"\\\\\\\\.\\\\nul\""
+    }
+  ]
+}

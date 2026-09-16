@@ -1,0 +1,43 @@
+{
+  "id": "node.os.uptime",
+  "category": "node_core",
+  "summary": "Return host system uptime in seconds with Node-compatible numeric semantics.",
+  "source": {
+    "pattern": "$os.uptime()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.Uptime()",
+    "helper": "NodeOs.Uptime"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "unit": "seconds",
+    "return_type": "JavaScript Number",
+    "host_dependent": true,
+    "monotonic_expectation": "normally nondecreasing but host/runtime behavior is authoritative"
+  },
+  "caveats": [
+    "Do not confuse system uptime with process uptime or Stopwatch elapsed time."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal nonnegative",
+      "input": "os.uptime() >= 0",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "edge distinct from process uptime",
+      "input": "console.log(os.uptime(), process.uptime());",
+      "expected_behavior": "the first value represents system uptime while the second represents this process's age; lowering must not substitute one for the other"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.os.homedir",
+  "category": "node_core",
+  "summary": "Return the Node-compatible current-user home directory with Node environment-variable precedence.",
+  "source": {
+    "pattern": "$os.homedir()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.HomeDir(NodeProcess.Env)",
+    "helper": "NodeOs.HomeDir"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "posix": "HOME if defined, otherwise effective-uid home lookup",
+    "windows": "USERPROFILE if defined, otherwise OS profile directory",
+    "return_type": "string"
+  },
+  "caveats": [
+    "Environment overrides mean Environment.GetFolderPath(UserProfile) alone is not equivalent."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal returns string",
+      "input": "typeof os.homedir()",
+      "expected_behavior": "returns \"string\""
+    },
+    {
+      "name": "edge environment precedence",
+      "input": "process.env.HOME='/custom-home'; os.homedir()",
+      "expected_behavior": "on POSIX returns '/custom-home'"
+    }
+  ]
+}

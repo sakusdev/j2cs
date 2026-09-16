@@ -1,0 +1,41 @@
+{
+  "id": "node.os.hostname",
+  "category": "node_core",
+  "summary": "Return the operating-system hostname using Node/libuv-compatible host behavior.",
+  "source": {
+    "pattern": "$os.hostname()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.Hostname()",
+    "helper": "NodeOs.Hostname"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "string",
+    "host_dependent": true
+  },
+  "caveats": [
+    "Do not constant-fold at compile time for binaries that may run on another host."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal hostname",
+      "input": "typeof os.hostname()",
+      "expected_behavior": "returns \"string\""
+    },
+    {
+      "name": "edge runtime host dependency",
+      "input": "const a=os.hostname(); const b=os.hostname(); a===b",
+      "expected_behavior": "normally true within a stable host session; value is not a compiler constant"
+    }
+  ]
+}

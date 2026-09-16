@@ -1,0 +1,42 @@
+{
+  "id": "node.os.tmpdir",
+  "category": "node_core",
+  "summary": "Return Node's temporary directory using documented environment-variable precedence and no trailing separator.",
+  "source": {
+    "pattern": "$os.tmpdir()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.TempDir(NodeProcess.Env)",
+    "helper": "NodeOs.TempDir"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "windows_precedence": "TEMP, then TMP, then system defaults",
+    "posix_precedence": "TMPDIR, then TMP, then TEMP, then /tmp",
+    "trailing_separator": "not returned"
+  },
+  "caveats": [
+    "Path.GetTempPath commonly includes a trailing separator and uses different environment resolution details."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal no trailing slash",
+      "input": "os.tmpdir()",
+      "expected_behavior": "returns a temporary-directory string without a trailing separator except where root semantics require otherwise"
+    },
+    {
+      "name": "edge posix override",
+      "input": "process.env.TMPDIR='/x'; os.tmpdir()",
+      "expected_behavior": "on POSIX returns '/x'"
+    }
+  ]
+}

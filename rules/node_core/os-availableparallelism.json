@@ -1,0 +1,42 @@
+{
+  "id": "node.os.availableparallelism",
+  "category": "node_core",
+  "summary": "Return Node/libuv's estimate of available parallelism, honoring affinity/container constraints where the host exposes them.",
+  "source": {
+    "pattern": "$os.availableParallelism()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.AvailableParallelism()",
+    "helper": "NodeOs.AvailableParallelism"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "positive integer Number",
+    "minimum": 1,
+    "source": "libuv uv_available_parallelism-compatible host estimate"
+  },
+  "caveats": [
+    "Environment.ProcessorCount may be close but must not be assumed equivalent on every platform/container/runtime."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal positive",
+      "input": "Number.isInteger(os.availableParallelism()) && os.availableParallelism() > 0",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "edge not cpus length contract",
+      "input": "os.availableParallelism()",
+      "expected_behavior": "must use the Node/libuv contract rather than defining the result as os.cpus().length"
+    }
+  ]
+}
