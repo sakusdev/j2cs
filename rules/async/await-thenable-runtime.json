@@ -1,0 +1,16 @@
+{
+  "id": "async.await.thenable-runtime",
+  "category": "async",
+  "summary": "Use runtime fallback when await may encounter an arbitrary thenable with dynamic JavaScript property semantics.",
+  "source": {"pattern": "await $value", "requirements": {"operand": "not proven primitive, intrinsic Promise, or non-thenable"}},
+  "target": {"kind": "runtime", "template": "JsRuntime.AwaitDynamic($value)", "notes": "Runtime must perform PromiseResolve-style dynamic then lookup, getter execution, callability checks, and one-shot resolution."},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"then_getter": "observable and may throw", "proxy": "property lookup may be intercepted", "then_call": "callable then is invoked with the thenable as this", "multiple_calls": "only first resolve/reject has effect"},
+  "caveats": ["Static Task conversion cannot reproduce arbitrary getters, Proxy traps, or monkey-patched then properties."],
+  "references": ["ECMAScript 2026 Await", "ECMAScript 2026 Promise Resolve Functions"],
+  "tests": [
+    {"name": "custom thenable assimilates", "input": "async function f(){console.log(await {then(r){r(42)}})} f();", "expected_behavior": "prints 42"},
+    {"name": "throwing then getter rejects await", "input": "async function f(){try{await Object.defineProperty({},'then',{get(){throw 'boom'}})}catch(e){console.log(e)}} f();", "expected_behavior": "prints boom"}
+  ]
+}
