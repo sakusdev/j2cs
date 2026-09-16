@@ -1,0 +1,43 @@
+{
+  "id": "map.prototype.clear",
+  "category": "map_set",
+  "summary": "Clear all Map entries without invalidating the live iteration sequence semantics of already-created iterators.",
+  "source": {
+    "pattern": "$map.clear()",
+    "requirements": {
+      "receiver_inferred_builtin_map": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsMap.Clear($map)",
+    "helper": "JsMap.Clear"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "size_after": 0,
+    "existing_iterators": "removed entries are skipped; later appended entries may still be observed by unfinished iterators"
+  },
+  "caveats": [
+    "Replacing the underlying collection object can break existing iterator behavior."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "clears all",
+      "input": "const m=new Map([[1,'a'],[2,'b']]); console.log(m.clear(),m.size);",
+      "expected_behavior": "prints undefined 0"
+    },
+    {
+      "name": "unfinished iterator sees post-clear append",
+      "input": "const m=new Map([['a',1],['b',2]]); const it=m.keys(); it.next(); m.clear(); m.set('c',3); console.log(it.next().value);",
+      "expected_behavior": "prints c"
+    }
+  ]
+}
