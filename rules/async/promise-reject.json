@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.reject",
+  "category": "async",
+  "summary": "Create a new rejected intrinsic Promise while preserving the rejection reason verbatim.",
+  "source": {"pattern": "Promise.reject($reason)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "JsPromise.Reject", "template": "JsPromise.Reject($reason)", "notes": "Do not assimilate the rejection reason even if it is itself a Promise or thenable."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"return": "new rejected promise", "reason": "preserved exactly", "thenable_reason": "not assimilated", "handlers": "run asynchronously"},
+  "caveats": ["JavaScript may reject with any value, not just an Error/Exception."],
+  "references": ["ECMAScript 2026 Promise.reject"],
+  "tests": [
+    {"name": "string reason preserved", "input": "Promise.reject('x').catch(console.log);", "expected_csharp": "var p = JsPromise.Reject(JsValue.From(\"x\"));", "expected_behavior": "prints x"},
+    {"name": "promise reason is not adopted", "input": "const q=Promise.resolve(1);Promise.reject(q).catch(e=>console.log(e===q));", "expected_behavior": "prints true"}
+  ]
+}
