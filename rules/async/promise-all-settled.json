@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.all-settled",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.allSettled to ordered fulfillment/rejection records without rejecting merely because an input promise rejects.",
+  "source": {"pattern": "Promise.allSettled($iterable)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true, "promise_resolve_not_overridden": true, "iterable": "supported compiled JS iterable"}},
+  "target": {"kind": "helper", "helper": "JsPromise.AllSettled", "template": "JsPromise.AllSettled($iterable)", "notes": "Produce JS-shaped {status,value} or {status,reason} objects in input order."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"result_order": "input iteration order", "element_rejection": "recorded, not aggregate rejection", "fulfilled_record": "status fulfilled plus value", "rejected_record": "status rejected plus reason", "empty": "fulfilled with empty array"},
+  "caveats": ["The aggregate can still reject for abrupt iterator/constructor/Promise.resolve operations."],
+  "references": ["ECMAScript 2026 Promise.allSettled"],
+  "tests": [
+    {"name": "mixed outcomes", "input": "Promise.allSettled([Promise.resolve(1),Promise.reject(2)]).then(x=>console.log(x[0].status,x[1].reason));", "expected_csharp": "var p = JsPromise.AllSettled(values);", "expected_behavior": "prints fulfilled 2"},
+    {"name": "empty iterable", "input": "Promise.allSettled([]).then(x=>console.log(x.length));", "expected_behavior": "eventually prints 0"}
+  ]
+}

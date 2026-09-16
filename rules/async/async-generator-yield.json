@@ -1,0 +1,16 @@
+{
+  "id": "async.async-generator.yield",
+  "category": "async",
+  "summary": "Lower async-generator yield through a compatibility state machine rather than treating it as a normal C# async iterator yield.",
+  "source": {"pattern": "async function* $g($args) { yield $value; }", "requirements": {"function_kind": "async generator", "dynamic_prototype_mutation": false}},
+  "target": {"kind": "helper", "helper": "JsAsyncGenerator.Run", "template": "JsAsyncGenerator.Run(async ctx => { await ctx.YieldAsync($value); })", "notes": "Calling the generator creates an async-generator object; body execution is request-driven and each yielded value is delivered through a Promise<IteratorResult>."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"call": "returns async generator object", "body_start": "request-driven", "yield_delivery": "Promise of IteratorResult", "uncaught_throw": "reject pending request and close generator"},
+  "caveats": ["C# async iterators have different next/return/throw request APIs and disposal/cancellation conventions."],
+  "references": ["ECMAScript 2026 Async Generator Functions", "ECMAScript 2026 Async Generator Objects"],
+  "tests": [
+    {"name": "body starts on next", "input": "async function* g(){console.log('run');yield 1} const it=g();console.log('made');it.next();", "expected_behavior": "prints made before run"},
+    {"name": "body throw rejects request", "input": "async function* g(){throw 'x'} g().next().catch(console.log);", "expected_behavior": "next() promise rejects with x"}
+  ]
+}

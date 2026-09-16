@@ -1,0 +1,16 @@
+{
+  "id": "async.await.rejection",
+  "category": "async",
+  "summary": "A rejected awaited promise resumes the async context with an abrupt completion carrying the JavaScript rejection reason.",
+  "source": {"pattern": "await $promise", "requirements": {"operand": "proven builtin Promise representation"}},
+  "target": {"kind": "helper", "helper": "JsAsync.Await", "template": "await JsAsync.Await($promise)", "notes": "The helper must bridge arbitrary JS rejection values into catchable compiler/runtime control flow without losing the original value."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"rejection": "await throws the rejection reason into the suspended async context", "try_catch": "surrounding JS try/catch observes the original reason", "uncaught": "outer async promise rejects"},
+  "caveats": ["JavaScript rejection reasons are not restricted to Exception objects.", "Task cancellation is not equivalent to Promise rejection."],
+  "references": ["ECMAScript 2026 Await abstract operation"],
+  "tests": [
+    {"name": "await rejection is catchable", "input": "async function f(){try{await Promise.reject('x')}catch(e){console.log(e)}} f();", "expected_behavior": "prints x"},
+    {"name": "uncaught rejection rejects outer promise", "input": "async function f(){await Promise.reject(5)} f().catch(console.log);", "expected_behavior": "outer promise rejects with numeric reason 5"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.catch",
+  "category": "async",
+  "summary": "Lower Promise.prototype.catch only when its dynamic invocation of the receiver's then property is proven to reach the builtin Promise path.",
+  "source": {"pattern": "$promise.catch($onRejected)", "requirements": {"receiver": "proven intrinsic Promise representation", "builtin_catch_not_overridden": true, "builtin_then_not_overridden": true, "species": "intrinsic Promise"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Catch", "template": "JsPromise.Catch($promise, $onRejected)", "notes": "Equivalent to invoking then(undefined, onRejected) only under the stated non-overridden requirements."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"lookup": "catch performs dynamic Invoke of then", "return": "result of then", "handler": "rejection reaction follows normal then semantics"},
+  "caveats": ["If promise.then is overridden, catch must observe that property and cannot use this intrinsic helper."],
+  "references": ["ECMAScript 2026 Promise.prototype.catch"],
+  "tests": [
+    {"name": "rejection recovery", "input": "Promise.reject(4).catch(e=>e+1).then(console.log);", "expected_csharp": "var q = JsPromise.Catch(p, onRejected);", "expected_behavior": "prints 5"},
+    {"name": "overridden then is observable", "input": "const p=Promise.resolve();p.then=()=>{console.log('custom');return 1};console.log(p.catch(()=>{}));", "expected_behavior": "calls custom then; intrinsic helper rule must not match"}
+  ]
+}

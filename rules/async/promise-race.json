@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.race",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.race preserving first settlement and the permanently-pending empty-iterable case.",
+  "source": {"pattern": "Promise.race($iterable)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true, "promise_resolve_not_overridden": true, "iterable": "supported compiled JS iterable"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Race", "template": "JsPromise.Race($iterable)", "notes": "Each element passes through Promise.resolve semantics; the first fulfillment or rejection settles the result."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"settlement": "first settlement wins", "empty": "result remains pending forever", "iteration": "synchronous during call", "elements": "Promise.resolve semantics"},
+  "caveats": ["Task.WhenAny on an empty collection throws and is therefore not equivalent."],
+  "references": ["ECMAScript 2026 Promise.race"],
+  "tests": [
+    {"name": "rejection can win race", "input": "Promise.race([Promise.reject('x'),Promise.resolve(2)]).catch(console.log);", "expected_csharp": "var p = JsPromise.Race(values);", "expected_behavior": "rejects with x under ordinary reaction ordering"},
+    {"name": "empty race never settles", "input": "const p=Promise.race([]);let hit=false;p.then(()=>hit=true);queueMicrotask(()=>console.log(hit));", "expected_behavior": "prints false"}
+  ]
+}

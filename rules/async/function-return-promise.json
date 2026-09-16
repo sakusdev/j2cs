@@ -1,0 +1,16 @@
+{
+  "id": "async.function.return-promise",
+  "category": "async",
+  "summary": "Async functions always return a Promise-compatible object and returned values are adopted using Promise resolution semantics.",
+  "source": {"pattern": "async function $f($args) { $body }", "requirements": {"function_kind": "async function", "dynamic_constructor": false}},
+  "target": {"kind": "helper", "helper": "JsAsync.Run", "template": "JsAsync.Run(async () => { $body })", "notes": "Use a JS-compatible async state machine and promise scheduler; do not assume Task scheduling is equivalent."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"return_value": "always promise", "return_adoption": "returned promises/thenables are adopted", "execution": "body executes until suspension", "continuations": "resume through JS promise jobs"},
+  "caveats": ["Argument evaluation occurs before the async call and may still throw synchronously.", "A completed .NET awaitable may continue synchronously, unlike required JS promise-job ordering."],
+  "references": ["ECMAScript 2026 Async Functions", "ECMAScript 2026 Promise Objects"],
+  "tests": [
+    {"name": "plain return fulfills later", "input": "async function f(){ return 7; } f().then(console.log); console.log('sync');", "expected_csharp": "var p = JsAsync.Run(async () => 7d);", "expected_behavior": "prints sync before 7 and f() returns a promise"},
+    {"name": "returned promise is adopted", "input": "async function f(){ return Promise.resolve(9); } f().then(console.log);", "expected_behavior": "fulfills with 9, not with a nested Promise object"}
+  ]
+}

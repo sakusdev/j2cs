@@ -1,0 +1,16 @@
+{
+  "id": "async.top-level-await",
+  "category": "async",
+  "summary": "Use module-runtime fallback for top-level await because it changes asynchronous ECMAScript module evaluation and dependency ordering.",
+  "source": {"pattern": "await $expr", "requirements": {"source_type": "ECMAScript module", "location": "module top level"}},
+  "target": {"kind": "runtime", "template": "JsModuleRuntime.EvaluateWithTopLevelAwait($module)", "notes": "Preserve async module execution, dependency waiting, rejection propagation, and module-graph cycle behavior."},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"module_state": "may become asynchronously evaluating", "dependencies": "dependent module execution waits", "rejection": "module evaluation fails", "graph": "ordering depends on module dependency graph"},
+  "caveats": ["C# top-level await in an entry point is not equivalent to ECMAScript module-graph evaluation."],
+  "references": ["ECMAScript 2026 Async Module Execution", "ECMAScript 2026 AwaitExpression"],
+  "tests": [
+    {"name": "dependent module waits", "input": "// a.mjs: await Promise.resolve(); export const x=1; // b.mjs: import {x} from './a.mjs'; console.log(x);", "expected_behavior": "b executes only after a finishes asynchronous module evaluation"},
+    {"name": "top-level rejection fails module", "input": "await Promise.reject('x');", "expected_behavior": "module evaluation fails with rejection reason x under the selected module host"}
+  ]
+}

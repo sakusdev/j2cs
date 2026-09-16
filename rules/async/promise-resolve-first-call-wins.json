@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.resolve-first-call-wins",
+  "category": "async",
+  "summary": "Promise resolving functions ignore every resolve/reject call after the first effective resolution, including when locked to another pending promise.",
+  "source": {"pattern": "$resolve($value); $reject($reason)", "requirements": {"resolve_reject_functions": "created by Promise capability"}},
+  "target": {"kind": "helper", "helper": "JsPromise.ResolveFunction", "notes": "The helper must distinguish resolved from settled: resolving with another pending promise locks the outcome immediately."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"first_call": "wins", "later_calls": "no effect", "resolved_pending": "possible when adopting a pending promise", "self_resolution": "reject TypeError"},
+  "caveats": ["A promise can be resolved but still pending; mapping resolved directly to Task completion is incorrect."],
+  "references": ["ECMAScript 2026 CreateResolvingFunctions"],
+  "tests": [
+    {"name": "first settlement wins", "input": "new Promise((r,j)=>{r(1);r(2);j(3)}).then(console.log);", "expected_behavior": "fulfills with 1"},
+    {"name": "adoption locks before adopted promise settles", "input": "let rr;const q=new Promise(r=>rr=r);const p=new Promise((r,j)=>{r(q);j('x')});rr(8);p.then(console.log);", "expected_behavior": "fulfills with 8; later reject call has no effect"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "async.function.throw-rejection",
+  "category": "async",
+  "summary": "A throw from inside an async function body rejects the returned promise rather than synchronously throwing to the caller.",
+  "source": {"pattern": "async function $f($args) { throw $reason; }", "requirements": {"function_kind": "async function"}},
+  "target": {"kind": "helper", "helper": "JsAsync.Run", "template": "JsAsync.Run(async () => { throw JsException.Wrap($reason); })", "notes": "The runtime representation must support arbitrary JavaScript rejection values, not only System.Exception."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"body_throw": "reject returned promise", "caller": "receives promise immediately", "rejection_reason": "preserve JS value"},
+  "caveats": ["Throws while evaluating call arguments occur before entering the async function and remain synchronous."],
+  "references": ["ECMAScript 2026 AsyncFunctionStart"],
+  "tests": [
+    {"name": "throw before await rejects", "input": "async function f(){ throw 3; } const p=f(); console.log('after'); p.catch(console.log);", "expected_csharp": "var p = JsAsync.Run<JsValue>(async () => throw JsException.Wrap(JsValue.From(3d)));", "expected_behavior": "prints after before 3"},
+    {"name": "object rejection reason preserved", "input": "const e={x:1}; async function f(){throw e} f().catch(v=>console.log(v===e));", "expected_behavior": "prints true"}
+  ]
+}

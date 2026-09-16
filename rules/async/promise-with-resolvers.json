@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.with-resolvers",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.withResolvers to a promise capability object exposing promise, resolve, and reject.",
+  "source": {"pattern": "Promise.withResolvers()", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true, "ecmascript_version": ">=2024"}},
+  "target": {"kind": "helper", "helper": "JsPromise.WithResolvers", "template": "JsPromise.WithResolvers()", "notes": "Returned resolve/reject functions must be the same one-shot Promise resolving functions used by the constructor."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"return_shape": "object with promise, resolve, reject", "resolve": "Promise resolution procedure", "reject": "verbatim rejection reason", "first_call": "later resolving calls ignored"},
+  "caveats": ["The ECMAScript method is generic over constructors; custom constructor cases are outside this intrinsic rule."],
+  "references": ["ECMAScript 2026 Promise.withResolvers"],
+  "tests": [
+    {"name": "external resolve", "input": "const {promise,resolve}=Promise.withResolvers();resolve(5);promise.then(console.log);", "expected_csharp": "var cap = JsPromise.WithResolvers(); cap.Resolve(JsValue.From(5d));", "expected_behavior": "prints 5"},
+    {"name": "first settlement wins", "input": "const {promise,resolve,reject}=Promise.withResolvers();reject('x');resolve(1);promise.catch(console.log);", "expected_behavior": "prints x"}
+  ]
+}

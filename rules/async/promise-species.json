@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.species",
+  "category": "async",
+  "summary": "Use runtime fallback when Promise chaining can observe a subclass constructor or custom Symbol.species.",
+  "source": {"pattern": "$promise.then($handler)", "requirements": {"receiver": "Promise subclass or unknown promise object", "species_not_proven_intrinsic": true}},
+  "target": {"kind": "runtime", "template": "JsRuntime.PromiseThenWithSpecies($promise, $handler)", "notes": "Runtime must implement SpeciesConstructor and custom constructor capability semantics before creating the derived promise."},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"derived_constructor": "selected through SpeciesConstructor", "symbol_species_getter": "observable and may run user code or throw", "applies_to": "then and finally chaining"},
+  "caveats": ["Hard-wiring JsPromise changes instanceof/constructor-observable behavior for subclasses."],
+  "references": ["ECMAScript 2026 Promise Symbol.species", "ECMAScript 2026 SpeciesConstructor"],
+  "tests": [
+    {"name": "subclass chaining returns subclass", "input": "class P extends Promise{};const p=P.resolve(1);console.log(p.then(x=>x) instanceof P);", "expected_behavior": "prints true"},
+    {"name": "species can select base Promise", "input": "class P extends Promise{static get [Symbol.species](){return Promise}};const q=P.resolve(1).then(x=>x);console.log(q instanceof P);", "expected_behavior": "prints false"}
+  ]
+}

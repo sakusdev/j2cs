@@ -1,0 +1,16 @@
+{
+  "id": "async.async-generator.next",
+  "category": "async",
+  "summary": "Lower next() on a proven async generator to a Promise of a JavaScript IteratorResult while preserving queued request ordering.",
+  "source": {"pattern": "$generator.next($value)", "requirements": {"receiver": "proven async generator representation", "builtin_next_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "JsAsyncGenerator.Next", "template": "JsAsyncGenerator.Next($generator, $value)", "notes": "Return a JsPromise resolving to {value, done}; multiple next/return/throw requests must be queued and processed in order."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"return": "Promise<IteratorResult>", "iterator_result": "object with value and done", "request_queue": "FIFO", "completed": "next resolves to done true with undefined value"},
+  "caveats": ["IAsyncEnumerator.MoveNextAsync returns bool and exposes Current separately, so a direct API substitution changes observable shape and request semantics."],
+  "references": ["ECMAScript 2026 Async Generator Objects"],
+  "tests": [
+    {"name": "yielded result shape", "input": "async function* g(){yield 1} g().next().then(r=>console.log(r.value,r.done));", "expected_csharp": "var resultPromise = JsAsyncGenerator.Next(gen, JsValue.Undefined);", "expected_behavior": "prints 1 false"},
+    {"name": "completed result", "input": "async function* g(){} g().next().then(r=>console.log(r.value===undefined,r.done));", "expected_behavior": "prints true true"}
+  ]
+}
