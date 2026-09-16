@@ -1,0 +1,48 @@
+{
+  "id": "json.stringify.bigint",
+  "category": "json",
+  "summary": "Throw for BigInt serialization unless a callable toJSON hook transforms the BigInt before the BigInt type check.",
+  "source": {
+    "pattern": "JSON.stringify($value, $replacer, $space)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_may_contain_bigint": true,
+      "bigint_model_available": true,
+      "function_call_semantics_available": true,
+      "no_json_rawjson_values": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value, $replacer, $space)",
+    "helper": "JsJson.Stringify",
+    "notes": "After toJSON and replacer processing, a remaining BigInt causes TypeError. BigInt is special because a callable toJSON property can convert it first."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "unhandled_bigint": "TypeError",
+    "hook_order": "toJSON lookup/call occurs before the remaining BigInt rejection",
+    "replacer": "a replacer function may also transform a BigInt before rejection if toJSON did not"
+  },
+  "caveats": [
+    "A blanket 'BigInt always throws' rule is incorrect when BigInt.prototype.toJSON or another reachable toJSON lookup transforms it."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "plain BigInt throws",
+      "input": "try { JSON.stringify({x:1n}); } catch(e) { console.log(e instanceof TypeError); }",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "BigInt toJSON can make it serializable",
+      "input": "BigInt.prototype.toJSON=function(){return this.toString()}; console.log(JSON.stringify({x:1n})); delete BigInt.prototype.toJSON;",
+      "expected_behavior": "prints {\"x\":\"1\"}"
+    }
+  ]
+}

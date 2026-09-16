@@ -1,0 +1,47 @@
+{
+  "id": "json.stringify.space",
+  "category": "json",
+  "summary": "Preserve JSON.stringify space coercion, clamping/truncation, and indentation behavior.",
+  "source": {
+    "pattern": "JSON.stringify($value, $replacer, $space)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "space_argument_present": true,
+      "no_json_rawjson_values": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value, $replacer, $space)",
+    "helper": "JsJson.Stringify",
+    "notes": "The Gap is derived once: Number/boxed Number is ToNumber then integer-clamped to 0..10 spaces; String/boxed String is truncated to at most 10 UTF-16 code units; other values produce no gap."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "number_space": "ToNumber/ToIntegerOrInfinity semantics then max 10 ASCII spaces",
+    "string_space": "first at most 10 UTF-16 code units",
+    "other": "empty gap",
+    "format": "when gap is non-empty, inserts line feeds and indentation exactly per JSON serialization algorithm"
+  },
+  "caveats": [
+    "Substring by Unicode scalar value is incorrect; ECMAScript truncates strings by UTF-16 code units."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "numeric space clamped to ten",
+      "input": "console.log(JSON.stringify({a:1},null,20));",
+      "expected_behavior": "prints a three-line object with exactly 10 spaces before the member"
+    },
+    {
+      "name": "string space truncated to ten code units",
+      "input": "console.log(JSON.stringify({a:1},null,'abcdefghijk'));",
+      "expected_behavior": "indent prefix is abcdefghij, not all 11 characters"
+    }
+  ]
+}

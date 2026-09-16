@@ -1,0 +1,50 @@
+{
+  "id": "json.stringify.tojson-hook",
+  "category": "json",
+  "summary": "Call an object's callable toJSON hook before replacer processing with the correct key and this binding.",
+  "source": {
+    "pattern": "JSON.stringify($value, $replacer, $space)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "tojson_hook_may_be_present": true,
+      "function_call_semantics_available": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value, $replacer, $space)",
+    "helper": "JsJson.Stringify",
+    "notes": "For Object and BigInt values, the serializer performs GetV(value, 'toJSON'); if callable it calls that hook with this=value and the current property key before applying a replacer function."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "lookup": "GetV(value, 'toJSON') is observable and may invoke property/proxy semantics permitted by the rule.",
+    "this_binding": "hook this is the original value",
+    "argument": "current property key, with empty string for the root",
+    "ordering": "toJSON result is produced before replacer-function invocation",
+    "exceptions": "lookup or hook exceptions propagate"
+  },
+  "caveats": [
+    "Do not special-case Date by calling a .NET date formatter before ordinary JS toJSON lookup semantics."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "hook receives property key",
+      "input": "const x={toJSON(k){return 'key='+k}}; console.log(JSON.stringify({x}));",
+      "expected_behavior": "prints {\"x\":\"key=x\"}"
+    },
+    {
+      "name": "toJSON runs before replacer",
+      "input": "const log=[]; const x={toJSON(k){log.push('toJSON:'+k);return {a:1}}}; JSON.stringify({x},function(k,v){log.push('replacer:'+k);return v}); console.log(log.join('|'));",
+      "expected_behavior": "prints replacer:|toJSON:x|replacer:x|replacer:a"
+    }
+  ]
+}

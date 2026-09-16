@@ -1,0 +1,52 @@
+{
+  "id": "json.stringify.property-order",
+  "category": "json",
+  "summary": "Serialize ordinary object keys in ECMAScript own-enumerable string-key order when no replacer PropertyList is active.",
+  "source": {
+    "pattern": "JSON.stringify($object)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_known_ordinary_object": true,
+      "replacer_array_not_active": true,
+      "reachable_proxy_or_unmodeled_exotic": false,
+      "no_json_rawjson_values": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($object)",
+    "helper": "JsJson.Stringify",
+    "notes": "Reuse JsObject.Keys for the object-key list: canonical array-index keys ascending, then other string keys in creation order; Symbol keys are excluded."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "key_source": "same own enumerable string-key ordering contract as JsObject.Keys",
+    "index_order": "canonical integer index keys ascending",
+    "string_order": "remaining strings in property creation order",
+    "symbols": "omitted",
+    "snapshot": "the key list for an object is established when that object's serialization starts"
+  },
+  "caveats": [
+    "C# Dictionary enumeration or reflection metadata order is not the semantic contract.",
+    "Reuse object.keys ordering responsibility instead of defining a competing generic property-order helper."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty",
+    "j2cs object.keys / JsObject.Keys"
+  ],
+  "tests": [
+    {
+      "name": "integer keys precede insertion-ordered strings",
+      "input": "console.log(JSON.stringify({100:'a',2:'b',x:1,1:'c',y:2}));",
+      "expected_behavior": "prints {\"1\":\"c\",\"2\":\"b\",\"100\":\"a\",\"x\":1,\"y\":2}"
+    },
+    {
+      "name": "added key after snapshot is not visited",
+      "input": "const o={a:1,b:2}; Object.defineProperty(o,'a',{enumerable:true,get(){o.c=3; return 1}}); console.log(JSON.stringify(o));",
+      "expected_behavior": "prints {\"a\":1,\"b\":2}; c was added after the key list was captured"
+    }
+  ]
+}

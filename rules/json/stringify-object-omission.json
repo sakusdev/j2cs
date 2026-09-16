@@ -1,0 +1,49 @@
+{
+  "id": "json.stringify.object-omission",
+  "category": "json",
+  "summary": "Omit object properties whose serialized value is undefined, a Function, or a Symbol, and ignore symbol-keyed properties.",
+  "source": {
+    "pattern": "JSON.stringify($object)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_known_object": true,
+      "replacer_omitted": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($object)",
+    "helper": "JsJson.Stringify",
+    "notes": "While serializing an ordinary object without a replacer property list, only own enumerable string keys are considered. Unrepresentable property values are omitted."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined_function_symbol_values": "property omitted",
+    "symbol_keys": "not enumerated",
+    "null": "serialized as null",
+    "get": "property value is obtained with ordinary JS Get, so getters may run"
+  },
+  "caveats": [
+    "Do not map undefined object members to JSON null; omission is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "unrepresentable object values omitted",
+      "input": "console.log(JSON.stringify({a:undefined,b(){},c:Symbol('x'),d:null}));",
+      "expected_behavior": "prints {\"d\":null}"
+    },
+    {
+      "name": "symbol keyed property ignored",
+      "input": "const s=Symbol('s'); console.log(JSON.stringify({[s]:1,a:2}));",
+      "expected_behavior": "prints {\"a\":2}"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "json.parse.basic",
+  "category": "json",
+  "summary": "Parse JSON text with ECMAScript ToString, JSON grammar, Number, object, and array semantics.",
+  "source": {
+    "pattern": "JSON.parse($text)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "reviver_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Parse($text)",
+    "helper": "JsJson.Parse",
+    "notes": "The helper must first apply JsCoercion.ToString, parse the ECMAScript JSON grammar, create j2cs JS object/array representations, and throw a JS SyntaxError on invalid JSON."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "input_coercion": "Apply ECMAScript ToString before parsing.",
+    "numbers": "JSON numeric tokens become ECMAScript Number values (IEEE-754 binary64), including precision loss where required.",
+    "objects": "Create ordinary JS objects with own data properties; JSON '__proto__' is data, not prototype mutation.",
+    "arrays": "Create JS arrays with dense parsed elements.",
+    "duplicate_names": "Later duplicate object member names replace earlier values.",
+    "exceptions": "Invalid JSON after ToString throws SyntaxError."
+  },
+  "caveats": [
+    "Do not deserialize directly into typed C# POCOs; that can lose JS Number precision rules, property identity, and '__proto__' data-property behavior."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.1 JSON.parse"
+  ],
+  "tests": [
+    {
+      "name": "coerces input to string",
+      "input": "console.log(JSON.parse(123) === 123);",
+      "expected_csharp": "Console.WriteLine(JsStrictEquality.Equals(JsJson.Parse(123d), 123d));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "proto spelling is an own data property",
+      "input": "const o=JSON.parse('{\"__proto__\":{\"x\":1}}'); console.log(Object.hasOwn(o,'__proto__'), Object.getPrototypeOf(o)===Object.prototype);",
+      "expected_behavior": "prints true true; parsing does not change the object's prototype"
+    },
+    {
+      "name": "invalid syntax throws SyntaxError",
+      "input": "try { JSON.parse('{\"a\":1,}'); } catch (e) { console.log(e instanceof SyntaxError); }",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

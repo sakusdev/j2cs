@@ -1,0 +1,45 @@
+{
+  "id": "json.parse.reviver-context-source",
+  "category": "json",
+  "summary": "Preserve the JSON.parse reviver context.source text for primitive parse results.",
+  "source": {
+    "pattern": "JSON.parse($text, $reviver)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "reviver_call_semantics_available": true,
+      "reviver_observes_context_argument": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Parse($text, $reviver)",
+    "helper": "JsJson.Parse",
+    "notes": "The parse helper must retain source slices/parse records when the reviver can observe its third context argument. For unmodified primitive values context.source is the exact JSON source text for that value."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "context": "Each reviver call receives a fresh context object; primitive parse values expose source when the specification defines it.",
+    "precision_use_case": "context.source can retain digits that were lost when the JSON number was converted to Number.",
+    "objects": "Object/array reviver contexts do not fabricate a primitive source string."
+  },
+  "caveats": [
+    "This is newer JSON.parse semantics and cannot be dropped merely because the parsed Number already lost precision."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.1 JSON.parse reviver context"
+  ],
+  "tests": [
+    {
+      "name": "source preserves original large integer digits",
+      "input": "let src; JSON.parse('9007199254740993',(k,v,c)=>{if(k==='') src=c.source; return v;}); console.log(src);",
+      "expected_behavior": "prints 9007199254740993 even though the Number value is rounded"
+    },
+    {
+      "name": "escaped string source is source text not cooked value",
+      "input": "let src; JSON.parse('\"\\u0061\"',(k,v,c)=>{if(k==='') src=c.source; return v;}); console.log(src);",
+      "expected_behavior": "prints the JSON source token including quotes and escape spelling"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "json.stringify.basic",
+  "category": "json",
+  "summary": "Serialize supported ECMAScript values using JSON.stringify semantics rather than .NET serializer defaults.",
+  "source": {
+    "pattern": "JSON.stringify($value)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "replacer_omitted": true,
+      "space_omitted": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value)",
+    "helper": "JsJson.Stringify",
+    "notes": "The helper must implement ECMAScript JSON serialization over j2cs values and may reuse JsObject.Keys, JsCoercion operations, and canonical function-call semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Returns a JS string or undefined for a root value with no JSON representation.",
+    "primitives": "null/booleans/strings/finite Numbers use JSON forms.",
+    "object_processing": "Uses observable JS Get/property semantics rather than C# reflection.",
+    "root_wrapper": "Serialization conceptually uses a wrapper with empty-string root key, which is observable to hooks."
+  },
+  "caveats": [
+    "System.Text.Json defaults are not a semantic substitute for JS hooks, undefined, Number formatting, property ordering, or cycles.",
+    "JSON.rawJSON/isRawJSON are intentionally outside issue #15 and excluded by this rule's requirements."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "ordinary object",
+      "input": "console.log(JSON.stringify({a:1,b:'x'}));",
+      "expected_csharp": "Console.WriteLine(JsJson.Stringify(obj));",
+      "expected_behavior": "prints {\"a\":1,\"b\":\"x\"}"
+    },
+    {
+      "name": "root undefined returns undefined not string",
+      "input": "console.log(JSON.stringify(undefined) === undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
