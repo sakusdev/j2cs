@@ -1,0 +1,47 @@
+{
+  "id": "node.fs.readfilesync",
+  "category": "node_fs",
+  "summary": "Read an entire file synchronously while preserving Node Buffer/string, encoding, descriptor-position, and error behavior.",
+  "source": {
+    "pattern": "$fs.readFileSync($path, $options?)",
+    "requirements": {
+      "module_binding": "node:fs builtin",
+      "builtin_not_shadowed": true,
+      "options_shape": "statically known or represented by NodeFsOptions"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.ReadFileSync",
+    "template": "NodeFs.ReadFileSync($path, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "blocks_caller": true,
+    "return_value": "Buffer when encoding is null/omitted; string when encoding is specified",
+    "file_descriptor": "if path is an fd, reading starts at its current position and does not auto-close it",
+    "encoding": "Node Buffer encodings, not arbitrary .NET Encoding defaults",
+    "exceptions": "Node-compatible system/argument errors"
+  },
+  "caveats": [
+    "Reading a directory is platform-specific in Node; do not normalize it to one cross-platform result.",
+    "A direct File.ReadAllText changes the default return type from Buffer to string.",
+    "WHATWG file: URLs and Buffer paths require Node path normalization."
+  ],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {
+      "name": "default returns bytes",
+      "input": "const b = fs.readFileSync('a.bin'); console.log(Buffer.isBuffer(b), b.length);",
+      "expected_csharp": "var b = NodeFs.ReadFileSync(path, NodeFsReadFileOptions.BufferDefault);",
+      "expected_behavior": "returns a Node-compatible Buffer containing the exact file bytes"
+    },
+    {
+      "name": "utf8 returns string",
+      "input": "const s = fs.readFileSync('a.txt', 'utf8'); console.log(typeof s, s);",
+      "expected_csharp": "var s = NodeFs.ReadFileSync(path, NodeFsReadFileOptions.FromEncoding(\"utf8\"));",
+      "expected_behavior": "returns a string decoded with Node's utf8 semantics; invalid byte sequences use Node-compatible replacement behavior"
+    }
+  ]
+}
