@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.accesssync",
+  "category": "node_fs",
+  "summary": "Synchronously test F_OK/R_OK/W_OK/X_OK access using Node's process and OS permission semantics.",
+  "source": {"pattern":"$fs.accessSync($path, $mode?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true}},
+  "target": {"kind":"helper","helper":"NodeFs.AccessSync","template":"NodeFs.AccessSync($path, $mode)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"undefined on success","default_mode":"F_OK","mode":"bitmask of F_OK/R_OK/W_OK/X_OK","failure":"throws Node-compatible system error"},
+  "caveats": ["Checking access before opening a file introduces a race; preserve source behavior but do not optimize into assumptions.",".NET ACL helpers do not directly model effective POSIX access checks across platforms."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"F_OK succeeds","input":"fs.writeFileSync('a','x'); console.log(fs.accessSync('a'));","expected_csharp":"NodeFs.AccessSync(path, NodeFsConstants.F_OK);","expected_behavior":"returns undefined when the entry is visible to the process"},
+    {"name":"missing throws","input":"fs.accessSync('missing');","expected_csharp":"NodeFs.AccessSync(path, NodeFsConstants.F_OK);","expected_behavior":"throws a Node-compatible filesystem error when the check fails"}
+  ]
+}
