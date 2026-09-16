@@ -1,0 +1,45 @@
+{
+  "id": "electron.clipboard.readtext",
+  "category": "electron.clipboard",
+  "summary": "Read plain text from the selected clipboard.",
+  "source": {
+    "pattern": "clipboard.readText($type)",
+    "requirements": {
+      "module_binding": "electron.clipboard",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Clipboard.ReadText($type)",
+    "helper": "ElectronCompat.Clipboard.ReadText",
+    "notes": "Use a native clipboard service; preserve Electron type selection and data-format behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "string",
+    "default_type": "clipboard",
+    "linux_selection_supported": true
+  },
+  "caveats": [
+    "The Linux selection clipboard is distinct from the normal clipboard.",
+    "Renderer direct clipboard use is deprecated; process restrictions should be checked by analysis."
+  ],
+  "references": [
+    "Electron clipboard API"
+  ],
+  "tests": [
+    {
+      "name": "read default clipboard",
+      "input": "const t=clipboard.readText();",
+      "expected_csharp": "var t = ElectronCompat.Clipboard.ReadText(ClipboardType.Clipboard);",
+      "expected_behavior": "returns clipboard plain text"
+    },
+    {
+      "name": "linux selection",
+      "input": "clipboard.readText('selection');",
+      "expected_behavior": "reads the Linux selection clipboard where available; unsupported platforms must not silently alias it without an explicit compatibility policy"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "electron.shell.beep",
+  "category": "electron.shell",
+  "summary": "Play the platform alert/beep sound.",
+  "source": {
+    "pattern": "shell.beep()",
+    "requirements": {
+      "module_binding": "electron.shell",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Shell.Beep()",
+    "helper": "ElectronCompat.Shell.Beep",
+    "notes": "Uses native OS integration without requiring Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "undefined",
+    "side_effects": "plays OS alert sound"
+  },
+  "caveats": [
+    "Console.Beep is not supported/equivalent on all target platforms; route through platform abstraction."
+  ],
+  "references": [
+    "Electron shell API"
+  ],
+  "tests": [
+    {
+      "name": "play beep",
+      "input": "shell.beep();",
+      "expected_csharp": "ElectronCompat.Shell.Beep();",
+      "expected_behavior": "requests the platform beep sound"
+    },
+    {
+      "name": "headless backend",
+      "input": "shell.beep();",
+      "expected_behavior": "headless/no-audio backends must define a safe Electron-compatible no-op/failure policy rather than crash translated code unexpectedly"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "electron.browserwindow.destroy",
+  "category": "electron.browserwindow",
+  "summary": "Force destruction without the normal close/beforeunload/unload path.",
+  "source": {
+    "pattern": "$win.destroy()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.Destroy()",
+    "helper": "ElectronCompat.BrowserWindow.Destroy",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "force": true,
+    "emits_close": false,
+    "emits_closed": true
+  },
+  "caveats": [
+    "Destroy is intentionally not equivalent to Close."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "force destroy",
+      "input": "win.destroy();",
+      "expected_csharp": "win.Destroy();",
+      "expected_behavior": "window is destroyed and closed is emitted without close/beforeunload/unload"
+    },
+    {
+      "name": "destroy then state",
+      "input": "win.destroy(); console.log(win.isDestroyed());",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "electron.clipboard.readhtml",
+  "category": "electron.clipboard",
+  "summary": "Read HTML/markup from the clipboard.",
+  "source": {
+    "pattern": "clipboard.readHTML($type)",
+    "requirements": {
+      "module_binding": "electron.clipboard",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Clipboard.ReadHtml($type)",
+    "helper": "ElectronCompat.Clipboard.ReadHtml",
+    "notes": "Use a native clipboard service; preserve Electron type selection and data-format behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "string",
+    "default_type": "clipboard"
+  },
+  "caveats": [
+    "Electron/platform clipboard APIs may normalize markup; e.g. metadata such as charset can appear. Do not assume byte-for-byte roundtrip."
+  ],
+  "references": [
+    "Electron clipboard API"
+  ],
+  "tests": [
+    {
+      "name": "read html",
+      "input": "const h=clipboard.readHTML();",
+      "expected_csharp": "var h = ElectronCompat.Clipboard.ReadHtml(ClipboardType.Clipboard);",
+      "expected_behavior": "returns the clipboard HTML representation"
+    },
+    {
+      "name": "normalized html",
+      "input": "clipboard.writeHTML('<b>Hi</b>'); console.log(clipboard.readHTML());",
+      "expected_behavior": "read markup may include platform/Electron normalization such as charset metadata"
+    }
+  ]
+}

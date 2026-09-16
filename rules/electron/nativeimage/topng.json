@@ -1,0 +1,43 @@
+{
+  "id": "electron.nativeimage.topng",
+  "category": "electron.nativeimage",
+  "summary": "Encode a NativeImage as PNG bytes.",
+  "source": {
+    "pattern": "$image.toPNG($options)",
+    "requirements": {
+      "module_binding": "electron.nativeImage",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$image.ToPng($options)",
+    "helper": "ElectronCompat.NativeImage.ToPng",
+    "notes": "Requires an image codec/native image wrapper, not Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "Buffer",
+    "binary_exactness": "valid PNG; byte sequence may depend on encoder"
+  },
+  "caveats": [
+    "Do not compare encoded PNG bytes for semantic equality unless encoder determinism is part of the compatibility contract; decoded pixels are the stronger behavioral oracle."
+  ],
+  "references": [
+    "Electron nativeImage API"
+  ],
+  "tests": [
+    {
+      "name": "encode png",
+      "input": "const b=img.toPNG();",
+      "expected_csharp": "var b = img.ToPng(null);",
+      "expected_behavior": "returns a Buffer-compatible PNG byte sequence"
+    },
+    {
+      "name": "empty image",
+      "input": "const b=nativeImage.createEmpty().toPNG();",
+      "expected_behavior": "must follow Electron empty-image encoding behavior rather than crashing the native codec"
+    }
+  ]
+}

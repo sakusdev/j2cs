@@ -1,0 +1,47 @@
+{
+  "id": "electron.browserwindow.close",
+  "category": "electron.browserwindow",
+  "summary": "Attempt a normal close that can be cancelled.",
+  "source": {
+    "pattern": "$win.close()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.Close()",
+    "helper": "ElectronCompat.BrowserWindow.Close",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "emits": "close before destruction",
+    "cancelable": true,
+    "renderer_unload": "runs compatible unload flow"
+  },
+  "caveats": [
+    "Must not be lowered to unconditional Dispose/Destroy because Electron close can be prevented."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "normal close",
+      "input": "win.close();",
+      "expected_csharp": "win.Close();",
+      "expected_behavior": "close lifecycle runs and the window is destroyed if not cancelled"
+    },
+    {
+      "name": "cancel close",
+      "input": "win.on('close', e => e.preventDefault()); win.close();",
+      "expected_behavior": "window remains open when the close event is prevented"
+    }
+  ]
+}

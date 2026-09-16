@@ -1,0 +1,46 @@
+{
+  "id": "electron.app.setpath",
+  "category": "electron.app",
+  "summary": "Override an Electron special path while preserving validation and later lookup behavior.",
+  "source": {
+    "pattern": "app.setPath($name, $path)",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.SetPath($name, $path)",
+    "helper": "ElectronCompat.App.SetPath",
+    "notes": "Validate supported names and existing-directory requirements before updating the path service."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates": "application special-path mapping",
+    "throws": "if a directory path does not exist or name is unsupported"
+  },
+  "caveats": [
+    "Do not create missing directories implicitly; Electron documents that callers should create them before setPath.",
+    "The override must affect later getPath calls."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "override existing directory",
+      "input": "app.setPath('userData', existingDir); console.log(app.getPath('userData'));",
+      "expected_csharp": "ElectronCompat.App.SetPath(\"userData\", existingDir);",
+      "expected_behavior": "subsequent getPath('userData') returns the override"
+    },
+    {
+      "name": "missing directory",
+      "input": "app.setPath('userData', missingDir);",
+      "expected_behavior": "throws instead of silently accepting a nonexistent directory"
+    }
+  ]
+}

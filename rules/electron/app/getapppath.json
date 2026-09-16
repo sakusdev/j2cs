@@ -1,0 +1,44 @@
+{
+  "id": "electron.app.getapppath",
+  "category": "electron.app",
+  "summary": "Return the current application directory.",
+  "source": {
+    "pattern": "app.getAppPath()",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.GetAppPath()",
+    "helper": "ElectronCompat.App.GetAppPath",
+    "notes": "Resolve the packaged/development application root according to the native packaging model."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "string",
+    "side_effects": false
+  },
+  "caveats": [
+    "AppContext.BaseDirectory is not automatically equivalent for every packaging layout; define the native packager mapping explicitly."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "read application path",
+      "input": "const root = app.getAppPath();",
+      "expected_csharp": "var root = ElectronCompat.App.GetAppPath();",
+      "expected_behavior": "returns the effective application directory"
+    },
+    {
+      "name": "stable lookup",
+      "input": "console.log(app.getAppPath() === app.getAppPath());",
+      "expected_behavior": "returns the same application path during a process lifetime absent host reconfiguration"
+    }
+  ]
+}

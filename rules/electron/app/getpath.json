@@ -1,0 +1,47 @@
+{
+  "id": "electron.app.getpath",
+  "category": "electron.app",
+  "summary": "Resolve Electron special-path names through the native host path service.",
+  "source": {
+    "pattern": "app.getPath($name)",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "name": "statically known supported Electron path name preferred"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.GetPath($name)",
+    "helper": "ElectronCompat.App.GetPath",
+    "notes": "Return paths using Electron-compatible special-directory meanings, not a generic current-directory mapping."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "string",
+    "side_effects": false,
+    "platform_dependent": true
+  },
+  "caveats": [
+    "Names such as appData, userData, temp, desktop and logs have Electron-defined meanings that differ by OS.",
+    "setPath overrides must be observed by subsequent getPath calls."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "read user data path",
+      "input": "const p = app.getPath('userData');",
+      "expected_csharp": "var p = ElectronCompat.App.GetPath(\"userData\");",
+      "expected_behavior": "returns the effective Electron-compatible userData path"
+    },
+    {
+      "name": "unknown path name",
+      "input": "app.getPath('not-a-real-path');",
+      "expected_behavior": "must fail the same way as Electron rather than silently returning an arbitrary directory"
+    }
+  ]
+}

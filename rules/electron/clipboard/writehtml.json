@@ -1,0 +1,43 @@
+{
+  "id": "electron.clipboard.writehtml",
+  "category": "electron.clipboard",
+  "summary": "Write HTML/markup to the clipboard.",
+  "source": {
+    "pattern": "clipboard.writeHTML($markup, $type)",
+    "requirements": {
+      "module_binding": "electron.clipboard",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Clipboard.WriteHtml($markup, $type)",
+    "helper": "ElectronCompat.Clipboard.WriteHtml",
+    "notes": "Use a native clipboard service; preserve Electron type selection and data-format behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "default_type": "clipboard"
+  },
+  "caveats": [
+    "The clipboard backend may store additional native formats/metadata."
+  ],
+  "references": [
+    "Electron clipboard API"
+  ],
+  "tests": [
+    {
+      "name": "write html",
+      "input": "clipboard.writeHTML('<b>Hi</b>');",
+      "expected_csharp": "ElectronCompat.Clipboard.WriteHtml(\"<b>Hi</b>\", ClipboardType.Clipboard);",
+      "expected_behavior": "HTML clipboard flavor is populated"
+    },
+    {
+      "name": "markup normalization",
+      "input": "clipboard.writeHTML('<b>Hi</b>'); const h=clipboard.readHTML();",
+      "expected_behavior": "do not require exact input bytes when the platform normalizes HTML clipboard markup"
+    }
+  ]
+}

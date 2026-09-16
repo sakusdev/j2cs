@@ -1,0 +1,44 @@
+{
+  "id": "electron.clipboard.availableformats",
+  "category": "electron.clipboard",
+  "summary": "List data formats currently available on the selected clipboard.",
+  "source": {
+    "pattern": "clipboard.availableFormats($type)",
+    "requirements": {
+      "module_binding": "electron.clipboard",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Clipboard.AvailableFormats($type)",
+    "helper": "ElectronCompat.Clipboard.AvailableFormats",
+    "notes": "Use a native clipboard service; preserve Electron type selection and data-format behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "string[]",
+    "default_type": "clipboard",
+    "ordering": "platform/Electron defined; do not sort unless proven unobservable"
+  },
+  "caveats": [
+    "MIME/native format names are platform dependent; compiler must not normalize them casually."
+  ],
+  "references": [
+    "Electron clipboard API"
+  ],
+  "tests": [
+    {
+      "name": "list formats",
+      "input": "const f=clipboard.availableFormats();",
+      "expected_csharp": "var f = ElectronCompat.Clipboard.AvailableFormats(ClipboardType.Clipboard);",
+      "expected_behavior": "returns formats advertised by the clipboard"
+    },
+    {
+      "name": "format order",
+      "input": "console.log(clipboard.availableFormats());",
+      "expected_behavior": "preserve backend-reported order; do not impose a new sort order"
+    }
+  ]
+}

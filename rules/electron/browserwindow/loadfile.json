@@ -1,0 +1,48 @@
+{
+  "id": "electron.browserwindow.loadfile",
+  "category": "electron.browserwindow",
+  "summary": "Load a local HTML file into a BrowserWindow renderer.",
+  "source": {
+    "pattern": "$win.loadFile($filePath, $options)",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "await ElectronRuntime.Current.Windows.LoadFileAsync($win, $filePath, $options)",
+    "notes": "Generic HTML loading requires a renderer/web runtime unless a separate HTML-to-native pipeline proves this resource can be compiled."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<void>",
+    "resolves": "did-finish-load",
+    "rejects": "did-fail-load",
+    "path_base": "application root",
+    "renderer_required": true
+  },
+  "caveats": [
+    "File path is relative to the application root under Electron.",
+    "query/search/hash options affect the generated file URL.",
+    "Do not replace with File.ReadAllText; DOM execution and load events are observable."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "successful local load",
+      "input": "await win.loadFile('index.html');",
+      "expected_csharp": "await ElectronRuntime.Current.Windows.LoadFileAsync(win, \"index.html\", null);",
+      "expected_behavior": "promise fulfills only after the page finishes loading"
+    },
+    {
+      "name": "failed load",
+      "input": "await win.loadFile('missing.html');",
+      "expected_behavior": "promise rejects in correspondence with did-fail-load"
+    }
+  ]
+}

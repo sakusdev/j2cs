@@ -1,0 +1,49 @@
+{
+  "id": "electron.app.exit",
+  "category": "electron.app",
+  "summary": "Map app.exit(code) to immediate host termination semantics, distinct from app.quit().",
+  "source": {
+    "pattern": "app.exit($exitCode)",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "exit_code": "integer or omitted"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.Exit($exitCode)",
+    "helper": "ElectronCompat.App.Exit",
+    "notes": "The helper must close/terminate immediately without Electron before-quit or will-quit lifecycle events; default code is 0 when omitted."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "default_exit_code": 0,
+    "graceful": false,
+    "emits_before_quit": false,
+    "emits_will_quit": false
+  },
+  "caveats": [
+    "Environment.Exit can be the final primitive only if the compatibility layer has first reproduced Electron's immediate-close semantics relevant to translated windows."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "default exit code",
+      "input": "app.exit();",
+      "expected_csharp": "ElectronCompat.App.Exit(0);",
+      "expected_behavior": "process terminates immediately with exit code 0"
+    },
+    {
+      "name": "custom exit code",
+      "input": "app.exit(7);",
+      "expected_csharp": "ElectronCompat.App.Exit(7);",
+      "expected_behavior": "process terminates immediately with exit code 7 without before-quit/will-quit"
+    }
+  ]
+}

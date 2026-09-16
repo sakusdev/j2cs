@@ -1,0 +1,47 @@
+{
+  "id": "electron.browserwindow.constructor",
+  "category": "electron.browserwindow",
+  "summary": "Construct an Electron-compatible native window wrapper when renderer requirements are supported by the selected backend.",
+  "source": {
+    "pattern": "new BrowserWindow($options)",
+    "requirements": {
+      "constructor_binding": "electron.BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.BrowserWindow.Create($options)",
+    "helper": "ElectronCompat.BrowserWindow.Create",
+    "notes": "Create a native window abstraction and preserve Electron option defaults relevant to translated code."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "BrowserWindow object",
+    "requires_app_ready": true,
+    "side_effects": "creates OS window and renderer host"
+  },
+  "caveats": [
+    "Electron BrowserWindow cannot be constructed before app readiness.",
+    "webPreferences and Chromium-specific options may force runtime fallback even if outer-window behavior is native."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "construct after ready",
+      "input": "await app.whenReady(); const w = new BrowserWindow({width:800,height:600});",
+      "expected_csharp": "var w = ElectronCompat.BrowserWindow.Create(options);",
+      "expected_behavior": "creates a window with requested dimensions after host readiness"
+    },
+    {
+      "name": "construct too early",
+      "input": "const w = new BrowserWindow();",
+      "expected_behavior": "must fail or be rejected when invoked before the application ready boundary, matching Electron"
+    }
+  ]
+}

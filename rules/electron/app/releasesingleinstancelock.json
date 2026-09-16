@@ -1,0 +1,44 @@
+{
+  "id": "electron.app.releasesingleinstancelock",
+  "category": "electron.app",
+  "summary": "Release all single-instance locks created by requestSingleInstanceLock.",
+  "source": {
+    "pattern": "app.releaseSingleInstanceLock()",
+    "requirements": {
+      "module_binding": "electron.app",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.App.ReleaseSingleInstanceLock()",
+    "helper": "ElectronCompat.App.ReleaseSingleInstanceLock",
+    "notes": "Release OS-visible ownership so another process can become primary."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "side_effects": "releases all app single-instance locks"
+  },
+  "caveats": [
+    "Do not leave background IPC endpoints holding ownership after release."
+  ],
+  "references": [
+    "Electron app API"
+  ],
+  "tests": [
+    {
+      "name": "release lock",
+      "input": "app.requestSingleInstanceLock(); app.releaseSingleInstanceLock();",
+      "expected_csharp": "ElectronCompat.App.ReleaseSingleInstanceLock();",
+      "expected_behavior": "another instance may subsequently acquire the lock"
+    },
+    {
+      "name": "release without ownership",
+      "input": "app.releaseSingleInstanceLock();",
+      "expected_behavior": "must not manufacture ownership or crash solely because no lock is held"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.browserwindow.hide",
+  "category": "electron.browserwindow",
+  "summary": "Hide the window.",
+  "source": {
+    "pattern": "$win.hide()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.Hide()",
+    "helper": "ElectronCompat.BrowserWindow.Hide",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "visibility": "hidden"
+  },
+  "caveats": [
+    "Hiding is not closing; object identity and renderer state remain unless backend policy says otherwise."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "hide visible window",
+      "input": "win.hide();",
+      "expected_csharp": "win.Hide();",
+      "expected_behavior": "window is no longer visible"
+    },
+    {
+      "name": "hide keeps window alive",
+      "input": "win.hide(); console.log(win.isDestroyed());",
+      "expected_behavior": "isDestroyed remains false"
+    }
+  ]
+}

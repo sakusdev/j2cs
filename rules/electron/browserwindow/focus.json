@@ -1,0 +1,45 @@
+{
+  "id": "electron.browserwindow.focus",
+  "category": "electron.browserwindow",
+  "summary": "Request focus for the window.",
+  "source": {
+    "pattern": "$win.focus()",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "native_window_backend_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$win.Focus()",
+    "helper": "ElectronCompat.BrowserWindow.Focus",
+    "notes": "Requires an ElectronCompat native-window abstraction so object lifetime and window events remain observable."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "undefined",
+    "side_effects": "OS focus request"
+  },
+  "caveats": [
+    "Wayland and other desktop policies may refuse programmatic focus."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "focus window",
+      "input": "win.focus();",
+      "expected_csharp": "win.Focus();",
+      "expected_behavior": "requests window focus"
+    },
+    {
+      "name": "focus policy limitation",
+      "input": "win.focus(); console.log(win.isFocused());",
+      "expected_behavior": "isFocused reflects actual OS state, not an assumed true value"
+    }
+  ]
+}

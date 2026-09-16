@@ -1,0 +1,44 @@
+{
+  "id": "electron.dialog.showmessagebox",
+  "category": "electron.dialog",
+  "summary": "Show a native message box and return selected button/checkbox state.",
+  "source": {
+    "pattern": "dialog.showMessageBox($browserWindow, $options)",
+    "requirements": {
+      "module_binding": "electron.dialog",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.Dialog.ShowMessageBoxAsync($browserWindow, $options)",
+    "helper": "ElectronCompat.Dialog.ShowMessageBoxAsync",
+    "notes": "Requires native platform dialog services; no Chromium dependency is inherently required."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "Promise<{response:number,checkboxChecked:boolean}>",
+    "modal_parent_optional": true
+  },
+  "caveats": [
+    "Button index is observable and must preserve Electron ordering/default/cancel choices."
+  ],
+  "references": [
+    "Electron dialog API"
+  ],
+  "tests": [
+    {
+      "name": "button response",
+      "input": "const r=await dialog.showMessageBox({buttons:['No','Yes']});",
+      "expected_csharp": "var r = await ElectronCompat.Dialog.ShowMessageBoxAsync(null, options);",
+      "expected_behavior": "response is the zero-based index of the selected button"
+    },
+    {
+      "name": "checkbox state",
+      "input": "const r=await dialog.showMessageBox({checkboxLabel:'Remember'});",
+      "expected_behavior": "checkboxChecked reflects the user's checkbox state"
+    }
+  ]
+}

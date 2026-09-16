@@ -1,0 +1,43 @@
+{
+  "id": "electron.nativeimage.isempty",
+  "category": "electron.nativeimage",
+  "summary": "Read whether a NativeImage has no image representation.",
+  "source": {
+    "pattern": "$image.isEmpty()",
+    "requirements": {
+      "module_binding": "electron.nativeImage",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$image.IsEmpty",
+    "helper": "ElectronCompat.NativeImage.IsEmpty",
+    "notes": "Requires an image codec/native image wrapper, not Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [
+    "Do not infer emptiness only from source path existence; decoding failure can produce an empty image."
+  ],
+  "references": [
+    "Electron nativeImage API"
+  ],
+  "tests": [
+    {
+      "name": "empty image",
+      "input": "console.log(nativeImage.createEmpty().isEmpty());",
+      "expected_csharp": "Console.WriteLine(img.IsEmpty);",
+      "expected_behavior": "true for createEmpty"
+    },
+    {
+      "name": "loaded image",
+      "input": "console.log(nativeImage.createFromPath(valid).isEmpty());",
+      "expected_behavior": "false for a successfully decoded nonempty image"
+    }
+  ]
+}

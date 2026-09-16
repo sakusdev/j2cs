@@ -1,0 +1,43 @@
+{
+  "id": "electron.webcontents.executejavascript",
+  "category": "electron.webcontents",
+  "summary": "Do not AOT-lower arbitrary JavaScript source strings executed in a renderer.",
+  "source": {
+    "pattern": "$contents.executeJavaScript($code, $userGesture)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true,
+      "code": "not proven statically reducible"
+    }
+  },
+  "target": {
+    "kind": "unsupported",
+    "notes": "Arbitrary runtime JavaScript source evaluation is an eval-equivalent capability and cannot be translated soundly by static AST rules."
+  },
+  "strategy": "unsupported",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<any>",
+    "dynamic_code_execution": true,
+    "renderer_context": true
+  },
+  "caveats": [
+    "If a future runtime intentionally retains a JavaScript engine, this can become a runtime fallback rule instead.",
+    "A separately proven constant script may be analyzed as source code before this rule applies, but never by string substitution."
+  ],
+  "references": [
+    "Electron webContents API"
+  ],
+  "tests": [
+    {
+      "name": "dynamic source",
+      "input": "await win.webContents.executeJavaScript(codeFromNetwork);",
+      "expected_behavior": "unsupported for Chromium/V8-free AOT translation because source is only known at runtime"
+    },
+    {
+      "name": "constant source requires reparse",
+      "input": "await win.webContents.executeJavaScript('1 + 2');",
+      "expected_behavior": "must not be emitted as C# string execution; an optimizer may only handle it by reparsing/analyzing the constant source under a separate rule"
+    }
+  ]
+}

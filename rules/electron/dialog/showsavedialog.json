@@ -1,0 +1,45 @@
+{
+  "id": "electron.dialog.showsavedialog",
+  "category": "electron.dialog",
+  "summary": "Show a native save dialog and return Electron's cancellation/path result.",
+  "source": {
+    "pattern": "dialog.showSaveDialog($browserWindow, $options)",
+    "requirements": {
+      "module_binding": "electron.dialog",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "await ElectronCompat.Dialog.ShowSaveDialogAsync($browserWindow, $options)",
+    "helper": "ElectronCompat.Dialog.ShowSaveDialogAsync",
+    "notes": "Requires native platform dialog services; no Chromium dependency is inherently required."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "Promise<{canceled:boolean,filePath:string,bookmark?:string}>",
+    "modal_parent_optional": true
+  },
+  "caveats": [
+    "Electron's asynchronous showSaveDialog uses an empty string filePath when cancelled; do not rewrite this to null/undefined.",
+    "With securityScopedBookmarks on macOS MAS, selecting a nonexistent path may create a blank file."
+  ],
+  "references": [
+    "Electron dialog API"
+  ],
+  "tests": [
+    {
+      "name": "choose save path",
+      "input": "const r=await dialog.showSaveDialog({defaultPath:'a.txt'});",
+      "expected_csharp": "var r = await ElectronCompat.Dialog.ShowSaveDialogAsync(null, options);",
+      "expected_behavior": "returns canceled=false and a chosen filePath"
+    },
+    {
+      "name": "cancel save",
+      "input": "const r=await dialog.showSaveDialog({});",
+      "expected_behavior": "returns canceled=true and filePath='' when the user cancels"
+    }
+  ]
+}

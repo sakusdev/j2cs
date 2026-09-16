@@ -1,0 +1,45 @@
+{
+  "id": "electron.browserwindow.loadurl",
+  "category": "electron.browserwindow",
+  "summary": "Load a URL in a BrowserWindow renderer.",
+  "source": {
+    "pattern": "$win.loadURL($url, $options)",
+    "requirements": {
+      "receiver": "Electron BrowserWindow",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "await ElectronRuntime.Current.Windows.LoadUrlAsync($win, $url, $options)",
+    "notes": "Arbitrary web content requires a browser-compatible renderer/network stack unless a stronger static transformation is proven."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Promise<void>",
+    "renderer_required": true,
+    "network_or_custom_protocols": true
+  },
+  "caveats": [
+    "Remote URL loading cannot be considered Chromium-free native UI by default.",
+    "Navigation, CSP, redirects, cookies, session and renderer lifecycle can affect observable behavior."
+  ],
+  "references": [
+    "Electron BrowserWindow API"
+  ],
+  "tests": [
+    {
+      "name": "successful URL load",
+      "input": "await win.loadURL('https://example.com');",
+      "expected_csharp": "await ElectronRuntime.Current.Windows.LoadUrlAsync(win, \"https://example.com\", null);",
+      "expected_behavior": "promise fulfills after successful load completion"
+    },
+    {
+      "name": "failed URL load",
+      "input": "await win.loadURL('bad-scheme://x');",
+      "expected_behavior": "promise rejects/fails according to Electron navigation semantics"
+    }
+  ]
+}

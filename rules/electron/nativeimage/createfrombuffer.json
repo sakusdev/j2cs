@@ -1,0 +1,45 @@
+{
+  "id": "electron.nativeimage.createfrombuffer",
+  "category": "electron.nativeimage",
+  "summary": "Decode a NativeImage from encoded/raw buffer data with Electron options.",
+  "source": {
+    "pattern": "nativeImage.createFromBuffer($buffer, $options)",
+    "requirements": {
+      "module_binding": "electron.nativeImage",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.NativeImage.CreateFromBuffer($buffer, $options)",
+    "helper": "ElectronCompat.NativeImage.CreateFromBuffer",
+    "notes": "Requires an image codec/native image wrapper, not Chromium."
+  },
+  "strategy": "helper",
+  "confidence": "medium",
+  "semantics": {
+    "returns": "NativeImage",
+    "input": "Buffer",
+    "options": "width/height/scaleFactor may affect raw bitmap interpretation"
+  },
+  "caveats": [
+    "Node Buffer-to-byte[] lowering must preserve exact bytes.",
+    "Raw bitmap inputs require dimensions; encoded formats must be decoded by compatible codecs."
+  ],
+  "references": [
+    "Electron nativeImage API"
+  ],
+  "tests": [
+    {
+      "name": "decode PNG buffer",
+      "input": "const img=nativeImage.createFromBuffer(buf);",
+      "expected_csharp": "var img = ElectronCompat.NativeImage.CreateFromBuffer(buf, options);",
+      "expected_behavior": "returns decoded image when buffer format is supported"
+    },
+    {
+      "name": "invalid bytes",
+      "input": "const img=nativeImage.createFromBuffer(Buffer.from([1,2,3]));",
+      "expected_behavior": "returns/behaves as Electron NativeImage does for invalid image data; do not expose arbitrary decoder-specific exceptions without compatibility handling"
+    }
+  ]
+}
