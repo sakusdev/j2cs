@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.any",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.any preserving first fulfillment and AggregateError rejection when all inputs reject.",
+  "source": {"pattern": "Promise.any($iterable)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true, "promise_resolve_not_overridden": true, "iterable": "supported compiled JS iterable"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Any", "template": "JsPromise.Any($iterable)", "notes": "Ignore input rejections until every element rejects; AggregateError.errors must follow input iteration order, not rejection timing."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"fulfillment": "first fulfillment settles result", "all_rejected": "reject AggregateError", "errors_order": "input iteration order", "empty": "reject AggregateError with empty errors array"},
+  "caveats": ["Task.WhenAny is not equivalent because it completes on rejection as well as fulfillment."],
+  "references": ["ECMAScript 2026 Promise.any", "ECMAScript 2026 PerformPromiseAny"],
+  "tests": [
+    {"name": "first fulfillment wins", "input": "Promise.any([Promise.reject('x'),Promise.resolve(7)]).then(console.log);", "expected_csharp": "var p = JsPromise.Any(values);", "expected_behavior": "prints 7"},
+    {"name": "all rejected preserves reason order", "input": "Promise.any([Promise.reject('a'),Promise.reject('b')]).catch(e=>console.log(e instanceof AggregateError,e.errors.join(',')));", "expected_behavior": "prints true a,b"}
+  ]
+}
