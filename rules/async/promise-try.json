@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.try",
+  "category": "async",
+  "summary": "Lower intrinsic Promise.try by invoking the callback synchronously and converting its return/throw into Promise resolution/rejection.",
+  "source": {"pattern": "Promise.try($callback, ...$args)", "requirements": {"constructor": "intrinsic Promise", "method_not_overridden": true, "ecmascript_version": ">=2025"}},
+  "target": {"kind": "helper", "helper": "JsPromise.Try", "template": "JsPromise.Try($callback, $args)", "notes": "Call callback immediately with undefined this and the supplied arguments; thrown JS values reject, returned thenables are adopted."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"callback_timing": "synchronous", "callback_this": "undefined", "throw": "reject promise", "return": "resolve/adopt promise"},
+  "caveats": ["Promise.try was standardized in ECMAScript 2025; older source-runtime profiles need a feature-availability check."],
+  "references": ["ECMAScript 2026 Promise.try"],
+  "tests": [
+    {"name": "callback runs synchronously", "input": "const p=Promise.try(()=>{console.log(1);return 2});console.log(3);p.then(console.log);", "expected_csharp": "var p = JsPromise.Try(callback);", "expected_behavior": "prints 1,3,2"},
+    {"name": "throw becomes rejection", "input": "Promise.try(()=>{throw 'x'}).catch(console.log);", "expected_behavior": "rejects with x"}
+  ]
+}
