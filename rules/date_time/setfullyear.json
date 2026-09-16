@@ -1,0 +1,49 @@
+{
+  "id": "date.prototype.setfullyear",
+  "category": "date_time",
+  "summary": "setFullYear mutates the Date: replace local full year; month/date default from current local time; invalid receiver uses +0 as base; it returns the resulting millisecond time value.",
+  "source": {
+    "pattern": "$date.setFullYear($year, $month?, $day?)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.setFullYear"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.setFullYear",
+    "template": "JsDate.setFullYear($date, ...)",
+    "notes": "Reuse canonical ToNumber helpers/runtime as required by argument static types; preserve mutation only after the specified conversions/calculations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "new [[DateValue]] after TimeClip, or NaN",
+    "coercion": "ToNumber supplied arguments in specification order",
+    "timezone": "host local",
+    "description": "replace local full year; month/date default from current local time; invalid receiver uses +0 as base",
+    "invalid_receiver_recovery": true
+  },
+  "caveats": [
+    "Explicit undefined is a supplied argument and ToNumber(undefined) is NaN; omitted optional arguments instead use current component defaults.",
+    "Local setters are DST-sensitive; elapsed milliseconds can differ from nominal component changes.",
+    "Unlike most component setters, FullYear setters use +0 as the base time when the receiver is Invalid Date, so they can recover it."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid mutation returns time value",
+      "input": "const d=new Date(2020,5,15,12); d.setFullYear(2024); console.log(d.getFullYear(),d.getMonth(),d.getDate());",
+      "expected_behavior": "prints 2024 5 15"
+    },
+    {
+      "name": "Invalid Date can be recovered",
+      "input": "const d=new Date(NaN); const r=d.setFullYear(2000); console.log(Number.isNaN(r),d.getFullYear());",
+      "expected_behavior": "prints false 2000; unlike most component setters, setFullYear uses +0 as its base when the receiver is invalid"
+    }
+  ]
+}

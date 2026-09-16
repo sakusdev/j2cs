@@ -1,0 +1,48 @@
+{
+  "id": "date.prototype.setutcfullyear",
+  "category": "date_time",
+  "summary": "setUTCFullYear mutates the Date: replace UTC full year; invalid receiver uses +0 as base; it returns the resulting millisecond time value.",
+  "source": {
+    "pattern": "$date.setUTCFullYear($year, $month?, $day?)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.setUTCFullYear"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.setUTCFullYear",
+    "template": "JsDate.setUTCFullYear($date, ...)",
+    "notes": "Reuse canonical ToNumber helpers/runtime as required by argument static types; preserve mutation only after the specified conversions/calculations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "new [[DateValue]] after TimeClip, or NaN",
+    "coercion": "ToNumber supplied arguments in specification order",
+    "timezone": "UTC",
+    "description": "replace UTC full year; invalid receiver uses +0 as base",
+    "invalid_receiver_recovery": true
+  },
+  "caveats": [
+    "Explicit undefined is a supplied argument and ToNumber(undefined) is NaN; omitted optional arguments instead use current component defaults.",
+    "Unlike most component setters, FullYear setters use +0 as the base time when the receiver is Invalid Date, so they can recover it."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid mutation returns time value",
+      "input": "const d=new Date(Date.UTC(2020,5,15)); d.setUTCFullYear(2024); console.log(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());",
+      "expected_behavior": "prints 2024 5 15"
+    },
+    {
+      "name": "semantic edge case",
+      "input": "const d=new Date(NaN); console.log(d.setUTCFullYear(2000),d.toISOString());",
+      "expected_behavior": "prints 946684800000 2000-01-01T00:00:00.000Z"
+    }
+  ]
+}

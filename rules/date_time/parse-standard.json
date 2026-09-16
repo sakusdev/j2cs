@@ -1,0 +1,45 @@
+{
+  "id": "date.parse.standard-string",
+  "category": "date_time",
+  "summary": "Date.parse on a proven ECMAScript Date Time String Format String returns its time value or NaN.",
+  "source": {
+    "pattern": "Date.parse($string)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "property_lookup_resolves_builtin": "Date.parse",
+      "argument_static_type": "String",
+      "string_proven_ecmascript_date_time_format": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.ParseStandard",
+    "template": "JsDate.ParseStandard($string)",
+    "notes": "Use the normative ECMAScript Date Time String Format parser."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Number",
+    "date_only_without_offset": "UTC",
+    "date_time_without_offset": "local time",
+    "invalid_standard_form": "NaN"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "date-only is UTC",
+      "input": "console.log(Date.parse(\"1970-01-01\"));",
+      "expected_behavior": "prints 0 regardless of host time zone"
+    },
+    {
+      "name": "offset is honored",
+      "input": "console.log(Date.parse(\"1970-01-01T01:00:00+01:00\"));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

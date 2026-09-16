@@ -1,0 +1,53 @@
+{
+  "id": "date.constructor.components-local",
+  "category": "date_time",
+  "summary": "new Date(year, month, ...) coerces supplied components, applies the 0..99 year adjustment, interprets them in local time, then TimeClips.",
+  "source": {
+    "pattern": "new Date($year, $month, $date?, $hours?, $minutes?, $seconds?, $ms?)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "argument_count_at_least": 2
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.FromLocalComponents",
+    "template": "JsDate.FromLocalComponents($year, $month, ...)",
+    "notes": "Reuse canonical ToNumber operations. Local-time resolution must preserve DST gap/overlap semantics; do not delegate blindly to DateTime constructors."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToNumber each supplied argument left-to-right",
+    "defaults": {
+      "date": 1,
+      "hours": 0,
+      "minutes": 0,
+      "seconds": 0,
+      "ms": 0
+    },
+    "year_0_99": "1900 + year",
+    "calendar_overflow": "MakeDay/MakeTime normalization",
+    "timezone": "host local with ECMAScript LocalTime/UTC conversion",
+    "time_clip": true
+  },
+  "caveats": [
+    "In a DST gap, local time is advanced by the gap; in an overlap, the earlier instant is selected by ECMAScript compatible disambiguation."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "year 99 means 1999",
+      "input": "console.log(new Date(99,0,1).getFullYear());",
+      "expected_behavior": "prints 1999"
+    },
+    {
+      "name": "explicit undefined is not omission",
+      "input": "console.log(Number.isNaN(new Date(2020, undefined).getTime()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

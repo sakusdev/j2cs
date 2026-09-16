@@ -1,0 +1,42 @@
+{
+  "id": "date.prototype.getutchours",
+  "category": "date_time",
+  "summary": "getUTCHours reads UTC hour 0..23 directly from the UTC time value; Invalid Date returns NaN.",
+  "source": {
+    "pattern": "$date.getUTCHours()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.getUTCHours"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.getUTCHours",
+    "template": "JsDate.getUTCHours($date)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "invalid_date": "NaN",
+    "timezone": "UTC",
+    "operation": "HourFromTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid UTC component",
+      "input": "console.log(new Date(Date.UTC(2024,0,1,13)).getUTCHours());",
+      "expected_behavior": "prints 13"
+    },
+    {
+      "name": "invalid Date returns NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).getUTCHours()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

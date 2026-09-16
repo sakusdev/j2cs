@@ -1,0 +1,45 @@
+{
+  "id": "date.prototype.tolocaletimestring-runtime",
+  "category": "date_time",
+  "summary": "toLocaleTimeString is locale/Intl-sensitive and therefore requires a runtime/Intl-compatible formatting layer rather than direct DateTime.ToString substitution.",
+  "source": {
+    "pattern": "$date.toLocaleTimeString($locales?, $options?)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.toLocaleTimeString"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DateLocaleTimeString",
+    "template": "JsRuntime.DateLocaleTimeString($date, $locales, $options)",
+    "notes": "Delegate to an ECMA-402/Intl-compatible runtime with explicit locale/time-zone data."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "locale_sensitive": true,
+    "time_zone_options_observable": true,
+    "invalid_date": "locale representation of Invalid Date per Intl/host semantics",
+    "options_property_access_can_execute_user_code": true
+  },
+  "caveats": [
+    "Exact output varies by locale data and implementation; tests should assert semantics under a controlled Intl environment rather than hard-code unrelated host culture output."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "locale/options influence output",
+      "input": "console.log(new Date(Date.UTC(2020,0,2,3,4,5)).toLocaleTimeString(\"en-US\",{timeZone:\"UTC\"}));",
+      "expected_behavior": "returns an en-US locale-sensitive string using UTC"
+    },
+    {
+      "name": "options getters are observable",
+      "input": "let n=0; const o={get timeZone(){n++; return \"UTC\";}}; new Date(0).toLocaleTimeString(\"en-US\",o); console.log(n>0);",
+      "expected_behavior": "prints true in Intl-enabled environments because options properties are read"
+    }
+  ]
+}

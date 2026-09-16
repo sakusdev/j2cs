@@ -1,0 +1,47 @@
+{
+  "id": "date.prototype.setutcseconds",
+  "category": "date_time",
+  "summary": "setUTCSeconds mutates the Date: replace UTC seconds and optional milliseconds; it returns the resulting millisecond time value.",
+  "source": {
+    "pattern": "$date.setUTCSeconds($seconds, $ms?)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.setUTCSeconds"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.setUTCSeconds",
+    "template": "JsDate.setUTCSeconds($date, ...)",
+    "notes": "Reuse canonical ToNumber helpers/runtime as required by argument static types; preserve mutation only after the specified conversions/calculations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "new [[DateValue]] after TimeClip, or NaN",
+    "coercion": "ToNumber supplied arguments in specification order",
+    "timezone": "UTC",
+    "description": "replace UTC seconds and optional milliseconds",
+    "invalid_receiver_recovery": false
+  },
+  "caveats": [
+    "Explicit undefined is a supplied argument and ToNumber(undefined) is NaN; omitted optional arguments instead use current component defaults."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid mutation returns time value",
+      "input": "const d=new Date(Date.UTC(2024,0,15,1,2,3,4)); d.setUTCSeconds(40); console.log(d.getUTCSeconds(),d.getUTCMilliseconds());",
+      "expected_behavior": "prints 40 4"
+    },
+    {
+      "name": "semantic edge case",
+      "input": "const d=new Date(NaN); console.log(Number.isNaN(d.setUTCSeconds(1)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

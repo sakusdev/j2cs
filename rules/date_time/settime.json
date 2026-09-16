@@ -1,0 +1,47 @@
+{
+  "id": "date.prototype.settime",
+  "category": "date_time",
+  "summary": "setTime mutates the Date: replace the time value with TimeClip(ToNumber(time)); it returns the resulting millisecond time value.",
+  "source": {
+    "pattern": "$date.setTime($time)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.setTime"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.setTime",
+    "template": "JsDate.setTime($date, ...)",
+    "notes": "Reuse canonical ToNumber helpers/runtime as required by argument static types; preserve mutation only after the specified conversions/calculations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "new [[DateValue]] after TimeClip, or NaN",
+    "coercion": "ToNumber supplied arguments in specification order",
+    "timezone": "none; directly sets time value",
+    "description": "replace the time value with TimeClip(ToNumber(time))",
+    "invalid_receiver_recovery": true
+  },
+  "caveats": [
+    "Explicit undefined is a supplied argument and ToNumber(undefined) is NaN; omitted optional arguments instead use current component defaults."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid mutation returns time value",
+      "input": "const d=new Date(NaN); console.log(d.setTime(1234),d.getTime());",
+      "expected_behavior": "prints 1234 1234"
+    },
+    {
+      "name": "semantic edge case",
+      "input": "const d=new Date(0); console.log(Number.isNaN(d.setTime(undefined)),Number.isNaN(d.getTime()));",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

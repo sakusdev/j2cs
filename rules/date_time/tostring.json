@@ -1,0 +1,45 @@
+{
+  "id": "date.prototype.tostring",
+  "category": "date_time",
+  "summary": "toString returns the ECMAScript local date + local time string; Invalid Date returns the literal \"Invalid Date\".",
+  "source": {
+    "pattern": "$date.toString()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.toString"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.toString",
+    "template": "JsDate.toString($date)",
+    "notes": "Use ECMAScript Date formatting rather than culture-sensitive default .NET formatting."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "format": "local date + local time string",
+    "invalid_date": "Invalid Date",
+    "return_type": "String",
+    "host_timezone_used": true
+  },
+  "caveats": [
+    "Local time-zone names/host conventions can be implementation-sensitive."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid returns string",
+      "input": "console.log(typeof new Date(0).toString());",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "invalid literal",
+      "input": "console.log(new Date(NaN).toString());",
+      "expected_behavior": "prints Invalid Date"
+    }
+  ]
+}

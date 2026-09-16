@@ -1,0 +1,43 @@
+{
+  "id": "date.now",
+  "category": "date_time",
+  "summary": "Date.now returns the current UTC time value in milliseconds as a Number.",
+  "source": {
+    "pattern": "Date.now()",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "property_lookup_resolves_builtin": "Date.now"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.Now",
+    "template": "JsDate.Now()",
+    "notes": "Use a host clock abstraction returning ECMAScript-compatible epoch milliseconds; this also enables deterministic testing."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Number",
+    "unit": "milliseconds since Unix epoch",
+    "timezone": "UTC instant",
+    "creates_date_object": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "number result",
+      "input": "console.log(typeof Date.now());",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "millisecond time value is integral",
+      "input": "console.log(Number.isInteger(Date.now()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

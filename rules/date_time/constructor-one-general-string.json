@@ -1,0 +1,45 @@
+{
+  "id": "date.constructor.one-general-string-runtime",
+  "category": "date_time",
+  "summary": "Constructing Date from an arbitrary runtime String requires Date.parse including implementation-defined non-standard parsing behavior.",
+  "source": {
+    "pattern": "new Date($string)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "argument_static_type": "String",
+      "string_not_proven_standard_format": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DateConstructString",
+    "template": "JsRuntime.DateConstructString($string)",
+    "notes": "A compatibility runtime must define which implementation-defined Date.parse extensions it emulates."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "parsing": "standard grammar first; otherwise implementation-defined permitted extensions",
+    "time_clip": true,
+    "result": "fresh Date"
+  },
+  "caveats": [
+    "Non-standard parsing differs across JavaScript engines and versions."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "standard string still works through general path",
+      "input": "console.log(new Date(\"1970-01-01T00:00:00Z\").getTime());",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "non-standard spelling is implementation-defined",
+      "input": "console.log(new Date(\"01/02/2003\").getTime());",
+      "expected_behavior": "behavior must match the selected JavaScript compatibility runtime/host policy; static .NET parsing must not be assumed equivalent"
+    }
+  ]
+}

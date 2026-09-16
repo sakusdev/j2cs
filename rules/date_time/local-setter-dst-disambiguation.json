@@ -1,0 +1,44 @@
+{
+  "id": "date.local-setter.dst-disambiguation",
+  "category": "date_time",
+  "summary": "Local Date construction/setter operations resolve DST gaps/overlaps with ECMAScript compatible disambiguation rather than arbitrary platform defaults.",
+  "source": {
+    "pattern": "[[UTC]]([[LocalDateTimeComponents]])",
+    "requirements": {
+      "semantic_operation": "Date local-time to UTC conversion",
+      "host_time_zone_rules_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.LocalTimeToUtcCompatible",
+    "template": "JsDate.LocalTimeToUtcCompatible($components)",
+    "notes": "This helper contract is shared by multi-argument construction and local setters."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "gap": "advance local time forward by the gap duration",
+    "overlap": "choose the earlier matching instant",
+    "time_zone": "host local"
+  },
+  "caveats": [
+    "Do not assume .NET TimeZoneInfo invalid/ambiguous-time default choices automatically match ECMAScript."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "spring-forward gap",
+      "input": "// under TZ=America/New_York: console.log(new Date(2024,2,10,2,30).getHours());",
+      "expected_behavior": "prints 3 because 02:30 is in the DST gap and is advanced by one hour"
+    },
+    {
+      "name": "fall-back overlap chooses earlier instant",
+      "input": "// under TZ=America/New_York: console.log(new Date(2024,10,3,1,30).getTimezoneOffset());",
+      "expected_behavior": "prints 240 (EDT), selecting the earlier occurrence rather than the later EST occurrence"
+    }
+  ]
+}

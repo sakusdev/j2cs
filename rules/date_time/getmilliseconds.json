@@ -1,0 +1,43 @@
+{
+  "id": "date.prototype.getmilliseconds",
+  "category": "date_time",
+  "summary": "getMilliseconds reads local milliseconds 0..999 after converting the Date time value through host local-time rules; Invalid Date returns NaN.",
+  "source": {
+    "pattern": "$date.getMilliseconds()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.getMilliseconds"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.getMilliseconds",
+    "template": "JsDate.getMilliseconds($date)",
+    "notes": "LocalTime conversion must use the host time-zone rules applicable to that instant, including historical/DST transitions."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "invalid_date": "NaN",
+    "timezone": "host local",
+    "operation": "msFromTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid local component",
+      "input": "const d=new Date(2024,0,15,13,4,5,678); console.log(d.getMilliseconds());",
+      "expected_behavior": "prints 678"
+    },
+    {
+      "name": "invalid Date returns NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).getMilliseconds()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

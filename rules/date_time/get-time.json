@@ -1,0 +1,45 @@
+{
+  "id": "date.prototype.gettime",
+  "category": "date_time",
+  "summary": "getTime returns the Date internal [[DateValue]] exactly (finite millisecond value or NaN).",
+  "source": {
+    "pattern": "$date.getTime()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.getTime",
+      "canonical_jsdate_representation": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$date.TimeValue",
+    "notes": "Safe only when semantic analysis has already resolved the property lookup to the intrinsic getTime and the internal Date representation stores the ECMAScript time value directly."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "return": "internal [[DateValue]]",
+    "invalid_date": "NaN"
+  },
+  "caveats": [
+    "Calling Date.prototype.getTime with a non-Date receiver throws TypeError; the native rule requires the Date internal slot."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "epoch value",
+      "input": "console.log(new Date(1234).getTime());",
+      "expected_csharp": "double t = date.TimeValue;",
+      "expected_behavior": "prints 1234"
+    },
+    {
+      "name": "invalid Date is NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).getTime()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

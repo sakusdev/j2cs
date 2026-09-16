@@ -1,0 +1,47 @@
+{
+  "id": "date.prototype.symbol-to-primitive-runtime",
+  "category": "date_time",
+  "summary": "Date.prototype[Symbol.toPrimitive] treats the default hint like string (unlike ordinary objects), then performs ordinary primitive conversion with observable valueOf/toString lookup and calls.",
+  "source": {
+    "pattern": "$date[Symbol.toPrimitive]($hint)",
+    "requirements": {
+      "property_lookup_resolves_builtin": "Date.prototype[Symbol.toPrimitive]",
+      "receiver_is_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DateToPrimitive",
+    "template": "JsRuntime.DateToPrimitive($date, $hint)",
+    "notes": "For hint \"string\" or \"default\", use OrdinaryToPrimitive with string hint (toString before valueOf). For hint \"number\", use number hint (valueOf before toString). Any other hint throws TypeError. Reuse canonical dynamic property lookup/call semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default_hint": "treated as string",
+    "string_hint": "toString then valueOf",
+    "number_hint": "valueOf then toString",
+    "invalid_hint": "TypeError",
+    "can_execute_user_code": true
+  },
+  "caveats": [
+    "This Date-specific default-hint behavior is why generic ordinary-object ToPrimitive lowering is insufficient for Date objects.",
+    "Overridden toString/valueOf properties and accessors are observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date.prototype-@@toprimitive",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Symbol.toPrimitive"
+  ],
+  "tests": [
+    {
+      "name": "default hint prefers string conversion",
+      "input": "const d=new Date(0); console.log(typeof d[Symbol.toPrimitive](\"default\"));",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "number hint uses numeric valueOf first",
+      "input": "const d=new Date(0); d.toString=()=>{throw new Error(\"should not run\")}; console.log(d[Symbol.toPrimitive](\"number\"));",
+      "expected_behavior": "prints 0 without calling the overridden toString"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "date.prototype.toutcstring",
+  "category": "date_time",
+  "summary": "toUTCString returns the ECMAScript UTC RFC-style date string; Invalid Date returns the literal \"Invalid Date\".",
+  "source": {
+    "pattern": "$date.toUTCString()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.toUTCString"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.toUTCString",
+    "template": "JsDate.toUTCString($date)",
+    "notes": "Use ECMAScript Date formatting rather than culture-sensitive default .NET formatting."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "format": "UTC RFC-style date string",
+    "invalid_date": "Invalid Date",
+    "return_type": "String",
+    "host_timezone_used": false
+  },
+  "caveats": [
+    "Formatting must remain culture-invariant for this API."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid returns string",
+      "input": "console.log(typeof new Date(0).toUTCString());",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "invalid literal",
+      "input": "console.log(new Date(NaN).toUTCString());",
+      "expected_behavior": "prints Invalid Date"
+    }
+  ]
+}
