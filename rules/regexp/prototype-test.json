@@ -1,0 +1,45 @@
+{
+  "id": "regexp.prototype.test",
+  "category": "regexp",
+  "summary": "Implement RegExp.prototype.test via RegExpExec rather than a stateless boolean .NET match.",
+  "source": {
+    "pattern": "$regexp.test($input)",
+    "requirements": {
+      "receiver_inferred_as": "ECMAScript RegExp or runtime RegExp value",
+      "builtin_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpTest",
+    "template": "JsRuntime.RegExpTest($regexp, $input)",
+    "notes": "test ToString-coerces input, calls the RegExpExec abstract operation (thus observing overridden exec), returns match !== null, and preserves exec/lastIndex side effects."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "dispatch": "RegExpExec",
+    "lastIndex_side_effects": "same as selected exec implementation"
+  },
+  "caveats": [
+    "Global/sticky test calls mutate lastIndex.",
+    "Overridden exec may return any object to mean success."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object",
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "global test advances",
+      "input": "const r=/a/g; console.log(r.test('a'),r.lastIndex);",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "second failed test resets",
+      "input": "const r=/a/g; r.test('a'); console.log(r.test('a'),r.lastIndex);",
+      "expected_behavior": "prints false 0"
+    }
+  ]
+}

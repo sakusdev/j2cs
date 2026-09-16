@@ -1,0 +1,41 @@
+{
+  "id": "regexp.constructor.subclass",
+  "category": "regexp",
+  "summary": "Preserve RegExp subclass construction and initialized RegExp internal slots.",
+  "source": {
+    "pattern": "new $RegExpSubclass($pattern, $flags)",
+    "requirements": {
+      "constructor_proven_subclass_of_builtin_RegExp": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpConstruct",
+    "template": "JsRuntime.RegExpConstruct($RegExpSubclass, $pattern, $flags)",
+    "notes": "A subclass that calls super creates an instance with subclass prototype plus RegExp internal slots; System.Text.RegularExpressions.Regex inheritance is not an equivalent model."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "newTarget_prototype_used": true,
+    "regexp_internal_slots_initialized": true
+  },
+  "caveats": [
+    "Custom subclass constructors and overridden properties remain observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor"
+  ],
+  "tests": [
+    {
+      "name": "subclass instance is regexp",
+      "input": "class R extends RegExp{} const r=new R('a','g'); console.log(r instanceof R,r instanceof RegExp,r.flags);",
+      "expected_behavior": "prints true true g"
+    },
+    {
+      "name": "subclass retains lastIndex behavior",
+      "input": "class R extends RegExp{} const r=new R('a','g'); r.test('a'); console.log(r.lastIndex);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

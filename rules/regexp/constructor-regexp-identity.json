@@ -1,0 +1,44 @@
+{
+  "id": "regexp.constructor.regexp-identity",
+  "category": "regexp",
+  "summary": "Preserve the special RegExp(re) identity result when called as a function with a matching constructor and no flags.",
+  "source": {
+    "pattern": "RegExp($regexp)",
+    "requirements": {
+      "callee_is_builtin_RegExp": true,
+      "called_without_new": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCall",
+    "template": "JsRuntime.RegExpCall($regexp, JsUndefined.Value)",
+    "notes": "Function-call RegExp may return the argument itself; new RegExp(re) never uses this identity shortcut."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity_if": "IsRegExp(argument) && flags is undefined && argument.constructor === active RegExp",
+    "constructor_property_get_is_observable": true
+  },
+  "caveats": [
+    "An own/inherited constructor override disables the identity shortcut.",
+    "IsRegExp is affected by Symbol.match."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor",
+    "https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isregexp"
+  ],
+  "tests": [
+    {
+      "name": "returns same regexp",
+      "input": "const r=/a/g; console.log(RegExp(r)===r);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "constructor override disables identity",
+      "input": "const r=/a/g; r.constructor=function X(){}; console.log(RegExp(r)===r, RegExp(r).source);",
+      "expected_behavior": "prints false a"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "regexp.matching.multiline",
+  "category": "regexp",
+  "summary": "Preserve ECMAScript multiline anchor semantics for the m flag.",
+  "source": {
+    "pattern": "/$pattern/m",
+    "requirements": {
+      "flags_include": "m"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpLiteral",
+    "template": "JsRuntime.RegExpLiteral($pattern, \"m\")",
+    "notes": "With m, ^ and $ recognize ECMAScript line terminator boundaries; this must not inherit .NET anchor/newline differences."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "anchors": "^ and $ also match around ECMAScript line terminators"
+  },
+  "caveats": [
+    "ECMAScript line terminator set and end-anchor behavior differ from some .NET regex modes."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-regular-expression-objects"
+  ],
+  "tests": [
+    {
+      "name": "start after newline",
+      "input": "console.log(/^b/m.test('a\\nb'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "without m no inner-line start",
+      "input": "console.log(/^b/.test('a\\nb'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

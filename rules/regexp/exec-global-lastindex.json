@@ -1,0 +1,44 @@
+{
+  "id": "regexp.exec.global-lastindex",
+  "category": "regexp",
+  "summary": "Use and update lastIndex for global RegExp execution.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include": "g",
+      "receiver_flags_exclude": "y",
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "With g, search begins at ToLength(lastIndex), may scan forward, and successful execution sets lastIndex to the UTF-16 end index."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "start": "ToLength(lastIndex)",
+    "can_scan_forward": true,
+    "success_write": "end UTF-16 code-unit index"
+  },
+  "caveats": [
+    "lastIndex is state carried across different input strings until reset or overwritten."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "global uses current index",
+      "input": "const r=/a/g; r.lastIndex=1; const m=r.exec('baac'); console.log(m.index,r.lastIndex);",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "global scans after start",
+      "input": "const r=/a/g; r.lastIndex=1; const m=r.exec('bba'); console.log(m.index,r.lastIndex);",
+      "expected_behavior": "prints 2 3"
+    }
+  ]
+}

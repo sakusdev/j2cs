@@ -1,0 +1,46 @@
+{
+  "id": "regexp.prototype.to-string",
+  "category": "regexp",
+  "summary": "Implement RegExp.prototype.toString using dynamic source and flags property reads.",
+  "source": {
+    "pattern": "RegExp.prototype.toString.call($object)",
+    "requirements": {
+      "builtin_RegExp_prototype_toString": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpToString",
+    "template": "JsRuntime.RegExpToString($object)",
+    "notes": "The method is intentionally generic for Objects: Get source, ToString it, then Get flags, ToString it, and concatenate /source/flags."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver_must_be_object": true,
+    "dynamic_get_order": [
+      "source",
+      "flags"
+    ],
+    "format": "/source/flags"
+  },
+  "caveats": [
+    "It does not require RegExp internal slots if the object supplies source and flags properties.",
+    "Property getters may have side effects or throw."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "normal regexp",
+      "input": "console.log(/a+/gi.toString());",
+      "expected_behavior": "prints /a+/gi"
+    },
+    {
+      "name": "generic object",
+      "input": "console.log(RegExp.prototype.toString.call({source:'x',flags:'g'}));",
+      "expected_behavior": "prints /x/g"
+    }
+  ]
+}

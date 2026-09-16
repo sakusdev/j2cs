@@ -1,0 +1,43 @@
+{
+  "id": "regexp.exec.sticky-lastindex",
+  "category": "regexp",
+  "summary": "Require a sticky RegExp match to start exactly at lastIndex.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include": "y",
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "With y, matching is anchored at ToLength(lastIndex); it never scans to a later position. g does not relax stickiness when both flags are present."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "start": "ToLength(lastIndex)",
+    "must_match_at_start": true,
+    "g_plus_y": "sticky behavior"
+  },
+  "caveats": [
+    "Failure resets lastIndex to 0."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "sticky success at exact index",
+      "input": "const r=/a/y; r.lastIndex=1; const m=r.exec('ba'); console.log(m.index,r.lastIndex);",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "sticky does not scan",
+      "input": "const r=/a/y; r.lastIndex=0; console.log(r.exec('ba'),r.lastIndex);",
+      "expected_behavior": "prints null 0"
+    }
+  ]
+}

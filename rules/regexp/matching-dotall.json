@@ -1,0 +1,41 @@
+{
+  "id": "regexp.matching.dotall",
+  "category": "regexp",
+  "summary": "Preserve ECMAScript dotAll behavior for the s flag.",
+  "source": {
+    "pattern": "/$pattern/s",
+    "requirements": {
+      "flags_include": "s"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpLiteral",
+    "template": "JsRuntime.RegExpLiteral($pattern, \"s\")",
+    "notes": "With s, dot matches ECMAScript line terminators as well; without u it still consumes UTF-16 code units rather than necessarily whole code points."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "dot_matches_line_terminators": true,
+    "unicode_interaction": "u/v controls code point handling"
+  },
+  "caveats": [
+    "RegexOptions.Singleline is not sufficient to prove full pattern equivalence."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-regular-expression-objects"
+  ],
+  "tests": [
+    {
+      "name": "dot matches newline with s",
+      "input": "console.log(/a.b/s.test('a\\nb'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "dot does not match newline without s",
+      "input": "console.log(/a.b/.test('a\\nb'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

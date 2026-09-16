@@ -1,0 +1,44 @@
+{
+  "id": "regexp.symbol.match",
+  "category": "regexp",
+  "summary": "Implement the RegExp-side Symbol.match protocol method used by String.prototype.match.",
+  "source": {
+    "pattern": "$regexp[Symbol.match]($string)",
+    "requirements": {
+      "builtin_RegExp_Symbol_match": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpSymbolMatch",
+    "template": "JsRuntime.RegExpSymbolMatch($regexp, $string)",
+    "notes": "Non-global matching performs one RegExpExec. Global matching resets lastIndex, repeatedly calls RegExpExec, collects matched strings, and explicitly advances after empty matches using Unicode-aware AdvanceStringIndex."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "non_global": "single RegExpExec result",
+    "global": "array of full-match strings or null",
+    "global_resets_lastIndex": true,
+    "zero_length_progress": "AdvanceStringIndex"
+  },
+  "caveats": [
+    "This is the RegExp protocol implementation; String.prototype.match remains owned by the STRING workstream.",
+    "Overridden exec is observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "global returns full matches",
+      "input": "console.log(JSON.stringify(/a/g[Symbol.match]('aba')));",
+      "expected_behavior": "prints [\"a\",\"a\"]"
+    },
+    {
+      "name": "empty global progresses",
+      "input": "console.log(/(?:)/g[Symbol.match]('a').length);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "regexp.exec.lastindex-nonwritable-write",
+  "category": "regexp",
+  "summary": "Throw when global/sticky builtin execution must update a non-writable lastIndex property.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include_any": [
+        "g",
+        "y"
+      ],
+      "lastIndex_descriptor_may_be_nonwritable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "RegExpBuiltinExec uses Set(regexp, \"lastIndex\", value, true), so required success/failure writes throw TypeError if lastIndex was made non-writable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "required_write_throws_on_failure": "TypeError",
+    "required_write_throws_on_success": "TypeError"
+  },
+  "caveats": [
+    "lastIndex is non-configurable but writable can be changed from true to false with defineProperty."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "success write throws",
+      "input": "const r=/a/g; Object.defineProperty(r,'lastIndex',{writable:false}); try{r.exec('a')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "failure reset throws",
+      "input": "const r=/x/g; Object.defineProperty(r,'lastIndex',{value:1,writable:false}); try{r.exec('a')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

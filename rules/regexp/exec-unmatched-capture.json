@@ -1,0 +1,42 @@
+{
+  "id": "regexp.exec.unmatched-capture-undefined",
+  "category": "regexp",
+  "summary": "Represent nonparticipating capturing groups as JavaScript undefined.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "pattern_contains_capturing_group": true,
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "Each capture slot exists in the result array; a group that did not participate has value undefined rather than empty string or null."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "nonparticipating_capture": "undefined",
+    "result_length_includes_capture": true
+  },
+  "caveats": [
+    "Do not map .NET Group.Success=false to an empty string if JS-visible value is required."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "optional capture unmatched",
+      "input": "const m=/(a)?b/.exec('b'); console.log(m.length,m[1]===undefined);",
+      "expected_behavior": "prints 2 true"
+    },
+    {
+      "name": "empty participating capture differs",
+      "input": "const m=/(a*)b/.exec('b'); console.log(m[1]===undefined,JSON.stringify(m[1]));",
+      "expected_behavior": "prints false \"\""
+    }
+  ]
+}

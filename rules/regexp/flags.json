@@ -1,0 +1,52 @@
+{
+  "id": "regexp.prototype.flags",
+  "category": "regexp",
+  "summary": "Build RegExp.prototype.flags in canonical d g i m s u v y order using observable property gets.",
+  "source": {
+    "pattern": "$regexp.flags",
+    "requirements": {
+      "property_resolution": "builtin RegExp.prototype.flags getter",
+      "receiver_may_be_generic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpFlags",
+    "template": "JsRuntime.RegExpFlags($regexp)",
+    "notes": "The builtin flags getter is generic over Objects: it reads hasIndices, global, ignoreCase, multiline, dotAll, unicode, unicodeSets, sticky in order, ToBoolean-coerces each, and concatenates canonical letters."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "get_order": [
+      "hasIndices",
+      "global",
+      "ignoreCase",
+      "multiline",
+      "dotAll",
+      "unicode",
+      "unicodeSets",
+      "sticky"
+    ],
+    "canonical_order": "dgimsuvy",
+    "coercion": "ToBoolean"
+  },
+  "caveats": [
+    "Because each property get is observable, a simple stored-flags read is safe only after proving a genuine unmodified RegExp receiver and no overrides."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "canonical order",
+      "input": "console.log(new RegExp('a','ymisgd').flags);",
+      "expected_behavior": "prints dgimsy"
+    },
+    {
+      "name": "generic getter uses boolean properties",
+      "input": "const get=Object.getOwnPropertyDescriptor(RegExp.prototype,'flags').get; console.log(get.call({hasIndices:true,global:true,ignoreCase:true,multiline:true,dotAll:true,unicode:false,unicodeSets:true,sticky:true}));",
+      "expected_behavior": "prints dgimsvy"
+    }
+  ]
+}

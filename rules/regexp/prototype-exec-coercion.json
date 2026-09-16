@@ -1,0 +1,42 @@
+{
+  "id": "regexp.prototype.exec-input-coercion",
+  "category": "regexp",
+  "summary": "Apply JavaScript ToString to RegExp.prototype.exec input before matching.",
+  "source": {
+    "pattern": "$regexp.exec($value)",
+    "requirements": {
+      "receiver_inferred_as": "ECMAScript RegExp or runtime RegExp value",
+      "builtin_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $value)",
+    "notes": "Omitted/undefined input becomes the string \"undefined\"; object conversion can run user code or throw."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "input": "ToString before matching",
+    "undefined_input": "\"undefined\""
+  },
+  "caveats": [
+    "ToString(Symbol) throws TypeError."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "undefined becomes text",
+      "input": "console.log(/undefined/.exec(undefined)[0]);",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "object toString is observable",
+      "input": "let n=0; const x={toString(){n++;return 'abc'}}; /b/.exec(x); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

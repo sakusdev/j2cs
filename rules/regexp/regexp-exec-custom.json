@@ -1,0 +1,43 @@
+{
+  "id": "regexp.abstract.regexp-exec-custom-dispatch",
+  "category": "regexp",
+  "summary": "Use a callable overridden exec property in RegExpExec-based operations such as test and Symbol hooks.",
+  "source": {
+    "pattern": "RegExpExec($regexp, $string)",
+    "requirements": {
+      "operation_uses_RegExpExec_abstract_operation": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExec",
+    "template": "JsRuntime.RegExpExec($regexp, $string)",
+    "notes": "The RegExpExec abstract operation dynamically gets regexp.exec, calls it with the regexp as this, and requires an Object or null result."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "dynamic_exec_get": true,
+    "this_value": "regexp",
+    "valid_return": "Object or null",
+    "invalid_return_throws": "TypeError"
+  },
+  "caveats": [
+    "Direct invocation of the intrinsic RegExp.prototype.exec is different: it requires RegExp internal slots and goes straight to RegExpBuiltinExec."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "test observes overridden exec",
+      "input": "const r=/a/; r.exec=function(s){ console.log('custom',s); return {}; }; console.log(r.test('x'));",
+      "expected_behavior": "prints custom x then true"
+    },
+    {
+      "name": "primitive custom result throws",
+      "input": "const r=/a/; r.exec=()=>1; try{r.test('a')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

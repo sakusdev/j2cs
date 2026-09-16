@@ -1,0 +1,45 @@
+{
+  "id": "regexp.prototype.unicode",
+  "category": "regexp",
+  "summary": "Read the builtin RegExp unicode accessor from stored ECMAScript flags.",
+  "source": {
+    "pattern": "$regexp.unicode",
+    "requirements": {
+      "receiver_inferred_as": "builtin RegExp instance",
+      "property_resolution": "builtin accessor proven unshadowed",
+      "prototype_not_mutated": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRegExp.GetUnicode",
+    "template": "JsRegExp.GetUnicode($regexp)",
+    "notes": "When property resolution is proven to the builtin accessor, return whether the original flag set contains u; the setter is undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "flag": "u",
+    "return": "boolean",
+    "setter": "undefined",
+    "brand_check": "RegExp internal OriginalFlags, except RegExp.prototype yields undefined when getter called directly"
+  },
+  "caveats": [
+    "Own properties or prototype mutation can shadow/replace the builtin accessor; then generic property semantics are required."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "unicode true",
+      "input": "console.log(/a/u.unicode);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "prototype getter special case",
+      "input": "const g=Object.getOwnPropertyDescriptor(RegExp.prototype,'unicode').get; console.log(g.call(RegExp.prototype));",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

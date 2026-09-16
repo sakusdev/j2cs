@@ -1,0 +1,43 @@
+{
+  "id": "regexp.symbol.search",
+  "category": "regexp",
+  "summary": "Implement the RegExp-side Symbol.search protocol while restoring observable lastIndex.",
+  "source": {
+    "pattern": "$regexp[Symbol.search]($string)",
+    "requirements": {
+      "builtin_RegExp_Symbol_search": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpSymbolSearch",
+    "template": "JsRuntime.RegExpSymbolSearch($regexp, $string)",
+    "notes": "The builtin search hook saves lastIndex, forces it to 0 when needed, performs RegExpExec, then restores the prior lastIndex if changed; it returns match.index or -1."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "first match index or -1",
+    "lastIndex": "save/temporarily zero/restore with SameValue checks",
+    "exec_dispatch": "RegExpExec"
+  },
+  "caveats": [
+    "Get/Set of lastIndex and overridden exec are observable and can throw.",
+    "String.prototype.search dispatch remains in STRING workstream."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "restores lastIndex",
+      "input": "const r=/a/g; r.lastIndex=2; console.log(r[Symbol.search]('ba'),r.lastIndex);",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "no match returns minus one",
+      "input": "console.log(/x/[Symbol.search]('abc'));",
+      "expected_behavior": "prints -1"
+    }
+  ]
+}

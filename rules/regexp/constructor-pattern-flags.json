@@ -1,0 +1,43 @@
+{
+  "id": "regexp.constructor.pattern-flags",
+  "category": "regexp",
+  "summary": "Create an ECMAScript RegExp from a pattern and flags without translating the pattern to .NET regex syntax.",
+  "source": {
+    "pattern": "new RegExp($pattern, $flags)",
+    "requirements": {
+      "builtin_RegExp_constructor": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate($pattern, $flags)",
+    "notes": "The runtime must parse ECMAScript RegExp grammar, validate flags, preserve original source/flags, and create mutable lastIndex state."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coerces_pattern_to_string": true,
+    "coerces_flags_to_string": true,
+    "lastIndex_initial": 0
+  },
+  "caveats": [
+    "ECMAScript escapes, Unicode modes, character classes, backreferences, lookarounds, and case folding differ from .NET.",
+    "Flags are d,g,i,m,s,u,v,y; duplicates and invalid combinations throw SyntaxError."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor"
+  ],
+  "tests": [
+    {
+      "name": "pattern and flags",
+      "input": "const r=new RegExp('a+','gi'); console.log(r.source,r.flags,r.test('A'));",
+      "expected_behavior": "prints a+ gi true"
+    },
+    {
+      "name": "flags are canonical through accessor",
+      "input": "const r=new RegExp('a','mig'); console.log(r.flags);",
+      "expected_behavior": "prints gim"
+    }
+  ]
+}

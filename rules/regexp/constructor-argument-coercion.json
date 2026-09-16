@@ -1,0 +1,44 @@
+{
+  "id": "regexp.constructor.argument-coercion",
+  "category": "regexp",
+  "summary": "Preserve RegExp constructor pattern/flag coercion and observable coercion order.",
+  "source": {
+    "pattern": "new RegExp($pattern, $flags)",
+    "requirements": {
+      "arguments_may_be_non_string": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate($pattern, $flags)",
+    "notes": "After IsRegExp classification, RegExpInitialize performs ToString(pattern) before ToString(flags); getters/toString hooks may run or throw."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "pattern_coercion": "ToString unless undefined",
+    "flags_coercion": "ToString unless undefined",
+    "observable_order": "pattern before flags during initialization"
+  },
+  "caveats": [
+    "IsRegExp itself may read Symbol.match before string coercion.",
+    "Symbols throw during ToString."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor",
+    "https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isregexp"
+  ],
+  "tests": [
+    {
+      "name": "coercion order",
+      "input": "const log=[]; const p={toString(){log.push('p');return 'a'}}; const f={toString(){log.push('f');return 'g'}}; new RegExp(p,f); console.log(log.join(','));",
+      "expected_behavior": "prints p,f"
+    },
+    {
+      "name": "symbol pattern throws",
+      "input": "try{ new RegExp(Symbol('x')); }catch(e){ console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

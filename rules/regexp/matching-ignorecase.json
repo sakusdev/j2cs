@@ -1,0 +1,42 @@
+{
+  "id": "regexp.matching.ignore-case",
+  "category": "regexp",
+  "summary": "Use ECMAScript ignoreCase canonicalization rather than .NET RegexOptions.IgnoreCase.",
+  "source": {
+    "pattern": "/$pattern/i",
+    "requirements": {
+      "flags_include": "i"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpLiteral",
+    "template": "JsRuntime.RegExpLiteral($pattern, \"i\")",
+    "notes": "ECMAScript i matching uses specification-defined canonicalization whose behavior depends on Unicode mode; host-culture .NET case comparison is not equivalent."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "case_folding": "ECMAScript RegExp Canonicalize",
+    "unicode_mode_affects_folding": true,
+    "culture": "not host-culture dependent"
+  },
+  "caveats": [
+    "Case-folding edge cases differ across engines/options; do not assume RegexOptions.IgnoreCase preserves JS."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-regular-expression-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic ASCII fold",
+      "input": "console.log(/a/i.test('A'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "unicode Kelvin sign fold under u",
+      "input": "console.log(/k/iu.test('K'),/k/i.test('K'));",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

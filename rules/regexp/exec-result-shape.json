@@ -1,0 +1,49 @@
+{
+  "id": "regexp.exec.result-shape",
+  "category": "regexp",
+  "summary": "Create the ECMAScript exec match Array and its index, input, groups, and optional indices properties.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "builtin_exec_selected": true,
+      "result_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "Successful builtin exec returns a true JS Array containing full match plus captures, with enumerable data properties index/input/groups and optional indices."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "array": true,
+    "element0": "full match",
+    "captures": "subsequent elements",
+    "extra_properties": [
+      "index",
+      "input",
+      "groups"
+    ],
+    "optional_property": "indices with d flag"
+  },
+  "caveats": [
+    "System.Text.RegularExpressions.Match/GroupCollection has a different object model and cannot be exposed directly."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "array and extra fields",
+      "input": "const m=/(a)/.exec('ba'); console.log(Array.isArray(m),m[0],m[1],m.index,m.input,m.groups);",
+      "expected_behavior": "prints true a a 1 ba undefined"
+    },
+    {
+      "name": "extra fields are own enumerable properties",
+      "input": "const m=/a/.exec('a'); console.log(Object.keys(m).slice(-3).join(','));",
+      "expected_behavior": "prints index,input,groups"
+    }
+  ]
+}

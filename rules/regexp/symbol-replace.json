@@ -1,0 +1,43 @@
+{
+  "id": "regexp.symbol.replace",
+  "category": "regexp",
+  "summary": "Implement the RegExp-side Symbol.replace protocol including captures, replacement tokens, functional replacers, global iteration, and lastIndex behavior.",
+  "source": {
+    "pattern": "$regexp[Symbol.replace]($string, $replacement)",
+    "requirements": {
+      "builtin_RegExp_Symbol_replace": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpSymbolReplace",
+    "template": "JsRuntime.RegExpSymbolReplace($regexp, $string, $replacement)",
+    "notes": "The builtin hook repeatedly uses RegExpExec when global, performs Unicode-aware empty-match advancement, and applies ECMAScript GetSubstitution or callable replacement semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "replacement": "string substitution tokens or callable",
+    "captures_and_named_groups": true,
+    "global_iteration": true
+  },
+  "caveats": [
+    "String.prototype.replace owns initial Symbol.replace dispatch; this rule owns the builtin RegExp hook implementation.",
+    ".NET Regex.Replace replacement-token grammar is not equivalent to JavaScript."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "direct global replace hook",
+      "input": "console.log(/a/g[Symbol.replace]('aba','x'));",
+      "expected_behavior": "prints xbx"
+    },
+    {
+      "name": "functional replacement gets captures",
+      "input": "console.log(/(a)/[Symbol.replace]('ba',(m,c,idx)=>c+idx));",
+      "expected_behavior": "prints ba1"
+    }
+  ]
+}

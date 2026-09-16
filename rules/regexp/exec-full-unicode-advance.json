@@ -1,0 +1,44 @@
+{
+  "id": "regexp.exec.full-unicode-search-advance",
+  "category": "regexp",
+  "summary": "Advance failed global searches by code point in u/v mode but by UTF-16 code unit otherwise.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include": "g",
+      "builtin_exec_selected": true,
+      "input_may_contain_surrogate_pairs": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "When scanning for a global match after failure, AdvanceStringIndex uses code-point advancement under u/v and code-unit advancement otherwise; externally reported indices remain UTF-16 code-unit indices."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "u_or_v": "advance by code point on scan",
+    "legacy": "advance by code unit",
+    "reported_index": "UTF-16 code units"
+  },
+  "caveats": [
+    "This affects whether matching can begin inside a surrogate pair."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "legacy can match low surrogate",
+      "input": "const s='😀'; const r=/\\uDE00/g; console.log(r.exec(s).index);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "unicode mode treats surrogate pair as code point",
+      "input": "const s='😀'; const r=/./gu; const m=r.exec(s); console.log(m[0],r.lastIndex);",
+      "expected_behavior": "prints 😀 2"
+    }
+  ]
+}

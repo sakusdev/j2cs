@@ -1,0 +1,43 @@
+{
+  "id": "regexp.exec.named-groups",
+  "category": "regexp",
+  "summary": "Populate exec result.groups with ECMAScript named-capture semantics and a null prototype.",
+  "source": {
+    "pattern": "$regexp.exec($input).groups",
+    "requirements": {
+      "pattern_may_contain_named_captures": true,
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "If named groups exist, groups is an ordinary null-prototype object containing a property for each group name; unmatched named captures are undefined. Without named groups, groups is undefined."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "groups_prototype": "null",
+    "no_named_groups": "undefined",
+    "unmatched_named_capture": "undefined"
+  },
+  "caveats": [
+    "Dictionary<string,string> does not preserve JS undefined values or object/prototype/reflection semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "named group object",
+      "input": "const m=/(?<x>a)/.exec('a'); console.log(m.groups.x,Object.getPrototypeOf(m.groups)===null);",
+      "expected_behavior": "prints a true"
+    },
+    {
+      "name": "no named groups",
+      "input": "console.log(/(a)/.exec('a').groups===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "regexp.constructor.flags-validation",
+  "category": "regexp",
+  "summary": "Validate ECMAScript RegExp flags exactly, including duplicates and the mutually exclusive u/v modes.",
+  "source": {
+    "pattern": "new RegExp($pattern, $flags)",
+    "requirements": {
+      "flags_not_compile_time_proven_valid": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate($pattern, $flags)",
+    "notes": "Validation occurs at runtime for dynamic flags and throws SyntaxError for unknown/duplicate flags or simultaneous u and v."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "valid_flags": [
+      "d",
+      "g",
+      "i",
+      "m",
+      "s",
+      "u",
+      "v",
+      "y"
+    ],
+    "duplicates_throw": "SyntaxError",
+    "u_and_v_together": "SyntaxError"
+  },
+  "caveats": [
+    "Do not map unknown flags to ignored .NET options.",
+    "A regexp literal with invalid flags is a parse-time syntax error; this rule is for constructor evaluation."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor"
+  ],
+  "tests": [
+    {
+      "name": "duplicate flag throws",
+      "input": "try{ new RegExp('a','gg'); }catch(e){ console.log(e.name); }",
+      "expected_behavior": "prints SyntaxError"
+    },
+    {
+      "name": "u and v together throw",
+      "input": "try{ new RegExp('a','uv'); }catch(e){ console.log(e.name); }",
+      "expected_behavior": "prints SyntaxError"
+    }
+  ]
+}

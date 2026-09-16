@@ -1,0 +1,43 @@
+{
+  "id": "regexp.constructor.empty",
+  "category": "regexp",
+  "summary": "Construct the empty ECMAScript regular expression when RegExp receives no pattern.",
+  "source": {
+    "pattern": "new RegExp()",
+    "requirements": {
+      "builtin_RegExp_constructor": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate(JsUndefined.Value, JsUndefined.Value)",
+    "notes": "undefined pattern and flags become empty strings; the observable source getter for an empty pattern is (?:)."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "pattern_default": "",
+    "flags_default": "",
+    "lastIndex_initial": 0,
+    "source_observable": "(?:)"
+  },
+  "caveats": [
+    "An empty original source is rendered by the source accessor as (?:), not an empty string."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor"
+  ],
+  "tests": [
+    {
+      "name": "empty constructor",
+      "input": "const r=new RegExp(); console.log(r.source,r.flags,r.lastIndex,r.test(''));",
+      "expected_behavior": "prints (?:), empty flags, 0, and true"
+    },
+    {
+      "name": "undefined is empty pattern",
+      "input": "console.log(new RegExp(undefined).source === '(?:)');",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
