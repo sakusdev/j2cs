@@ -1,0 +1,42 @@
+{
+  "id": "string.raw",
+  "category": "string",
+  "summary": "Preserve generic String.raw behavior including property access and coercion.",
+  "source": {
+    "pattern": "String.raw($template, $substitutions...)",
+    "requirements": {
+      "callee_resolved_as": "builtin String.raw"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.StringRaw",
+    "template": "JsRuntime.StringRaw($args)",
+    "notes": "General String.raw performs observable property access on template.raw and its length/items plus ToString coercions; getters, proxies, and user code can run."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "property_access": "Get(template, \"raw\"), length and indexed elements are observable",
+    "coercion": "raw segments and substitutions are ToString-converted left-to-right",
+    "return_value": "primitive string"
+  },
+  "caveats": [
+    "A compiler may add a separate native/helper fast path for syntactic tagged templates whose raw segments are compile-time constants."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "tagged template common case",
+      "input": "console.log(String.raw`a\\nb`);",
+      "expected_behavior": "prints the two characters backslash+n between a and b"
+    },
+    {
+      "name": "custom raw object",
+      "input": "console.log(String.raw({raw:[\"a\",\"b\"]}, 1));",
+      "expected_behavior": "prints a1b"
+    }
+  ]
+}

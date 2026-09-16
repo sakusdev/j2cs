@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.slice",
+  "category": "string",
+  "summary": "Slice by JavaScript UTF-16 indices including negative bounds.",
+  "source": {
+    "pattern": "$string.slice($start, $end)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Slice",
+    "template": "JsString.Slice($string, $start, $end)",
+    "notes": "Apply ToIntegerOrInfinity; negative indices are relative to UTF-16 length and both bounds are clamped. If end <= start, return empty string."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "indices": "ToIntegerOrInfinity then negative-relative/clamped",
+    "encoding": "UTF-16 code units",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "negative start",
+      "input": "console.log(\"abcd\".slice(-2));",
+      "expected_csharp": "Console.WriteLine(JsString.Slice(\"abcd\", -2d, JsUndefined.Value));",
+      "expected_behavior": "prints cd"
+    },
+    {
+      "name": "reversed is empty",
+      "input": "console.log(\"abcd\".slice(3,1) === \"\");",
+      "expected_csharp": "Console.WriteLine(JsString.Slice(\"abcd\", 3d, 1d) == \"\");",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

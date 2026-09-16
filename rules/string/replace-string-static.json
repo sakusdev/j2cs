@@ -1,0 +1,50 @@
+{
+  "id": "string.prototype.replace.string-static",
+  "category": "string",
+  "summary": "Replace the first string match with JavaScript replacement-template semantics.",
+  "source": {
+    "pattern": "$string.replace($searchString, $replacementString)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "search_inferred_as": "primitive string",
+      "replacement_inferred_as": "primitive string"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ReplaceFirst",
+    "template": "JsString.ReplaceFirst($string, $searchString, $replacementString)",
+    "notes": "Replace only the first string occurrence and implement GetSubstitution tokens ($$, $&, $`, $'). System.String.Replace replaces all and treats replacement literally."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "search": "first ordinal UTF-16 occurrence",
+    "replacement_tokens": [
+      "$$",
+      "$&",
+      "$`",
+      "$'"
+    ],
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "only first occurrence",
+      "input": "console.log(\"aba\".replace(\"a\", \"x\"));",
+      "expected_csharp": "Console.WriteLine(JsString.ReplaceFirst(\"aba\", \"a\", \"x\"));",
+      "expected_behavior": "prints xba"
+    },
+    {
+      "name": "replacement token",
+      "input": "console.log(\"abc\".replace(\"b\", \"[$&]\"));",
+      "expected_csharp": "Console.WriteLine(JsString.ReplaceFirst(\"abc\", \"b\", \"[$&]\"));",
+      "expected_behavior": "prints a[b]c"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.repeat",
+  "category": "string",
+  "summary": "Repeat a string without inheriting .NET argument/overflow behavior.",
+  "source": {
+    "pattern": "$string.repeat($count)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Repeat",
+    "template": "JsString.Repeat($string, $count)",
+    "notes": "Apply ToIntegerOrInfinity; negative counts and +Infinity throw RangeError, zero returns empty string. Also surface allocation/maximum-length failure as JS-compatible RangeError where required."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "count": "ToIntegerOrInfinity",
+    "exception": "RangeError when count < 0 or +Infinity",
+    "return_value": "count concatenated copies"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic repeat",
+      "input": "console.log(\"ab\".repeat(3));",
+      "expected_csharp": "Console.WriteLine(JsString.Repeat(\"ab\", 3d));",
+      "expected_behavior": "prints ababab"
+    },
+    {
+      "name": "negative throws",
+      "input": "try { \"x\".repeat(-1); } catch (e) { console.log(e.name); }",
+      "expected_csharp": "JsString.Repeat(\"x\", -1d);",
+      "expected_behavior": "throws RangeError"
+    }
+  ]
+}

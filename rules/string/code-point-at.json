@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.codepointat",
+  "category": "string",
+  "summary": "Lower string.prototype.codepointat with exact JavaScript index and UTF-16 semantics.",
+  "source": {
+    "pattern": "$string.codePointAt($pos)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.CodePointAt",
+    "template": "JsString.CodePointAt($string, $pos)",
+    "notes": "Return the UTF-16 encoded code point starting at a code-unit index; trailing surrogates stand alone; out of range is undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "index": "ToIntegerOrInfinity in UTF-16 code units",
+    "return_value": "code point Number or undefined",
+    "encoding": "combines a valid leading+trailing surrogate pair only when starting on the lead"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "surrogate pair",
+      "input": "console.log(\"😄\".codePointAt(0));",
+      "expected_csharp": "Console.WriteLine(JsString.CodePointAt(\"😄\", 0d));",
+      "expected_behavior": "prints 128516"
+    },
+    {
+      "name": "trail surrogate position",
+      "input": "console.log(\"😄\".codePointAt(1));",
+      "expected_csharp": "Console.WriteLine(JsString.CodePointAt(\"😄\", 1d));",
+      "expected_behavior": "prints the trailing surrogate code unit value 56836"
+    }
+  ]
+}

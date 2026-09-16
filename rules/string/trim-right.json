@@ -1,0 +1,41 @@
+{
+  "id": "string.prototype.trimright",
+  "category": "string",
+  "summary": "Support legacy trimRight as an alias of trimEnd.",
+  "source": {
+    "pattern": "$string.trimRight()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.TrimEnd",
+    "template": "JsString.TrimEnd($string)",
+    "notes": "Annex B alias of trimEnd; use the same ECMAScript whitespace helper so behavior matches the canonical method."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "status": "Annex B web legacy alias",
+    "whitespace_set": "ECMAScript WhiteSpace + LineTerminator"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string.prototype.trimright"
+  ],
+  "tests": [
+    {
+      "name": "basic alias",
+      "input": "console.log(\"  x  \".trimRight());",
+      "expected_csharp": "Console.WriteLine(JsString.TrimEnd(\"  x  \"));",
+      "expected_behavior": "matches the corresponding canonical trim method"
+    },
+    {
+      "name": "zero width space remains",
+      "input": "console.log(\"\\u200Bx\\u200B\".trimRight().length);",
+      "expected_behavior": "U+200B is not removed"
+    }
+  ]
+}

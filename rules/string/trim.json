@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.trim",
+  "category": "string",
+  "summary": "Trim ECMAScript whitespace at the both ends.",
+  "source": {
+    "pattern": "$string.trim()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Trim",
+    "template": "JsString.Trim($string)",
+    "notes": "Remove exactly ECMAScript WhiteSpace and LineTerminator code points. Do not rely on .NET Trim() default set, which is not specified by ECMAScript."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "whitespace_set": "ECMAScript WhiteSpace + LineTerminator",
+    "encoding": "operate at code-point boundaries but preserve all other UTF-16 data",
+    "mutation": false
+  },
+  "caveats": [
+    "Whitespace membership has changed historically with Unicode/spec revisions; helper should follow the targeted ECMAScript edition."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "ordinary space",
+      "input": "console.log(\"  x  \".trim());",
+      "expected_csharp": "Console.WriteLine(JsString.Trim(\"  x  \"));",
+      "expected_behavior": "removes spaces only on the requested side(s)"
+    },
+    {
+      "name": "zero width space is not trimmed",
+      "input": "console.log(\"\\u200Bx\\u200B\".trim().length);",
+      "expected_csharp": "Console.WriteLine(JsString.Trim(\"\\u200Bx\\u200B\").Length);",
+      "expected_behavior": "U+200B remains because it is not ECMAScript whitespace"
+    }
+  ]
+}

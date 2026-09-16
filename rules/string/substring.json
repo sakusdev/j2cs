@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.substring",
+  "category": "string",
+  "summary": "Implement substring with JavaScript bound clamping and swapping.",
+  "source": {
+    "pattern": "$string.substring($start, $end)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Substring",
+    "template": "JsString.Substring($string, $start, $end)",
+    "notes": "Clamp each ToIntegerOrInfinity result to 0..length, treating negatives/NaN as 0; if start > end, swap them. C# Substring does not swap."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "indices": "ToIntegerOrInfinity, clamp negatives to 0 and values above length to length",
+    "swap": "start and end are swapped when start > end",
+    "encoding": "UTF-16 code units"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "swaps bounds",
+      "input": "console.log(\"abcd\".substring(3,1));",
+      "expected_csharp": "Console.WriteLine(JsString.Substring(\"abcd\", 3d, 1d));",
+      "expected_behavior": "prints bc"
+    },
+    {
+      "name": "negative clamps to zero",
+      "input": "console.log(\"abcd\".substring(-2,2));",
+      "expected_csharp": "Console.WriteLine(JsString.Substring(\"abcd\", -2d, 2d));",
+      "expected_behavior": "prints ab"
+    }
+  ]
+}

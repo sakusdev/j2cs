@@ -1,0 +1,42 @@
+{
+  "id": "string.prototype.split.regexp",
+  "category": "string",
+  "summary": "Route RegExp/custom Symbol.split string splitting through the runtime.",
+  "source": {
+    "pattern": "$string.split($regexp, $limit)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "separator_may_be_regexp_or_symbol_split": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.StringSplit",
+    "template": "JsRuntime.StringSplit($args)",
+    "notes": "RegExp splitting uses Symbol.split, ECMAScript regex semantics, capture insertion (including undefined captures), Unicode mode, and custom splitter hooks."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "dispatch": "Symbol.split may override",
+    "captures": "capturing groups are inserted into output",
+    "regexp": "ECMAScript engine semantics"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "capture insertion",
+      "input": "console.log(JSON.stringify(\"a1b\".split(/(1)/)));",
+      "expected_behavior": "array is [\"a\",\"1\",\"b\"]"
+    },
+    {
+      "name": "custom splitter",
+      "input": "const x={ [Symbol.split](){return [\"ok\"];} }; console.log(\"abc\".split(x)[0]);",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

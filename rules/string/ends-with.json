@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.endswith",
+  "category": "string",
+  "summary": "Lower endsWith with JavaScript coercion, clamping, and UTF-16 ordinal matching.",
+  "source": {
+    "pattern": "$string.endsWith($search, $endPosition)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.EndsWith",
+    "template": "JsString.EndsWith($string, $search, $endPosition)",
+    "notes": "Must apply JavaScript coercion/clamping and ordinal UTF-16 matching; do not use culture-sensitive .NET defaults."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "search": "code-unit exact ordinal match",
+    "end_position": "undefined means length; otherwise ToIntegerOrInfinity then clamp",
+    "regexp": "RegExp searchString throws TypeError"
+  },
+  "caveats": [
+    "C# string search overloads can be culture-sensitive unless StringComparison.Ordinal is selected."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic match",
+      "input": "console.log(\"abcabc\".endsWith(\"bc\"));",
+      "expected_csharp": "Console.WriteLine(JsString.EndsWith(\"abcabc\", \"bc\", JsUndefined.Value));",
+      "expected_behavior": "matches according to JavaScript semantics"
+    },
+    {
+      "name": "edge position",
+      "input": "console.log(\"abc\".endsWith(\"b\", 2));",
+      "expected_csharp": "Console.WriteLine(JsString.EndsWith(\"abc\", \"b\", 2d));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

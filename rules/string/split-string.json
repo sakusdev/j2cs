@@ -1,0 +1,44 @@
+{
+  "id": "string.prototype.split.string",
+  "category": "string",
+  "summary": "Split with a primitive string separator while preserving JS array contents and UTF-16 behavior.",
+  "source": {
+    "pattern": "$string.split($separator, $limit)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "separator_inferred_as": "primitive string or undefined"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.Split",
+    "template": "JsString.Split($string, $separator, $limit)",
+    "notes": "Implement undefined separator, ToUint32 limit, empty-separator UTF-16 code-unit splitting, and exact ordinal separator behavior. .NET Split has different empty entries and limit semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "limit": "ToUint32; zero returns empty array",
+    "separator_undefined": "returns [string] unless limit is zero",
+    "empty_separator": "splits by UTF-16 code units, not code points"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic separator",
+      "input": "console.log(JSON.stringify(\"a,b,c\".split(\",\",2)));",
+      "expected_csharp": "var parts = JsString.Split(\"a,b,c\", \",\", 2d);",
+      "expected_behavior": "array is [\"a\",\"b\"]"
+    },
+    {
+      "name": "empty separator breaks surrogate pair",
+      "input": "console.log(\"😄\".split(\"\").length);",
+      "expected_csharp": "Console.WriteLine(JsString.Split(\"😄\", \"\", JsUndefined.Value).Length);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

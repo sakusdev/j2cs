@@ -1,0 +1,42 @@
+{
+  "id": "string.from-code-point",
+  "category": "string",
+  "summary": "Implement String.fromCodePoint with JavaScript validation and UTF-16 encoding.",
+  "source": {
+    "pattern": "String.fromCodePoint($codePoints...)",
+    "requirements": {
+      "callee_resolved_as": "builtin String.fromCodePoint"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.FromCodePoint",
+    "template": "JsString.FromCodePoint($codePoints)",
+    "notes": "Coerce each argument with ToNumber, require an integral code point in 0..0x10FFFF, throw JS RangeError otherwise, and UTF-16 encode valid astral points."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToNumber then integral/range validation",
+    "exception": "RangeError for non-integral, negative, infinity, NaN, or > 0x10FFFF",
+    "encoding": "astral code points become surrogate pairs"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "astral point",
+      "input": "console.log(String.fromCodePoint(0x1F604));",
+      "expected_csharp": "Console.WriteLine(JsString.FromCodePoint(0x1F604d));",
+      "expected_behavior": "prints 😄"
+    },
+    {
+      "name": "invalid point throws",
+      "input": "try { String.fromCodePoint(0x110000); } catch (e) { console.log(e.name); }",
+      "expected_csharp": "JsString.FromCodePoint(0x110000d);",
+      "expected_behavior": "throws RangeError"
+    }
+  ]
+}

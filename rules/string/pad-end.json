@@ -1,0 +1,44 @@
+{
+  "id": "string.prototype.padend",
+  "category": "string",
+  "summary": "Pad at the end with exact JavaScript filler and truncation semantics.",
+  "source": {
+    "pattern": "$string.padEnd($maxLength, $fillString)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.PadEnd",
+    "template": "JsString.PadEnd($string, $maxLength, $fillString)",
+    "notes": "Use ToLength for maxLength, default fillString to one ASCII space, ToString the filler, repeat and truncate by UTF-16 code units."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "max_length": "ToLength",
+    "default_fill": "U+0020 SPACE",
+    "truncation": "UTF-16 code units",
+    "empty_fill": "returns original string"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic padding",
+      "input": "console.log(\"x\".padEnd(3, \"ab\"));",
+      "expected_csharp": "Console.WriteLine(JsString.PadEnd(\"x\", 3d, \"ab\"));",
+      "expected_behavior": "prints xab"
+    },
+    {
+      "name": "filler truncation",
+      "input": "console.log(\"x\".padEnd(4, \"abc\"));",
+      "expected_csharp": "Console.WriteLine(JsString.PadEnd(\"x\", 4d, \"abc\"));",
+      "expected_behavior": "uses exactly three fill code units"
+    }
+  ]
+}

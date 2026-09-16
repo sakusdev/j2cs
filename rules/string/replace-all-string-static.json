@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.replaceall.string-static",
+  "category": "string",
+  "summary": "Implement replaceAll for primitive string search and replacement values.",
+  "source": {
+    "pattern": "$string.replaceAll($searchString, $replacementString)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true,
+      "search_inferred_as": "primitive string",
+      "replacement_inferred_as": "primitive string"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ReplaceAll",
+    "template": "JsString.ReplaceAll($string, $searchString, $replacementString)",
+    "notes": "Replace every ordinal UTF-16 occurrence and implement GetSubstitution for each match. Empty search inserts at every code-unit boundary including both ends."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "search": "all non-overlapping ordinal UTF-16 occurrences",
+    "empty_search": "matches every code-unit boundary",
+    "replacement": "GetSubstitution per match"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "all occurrences",
+      "input": "console.log(\"aba\".replaceAll(\"a\", \"x\"));",
+      "expected_csharp": "Console.WriteLine(JsString.ReplaceAll(\"aba\", \"a\", \"x\"));",
+      "expected_behavior": "prints xbx"
+    },
+    {
+      "name": "empty search",
+      "input": "console.log(\"ab\".replaceAll(\"\", \"_\"));",
+      "expected_csharp": "Console.WriteLine(JsString.ReplaceAll(\"ab\", \"\", \"_\"));",
+      "expected_behavior": "prints _a_b_"
+    }
+  ]
+}

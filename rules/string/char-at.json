@@ -1,0 +1,43 @@
+{
+  "id": "string.prototype.charat",
+  "category": "string",
+  "summary": "Lower string.prototype.charat with exact JavaScript index and UTF-16 semantics.",
+  "source": {
+    "pattern": "$string.charAt($pos)",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.CharAt",
+    "template": "JsString.CharAt($string, $pos)",
+    "notes": "Use ToIntegerOrInfinity; return exactly one UTF-16 code unit as a string, or empty string when out of range."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "index": "ToIntegerOrInfinity",
+    "return_value": "one-code-unit string or empty string",
+    "encoding": "may return lone surrogate"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "basic",
+      "input": "console.log(\"abc\".charAt(1));",
+      "expected_csharp": "Console.WriteLine(JsString.CharAt(\"abc\", 1d));",
+      "expected_behavior": "prints b"
+    },
+    {
+      "name": "out of range",
+      "input": "console.log(\"abc\".charAt(99) === \"\");",
+      "expected_csharp": "Console.WriteLine(JsString.CharAt(\"abc\", 99d) == \"\");",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

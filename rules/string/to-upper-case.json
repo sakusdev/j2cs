@@ -1,0 +1,45 @@
+{
+  "id": "string.prototype.touppercase",
+  "category": "string",
+  "summary": "Perform locale-insensitive ECMAScript uppercase conversion.",
+  "source": {
+    "pattern": "$string.toUpperCase()",
+    "requirements": {
+      "receiver_inferred_as": "builtin String primitive",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsString.ToUpperCase",
+    "template": "JsString.ToUpperCase($string)",
+    "notes": "Use Unicode Default Case Conversion including multi-code-point mappings; exact Unicode data version may differ from .NET."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "algorithm": "Unicode Default Case Conversion",
+    "locale_sensitive": false,
+    "length_may_change": true
+  },
+  "caveats": [
+    "Do not assume current .NET ToUpperInvariant is identical for every Unicode version."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/#sec-string-objects"
+  ],
+  "tests": [
+    {
+      "name": "ascii",
+      "input": "console.log(\"abc\".toUpperCase());",
+      "expected_csharp": "Console.WriteLine(JsString.ToUpperCase(\"abc\"));",
+      "expected_behavior": "prints ABC"
+    },
+    {
+      "name": "multi character mapping",
+      "input": "console.log(\"ß\".toUpperCase());",
+      "expected_csharp": "Console.WriteLine(JsString.ToUpperCase(\"ß\"));",
+      "expected_behavior": "prints SS under current Unicode default case conversion"
+    }
+  ]
+}
