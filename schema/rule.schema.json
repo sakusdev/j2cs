@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sakusdev/j2cs/schema/rule.schema.json",
+  "title": "j2cs translation rule",
+  "type": "object",
+  "required": ["id", "category", "source", "target", "strategy", "confidence", "semantics", "tests"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
+    "category": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["pattern"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": { "type": "string" },
+        "requirements": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["csharp", "helper", "runtime", "unsupported"] },
+        "template": { "type": "string" },
+        "helper": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "strategy": { "enum": ["native", "helper", "runtime", "unsupported"] },
+    "confidence": { "enum": ["low", "medium", "high"] },
+    "semantics": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "caveats": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "references": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "input"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "input": { "type": "string" },
+          "expected_csharp": { "type": "string" },
+          "expected_behavior": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}
