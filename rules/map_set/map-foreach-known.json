@@ -1,0 +1,13 @@
+{
+  "id": "map.prototype.foreach.known-callback",
+  "category": "map_set",
+  "summary": "Run Map.forEach with a statically known callback through existing JsFunction call semantics.",
+  "source": {"pattern": "$map.forEach($callback, $thisArg)", "requirements": {"receiver_inferred_builtin_map": true, "builtin_member_not_overridden_or_shadowed": true, "receiver_not_proxy": true, "callback_statically_known_callable": true, "callback_invocation_uses_existing_jsfunction_semantics": true}},
+  "target": {"kind": "helper", "template": "JsMap.ForEach($map, $callback, $thisArg)", "helper": "JsMap.ForEach", "notes": "JsMap.ForEach must invoke the callback via canonical JsFunction call lowering as callback(value,key,map) with thisArg."},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"callback_arguments": ["value","key","map"], "this_binding": "thisArg via existing function-call semantics", "return_value": "undefined", "mutation_during_iteration": "deleted-before-visit skipped; added-before-completion visited; delete+readd may revisit"},
+  "caveats": ["Do not use LINQ foreach over a snapshot; mutation visibility differs."],
+  "references": ["https://tc39.es/ecma262/multipage/keyed-collections.html"],
+  "tests": [{"name": "argument order", "input": "const m=new Map([['k','v']]); m.forEach((v,k,self)=>console.log(v,k,self===m));", "expected_behavior": "prints v k true"}, {"name": "addition during callback visited", "input": "const m=new Map([['a',1]]); const seen=[]; m.forEach((v,k)=>{seen.push(k); if(k==='a')m.set('b',2)}); console.log(seen);", "expected_behavior": "prints ['a','b']"}]
+}
