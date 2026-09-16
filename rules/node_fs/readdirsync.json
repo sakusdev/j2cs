@@ -1,0 +1,16 @@
+{
+  "id": "node.fs.readdirsync",
+  "category": "node_fs",
+  "summary": "Synchronously list directory entry names while preserving encoding and unspecified OS enumeration order.",
+  "source": {"pattern":"$fs.readdirSync($path, $options?)","requirements":{"module_binding":"node:fs builtin","builtin_not_shadowed":true,"with_file_types":false,"recursive":"false or statically known"}},
+  "target": {"kind":"helper","helper":"NodeFs.ReadDirSync","template":"NodeFs.ReadDirSync($path, $options)"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"blocks_caller":true,"return_value":"array of names; strings by default, Buffers when encoding='buffer'","ordering":"unspecified; supplied by underlying directory mechanism","excludes":[".",".."]},
+  "caveats": ["Do not sort results unless source code does so; Node does not promise directory order.","Recursive mode has distinct result-shape/path semantics and must be preserved.","Directory mutations during enumeration can affect observed entries."],
+  "references": ["https://nodejs.org/api/fs.html"],
+  "tests": [
+    {"name":"lists names without dot entries","input":"console.log(fs.readdirSync('d').includes('.'));","expected_csharp":"var files = NodeFs.ReadDirSync(path, NodeFsReadDirOptions.Default);","expected_behavior":"returns entry names excluding . and ..; order is not assumed"},
+    {"name":"buffer filename encoding","input":"const xs = fs.readdirSync('d',{encoding:'buffer'}); console.log(Buffer.isBuffer(xs[0]));","expected_csharp":"var files = NodeFs.ReadDirSync(path, NodeFsReadDirOptions.BufferEncoding);","expected_behavior":"entry names are Node-compatible Buffers rather than strings"}
+  ]
+}
