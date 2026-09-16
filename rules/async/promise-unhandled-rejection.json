@@ -1,0 +1,16 @@
+{
+  "id": "async.promise.unhandled-rejection",
+  "category": "async",
+  "summary": "Delegate unhandled Promise rejection tracking to the selected JavaScript host compatibility runtime.",
+  "source": {"pattern": "$promise /* rejected without a timely handler */", "requirements": {"host": "browser, Node.js, or Electron compatibility requested"}},
+  "target": {"kind": "runtime", "template": "JsRuntime.TrackUnhandledRejection($promise)", "notes": "HostPromiseRejectionTracker behavior, notification timing, and late-handler behavior are host-defined."},
+  "strategy": "runtime",
+  "confidence": "medium",
+  "semantics": {"host_defined": true, "late_handler": "may cause a handled-after-report notification", "observable": "events/process hooks/logging may fire"},
+  "caveats": ["Browser unhandledrejection and Node.js unhandledRejection/rejectionHandled behavior are not identical.", "Pure .NET unobserved Task exception behavior is not a substitute."],
+  "references": ["ECMAScript HostPromiseRejectionTracker", "HTML unhandled promise rejection tracking", "Node.js process rejection events"],
+  "tests": [
+    {"name": "late handler host tracking", "input": "const p=Promise.reject('x');setTimeout(()=>p.catch(()=>{}),0);", "expected_behavior": "selected host profile may report unhandled rejection before the later handler and later report it handled"},
+    {"name": "immediate handler", "input": "Promise.reject('x').catch(()=>{});", "expected_behavior": "normally not reported as unhandled by the selected host"}
+  ]
+}
