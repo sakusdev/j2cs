@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.writable.finish",
+  "category": "events_streams",
+  "summary": "Preserve the Writable 'finish' event boundary after all accepted data and finalization are complete.",
+  "source": {
+    "pattern": "$writable.on(\"finish\", $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_writable": true,
+      "builtin_on_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.OnFinish",
+    "template": "NodeStreams.OnFinish($writable, $listener)",
+    "notes": "Register via EventEmitter semantics; emit finish after end() and after every chunk plus _final processing completes. Error termination must not incorrectly emit finish."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_condition": "all writes processed and finalization completed after end",
+    "writableFinished": "true immediately before event",
+    "error_path": "finish is not emitted for failed completion"
+  },
+  "caveats": [
+    "finish is not equivalent to close; resources may close later.",
+    "The end(callback) callback runs before finish."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html",
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "finish after writes",
+      "input": "const {Writable}=require('node:stream'); const out=[]; const w=new Writable({write(c,e,cb){out.push(c.toString());cb()}}); w.on('finish',()=>console.log(out.join(','))); w.end('x');",
+      "expected_behavior": "prints x from finish handler"
+    },
+    {
+      "name": "finish distinct from close",
+      "input": "const {Writable}=require('node:stream'); const out=[]; const w=new Writable({write(c,e,cb){cb()}}); w.on('finish',()=>out.push('finish')); w.on('close',()=>out.push('close')); w.end(); setImmediate(()=>console.log(out[0]));",
+      "expected_behavior": "finish occurs as writable completion; close is a separate resource-lifecycle event"
+    }
+  ]
+}

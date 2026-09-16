@@ -1,0 +1,44 @@
+{
+  "id": "node.stream.readable.push-eof",
+  "category": "events_streams",
+  "summary": "Treat readable.push(null) as the EOF signal, not as an ordinary null chunk.",
+  "source": {
+    "pattern": "$readable.push(null)",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_push_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.PushEof",
+    "template": "NodeStreams.PushEof($readable)",
+    "notes": "Queue EOF after already-buffered data; no further normal chunks may be pushed, and 'end' is emitted only after all data has been consumed."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "null_meaning": "EOF sentinel",
+    "buffered_data": "delivered before end",
+    "end_event": "after data is fully consumed"
+  },
+  "caveats": [
+    "In objectMode, null is still reserved for EOF and cannot be a data item.",
+    "An immediate C# close would be wrong if buffered chunks remain."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "buffer drains before end",
+      "input": "const {Readable}=require('node:stream'); const r=new Readable({read(){}}); const out=[]; r.on('data',x=>out.push(x.toString())); r.on('end',()=>console.log(out.join(','))); r.push('a'); r.push(null);",
+      "expected_behavior": "prints a when end fires"
+    },
+    {
+      "name": "null not object-mode data",
+      "input": "const {Readable}=require('node:stream'); const r=new Readable({objectMode:true,read(){this.push(null)}}); let n=0; r.on('data',()=>n++); r.on('end',()=>console.log(n));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

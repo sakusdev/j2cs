@@ -1,0 +1,45 @@
+{
+  "id": "node.events.event-emitter.remove-listener",
+  "category": "events_streams",
+  "summary": "Remove at most one matching listener, choosing the most recently added duplicate, without altering an emit already in progress.",
+  "source": {
+    "pattern": "$emitter.removeListener($eventName, $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.RemoveListener",
+    "template": "NodeEvents.RemoveListener($emitter, $eventName, $listener)",
+    "notes": "Must match Node duplicate-removal order, once-wrapper matching, 'removeListener' meta-event behavior, and snapshot semantics for an emit already underway."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "removes": "at most one registration",
+    "duplicate_choice": "most recently added matching registration",
+    "emit_in_progress": "current emit snapshot is unaffected"
+  },
+  "caveats": [
+    "Removing a listener during emit only affects later emits.",
+    "Listener identity is reference identity; do not remove structurally equivalent delegates."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "remove during emit affects next emit",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); const out=[]; const b=()=>out.push('b'); e.on('x',()=>{out.push('a');e.removeListener('x',b)}); e.on('x',b); e.emit('x'); e.emit('x'); console.log(out.join(','));",
+      "expected_behavior": "prints a,b,a"
+    },
+    {
+      "name": "most recent duplicate removed",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; function f(){n++} e.on('x',f); e.once('x',f); e.removeListener('x',f); e.emit('x'); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 2 because the once registration was the most recent and was removed"
+    }
+  ]
+}

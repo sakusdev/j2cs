@@ -1,0 +1,43 @@
+{
+  "id": "node.events.event-emitter.off",
+  "category": "events_streams",
+  "summary": "Preserve off() as the removeListener() alias, including duplicate and once-wrapper behavior.",
+  "source": {
+    "pattern": "$emitter.off($eventName, $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.RemoveListener",
+    "template": "NodeEvents.RemoveListener($emitter, $eventName, $listener)",
+    "notes": "off is an alias for removeListener and must share the same identity/removal semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "alias_of": "EventEmitter.removeListener",
+    "return_value": "receiver",
+    "removes": "at most one matching registration"
+  },
+  "caveats": [
+    "If off is overwritten, normal dynamic property/call semantics take precedence."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "off removes listener",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; const f=()=>n++; e.on('x',f); e.off('x',f); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "off only removes one duplicate",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; function f(){n++} e.on('x',f); e.on('x',f); e.off('x',f); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

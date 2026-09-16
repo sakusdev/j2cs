@@ -1,0 +1,48 @@
+{
+  "id": "node.events.event-emitter.on",
+  "category": "events_streams",
+  "summary": "Register an EventEmitter listener without deduplication and return the same emitter.",
+  "source": {
+    "pattern": "$emitter.on($eventName, $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.On",
+    "template": "NodeEvents.On($emitter, $eventName, $listener)",
+    "notes": "Must append the listener, preserve repeated identical registrations, return the emitter, emit 'newListener' before insertion when observed, and invoke listeners later through existing function-call semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "duplicates": "allowed",
+    "ordering": "append after existing listeners",
+    "newListener": "emitted before the listener is added",
+    "listener_this": "ordinary functions receive emitter; arrow lexical this remains governed by FUNCTIONS rules"
+  },
+  "caveats": [
+    "Do not use += on a C# event as the semantic model: EventEmitter listener inspection/removal/meta-events are observable.",
+    "eventName is a string or Symbol; do not silently ToString arbitrary keys."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html",
+    "rules/functions/call-extra-arguments.json"
+  ],
+  "tests": [
+    {
+      "name": "duplicates are kept",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; function f(){n++} e.on('x',f); e.on('x',f); e.emit('x'); console.log(n);",
+      "expected_csharp": "NodeEvents.On(e, \"x\", f); NodeEvents.On(e, \"x\", f);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "returns receiver",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); console.log(e.on('x',()=>{})===e);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

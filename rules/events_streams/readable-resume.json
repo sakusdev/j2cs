@@ -1,0 +1,44 @@
+{
+  "id": "node.stream.readable.resume",
+  "category": "events_streams",
+  "summary": "Resume a paused Readable and permit flowing consumption, including discard when no consumer observes data.",
+  "source": {
+    "pattern": "$readable.resume()",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_resume_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Resume",
+    "template": "NodeStreams.Resume($readable)",
+    "notes": "Switch explicitly paused streams to flowing mode, return the same stream, and consume/discard data if no data listener/pipe observes it; has no effect while a 'readable' listener governs consumption."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "flowing": "false -> true where allowed",
+    "no_data_listener": "data can be consumed and discarded",
+    "readable_listener": "resume has no effect"
+  },
+  "caveats": [
+    "Calling resume() without a consumer is observable because data may be lost."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "resume returns receiver",
+      "input": "const {PassThrough}=require('node:stream'); const r=new PassThrough(); r.pause(); console.log(r.resume()===r);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "resume can discard",
+      "input": "const {Readable}=require('node:stream'); const r=Readable.from(['x']); r.resume(); r.on('end',()=>console.log('end'));",
+      "expected_behavior": "stream is fully consumed even though no data listener processed x"
+    }
+  ]
+}

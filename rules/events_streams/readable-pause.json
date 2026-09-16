@@ -1,0 +1,44 @@
+{
+  "id": "node.stream.readable.pause",
+  "category": "events_streams",
+  "summary": "Pause a flowing Readable without discarding newly arriving data.",
+  "source": {
+    "pattern": "$readable.pause()",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_pause_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Pause",
+    "template": "NodeStreams.Pause($readable)",
+    "notes": "Switch flowing streams out of flowing mode, keep incoming data buffered, return the same stream, and preserve the documented no-effect behavior when a 'readable' listener controls consumption."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "flowing": "true -> false",
+    "buffering": "continues internally",
+    "readable_listener": "pause has no effect in readable-listener mode"
+  },
+  "caveats": [
+    "Pausing emission is not equivalent to stopping the underlying producer immediately; buffering/backpressure remain runtime concerns."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "pause returns receiver",
+      "input": "const {PassThrough}=require('node:stream'); const r=new PassThrough(); console.log(r.pause()===r,r.isPaused());",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "paused data is buffered",
+      "input": "const {PassThrough}=require('node:stream'); const r=new PassThrough(); const out=[]; r.on('data',x=>out.push(x.toString())); r.pause(); r.write('x'); console.log(out.length); r.resume();",
+      "expected_behavior": "prints 0 before resume; x is delivered after resume"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "node.stream.writable.end",
+  "category": "events_streams",
+  "summary": "End a Writable after an optional final chunk, preserving callback-before-finish ordering and return identity.",
+  "source": {
+    "pattern": "$writable.end($chunk?, $encoding?, $callback?)",
+    "requirements": {
+      "receiver_inferred_as_node_writable": true,
+      "builtin_end_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.End",
+    "template": "NodeStreams.End($writable, $chunk, $encoding, $callback)",
+    "notes": "Optionally write the final chunk, mark writableEnded, reject later writes, run finalization, invoke end callback before 'finish' (or on error), and return the same writable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "final_chunk": "written before ending",
+    "writableEnded": "true after end called",
+    "callback_order": "callback before finish",
+    "later_write": "error"
+  },
+  "caveats": [
+    "end() does not mean underlying resources are already closed; finish and close are distinct.",
+    "Pending buffered writes must be processed before finish."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "returns receiver",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({write(c,e,cb){cb()}}); console.log(w.end()===w);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "end callback before finish",
+      "input": "const {Writable}=require('node:stream'); const out=[]; const w=new Writable({write(c,e,cb){cb()}}); w.on('finish',()=>out.push('finish')); w.end('x',()=>out.push('callback')); process.nextTick(()=>console.log(out.join(',')));",
+      "expected_behavior": "prints callback,finish"
+    }
+  ]
+}

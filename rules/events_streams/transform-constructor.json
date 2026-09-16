@@ -1,0 +1,44 @@
+{
+  "id": "node.stream.transform.constructor",
+  "category": "events_streams",
+  "summary": "Construct Transform as a Duplex runtime whose writable input is processed into readable output.",
+  "source": {
+    "pattern": "new Transform($options)",
+    "requirements": {
+      "binding_resolves_to_node_stream_transform": true,
+      "constructor_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.CreateTransform",
+    "template": "NodeStreams.CreateTransform($options)",
+    "notes": "Preserve both Duplex sides, transform/flush callbacks, readable output buffering, writable backpressure, and the rule that output count/size/timing need not match input."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inherits": "Duplex",
+    "transform_hook": "required by implementation/options",
+    "flush_hook": "optional",
+    "input_output_relation": "arbitrary zero/many chunks and size changes"
+  },
+  "caveats": [
+    "A Transform is not equivalent to a stateless C# Func<byte[],byte[]>; it is a stateful backpressured stream."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "transform can change size",
+      "input": "const {Transform}=require('node:stream'); const t=new Transform({transform(c,e,cb){cb(null,Buffer.concat([c,c]))}}); t.on('data',c=>console.log(c.toString())); t.end('a');",
+      "expected_behavior": "prints aa"
+    },
+    {
+      "name": "transform can emit no chunk for an input",
+      "input": "const {Transform}=require('node:stream'); const t=new Transform({transform(c,e,cb){cb()}}); let n=0; t.on('data',()=>n++); t.on('end',()=>console.log(n)); t.end('a');",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

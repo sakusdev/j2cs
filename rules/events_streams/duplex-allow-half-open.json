@@ -1,0 +1,43 @@
+{
+  "id": "node.stream.duplex.allow-half-open",
+  "category": "events_streams",
+  "summary": "Preserve Duplex half-open behavior and the allowHalfOpen option/property.",
+  "source": {
+    "pattern": "$duplex.allowHalfOpen / new Duplex({allowHalfOpen:$value})",
+    "requirements": {
+      "receiver_inferred_as_node_duplex": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.SetAllowHalfOpen",
+    "template": "NodeStreams.SetAllowHalfOpen($duplex, $value)",
+    "notes": "When false, readable-side end automatically ends the writable side; default true keeps the writable side open. Runtime changes must occur before the readable 'end' event to affect that transition."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default": true,
+    "false_behavior": "readable end triggers writable end",
+    "true_behavior": "sides may complete independently",
+    "mutation_deadline": "before readable end"
+  },
+  "caveats": [
+    "Do not conflate TCP half-close details with the generic Duplex state machine."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "default true",
+      "input": "const {Duplex}=require('node:stream'); const d=new Duplex({read(){},write(c,e,cb){cb()}}); console.log(d.allowHalfOpen);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "false links readable end to writable end",
+      "input": "const {Duplex}=require('node:stream'); const d=new Duplex({allowHalfOpen:false,read(){this.push(null)},write(c,e,cb){cb()}}); d.resume(); d.on('finish',()=>console.log('finish'));",
+      "expected_behavior": "writable side is automatically ended after readable end and finish is emitted"
+    }
+  ]
+}

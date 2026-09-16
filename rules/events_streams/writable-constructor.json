@@ -1,0 +1,49 @@
+{
+  "id": "node.stream.writable.constructor",
+  "category": "events_streams",
+  "summary": "Construct Writable with Node buffering/backpressure and lifecycle state rather than mapping directly to System.IO.Stream.",
+  "source": {
+    "pattern": "new Writable($options?)",
+    "requirements": {
+      "binding_resolves_to_node_stream_writable": true,
+      "constructor_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.CreateWritable",
+    "template": "NodeStreams.CreateWritable($options)",
+    "notes": "Runtime must preserve objectMode/decodeStrings/highWaterMark, serial write/writev handling, final/destroy hooks, callback timing, and finish/error/close state."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "buffering": "runtime-managed",
+    "backpressure": "highWaterMark threshold",
+    "custom_hooks": [
+      "write",
+      "writev",
+      "final",
+      "destroy"
+    ],
+    "object_mode": "changes accepted chunk/value accounting"
+  },
+  "caveats": [
+    "Node writable callbacks/events are not equivalent to synchronous System.IO.Stream.Write semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "custom write receives chunks",
+      "input": "const {Writable}=require('node:stream'); const seen=[]; const w=new Writable({write(c,e,cb){seen.push(c.toString());cb()}}); w.end('x',()=>console.log(seen.join(',')));",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "object mode accepts non-null objects",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({objectMode:true,write(v,e,cb){console.log(v.x);cb()}}); w.end({x:1});",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

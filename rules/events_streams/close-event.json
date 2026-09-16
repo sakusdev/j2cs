@@ -1,0 +1,48 @@
+{
+  "id": "node.stream.close-event",
+  "category": "events_streams",
+  "summary": "Preserve stream 'close' as resource closure, distinct from readable end and writable finish.",
+  "source": {
+    "pattern": "$stream.on(\"close\", $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_stream": true,
+      "builtin_on_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.OnClose",
+    "template": "NodeStreams.OnClose($stream, $listener)",
+    "notes": "Register through EventEmitter semantics; close indicates stream and underlying resource closure and, when emitted, no further stream events should follow. emitClose:false can suppress it."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "meaning": "resource/lifecycle closure",
+    "distinct_from": [
+      "readable end",
+      "writable finish"
+    ],
+    "emitClose_option": "may suppress close"
+  },
+  "caveats": [
+    "Do not synthesize close merely because end/finish occurred; some resources close on different timing.",
+    "Host-specific stream subclasses may have additional close causes."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html",
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "destroy normally closes",
+      "input": "const {PassThrough}=require('node:stream'); const s=new PassThrough(); s.on('close',()=>console.log('close')); s.destroy();",
+      "expected_behavior": "prints close"
+    },
+    {
+      "name": "emitClose false suppresses",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({emitClose:false,write(c,e,cb){cb()}}); let n=0; w.on('close',()=>n++); w.destroy(); setImmediate(()=>console.log(n));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "node.events.event-emitter.constructor",
+  "category": "events_streams",
+  "summary": "Construct a Node-compatible EventEmitter helper object rather than mapping to a C# event/delegate.",
+  "source": {
+    "pattern": "new EventEmitter($options?)",
+    "requirements": {
+      "binding_resolves_to_node_events_eventemitter": true,
+      "constructor_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.Create",
+    "template": "NodeEvents.Create($options)",
+    "notes": "Creates an emitter that preserves duplicate listeners, string/Symbol event names, synchronous dispatch, meta-events, and Node error-event behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "new EventEmitter identity",
+    "listener_store": "ordered per event name",
+    "event_names": "string or Symbol",
+    "mutation": "new independent emitter"
+  },
+  "caveats": [
+    "C# events do not expose EventEmitter return values, duplicate-removal rules, Symbol keys, or unhandled 'error' behavior.",
+    "captureRejections changes rejection routing and requires the helper option to be preserved when present."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "independent emitter",
+      "input": "const {EventEmitter}=require('node:events'); const a=new EventEmitter(); const b=new EventEmitter(); let n=0; a.on('x',()=>n++); b.emit('x'); console.log(n);",
+      "expected_behavior": "prints 0; listener state is per-emitter"
+    },
+    {
+      "name": "symbol event name",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); const s=Symbol(); let n=0; e.on(s,()=>n++); e.emit(s); console.log(n);",
+      "expected_behavior": "prints 1; Symbol event names remain distinct"
+    }
+  ]
+}
