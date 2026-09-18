@@ -1,0 +1,41 @@
+{
+  "id": "node.os.endianness",
+  "category": "node_core",
+  "summary": "Return CPU byte order using Node's exact 'LE'/'BE' strings.",
+  "source": {
+    "pattern": "$os.endianness()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.Endianness()",
+    "helper": "NodeOs.Endianness"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_values": ["LE","BE"],
+    "host_dependent": true
+  },
+  "caveats": [
+    "Do not return boolean or .NET enum text."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal valid value",
+      "input": "['LE','BE'].includes(os.endianness())",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "edge exact casing",
+      "input": "os.endianness() === os.endianness().toUpperCase()",
+      "expected_behavior": "returns true"
+    }
+  ]
+}

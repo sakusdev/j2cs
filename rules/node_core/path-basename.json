@@ -1,0 +1,37 @@
+{
+  "id": "node.path.basename",
+  "category": "node_core",
+  "summary": "Preserve Node path.basename platform grammar and optional case-sensitive suffix removal.",
+  "source": {
+    "pattern": "$path.basename($value, $suffix?)",
+    "requirements": {
+      "module_binding": "node:path builtin",
+      "builtin_not_shadowed": true,
+      "arguments": "value and optional suffix proven strings",
+      "path_flavor": "default host, posix, or win32 is statically known"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodePath.Basename($value, $suffix, NodePathFlavor.$flavor)",
+    "helper": "NodePath.Basename",
+    "notes": "Do not substitute System.IO.Path.GetFileName: Node has its own POSIX/win32 lexical grammar and suffix-removal rules."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "filesystem_access": false,
+    "trailing_separators": "ignored",
+    "suffix": "removed only when it exactly matches the end of the basename; comparison is case-sensitive even for win32 flavor",
+    "exceptions": "TypeError for non-string path or suffix"
+  },
+  "caveats": [
+    "This is a lexical operation; it does not query the filesystem.",
+    "Windows filesystem case-insensitivity does not make suffix matching case-insensitive."
+  ],
+  "references": ["https://nodejs.org/api/path.html"],
+  "tests": [
+    {"name":"normal basename","input":"path.posix.basename('/a/b/file.txt')","expected_csharp":"NodePath.Basename(\"/a/b/file.txt\", null, NodePathFlavor.Posix)","expected_behavior":"returns \"file.txt\""},
+    {"name":"edge win32 suffix remains case-sensitive","input":"path.win32.basename('C:\\\\a\\\\FILE.TXT', '.txt')","expected_behavior":"returns \"FILE.TXT\", not \"FILE\""}
+  ]
+}

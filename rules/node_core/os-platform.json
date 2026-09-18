@@ -1,0 +1,42 @@
+{
+  "id": "node.os.platform",
+  "category": "node_core",
+  "summary": "Map the host operating system to Node's os.platform vocabulary rather than .NET platform names.",
+  "source": {
+    "pattern": "$os.platform()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.Platform()",
+    "helper": "NodeOs.Platform"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_values": "Node platform identifiers such as win32, linux, darwin, aix, freebsd, openbsd, sunos; android may appear on experimental builds",
+    "equivalent_surface": "matches process.platform for the same Node-compatible host"
+  },
+  "caveats": [
+    "OperatingSystem/RuntimeInformation names are not directly the same strings."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html",
+    "https://nodejs.org/api/process.html"
+  ],
+  "tests": [
+    {
+      "name": "normal platform string",
+      "input": "os.platform() === process.platform",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "edge Windows spelling",
+      "input": "process.platform === 'win32'",
+      "expected_behavior": "on Windows returns true; Node does not return 'windows'"
+    }
+  ]
+}

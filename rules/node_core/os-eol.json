@@ -1,0 +1,42 @@
+{
+  "id": "node.os.eol",
+  "category": "node_core",
+  "summary": "Expose Node's host-specific end-of-line marker.",
+  "source": {
+    "pattern": "$os.EOL",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.Eol",
+    "helper": "NodeOs.Eol"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "windows": "\\r\\n",
+    "posix": "\\n",
+    "return_type": "string"
+  },
+  "caveats": [
+    "Environment.NewLine is often equivalent on .NET hosts but the helper contract is explicitly Node platform semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html"
+  ],
+  "tests": [
+    {
+      "name": "normal membership",
+      "input": "os.EOL === '\\n' || os.EOL === '\\r\\n'",
+      "expected_behavior": "returns true on supported Node platforms"
+    },
+    {
+      "name": "edge Windows CRLF",
+      "input": "process.platform === 'win32' ? os.EOL : 'skip'",
+      "expected_behavior": "on Windows evaluates to \"\\r\\n\""
+    }
+  ]
+}

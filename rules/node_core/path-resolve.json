@@ -1,0 +1,9 @@
+{
+  "id": "node.path.resolve",
+  "category": "node_core",
+  "summary": "Resolve path segments right-to-left to an absolute Node path, consulting the process cwd only when needed.",
+  "source": {"pattern": "$path.resolve(...$segments)","requirements": {"module_binding":"node:path builtin","builtin_not_shadowed":true,"arguments":"all segments proven strings","path_flavor":"default host, posix, or win32 is statically known","process_cwd_source":"NodeProcess-compatible cwd state"}},
+  "target": {"kind":"helper","template":"NodePath.Resolve(NodeProcess.CurrentDirectory, $segments, NodePathFlavor.$flavor)","helper":"NodePath.Resolve","notes":"The helper must share cwd state with process.cwd()/process.chdir(); a compiler-time working directory is not equivalent."},
+  "strategy":"helper","confidence":"high","semantics":{"direction":"segments processed right-to-left until an absolute path is formed","cwd":"used only when no absolute segment resolves the path","empty_segments":"ignored","trailing_separator":"removed except for a root","exceptions":"TypeError for non-string segment"},
+  "caveats":["Windows drive-relative paths such as C:foo depend on per-drive cwd semantics and require the win32-compatible helper."],"references":["https://nodejs.org/api/path.html","https://nodejs.org/api/process.html"],"tests":[{"name":"normal resolve","input":"path.posix.resolve('/foo/bar', '../baz')","expected_behavior":"returns \"/foo/baz\""},{"name":"edge later absolute resets prior segments","input":"path.posix.resolve('/a', '/b', 'c')","expected_behavior":"returns \"/b/c\""}]
+}

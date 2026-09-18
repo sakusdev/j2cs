@@ -1,0 +1,42 @@
+{
+  "id": "node.os.arch",
+  "category": "node_core",
+  "summary": "Map runtime architecture to Node's architecture vocabulary.",
+  "source": {
+    "pattern": "$os.arch()",
+    "requirements": {
+      "module_binding": "node:os builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeOs.Arch()",
+    "helper": "NodeOs.Arch"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_values": "Node architecture identifiers such as x64, arm64, ia32, riscv64, s390x and others supported by Node",
+    "equivalent_surface": "matches process.arch"
+  },
+  "caveats": [
+    "RuntimeInformation.ProcessArchitecture enum names require Node-compatible mapping."
+  ],
+  "references": [
+    "https://nodejs.org/api/os.html",
+    "https://nodejs.org/api/process.html"
+  ],
+  "tests": [
+    {
+      "name": "normal arch matches process",
+      "input": "os.arch() === process.arch",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "edge x64 spelling",
+      "input": "os.arch()",
+      "expected_behavior": "uses Node spelling such as 'x64', not a .NET enum name such as 'X64'"
+    }
+  ]
+}
