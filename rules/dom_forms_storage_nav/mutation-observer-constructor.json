@@ -1,0 +1,43 @@
+{
+  "id": "dom.observer.mutation.constructor",
+  "category": "dom_forms_storage_nav",
+  "summary": "Construct a MutationObserver retaining callback identity and microtask-delivery semantics.",
+  "source": {
+    "pattern": "new MutationObserver($callback)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true,
+      "native_dom_mutation_observer_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.CreateMutationObserver",
+    "template": "NativeDom.CreateMutationObserver($callback)",
+    "notes": "Create an observer storing the Web IDL callback; mutation delivery must integrate with the DOM mutation-observer microtask checkpoint."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "callback_arguments": "records array, observer",
+    "delivery": "mutation observer microtask",
+    "callback_this": "observer per Web IDL callback invocation rules"
+  },
+  "caveats": [
+    "A normal Task/thread callback is not an equivalent scheduling primitive."
+  ],
+  "references": [
+    "https://dom.spec.whatwg.org/#mutation-observers"
+  ],
+  "tests": [
+    {
+      "name": "constructor stores callable",
+      "input": "const m=new MutationObserver(()=>{}); console.log(m instanceof MutationObserver);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "non-callable callback throws",
+      "input": "try{new MutationObserver(null)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

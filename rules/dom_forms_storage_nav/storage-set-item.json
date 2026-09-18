@@ -1,0 +1,47 @@
+{
+  "id": "dom.storage.set-item",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set a Storage string value atomically with quota and cross-context event semantics.",
+  "source": {
+    "pattern": "$storage.setItem($key, $value)",
+    "requirements": {
+      "receiver_inferred_as": "Storage",
+      "builtin_webidl_member_not_overridden": true,
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.SetItem",
+    "template": "WebStorage.SetItem($storage, $key, $value)",
+    "notes": "Convert key/value to DOMString, atomically update the storage map, throw QuotaExceededError if storage cannot accept the value, and broadcast storage changes to other relevant Window objects."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "key_conversion": "DOMString",
+    "value_conversion": "DOMString",
+    "return_value": "undefined",
+    "quota_failure": "QuotaExceededError",
+    "same_value": "no change/no broadcast",
+    "storage_event": "other equivalent storage contexts"
+  },
+  "caveats": [
+    "Dictionary assignment misses quota, atomicity, string coercion, and storage-event behavior."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "coerces value to string",
+      "input": "localStorage.setItem('n',42); console.log(localStorage.getItem('n'));",
+      "expected_behavior": "prints 42"
+    },
+    {
+      "name": "same stored value is a no-op for broadcast",
+      "input": "localStorage.setItem('x','1'); localStorage.setItem('x','1');",
+      "expected_behavior": "second write does not represent a storage-area change"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "dom.form.submit",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain web runtime for HTMLFormElement.submit because it invokes the form-submission/navigation pipeline while bypassing validation and submit events.",
+  "source": {
+    "pattern": "$form.submit()",
+    "requirements": {
+      "receiver_inferred_as": "HTMLFormElement",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomFormSubmit($form)",
+    "notes": "Runtime must execute the HTML form submission algorithm, including entry construction, target/navigation/network behavior, while preserving submit()'s bypass semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "constraint_validation": "not run",
+    "submit_event": "not fired",
+    "submission_pipeline": true,
+    "navigation_or_fetch_side_effects": true
+  },
+  "caveats": [
+    "A native HTTP POST is not equivalent: target browsing context, encodings, form-associated controls, CSP/sandboxing, and navigation are observable."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "submit bypasses submit event",
+      "input": "const f=document.createElement('form'); let n=0; f.addEventListener('submit',()=>n++); /* f.submit() invokes submission without firing submit */",
+      "expected_behavior": "submit event count remains 0 before navigation side effects"
+    },
+    {
+      "name": "submit bypasses validation",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.required=true; f.append(i); /* f.submit() does not run interactive constraint validation */",
+      "expected_behavior": "submission algorithm is entered despite invalid required control"
+    }
+  ]
+}

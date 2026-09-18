@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.get-item",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read a Storage entry by string-coerced key, returning null when missing.",
+  "source": {
+    "pattern": "$storage.getItem($key)",
+    "requirements": {
+      "receiver_inferred_as": "Storage",
+      "builtin_webidl_member_not_overridden": true,
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.GetItem",
+    "template": "WebStorage.GetItem($storage, $key)",
+    "notes": "Web IDL converts key to DOMString and returns the stored DOMString value or null."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "key_conversion": "DOMString",
+    "return_type": "DOMString or null",
+    "missing": "null"
+  },
+  "caveats": [
+    "Bracket named-property access returns undefined for missing keys and is a different JS surface."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "reads stored value",
+      "input": "localStorage.setItem('a','1'); console.log(localStorage.getItem('a'));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "missing is null",
+      "input": "localStorage.removeItem('missing'); console.log(localStorage.getItem('missing')===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "dom.location.href.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain navigation runtime for assigning Location.href.",
+  "source": {
+    "pattern": "$location.href = $value",
+    "requirements": {
+      "receiver_inferred_as": "Location",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.LocationSetHref($location, $value)",
+    "notes": "Convert/parse the URL relative to the relevant settings object then navigate using Location assignment semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "USVString",
+    "url_parse_failure": "TypeError or navigation-spec failure as defined",
+    "navigation": true,
+    "history_effect": "typically creates/replaces according to navigation rules"
+  },
+  "caveats": [
+    "Setting href can execute a full navigation, unload lifecycle, network fetch, sandbox checks, and javascript: URL behavior."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "relative URL resolves against current URL",
+      "input": "/* location.href='next' */",
+      "expected_behavior": "navigates to the URL obtained by resolving next against the current document URL"
+    },
+    {
+      "name": "assignment is not a local string field update",
+      "input": "/* const before=document; location.href='/other' */",
+      "expected_behavior": "may replace the active Document after navigation completes"
+    }
+  ]
+}

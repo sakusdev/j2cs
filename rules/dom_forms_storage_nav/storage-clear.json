@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.clear",
+  "category": "dom_forms_storage_nav",
+  "summary": "Clear a Storage area and broadcast one clear-style storage change when non-empty.",
+  "source": {
+    "pattern": "$storage.clear()",
+    "requirements": {
+      "receiver_inferred_as": "Storage",
+      "builtin_webidl_member_not_overridden": true,
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.Clear",
+    "template": "WebStorage.Clear($storage)",
+    "notes": "If empty, return without change; otherwise clear the map and broadcast a storage change with null key/oldValue/newValue to other relevant contexts."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "empty": "no-op",
+    "storage_event": "broadcast only when non-empty"
+  },
+  "caveats": [
+    "Clearing local in-memory state alone is insufficient when other windows share the storage area."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "clears all entries",
+      "input": "localStorage.setItem('a','1'); localStorage.setItem('b','2'); localStorage.clear(); console.log(localStorage.length);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "empty clear remains empty",
+      "input": "localStorage.clear(); localStorage.clear(); console.log(localStorage.length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

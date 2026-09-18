@@ -1,0 +1,46 @@
+{
+  "id": "dom.input.checked.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set current checkedness and dirty checkedness, including radio-group effects.",
+  "source": {
+    "pattern": "$input.checked = $value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetInputChecked",
+    "template": "NativeDom.SetInputChecked($input, $value)",
+    "notes": "Web IDL converts to boolean, sets dirty checkedness, and radio checkedness changes can uncheck other radios in the same group."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "dirty_checkedness": "set",
+    "content_attribute_changed": false,
+    "radio_group_exclusivity": true
+  },
+  "caveats": [
+    "C# boolean assignment alone misses radio-group side effects and separation from defaultChecked."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "setting checked does not add attribute",
+      "input": "const i=document.createElement('input'); i.type='checkbox'; i.checked=true; console.log(i.checked,i.hasAttribute('checked'));",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "radio group remains exclusive",
+      "input": "const f=document.createElement('form'); const a=document.createElement('input'); const b=document.createElement('input'); a.type=b.type='radio'; a.name=b.name='g'; f.append(a,b); a.checked=true; b.checked=true; console.log(a.checked,b.checked);",
+      "expected_behavior": "prints false true"
+    }
+  ]
+}

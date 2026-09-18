@@ -1,0 +1,43 @@
+{
+  "id": "dom.observer.intersection.observe",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain layout runtime when observing an Element for intersection changes.",
+  "source": {
+    "pattern": "$observer.observe($target)",
+    "requirements": {
+      "receiver_inferred_as": "IntersectionObserver",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IntersectionObserve($observer, $target)",
+    "notes": "Register target if not already observed and schedule/update observations through the browser rendering pipeline."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "duplicate_target": "no duplicate registration",
+    "target_type": "Element",
+    "delivery": "asynchronous intersection observer task processing"
+  },
+  "caveats": [
+    "Cannot be emulated from DOM tree structure without geometry/layout state."
+  ],
+  "references": [
+    "https://www.w3.org/TR/intersection-observer/"
+  ],
+  "tests": [
+    {
+      "name": "observe accepts element",
+      "input": "const o=new IntersectionObserver(()=>{}); const e=document.createElement('div'); o.observe(e);",
+      "expected_behavior": "target becomes observed"
+    },
+    {
+      "name": "duplicate observe is idempotent",
+      "input": "const o=new IntersectionObserver(()=>{}); const e=document.createElement('div'); o.observe(e); o.observe(e);",
+      "expected_behavior": "only one observation registration exists"
+    }
+  ]
+}

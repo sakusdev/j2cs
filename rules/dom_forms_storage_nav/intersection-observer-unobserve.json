@@ -1,0 +1,42 @@
+{
+  "id": "dom.observer.intersection.unobserve",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for removing one IntersectionObserver target registration.",
+  "source": {
+    "pattern": "$observer.unobserve($target)",
+    "requirements": {
+      "receiver_inferred_as": "IntersectionObserver",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IntersectionUnobserve($observer, $target)",
+    "notes": "Stop observing the target if registered; otherwise no-op."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "missing_target": "no-op",
+    "other_targets": "remain observed"
+  },
+  "caveats": [
+    "Queued entries and subsequent rendering-step behavior must follow the observer specification."
+  ],
+  "references": [
+    "https://www.w3.org/TR/intersection-observer/"
+  ],
+  "tests": [
+    {
+      "name": "unobserve one target",
+      "input": "const o=new IntersectionObserver(()=>{}); const a=document.createElement('div'),b=document.createElement('div'); o.observe(a);o.observe(b);o.unobserve(a);",
+      "expected_behavior": "b remains observed while a does not"
+    },
+    {
+      "name": "unknown target is harmless",
+      "input": "const o=new IntersectionObserver(()=>{}); o.unobserve(document.createElement('div'));",
+      "expected_behavior": "no exception"
+    }
+  ]
+}

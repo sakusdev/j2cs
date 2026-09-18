@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.session.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Get window.sessionStorage using the origin and top-level browsing-session partition.",
+  "source": {
+    "pattern": "$window.sessionStorage",
+    "requirements": {
+      "receiver_inferred_as": "Window",
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.GetSessionStorage",
+    "template": "WebStorage.GetSessionStorage($window)",
+    "notes": "Resolve the session storage area associated with the Document and browsing session; throw SecurityError when unavailable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "scope": "origin + page session",
+    "holder_identity": "cached per Document",
+    "failure": "SecurityError",
+    "lifetime": "session-scoped"
+  },
+  "caveats": [
+    "sessionStorage is not interchangeable with localStorage and can be cloned for newly created auxiliary browsing contexts."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "same document getter preserves identity",
+      "input": "console.log(window.sessionStorage===window.sessionStorage);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "local and session areas are distinct",
+      "input": "localStorage.setItem('x','l'); sessionStorage.setItem('x','s'); console.log(localStorage.getItem('x'),sessionStorage.getItem('x'));",
+      "expected_behavior": "prints l s"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "dom.location.replace",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for Location.replace navigation without preserving the current entry for back traversal.",
+  "source": {
+    "pattern": "$location.replace($url)",
+    "requirements": {
+      "receiver_inferred_as": "Location",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.LocationReplace($location, $url)",
+    "notes": "Parse/resolve the URL and perform replace-style navigation so the current session-history entry is replaced according to navigation rules."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "navigation": true,
+    "history_effect": "replace current entry"
+  },
+  "caveats": [
+    "assign and replace are observably different through back/forward history."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "replace initiates navigation",
+      "input": "/* location.replace('/next') */",
+      "expected_behavior": "navigates to resolved /next using replacement behavior"
+    },
+    {
+      "name": "current entry is not retained like assign",
+      "input": "/* location.replace('/next') */",
+      "expected_behavior": "back traversal does not expose the replaced entry as assign normally would"
+    }
+  ]
+}

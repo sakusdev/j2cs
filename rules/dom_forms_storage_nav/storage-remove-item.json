@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.remove-item",
+  "category": "dom_forms_storage_nav",
+  "summary": "Remove a Storage key if present and broadcast the change to other relevant contexts.",
+  "source": {
+    "pattern": "$storage.removeItem($key)",
+    "requirements": {
+      "receiver_inferred_as": "Storage",
+      "builtin_webidl_member_not_overridden": true,
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.RemoveItem",
+    "template": "WebStorage.RemoveItem($storage, $key)",
+    "notes": "Convert key to DOMString; if absent return with no change, otherwise remove it and broadcast oldValue -> null."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "missing": "no-op",
+    "storage_event": "broadcast when an entry was removed"
+  },
+  "caveats": [
+    "Removal is not an exception when the key is missing."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "removes entry",
+      "input": "localStorage.setItem('a','1'); localStorage.removeItem('a'); console.log(localStorage.getItem('a')===null);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "missing removal is harmless",
+      "input": "localStorage.removeItem('__definitely_missing__'); console.log('ok');",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

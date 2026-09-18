@@ -1,0 +1,42 @@
+{
+  "id": "dom.history.state.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read History.state through session-history state deserialization semantics.",
+  "source": {
+    "pattern": "$history.state",
+    "requirements": {
+      "receiver_inferred_as": "History",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.HistoryState($history)",
+    "notes": "Return the classic history API state associated with the active session history entry in the current realm/history object."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "source": "active session history entry",
+    "serialization": "structured serialization/deserialization model",
+    "initial_state": "null"
+  },
+  "caveats": [
+    "State identity/realm and navigation changes are browser-history concerns."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "initial state is null in a fresh entry",
+      "input": "console.log(history.state===null);",
+      "expected_behavior": "prints true in a fresh history entry"
+    },
+    {
+      "name": "pushState updates state",
+      "input": "history.pushState({x:1},''); console.log(history.state.x);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "dom.location.assign",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for Location.assign navigation semantics.",
+  "source": {
+    "pattern": "$location.assign($url)",
+    "requirements": {
+      "receiver_inferred_as": "Location",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.LocationAssign($location, $url)",
+    "notes": "Parse/resolve the URL and perform assign-style navigation subject to security/sandbox/navigation policy."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "navigation": true,
+    "history": "new navigation entry according to navigation algorithm"
+  },
+  "caveats": [
+    "Do not lower to Process.Start or HttpClient; browser session history and document lifecycle are observable."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "assign initiates navigation",
+      "input": "/* location.assign('/next') */",
+      "expected_behavior": "initiates navigation to resolved /next"
+    },
+    {
+      "name": "security can reject navigation",
+      "input": "/* cross-origin/sandboxed Location cases */",
+      "expected_behavior": "may throw SecurityError or be blocked according to navigation security rules"
+    }
+  ]
+}

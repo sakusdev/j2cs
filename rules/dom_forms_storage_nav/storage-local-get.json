@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.local.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Get window.localStorage using the document origin/policy storage area.",
+  "source": {
+    "pattern": "$window.localStorage",
+    "requirements": {
+      "receiver_inferred_as": "Window",
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.GetLocalStorage",
+    "template": "WebStorage.GetLocalStorage($window)",
+    "notes": "Resolve the origin-partitioned local storage area and return the Window's holder object; throw SecurityError when storage is unavailable by origin/policy."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "scope": "origin storage area",
+    "holder_identity": "cached per Document",
+    "failure": "SecurityError",
+    "persistence": "host-defined persistent storage"
+  },
+  "caveats": [
+    "Opaque origins and user policy can make the getter throw."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "same document getter preserves identity",
+      "input": "console.log(window.localStorage===window.localStorage);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "opaque/policy-denied origin throws",
+      "input": "/* in an opaque or denied origin */ try{void window.localStorage}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints SecurityError in the denied case"
+    }
+  ]
+}

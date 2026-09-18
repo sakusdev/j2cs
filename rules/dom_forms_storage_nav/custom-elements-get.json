@@ -1,0 +1,41 @@
+{
+  "id": "dom.custom-element.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read a registered custom element constructor by name.",
+  "source": {
+    "pattern": "customElements.get($name)",
+    "requirements": {
+      "custom_element_registry_semantics_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.CustomElementsGet($registry, $name)",
+    "notes": "Return the constructor associated with name in this registry, or undefined if there is no definition."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "constructor or undefined",
+    "missing": "undefined",
+    "registry_scoped": true
+  },
+  "caveats": [
+    "Constructor identity must be the original JavaScript constructor object."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/custom-elements.html"
+  ],
+  "tests": [
+    {
+      "name": "returns registered constructor",
+      "input": "class X extends HTMLElement{}; customElements.define('x-j2cs-c',X); console.log(customElements.get('x-j2cs-c')===X);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "missing returns undefined",
+      "input": "console.log(customElements.get('x-j2cs-missing')===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

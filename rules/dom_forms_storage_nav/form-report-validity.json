@@ -1,0 +1,43 @@
+{
+  "id": "dom.form.report-validity",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for reportValidity because interactive validation can invoke user-agent UI and focus behavior.",
+  "source": {
+    "pattern": "$form.reportValidity()",
+    "requirements": {
+      "receiver_inferred_as": "HTMLFormElement",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomFormReportValidity($form)",
+    "notes": "Runtime performs interactive constraint validation, invalid event dispatch, and user-agent reporting/focus behavior."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "boolean",
+    "validation": "interactive constraint validation",
+    "invalid_events": true,
+    "user_interface_side_effects": true
+  },
+  "caveats": [
+    "A pure boolean validation helper cannot reproduce validation bubbles/focus/reporting."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "valid form returns true",
+      "input": "const f=document.createElement('form'); console.log(f.reportValidity());",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "invalid form returns false and may report UI",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.required=true; f.append(i); console.log(f.reportValidity());",
+      "expected_behavior": "prints false and user agent may present validation UI"
+    }
+  ]
+}

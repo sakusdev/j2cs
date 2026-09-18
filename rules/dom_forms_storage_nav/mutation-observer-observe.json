@@ -1,0 +1,45 @@
+{
+  "id": "dom.observer.mutation.observe",
+  "category": "dom_forms_storage_nav",
+  "summary": "Register MutationObserver options with DOM validation and subtree/transient-observer semantics.",
+  "source": {
+    "pattern": "$observer.observe($target, $options)",
+    "requirements": {
+      "receiver_inferred_as": "MutationObserver",
+      "builtin_webidl_member_not_overridden": true,
+      "native_dom_mutation_observer_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.ObserveMutations",
+    "template": "NativeDom.ObserveMutations($observer, $target, $options)",
+    "notes": "Normalize options defaults, validate contradictory/empty configurations, update an existing registration for the same observer/target, and support subtree mutation semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "invalid_empty_options": "TypeError",
+    "attributes_defaulting": "implied by attributeOldValue/attributeFilter when omitted",
+    "character_data_defaulting": "implied by characterDataOldValue when omitted"
+  },
+  "caveats": [
+    "attributeOldValue with attributes:false and characterDataOldValue with characterData:false are errors."
+  ],
+  "references": [
+    "https://dom.spec.whatwg.org/#mutation-observers"
+  ],
+  "tests": [
+    {
+      "name": "childList observation works",
+      "input": "const n=document.createElement('div'); const m=new MutationObserver(()=>{}); m.observe(n,{childList:true}); n.append(document.createElement('i')); console.log(m.takeRecords().length);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "empty options throw",
+      "input": "const m=new MutationObserver(()=>{}); try{m.observe(document.body,{})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

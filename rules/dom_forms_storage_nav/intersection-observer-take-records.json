@@ -1,0 +1,43 @@
+{
+  "id": "dom.observer.intersection.take-records",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for draining pending IntersectionObserverEntry records.",
+  "source": {
+    "pattern": "$observer.takeRecords()",
+    "requirements": {
+      "receiver_inferred_as": "IntersectionObserver",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IntersectionTakeRecords($observer)",
+    "notes": "Return and clear the observer's pending entry queue without invoking its callback."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "sequence<IntersectionObserverEntry>",
+    "queue_after": "empty",
+    "callback_invoked": false,
+    "geometry_entries": true
+  },
+  "caveats": [
+    "Entry geometry/time/root bounds are rendering-runtime values."
+  ],
+  "references": [
+    "https://www.w3.org/TR/intersection-observer/"
+  ],
+  "tests": [
+    {
+      "name": "returns an array-like sequence",
+      "input": "const o=new IntersectionObserver(()=>{}); console.log(Array.isArray(o.takeRecords()));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "taking records drains queue",
+      "input": "const o=new IntersectionObserver(()=>{}); o.takeRecords(); console.log(o.takeRecords().length);",
+      "expected_behavior": "prints 0 when no new entries were queued"
+    }
+  ]
+}

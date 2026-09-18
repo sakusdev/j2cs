@@ -1,0 +1,44 @@
+{
+  "id": "dom.observer.mutation.disconnect",
+  "category": "dom_forms_storage_nav",
+  "summary": "Disconnect a MutationObserver from all nodes and empty its pending record queue.",
+  "source": {
+    "pattern": "$observer.disconnect()",
+    "requirements": {
+      "receiver_inferred_as": "MutationObserver",
+      "builtin_webidl_member_not_overridden": true,
+      "native_dom_mutation_observer_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DisconnectMutationObserver",
+    "template": "NativeDom.DisconnectMutationObserver($observer)",
+    "notes": "Remove this observer's registrations from observed nodes and empty its record queue."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "registrations": "removed",
+    "pending_records": "discarded"
+  },
+  "caveats": [
+    "disconnect does not destroy the observer; observe() can register it again."
+  ],
+  "references": [
+    "https://dom.spec.whatwg.org/#mutation-observers"
+  ],
+  "tests": [
+    {
+      "name": "disconnect stops later records",
+      "input": "const n=document.createElement('div'); const m=new MutationObserver(()=>{}); m.observe(n,{childList:true}); m.disconnect(); n.append(document.createElement('i')); console.log(m.takeRecords().length);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "disconnect discards queued records",
+      "input": "const n=document.createElement('div'); const m=new MutationObserver(()=>{}); m.observe(n,{childList:true}); n.append(document.createElement('i')); m.disconnect(); console.log(m.takeRecords().length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

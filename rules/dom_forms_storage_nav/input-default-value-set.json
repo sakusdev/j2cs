@@ -1,0 +1,46 @@
+{
+  "id": "dom.input.default-value.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set HTMLInputElement.defaultValue while preserving dirty-value synchronization rules.",
+  "source": {
+    "pattern": "$input.defaultValue = $value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetInputDefaultValue",
+    "template": "NativeDom.SetInputDefaultValue($input, $value)",
+    "notes": "Set the value content attribute; when the dirty value flag is false, the current value follows the attribute and is sanitized."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reflection": "sets value content attribute",
+    "syncs_current_value_only_if_not_dirty": true,
+    "type_specific_sanitization_when_synced": true
+  },
+  "caveats": [
+    "A direct assignment to both fields is wrong once the current value has become dirty."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "default updates pristine current value",
+      "input": "const i=document.createElement('input'); i.defaultValue='a'; console.log(i.value,i.getAttribute('value'));",
+      "expected_behavior": "prints a a"
+    },
+    {
+      "name": "dirty current value is preserved",
+      "input": "const i=document.createElement('input'); i.value='live'; i.defaultValue='default'; console.log(i.value,i.defaultValue);",
+      "expected_behavior": "prints live default"
+    }
+  ]
+}

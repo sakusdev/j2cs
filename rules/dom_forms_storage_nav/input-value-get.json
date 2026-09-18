@@ -1,0 +1,47 @@
+{
+  "id": "dom.input.value.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read an input element's current value, including type-specific value sanitization.",
+  "source": {
+    "pattern": "$input.value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetInputValue",
+    "template": "NativeDom.GetInputValue($input)",
+    "notes": "Return the control's current value state, not the value content attribute."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "DOMString",
+    "state": "current value",
+    "dirty_value_flag": "observable indirectly",
+    "type_specific_sanitization": true
+  },
+  "caveats": [
+    "Do not substitute getAttribute('value'); current value can diverge from the content attribute."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "reads current value",
+      "input": "const i=document.createElement('input'); i.value='live'; console.log(i.value);",
+      "expected_behavior": "prints live"
+    },
+    {
+      "name": "value can differ from attribute",
+      "input": "const i=document.createElement('input'); i.setAttribute('value','default'); i.value='live'; console.log(i.value,i.getAttribute('value'));",
+      "expected_behavior": "prints live default"
+    }
+  ]
+}

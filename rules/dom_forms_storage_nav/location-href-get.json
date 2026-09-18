@@ -1,0 +1,42 @@
+{
+  "id": "dom.location.href.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read Location.href using URL serialization and Location security semantics.",
+  "source": {
+    "pattern": "$location.href",
+    "requirements": {
+      "receiver_inferred_as": "Location",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.LocationGetHref($location)",
+    "notes": "Return the serialization of the associated Document's current URL, subject to Location object's cross-origin security rules."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "USVString",
+    "serialization": "current URL",
+    "security": "Location cross-origin access rules"
+  },
+  "caveats": [
+    "A URI object cached at creation can become stale after navigation/history changes."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "href is serialized URL",
+      "input": "console.log(typeof location.href);",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "href reflects hash changes",
+      "input": "const old=location.href; location.hash='x'; console.log(location.href.includes('#x'));",
+      "expected_behavior": "prints true before any subsequent navigation changes"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "dom.form.select.selected-index.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set selectedIndex with option selectedness side effects and -1 deselection.",
+  "source": {
+    "pattern": "$select.selectedIndex = $index",
+    "requirements": {
+      "receiver_inferred_as": "HTMLSelectElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetSelectedIndex",
+    "template": "NativeDom.SetSelectedIndex($select, $index)",
+    "notes": "Web IDL converts to long; -1 deselects all options, an in-range index selects that option according to select's selectedness rules, and out-of-range leaves none selected."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "minus_one": "deselect all",
+    "out_of_range": "no option selected",
+    "selection_mutation": true
+  },
+  "caveats": [
+    "Numeric Web IDL conversion and selectedness algorithms must be preserved."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "selects requested option",
+      "input": "const s=document.createElement('select'); s.innerHTML='<option>A</option><option>B</option>'; s.selectedIndex=1; console.log(s.value);",
+      "expected_behavior": "prints B"
+    },
+    {
+      "name": "minus one clears",
+      "input": "const s=document.createElement('select'); s.innerHTML='<option>A</option>'; s.selectedIndex=-1; console.log(s.selectedIndex);",
+      "expected_behavior": "prints -1"
+    }
+  ]
+}

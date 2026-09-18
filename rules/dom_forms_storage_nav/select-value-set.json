@@ -1,0 +1,45 @@
+{
+  "id": "dom.form.select.value.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set select.value using option-value matching and selection algorithms.",
+  "source": {
+    "pattern": "$select.value = $value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLSelectElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetSelectValue",
+    "template": "NativeDom.SetSelectValue($select, $value)",
+    "notes": "Convert to DOMString, select the first option whose value equals it, deselect other options as required by the setter; if no match exists, leave no option selected."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "matching": "DOMString equality against option value",
+    "unmatched": "no option selected",
+    "selectedness_mutation": true
+  },
+  "caveats": [
+    "Do not implement as a dictionary lookup; option order and selectedness side effects matter."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "selects matching value",
+      "input": "const s=document.createElement('select'); s.innerHTML='<option value=a>A</option><option value=b>B</option>'; s.value='b'; console.log(s.selectedIndex);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "unmatched clears selection",
+      "input": "const s=document.createElement('select'); s.innerHTML='<option value=a>A</option>'; s.value='z'; console.log(s.selectedIndex,s.value==='');",
+      "expected_behavior": "prints -1 true"
+    }
+  ]
+}

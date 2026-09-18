@@ -1,0 +1,49 @@
+{
+  "id": "dom.custom-element.form-associated-reactions",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain HTML runtime for form-associated custom-element lifecycle and ElementInternals coupling.",
+  "source": {
+    "pattern": "$formAssociatedCustomElementStateChange",
+    "requirements": {
+      "custom_element_registry_semantics_observable": true,
+      "form_associated_custom_elements_possible": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.RunFormAssociatedCustomElementReactions($element, $change)",
+    "notes": "Preserve form owner association and formAssociatedCallback/formDisabledCallback/formResetCallback/formStateRestoreCallback ordering, plus ElementInternals validity/value/state integration."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callbacks": [
+      "formAssociatedCallback",
+      "formDisabledCallback",
+      "formResetCallback",
+      "formStateRestoreCallback"
+    ],
+    "element_internals": true,
+    "form_owner_changes": true,
+    "reset_integration": true
+  },
+  "caveats": [
+    "This behavior crosses FORM and Custom Elements semantics and requires the retained HTML custom-element model."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/custom-elements.html",
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "reset callback participates in form reset",
+      "input": "/* a form-associated custom element with formResetCallback inside a form, followed by form.reset() */",
+      "expected_behavior": "formResetCallback is invoked through custom-element reactions"
+    },
+    {
+      "name": "association callback observes owner changes",
+      "input": "/* move a form-associated custom element between form owners */",
+      "expected_behavior": "formAssociatedCallback receives the new owner, including null when disassociated"
+    }
+  ]
+}

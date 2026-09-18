@@ -1,0 +1,47 @@
+{
+  "id": "dom.input.value.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set an input element's current value and dirty value flag with type-specific sanitization.",
+  "source": {
+    "pattern": "$input.value = $value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetInputValue",
+    "template": "NativeDom.SetInputValue($input, $value)",
+    "notes": "Web IDL converts to DOMString, sets the current value/dirty flag, then applies the input type's value sanitization algorithm."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "assigned JavaScript value as assignment-expression result outside this setter contract",
+    "dirty_value_flag": "set",
+    "content_attribute_changed": false,
+    "type_specific_sanitization": true
+  },
+  "caveats": [
+    "Number/date/color and other states can sanitize or reject textual forms; C# field assignment is not equivalent."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "text value becomes current value",
+      "input": "const i=document.createElement('input'); i.value='x'; console.log(i.value);",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "number rejects invalid text",
+      "input": "const i=document.createElement('input'); i.type='number'; i.value='not-a-number'; console.log(i.value==='');",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

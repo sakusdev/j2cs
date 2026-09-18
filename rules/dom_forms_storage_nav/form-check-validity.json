@@ -1,0 +1,46 @@
+{
+  "id": "dom.form.check-validity",
+  "category": "dom_forms_storage_nav",
+  "summary": "Perform static constraint validation and return the form validity result.",
+  "source": {
+    "pattern": "$form.checkValidity()",
+    "requirements": {
+      "receiver_inferred_as": "HTMLFormElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.CheckFormValidity",
+    "template": "NativeDom.CheckFormValidity($form)",
+    "notes": "Run static constraint validation across candidate controls; invalid controls receive invalid events and the aggregate result is false if any remain invalid."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "boolean",
+    "validation": "static constraint validation",
+    "invalid_events": true,
+    "navigation": false
+  },
+  "caveats": [
+    "Custom validity, disabled/readonly/barred controls, and form-associated custom elements affect the candidate set."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "required empty control is invalid",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.required=true; f.append(i); console.log(f.checkValidity());",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "invalid event is observable",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.required=true; f.append(i); let n=0; i.addEventListener('invalid',()=>n++); f.checkValidity(); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}
