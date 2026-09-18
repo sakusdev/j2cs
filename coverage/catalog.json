@@ -1,0 +1,582 @@
+{
+  "version": 1,
+  "description": "Coverage targets used by tools/coverage_gap.py. Missing/thin/runtime-heavy targets are ranked for autonomous workstream generation.",
+  "workstreams": [
+    {
+      "id": "VALUES_SYMBOL_BIGINT",
+      "title": "Primitive values, Symbol, and BigInt",
+      "priority": 100,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "values"
+        ],
+        "id_prefixes": [
+          "values.",
+          "symbol.",
+          "bigint."
+        ]
+      },
+      "required_id_prefixes": [
+        "symbol.",
+        "bigint.",
+        "values.undefined",
+        "values.nan"
+      ],
+      "scope": [
+        "Symbol construction/registry/well-known symbols",
+        "BigInt construction/conversion/arithmetic boundaries",
+        "undefined/null/NaN/Infinity/-0 value-model rules",
+        "typeof/value identity interactions not already owned by OPERATORS"
+      ],
+      "ownership_notes": [
+        "Reuse COERCION and OPERATORS instead of duplicating conversions/operators.",
+        "Keep abstract value-model semantics separate from API-specific workstreams."
+      ]
+    },
+    {
+      "id": "ITERATORS_GENERATORS",
+      "title": "Iterators, generators, and for-of",
+      "priority": 98,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "iteration",
+          "iterators",
+          "generators"
+        ],
+        "id_prefixes": [
+          "iterator.",
+          "iteration.",
+          "generator."
+        ]
+      },
+      "required_id_prefixes": [
+        "iterator.",
+        "generator.",
+        "iteration.for-of"
+      ],
+      "scope": [
+        "Iterator/Iterable protocols",
+        "for...of and IteratorClose",
+        "generator functions yield/next/return/throw",
+        "yield* delegation",
+        "sync iterator helpers where appropriate"
+      ],
+      "ownership_notes": [
+        "Reuse FUNCTIONS and ASYNC; do not redefine Promise or generic call semantics.",
+        "Array/String/Map/Set own container APIs; this workstream owns generic iterator protocol semantics."
+      ]
+    },
+    {
+      "id": "ERRORS_CONTROL_FLOW",
+      "title": "Errors and abrupt completion",
+      "priority": 96,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "errors",
+          "control_flow"
+        ],
+        "id_prefixes": [
+          "error.",
+          "errors.",
+          "control."
+        ]
+      },
+      "required_id_prefixes": [
+        "error.",
+        "control.throw",
+        "control.try"
+      ],
+      "scope": [
+        "throw/catch/finally",
+        "Error subclasses and cause",
+        "arbitrary thrown JS values",
+        "abrupt completion propagation",
+        "stack/message portability boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse FUNCTIONS/ASYNC for callback and promise propagation.",
+        "Do not bake engine-specific stack text into native rules."
+      ]
+    },
+    {
+      "id": "MATH_NUMBER",
+      "title": "Math and Number builtins",
+      "priority": 94,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "math",
+          "number"
+        ],
+        "id_prefixes": [
+          "math.",
+          "number."
+        ]
+      },
+      "required_id_prefixes": [
+        "math.",
+        "number."
+      ],
+      "scope": [
+        "Math static methods/constants",
+        "Number constructor/static predicates",
+        "Number.prototype formatting",
+        "IEEE-754 edge cases, -0, NaN, infinities",
+        "safe-integer and parsing behavior"
+      ],
+      "ownership_notes": [
+        "Reuse COERCION for ToNumber/ToNumeric.",
+        "Operator arithmetic remains owned by OPERATORS."
+      ]
+    },
+    {
+      "id": "REFLECT_PROXY_META",
+      "title": "Reflect, Proxy, and meta-object protocol",
+      "priority": 92,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "reflect_proxy"
+        ],
+        "id_prefixes": [
+          "reflect.",
+          "proxy."
+        ]
+      },
+      "required_id_prefixes": [
+        "reflect.",
+        "proxy."
+      ],
+      "scope": [
+        "Reflect.* methods",
+        "Proxy constructor and traps",
+        "revocable proxies",
+        "invariants for get/set/ownKeys/defineProperty/etc.",
+        "runtime-fallback boundaries for dynamic meta-object behavior"
+      ],
+      "ownership_notes": [
+        "Reuse OBJECT descriptors/property semantics and OPERATORS for delete/in.",
+        "Prefer runtime where Proxy observability prevents safe specialization."
+      ]
+    },
+    {
+      "id": "TIMERS_EVENT_LOOP",
+      "title": "Timers and Node event-loop surfaces",
+      "priority": 90,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "timers",
+          "event_loop"
+        ],
+        "id_prefixes": [
+          "node.timers.",
+          "timers.",
+          "eventloop."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.timers.",
+        "eventloop."
+      ],
+      "scope": [
+        "setTimeout/setInterval/setImmediate",
+        "clear* APIs and handle identity",
+        "process.nextTick ordering",
+        "microtask vs timer/immediate phases",
+        "ref/unref/refresh where relevant"
+      ],
+      "ownership_notes": [
+        "Reuse ASYNC Promise/microtask rules.",
+        "Do not model Node event-loop ordering as arbitrary Task scheduling."
+      ]
+    },
+    {
+      "id": "WEB_URL_FETCH",
+      "title": "WHATWG URL and Fetch APIs",
+      "priority": 88,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "web_url_fetch"
+        ],
+        "id_prefixes": [
+          "web.url.",
+          "web.fetch.",
+          "web.headers.",
+          "web.request.",
+          "web.response."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.url.",
+        "web.fetch.",
+        "web.headers."
+      ],
+      "scope": [
+        "URL/URLSearchParams",
+        "fetch",
+        "Headers/Request/Response",
+        "AbortSignal integration boundaries",
+        "body consumption and web-stream interactions"
+      ],
+      "ownership_notes": [
+        "Node-specific fileURL/path helpers remain in NODE_CORE.",
+        "Reuse ASYNC and DOM/WebIDL call semantics where applicable."
+      ]
+    },
+    {
+      "id": "NODE_HTTP_CRYPTO",
+      "title": "Node HTTP/HTTPS and crypto core",
+      "priority": 86,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "node_http_crypto"
+        ],
+        "id_prefixes": [
+          "node.http.",
+          "node.https.",
+          "node.crypto."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.http.",
+        "node.crypto."
+      ],
+      "scope": [
+        "http/https request/response/server core",
+        "headers and stream coupling",
+        "crypto hash/HMAC/random/UUID representative APIs",
+        "Buffer interactions",
+        "host/TLS/runtime boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse EVENTS_STREAMS and BINARY/Buffer semantics.",
+        "Avoid ad-hoc crypto substitutions without explicit platform contracts."
+      ]
+    },
+    {
+      "id": "ELECTRON_OS_INTEGRATION",
+      "title": "Electron OS integration APIs",
+      "priority": 84,
+      "minimum_rules": 35,
+      "match": {
+        "id_prefixes": [
+          "electron.tray.",
+          "electron.notification.",
+          "electron.globalshortcut.",
+          "electron.menu.",
+          "electron.power.",
+          "electron.screen.",
+          "electron.native-theme."
+        ]
+      },
+      "required_id_prefixes": [
+        "electron.tray.",
+        "electron.notification.",
+        "electron.globalshortcut.",
+        "electron.menu."
+      ],
+      "scope": [
+        "Tray",
+        "Notification",
+        "globalShortcut",
+        "Menu/MenuItem",
+        "powerMonitor/powerSaveBlocker",
+        "screen/nativeTheme representative APIs"
+      ],
+      "ownership_notes": [
+        "Reuse existing ElectronCompat host abstraction.",
+        "Do not duplicate dialog/shell/clipboard/nativeImage rules already covered."
+      ]
+    },
+    {
+      "id": "DOM_FORMS_STORAGE_NAV",
+      "title": "DOM forms, storage, observers, and navigation",
+      "priority": 82,
+      "minimum_rules": 40,
+      "match": {
+        "id_prefixes": [
+          "dom.form.",
+          "dom.storage.",
+          "dom.history.",
+          "dom.location.",
+          "dom.observer.",
+          "dom.input.",
+          "dom.custom-element."
+        ]
+      },
+      "required_id_prefixes": [
+        "dom.form.",
+        "dom.storage.",
+        "dom.observer."
+      ],
+      "scope": [
+        "HTML form/input/select/textarea state",
+        "localStorage/sessionStorage",
+        "MutationObserver/IntersectionObserver boundaries",
+        "history/location navigation surfaces",
+        "custom-element reaction boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse DOM_RENDERER node/event semantics.",
+        "CSS layout/rendering belongs to a separate renderer workstream."
+      ]
+    },
+    {
+      "id": "CSS_LAYOUT_RENDERER",
+      "title": "CSSOM and native layout/rendering boundary",
+      "priority": 80,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "css_renderer"
+        ],
+        "id_prefixes": [
+          "css.",
+          "cssom.",
+          "layout."
+        ]
+      },
+      "required_id_prefixes": [
+        "css.",
+        "layout."
+      ],
+      "scope": [
+        "CSSStyleDeclaration/CSSOM mutation",
+        "computed style boundary",
+        "layout metrics such as client/offset/scroll sizes",
+        "style invalidation",
+        "native-renderer vs retained web-runtime fallback criteria"
+      ],
+      "ownership_notes": [
+        "Do not claim pixel-perfect browser layout without an explicit compatibility runtime.",
+        "Reuse DOM_RENDERER identity/event rules."
+      ]
+    },
+    {
+      "id": "WORKERS_MESSAGING",
+      "title": "Workers, MessagePort, and structured clone",
+      "priority": 78,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "workers_messaging"
+        ],
+        "id_prefixes": [
+          "worker.",
+          "messageport.",
+          "structured-clone."
+        ]
+      },
+      "required_id_prefixes": [
+        "worker.",
+        "messageport.",
+        "structured-clone."
+      ],
+      "scope": [
+        "Worker lifecycle",
+        "MessageChannel/MessagePort",
+        "postMessage",
+        "structured clone and transfer lists",
+        "SharedArrayBuffer/transfer interactions"
+      ],
+      "ownership_notes": [
+        "Reuse BINARY backing-store semantics and ASYNC scheduling.",
+        "Electron IPC structured-clone behavior is related but not the canonical web Worker owner."
+      ]
+    },
+    {
+      "id": "NODE_CHILD_WORKER",
+      "title": "Node child_process, worker_threads, and cluster",
+      "priority": 76,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "node_process_workers"
+        ],
+        "id_prefixes": [
+          "node.child-process.",
+          "node.worker-threads.",
+          "node.cluster."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.child-process.",
+        "node.worker-threads."
+      ],
+      "scope": [
+        "child_process spawn/exec/fork core",
+        "worker_threads lifecycle/messages",
+        "stdio/IPC surfaces",
+        "termination/error/exit ordering"
+      ],
+      "ownership_notes": [
+        "Reuse EVENTS_STREAMS, BINARY, and WORKERS_MESSAGING semantics where possible.",
+        "Keep OS process lifecycle differences explicit."
+      ]
+    },
+    {
+      "id": "INTL",
+      "title": "Intl / ECMA-402",
+      "priority": 74,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "intl"
+        ],
+        "id_prefixes": [
+          "intl."
+        ]
+      },
+      "required_id_prefixes": [
+        "intl."
+      ],
+      "scope": [
+        "Intl.Collator",
+        "NumberFormat",
+        "DateTimeFormat",
+        "PluralRules/RelativeTimeFormat",
+        "Locale/Segmenter representative behavior"
+      ],
+      "ownership_notes": [
+        "Locale/timezone data are runtime/profile-sensitive.",
+        "Reuse STRING and DATE_TIME rather than duplicating their non-locale semantics."
+      ]
+    },
+    {
+      "id": "ARRAY_CORE",
+      "title": "Array core",
+      "priority": 40,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "array"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "STRING_CORE",
+      "title": "String core",
+      "priority": 40,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "string"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "OBJECT_CORE",
+      "title": "Object core",
+      "priority": 40,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "object"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "OPERATORS",
+      "title": "Operators",
+      "priority": 40,
+      "minimum_rules": 65,
+      "match": {
+        "categories": [
+          "operators"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "COERCION",
+      "title": "Coercion",
+      "priority": 40,
+      "minimum_rules": 55,
+      "match": {
+        "categories": [
+          "coercion"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "FUNCTIONS",
+      "title": "Functions",
+      "priority": 40,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "functions"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "ASYNC_PROMISES",
+      "title": "Async and Promise",
+      "priority": 40,
+      "minimum_rules": 25,
+      "match": {
+        "categories": [
+          "async"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "NODE_FS",
+      "title": "Node fs",
+      "priority": 40,
+      "minimum_rules": 25,
+      "match": {
+        "categories": [
+          "node_fs"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "ELECTRON_CORE",
+      "title": "Electron core",
+      "priority": 40,
+      "minimum_rules": 50,
+      "match": {
+        "category_prefixes": [
+          "electron."
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    },
+    {
+      "id": "DOM_RENDERER_CORE",
+      "title": "DOM renderer core",
+      "priority": 40,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "dom_renderer"
+        ]
+      },
+      "scope": [],
+      "ownership_notes": []
+    }
+  ]
+}

@@ -55,4 +55,17 @@ sakusdev/j2cs の自律Workerとして prompts/worker.md に従い、未担当�
 
 Use `prompts/workstream-issue-template.md` when adding new workstream tasks.
 
+## Coverage gap automation
+
+`tools/coverage_gap.py` measures the current rule corpus against the planning
+targets in `coverage/catalog.json`. It ranks missing, thin, and runtime-heavy
+semantic workstreams and can emit machine-readable Issue proposals.
+
+The `Coverage gaps` GitHub Actions workflow publishes a report artifact on
+relevant changes. A manual workflow run can also create the highest-ranked
+`STATUS: READY` Issues automatically; `tools/create_gap_issues.py` deduplicates
+existing open workstreams before creation.
+
+See `coverage/README.md` for usage and scoring details.
+
 The repository is intentionally a knowledge base first. A compiler can consume this data later through an AST/type-analysis pipeline.
