@@ -1,0 +1,44 @@
+{
+  "id": "node.events.event-emitter.add-listener",
+  "category": "events_streams",
+  "summary": "Preserve addListener as the on() alias with identical ordering and return-value semantics.",
+  "source": {
+    "pattern": "$emitter.addListener($eventName, $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.On",
+    "template": "NodeEvents.On($emitter, $eventName, $listener)",
+    "notes": "addListener is an alias of on; use the same helper contract rather than defining a second listener store."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "alias_of": "EventEmitter.on",
+    "return_value": "receiver",
+    "duplicates": "allowed",
+    "ordering": "append"
+  },
+  "caveats": [
+    "If addListener itself is monkey-patched, fall back to ordinary property lookup/call semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "alias registers",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; e.addListener('x',()=>n++); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "duplicate alias registrations",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; function f(){n++} e.addListener('x',f).addListener('x',f); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

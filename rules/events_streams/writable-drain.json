@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.writable.drain",
+  "category": "events_streams",
+  "summary": "Emit drain only after a Writable that returned false becomes ready for more writes.",
+  "source": {
+    "pattern": "$writable.on(\"drain\", $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_writable": true,
+      "builtin_on_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.OnDrain",
+    "template": "NodeStreams.OnDrain($writable, $listener)",
+    "notes": "Register through EventEmitter semantics; runtime emits drain when previously backpressured queued data has drained enough that writing should resume."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "write returned false / writableNeedDrain",
+    "meaning": "resume producing writes",
+    "ordering": "after relevant buffered writes advance"
+  },
+  "caveats": [
+    "drain is not emitted for every completed write.",
+    "The exact scheduling depends on the writable implementation and remains runtime-managed."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html",
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "drain follows backpressure",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({highWaterMark:1,write(c,e,cb){setImmediate(cb)}}); if(!w.write(Buffer.from([1]))) w.once('drain',()=>console.log('drain'));",
+      "expected_behavior": "prints drain after the buffered write advances"
+    },
+    {
+      "name": "no required drain after true write",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({highWaterMark:1024,write(c,e,cb){cb()}}); console.log(w.write('x'));",
+      "expected_behavior": "prints true; caller must not wait for drain"
+    }
+  ]
+}

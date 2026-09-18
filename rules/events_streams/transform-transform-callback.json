@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.transform.transform-callback",
+  "category": "events_streams",
+  "summary": "Serialize Transform _transform work so the next chunk is not processed until callback completes.",
+  "source": {
+    "pattern": "$transform._transform($chunk, $encoding, $callback)",
+    "requirements": {
+      "receiver_inferred_as_node_transform_implementation": true,
+      "called_by_node_stream_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.InvokeTransform",
+    "template": "NodeStreams.InvokeTransform($transform, $chunk, $encoding, $callback)",
+    "notes": "Node never calls _transform in parallel; the callback gates dequeuing of the next input. callback(error) fails the stream; callback(null, data) can emit output equivalently to push(data) then callback()."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "parallelism": "none for _transform invocations",
+    "next_chunk": "waits for callback",
+    "output": "zero or more pushes / optional callback data",
+    "error": "callback error enters stream error path"
+  },
+  "caveats": [
+    "Application code must not call _transform directly.",
+    "Do not map each chunk to independent Task.Run work; that can reorder chunks."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "second transform waits",
+      "input": "const {Transform}=require('node:stream'); const calls=[]; let first; const t=new Transform({transform(c,e,cb){calls.push(c.toString()); if(!first)first=cb; else cb(null,c)}}); t.write('a'); t.write('b'); console.log(calls.join(',')); first(null,Buffer.from('a'));",
+      "expected_behavior": "before first callback prints only a; b is processed afterward"
+    },
+    {
+      "name": "callback data becomes output",
+      "input": "const {Transform}=require('node:stream'); const t=new Transform({transform(c,e,cb){cb(null,Buffer.from('x'))}}); t.on('data',c=>console.log(c.toString())); t.end('a');",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

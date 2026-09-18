@@ -1,0 +1,47 @@
+{
+  "id": "node.stream.writable.destroy",
+  "category": "events_streams",
+  "summary": "Destroy a Writable immediately with Node idempotence, error, and close behavior rather than flushing like end().",
+  "source": {
+    "pattern": "$writable.destroy($error?)",
+    "requirements": {
+      "receiver_inferred_as_node_writable": true,
+      "builtin_destroy_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.DestroyWritable",
+    "template": "NodeStreams.DestroyWritable($writable, $error)",
+    "notes": "Mark destroyed immediately, stop normal use, optionally emit error, then close unless emitClose is false; pending writes need not flush. Repeated destroy calls are no-ops apart from internal _destroy behavior."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "destroyed": "true immediately after call",
+    "pending_writes": "may fail / need not flush",
+    "error_argument": "emitted as error",
+    "close": "normally follows",
+    "idempotence": "subsequent calls no-op"
+  },
+  "caveats": [
+    "destroy(error) is not a graceful end().",
+    "Event emission may be deferred by the implementation; preserve Node ordering rather than throwing inline by assumption."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "destroyed becomes true",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({write(c,e,cb){cb()}}); w.destroy(); console.log(w.destroyed);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "repeated destroy no-op",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({write(c,e,cb){cb()}}); w.destroy(); w.destroy(); console.log(w.destroyed);",
+      "expected_behavior": "prints true without creating a second ordinary destroy transition"
+    }
+  ]
+}

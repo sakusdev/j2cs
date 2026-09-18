@@ -1,0 +1,44 @@
+{
+  "id": "node.stream.readable.unpipe",
+  "category": "events_streams",
+  "summary": "Detach one or all pipe destinations and preserve flow-state/unpipe event behavior.",
+  "source": {
+    "pattern": "$readable.unpipe($destination?)",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_unpipe_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Unpipe",
+    "template": "NodeStreams.Unpipe($readable, $destination)",
+    "notes": "Detach the specified destination, or all destinations when omitted; emit 'unpipe' on each detached destination as Node requires; return the readable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "omitted_destination": "detach all",
+    "unknown_destination": "no-op",
+    "flow_state": "can become non-flowing after unpipe"
+  },
+  "caveats": [
+    "Removing a pipe can leave readableFlowing false; merely adding a data listener afterward does not always restart it until resume()."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "specific unpipe",
+      "input": "const {PassThrough}=require('node:stream'); const r=new PassThrough(); const w=new PassThrough(); let n=0; w.on('unpipe',()=>n++); r.pipe(w); r.unpipe(w); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "unpipe unknown destination no-op",
+      "input": "const {PassThrough}=require('node:stream'); const r=new PassThrough(); const w=new PassThrough(); console.log(r.unpipe(w)===r);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

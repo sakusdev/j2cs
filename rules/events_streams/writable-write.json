@@ -1,0 +1,46 @@
+{
+  "id": "node.stream.writable.write",
+  "category": "events_streams",
+  "summary": "Write a chunk with Node validation, buffering, callback timing, and the backpressure boolean return.",
+  "source": {
+    "pattern": "$writable.write($chunk, $encoding?, $callback?)",
+    "requirements": {
+      "receiver_inferred_as_node_writable": true,
+      "builtin_write_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Write",
+    "template": "NodeStreams.Write($writable, $chunk, $encoding, $callback)",
+    "notes": "Admit/validate the chunk, buffer as needed, invoke the per-write callback asynchronously after handling, and return false when buffered size reaches/exceeds highWaterMark."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean backpressure signal",
+    "callback": "asynchronous after chunk handled",
+    "callback_error": "callback receives write error before corresponding error event",
+    "null_chunk": "invalid even in objectMode",
+    "after_end": "stream write-after-end error semantics"
+  },
+  "caveats": [
+    "Do not ignore the return value; doing so defeats Node backpressure.",
+    "String decoding, TypedArray/DataView support, and objectMode affect accepted chunks."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "highWaterMark false",
+      "input": "const {Writable}=require('node:stream'); let done; const w=new Writable({highWaterMark:1,write(c,e,cb){done=cb}}); console.log(w.write(Buffer.from([1]))); done();",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "null rejected in object mode",
+      "input": "const {Writable}=require('node:stream'); const w=new Writable({objectMode:true,write(v,e,cb){cb()}}); try{w.write(null)}catch(e){console.log(e.code||e.name)}",
+      "expected_behavior": "throws a Node invalid-argument/type error; null is not a valid data item"
+    }
+  ]
+}

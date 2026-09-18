@@ -1,0 +1,47 @@
+{
+  "id": "node.stream.duplex.constructor",
+  "category": "events_streams",
+  "summary": "Construct Duplex with independent readable and writable state/buffers.",
+  "source": {
+    "pattern": "new Duplex($options)",
+    "requirements": {
+      "binding_resolves_to_node_stream_duplex": true,
+      "constructor_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.CreateDuplex",
+    "template": "NodeStreams.CreateDuplex($options)",
+    "notes": "Runtime must combine Readable and Writable contracts while keeping separate buffers, object modes, highWaterMarks, lifecycle state, and half-open behavior."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inherits": [
+      "Readable semantics",
+      "Writable semantics"
+    ],
+    "buffers": "separate readable and writable queues",
+    "high_water_marks": "independent unless common option supplied",
+    "allowHalfOpen_default": true
+  },
+  "caveats": [
+    "Mapping Duplex to one bidirectional System.IO.Stream buffer loses separate Node flow-control state."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "two directions exist",
+      "input": "const {Duplex}=require('node:stream'); const d=new Duplex({read(){this.push(null)},write(c,e,cb){cb()}}); console.log(d.readable,d.writable);",
+      "expected_behavior": "both sides are independently enabled initially"
+    },
+    {
+      "name": "separate hwm options",
+      "input": "const {Duplex}=require('node:stream'); const d=new Duplex({read(){},write(c,e,cb){cb()},readableHighWaterMark:1,writableHighWaterMark:7}); console.log(d.readableHighWaterMark,d.writableHighWaterMark);",
+      "expected_behavior": "prints 1 7"
+    }
+  ]
+}

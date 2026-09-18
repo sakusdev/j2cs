@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.readable.data-listener-flowing",
+  "category": "events_streams",
+  "summary": "Specialize EventEmitter.on('data') because adding a data listener can change Readable flow state.",
+  "source": {
+    "pattern": "$readable.on(\"data\", $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_on_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.OnData",
+    "template": "NodeStreams.OnData($readable, $listener)",
+    "notes": "Register via NodeEvents semantics and, if the stream has not been explicitly paused/readable-driven, switch it to flowing mode so chunks are delivered as data events."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "listener_registration": "reuses NodeEvents.On ordering/duplicates",
+    "flow_transition": "null to true unless explicitly paused/readable listener rules prevent it",
+    "delivery": "chunks emitted as data become consumed"
+  },
+  "caveats": [
+    "A generic EventEmitter.on lowering is insufficient because it would miss the Readable state transition.",
+    "Mixing data/readable/pipe/async-iterator consumption styles can produce unintuitive behavior and remains runtime-managed."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html",
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "data listener starts flowing",
+      "input": "const {Readable}=require('node:stream'); const r=Readable.from(['a']); r.on('data',()=>{}); console.log(r.readableFlowing);",
+      "expected_behavior": "readableFlowing becomes true as consumption starts"
+    },
+    {
+      "name": "explicitly paused stream stays paused until resumed",
+      "input": "const {PassThrough}=require('node:stream'); const r=new PassThrough(); r.pause(); r.on('data',()=>console.log('data')); r.write('x'); console.log(r.readableFlowing);",
+      "expected_behavior": "no data event before resume; readableFlowing remains false"
+    }
+  ]
+}

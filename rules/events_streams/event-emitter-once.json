@@ -1,0 +1,45 @@
+{
+  "id": "node.events.event-emitter.once",
+  "category": "events_streams",
+  "summary": "Register a one-shot listener that is removed before invocation, including under re-entrant emit.",
+  "source": {
+    "pattern": "$emitter.once($eventName, $listener)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.Once",
+    "template": "NodeEvents.Once($emitter, $eventName, $listener)",
+    "notes": "The helper must install Node-compatible once state/wrapper behavior and remove the registration before calling the listener so a re-entrant emit does not call it again."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "receiver",
+    "fires": "at most once",
+    "removal_timing": "before listener invocation",
+    "raw_listener_identity": "Node exposes a once wrapper through rawListeners"
+  },
+  "caveats": [
+    "A naive 'call then remove' implementation is wrong for re-entrant emit.",
+    "removeListener(event, originalListener) must be able to remove a pending once registration."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "one shot",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; e.once('x',()=>n++); e.emit('x'); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "reentrant emit still once",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); let n=0; e.once('x',()=>{n++; e.emit('x')}); e.emit('x'); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "node.events.event-emitter.emit",
+  "category": "events_streams",
+  "summary": "Synchronously invoke the emit-start listener snapshot in registration order and return whether listeners existed.",
+  "source": {
+    "pattern": "$emitter.emit($eventName, ...$args)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.Emit",
+    "template": "NodeEvents.Emit($emitter, $eventName, $args)",
+    "notes": "Must synchronously call listeners in registration order, bind ordinary-function this to the emitter through existing FUNCTIONS semantics, ignore listener return values, propagate thrown exceptions, and snapshot listeners at emit start."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "dispatch": "synchronous",
+    "ordering": "registration order",
+    "return_value": "true iff event had listeners",
+    "arguments": "forwarded as supplied",
+    "listener_returns": "ignored",
+    "listener_throw": "propagates immediately; later listeners are not called",
+    "mutation_during_emit": "current listener snapshot remains in effect"
+  },
+  "caveats": [
+    "Do not schedule listeners through Task/async dispatch; that changes ordering and exception propagation.",
+    "The 'error' event has additional no-listener semantics covered by node.events.event-emitter.emit-error-unhandled."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html",
+    "rules/functions/call-extra-arguments.json"
+  ],
+  "tests": [
+    {
+      "name": "ordered synchronous dispatch and boolean result",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); const out=[]; e.on('x',()=>out.push(1)); e.on('x',()=>out.push(2)); console.log(e.emit('x'),out.join(','),e.emit('none'));",
+      "expected_behavior": "prints true 1,2 false"
+    },
+    {
+      "name": "throw stops later listener",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); const out=[]; e.on('x',()=>{out.push('a');throw Error('boom')}); e.on('x',()=>out.push('b')); try{e.emit('x')}catch(err){out.push(err.message)} console.log(out.join(','));",
+      "expected_behavior": "prints a,boom"
+    }
+  ]
+}

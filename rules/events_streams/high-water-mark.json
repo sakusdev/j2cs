@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.high-water-mark",
+  "category": "events_streams",
+  "summary": "Treat highWaterMark as a backpressure threshold measured in bytes/code-units/objects, not a hard memory cap.",
+  "source": {
+    "pattern": "new $Stream({highWaterMark:$hwm, objectMode:$objectMode?}) / $stream.*HighWaterMark",
+    "requirements": {
+      "receiver_or_constructor_inferred_as_node_stream": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.ConfigureHighWaterMark",
+    "template": "NodeStreams.ConfigureHighWaterMark($stream, $hwm, $mode)",
+    "notes": "Runtime must apply the threshold independently to readable/writable sides where applicable; objectMode counts objects, byte mode counts bytes, and encoded readable strings use UTF-16 code units."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "role": "threshold, not hard limit",
+    "writable": "write returns false at/above threshold after admitting chunk",
+    "readable": "producer should stop pushing when threshold reached",
+    "object_mode": "counts objects",
+    "encoded_strings": "counts UTF-16 code units"
+  },
+  "caveats": [
+    "Node defaults can change across Node versions; preserve explicit options and avoid baking a stale default into translation rules.",
+    "Continued writes after false are allowed but can buffer unboundedly and must not be silently dropped."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "object mode counts objects",
+      "input": "const {Writable}=require('node:stream'); let cb; const w=new Writable({objectMode:true,highWaterMark:1,write(v,e,d){cb=d}}); console.log(w.write({x:1})); cb();",
+      "expected_behavior": "prints false after one queued object reaches threshold 1"
+    },
+    {
+      "name": "threshold is not rejection",
+      "input": "const {Writable}=require('node:stream'); let callbacks=[]; const w=new Writable({highWaterMark:1,write(c,e,cb){callbacks.push(cb)}}); const a=w.write('a'); const b=w.write('b'); console.log(a,b,w.writableLength>=2); callbacks.shift()();",
+      "expected_behavior": "writes are admitted/buffered even when false signals backpressure"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "node.stream.readable.async-iterator",
+  "category": "events_streams",
+  "summary": "Expose Readable's Node async iterator while reusing the existing generic for-await-of lowering.",
+  "source": {
+    "pattern": "$readable[Symbol.asyncIterator]()",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_async_iterator_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.GetAsyncIterator",
+    "template": "NodeStreams.GetAsyncIterator($readable)",
+    "notes": "Create the stream async iterator; consuming it drains the stream, and early return/break/throw destroys the stream by default. The surrounding for-await-of lowering remains owned by async.for-await-of / JsAsyncIterator.ForAwait."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "consumption": "drains chunks asynchronously",
+    "early_exit": "destroys stream by default",
+    "iterator_protocol": "AsyncIterator",
+    "generic_loop": "reuse JsAsyncIterator.ForAwait"
+  },
+  "caveats": [
+    "Do not duplicate generic async-iterator close semantics in this workstream.",
+    "readable.iterator({destroyOnReturn:false}) is a distinct API and is intentionally deferred."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html",
+    "rules/async/for-await-of.json"
+  ],
+  "tests": [
+    {
+      "name": "for await consumes chunks",
+      "input": "const {Readable}=require('node:stream'); (async()=>{let s='';for await(const x of Readable.from(['a','b']))s+=x;console.log(s)})();",
+      "expected_behavior": "prints ab using the stream async iterator plus generic for-await-of semantics"
+    },
+    {
+      "name": "break destroys default iterator stream",
+      "input": "const {Readable}=require('node:stream'); (async()=>{const r=Readable.from([1,2,3]);for await(const x of r){break}console.log(r.destroyed)})();",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

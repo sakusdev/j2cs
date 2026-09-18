@@ -1,0 +1,47 @@
+{
+  "id": "node.stream.readable.pipe",
+  "category": "events_streams",
+  "summary": "Pipe a Readable to a Writable with Node backpressure, event, and destination-ending semantics.",
+  "source": {
+    "pattern": "$readable.pipe($destination, $options?)",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "destination_inferred_as_node_writable": true,
+      "builtin_pipe_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Pipe",
+    "template": "NodeStreams.Pipe($readable, $destination, $options)",
+    "notes": "Attach destination, enter flowing mode, pause/resume according to write() backpressure, emit 'pipe' on destination, return destination, and by default call destination.end() when source ends."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "destination",
+    "backpressure": "managed from destination.write boolean and drain",
+    "default_end": true,
+    "multiple_destinations": "supported",
+    "source_error": "does not automatically close destination"
+  },
+  "caveats": [
+    "A simple copy loop misses event ordering, multiple destinations, drain coordination, and error behavior.",
+    "options.end === false keeps destination writable after source end."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "returns destination and ends by default",
+      "input": "const {Readable,Writable}=require('node:stream'); const r=Readable.from(['x']); const w=new Writable({write(c,e,cb){cb()}}); console.log(r.pipe(w)===w); w.on('finish',()=>console.log('finish'));",
+      "expected_behavior": "prints true and later finish"
+    },
+    {
+      "name": "end false leaves destination open",
+      "input": "const {Readable,PassThrough}=require('node:stream'); const r=Readable.from(['x']); const w=new PassThrough(); r.pipe(w,{end:false}); r.on('end',()=>console.log(w.writableEnded)); w.resume();",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "node.stream.readable.constructor",
+  "category": "events_streams",
+  "summary": "Construct Readable with a Node-compatible runtime state machine rather than System.IO.Stream.",
+  "source": {
+    "pattern": "new Readable($options?)",
+    "requirements": {
+      "binding_resolves_to_node_stream_readable": true,
+      "constructor_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.CreateReadable",
+    "template": "NodeStreams.CreateReadable($options)",
+    "notes": "Runtime must preserve paused/flowing states, internal buffering, objectMode, encoding, highWaterMark, destroy/close state, and custom read/destroy callbacks."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "states": [
+      "readableFlowing null",
+      "false",
+      "true"
+    ],
+    "buffering": "runtime-managed",
+    "object_mode": "changes chunk/count semantics",
+    "custom_hooks": [
+      "read",
+      "destroy"
+    ]
+  },
+  "caveats": [
+    "System.IO.Stream does not model Node's event-driven readable state machine or objectMode.",
+    "Subclass overrides and user callbacks can execute arbitrary JavaScript semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "readable starts non-flowing",
+      "input": "const {Readable}=require('node:stream'); const r=new Readable({read(){}}); console.log(r.readableFlowing);",
+      "expected_behavior": "prints null"
+    },
+    {
+      "name": "object mode preserves objects",
+      "input": "const {Readable}=require('node:stream'); const r=new Readable({objectMode:true,read(){this.push({x:1});this.push(null)}}); r.on('data',x=>console.log(x.x));",
+      "expected_behavior": "prints 1 without byte/string coercion"
+    }
+  ]
+}

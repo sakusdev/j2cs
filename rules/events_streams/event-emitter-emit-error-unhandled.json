@@ -1,0 +1,46 @@
+{
+  "id": "node.events.event-emitter.emit-error-unhandled",
+  "category": "events_streams",
+  "summary": "Preserve EventEmitter's special unhandled 'error' behavior instead of treating it as an ordinary event.",
+  "source": {
+    "pattern": "$emitter.emit(\"error\", $error)",
+    "requirements": {
+      "receiver_inferred_as_node_event_emitter": true,
+      "builtin_emit_not_overridden": true,
+      "no_registered_error_listener": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeEvents.Emit",
+    "template": "NodeEvents.Emit($emitter, \"error\", $error)",
+    "notes": "When no regular 'error' listener exists, Node throws the emitted Error (or creates an unhandled-error failure for non-Error payloads). errorMonitor listeners do not count as handling the error."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "no_error_listener": "throws synchronously",
+    "error_listener_present": "ordinary synchronous emit semantics",
+    "process_effect": "an uncaught throw may terminate the process",
+    "return_value_on_handled": "true"
+  },
+  "caveats": [
+    "Do not lower to a silent boolean false for the no-listener case.",
+    "captureRejections can generate error events asynchronously; advanced rejection routing is intentionally deferred."
+  ],
+  "references": [
+    "https://nodejs.org/api/events.html"
+  ],
+  "tests": [
+    {
+      "name": "unhandled error throws same Error",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); const err=Error('x'); try{e.emit('error',err)}catch(x){console.log(x===err)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "handled error does not throw",
+      "input": "const {EventEmitter}=require('node:events'); const e=new EventEmitter(); e.on('error',e=>console.log(e.message)); console.log(e.emit('error',Error('x')));",
+      "expected_behavior": "prints x then true"
+    }
+  ]
+}

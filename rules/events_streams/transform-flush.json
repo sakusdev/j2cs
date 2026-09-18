@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.transform.flush",
+  "category": "events_streams",
+  "summary": "Run optional Transform _flush after written input is consumed and before readable end.",
+  "source": {
+    "pattern": "$transform._flush($callback)",
+    "requirements": {
+      "receiver_inferred_as_node_transform_implementation": true,
+      "called_by_node_stream_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.InvokeFlush",
+    "template": "NodeStreams.InvokeFlush($transform, $callback)",
+    "notes": "Call flush only after no more written data remains, allow zero or more final pushes, require callback completion, then permit readable end. On error, normal end/finish must not be synthesized incorrectly."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timing": "after all transform input, before readable end",
+    "output": "may push final chunks",
+    "callback": "gates completion",
+    "error": "enters stream error path"
+  },
+  "caveats": [
+    "Application code must not call _flush directly.",
+    "Writable finish and readable end are related but distinct sides of Transform lifecycle."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "flush emits trailing data",
+      "input": "const {Transform}=require('node:stream'); const t=new Transform({transform(c,e,cb){cb(null,c)},flush(cb){this.push('!');cb()}}); let s=''; t.on('data',c=>s+=c); t.on('end',()=>console.log(s)); t.end('a');",
+      "expected_behavior": "prints a!"
+    },
+    {
+      "name": "flush precedes end",
+      "input": "const {Transform}=require('node:stream'); const out=[]; const t=new Transform({transform(c,e,cb){cb()},flush(cb){out.push('flush');cb()}}); t.on('end',()=>{out.push('end');console.log(out.join(','))}); t.resume(); t.end();",
+      "expected_behavior": "prints flush,end"
+    }
+  ]
+}

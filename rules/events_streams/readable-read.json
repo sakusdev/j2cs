@@ -1,0 +1,45 @@
+{
+  "id": "node.stream.readable.read",
+  "category": "events_streams",
+  "summary": "Read from the Node Readable buffer with byte/object-mode semantics and nullable temporary-empty result.",
+  "source": {
+    "pattern": "$readable.read($size?)",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_read_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Read",
+    "template": "NodeStreams.Read($readable, $size)",
+    "notes": "Runtime must preserve internal queue boundaries, optional size behavior, objectMode single-item semantics, setEncoding output, data-event side effects when a chunk is returned, and null meaning no chunk currently available."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "chunk or null",
+    "null": "may mean temporarily empty, not necessarily EOF",
+    "object_mode": "returns one object regardless of size",
+    "after_end": "returns null"
+  },
+  "caveats": [
+    "Do not translate null from read() directly to permanent EOF without stream state.",
+    "Buffer/string boundaries and encoding decoder state are observable."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "object mode ignores size",
+      "input": "const {Readable}=require('node:stream'); const r=Readable.from([{x:1},{x:2}],{objectMode:true}); r.on('readable',()=>{const v=r.read(999); if(v) console.log(v.x)});",
+      "expected_behavior": "each successful read yields a single object, not 999 objects"
+    },
+    {
+      "name": "read after end is null",
+      "input": "const {Readable}=require('node:stream'); const r=Readable.from([]); r.on('end',()=>console.log(r.read()===null)); r.resume();",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

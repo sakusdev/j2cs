@@ -1,0 +1,47 @@
+{
+  "id": "node.stream.readable.push",
+  "category": "events_streams",
+  "summary": "Push a chunk into a Readable queue and preserve the backpressure boolean.",
+  "source": {
+    "pattern": "$readable.push($chunk, $encoding?)",
+    "requirements": {
+      "receiver_inferred_as_node_readable": true,
+      "builtin_push_not_overridden": true,
+      "chunk_not_null": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeStreams.Push",
+    "template": "NodeStreams.Push($readable, $chunk, $encoding)",
+    "notes": "Add the chunk to the internal queue or deliver it in flowing mode; return false when the producer should stop pushing until the runtime asks for more."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mutation": "adds readable data",
+    "flowing_mode": "may emit data immediately",
+    "paused_mode": "buffers",
+    "return_value": "backpressure signal",
+    "undefined_non_object_mode": "treated as empty string/buffer by Node semantics"
+  },
+  "caveats": [
+    "The return value is not a success/failure flag; it is flow-control guidance.",
+    "Chunk validation differs between objectMode and byte/string modes."
+  ],
+  "references": [
+    "https://nodejs.org/api/stream.html"
+  ],
+  "tests": [
+    {
+      "name": "push feeds data",
+      "input": "const {Readable}=require('node:stream'); const r=new Readable({read(){}}); r.push('x'); console.log(r.read().toString());",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "push may signal backpressure",
+      "input": "const {Readable}=require('node:stream'); const r=new Readable({highWaterMark:1,read(){}}); console.log(r.push(Buffer.from([1])));",
+      "expected_behavior": "prints false when buffered length reaches the threshold"
+    }
+  ]
+}
