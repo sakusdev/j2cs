@@ -1,0 +1,38 @@
+{
+  "id": "control.try.finally-runs-on-return",
+  "category": "control_flow",
+  "summary": "Execute finally before a pending return leaves a function.",
+  "source": {
+    "pattern": "try { return $value; } finally { $finally }",
+    "requirements": {
+      "inside_function": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion.TryFinally",
+    "template": "JsCompletion.TryFinally($body, $finally)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "evaluated before entering finally",
+    "finally": "executes before the return completes",
+    "override": "abrupt finally can replace the pending return"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "return expression first",
+      "input": "let s=[]; function f(){try{return (s.push('ret'),3)}finally{s.push('fin')}} console.log(f(),s.join(','))",
+      "expected_behavior": "prints 3 ret,fin"
+    },
+    {
+      "name": "finally throw replaces return",
+      "input": "function f(){try{return 1}finally{throw 2}} try{f()}catch(e){console.log(e)}",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

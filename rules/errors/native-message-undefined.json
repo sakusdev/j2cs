@@ -1,0 +1,46 @@
+{
+  "id": "error.native-message-undefined",
+  "category": "errors",
+  "summary": "NativeError constructors omit the own message property when message is undefined, matching Error rather than storing an empty string.",
+  "source": {
+    "pattern": "$NativeError(undefined)",
+    "requirements": {
+      "constructor_is_one_of": [
+        "EvalError",
+        "RangeError",
+        "ReferenceError",
+        "SyntaxError",
+        "TypeError",
+        "URIError"
+      ],
+      "builtin_constructor_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.CreateNativeError",
+    "template": "JsRuntime.CreateNativeError($kind, JsUndefined.Value, $options, $newTarget)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "own_message": false,
+    "read_message": "inherits empty string from prototype",
+    "undefined": "not converted to the literal string 'undefined'"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "TypeError undefined",
+      "input": "const e=TypeError(undefined); console.log(Object.hasOwn(e,'message'),JSON.stringify(e.message))",
+      "expected_behavior": "prints false \"\""
+    },
+    {
+      "name": "empty string creates own",
+      "input": "const e=TypeError(''); console.log(Object.hasOwn(e,'message'))",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

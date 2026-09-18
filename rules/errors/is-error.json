@@ -1,0 +1,39 @@
+{
+  "id": "error.is-error",
+  "category": "errors",
+  "summary": "Implement Error.isError using the ErrorData internal brand rather than instanceof or CLR exception type tests.",
+  "source": {
+    "pattern": "Error.isError($arg)",
+    "requirements": {
+      "builtin_Error_isError_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.IsError",
+    "template": "JsRuntime.IsError($arg)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "primitive": "false",
+    "brand": "true only for objects carrying [[ErrorData]]",
+    "cross_realm": "brand check remains true for genuine cross-realm Error objects",
+    "instanceof": "not used"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "ordinary error",
+      "input": "console.log(Error.isError(new TypeError('x')),Error.isError({name:'Error'}))",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "prototype is not branded",
+      "input": "console.log(Error.isError(Error.prototype))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

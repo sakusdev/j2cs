@@ -1,0 +1,40 @@
+{
+  "id": "control.try.catch-thrown-value",
+  "category": "control_flow",
+  "summary": "Bind a catch parameter to the exact JavaScript value carried by a throw completion.",
+  "source": {
+    "pattern": "try { $body } catch ($e) { $handler }",
+    "requirements": {
+      "catch_parameter_kind": "BindingIdentifier",
+      "sync_control_flow": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsException.Unwrap",
+    "template": "try { $body } catch (JsException __ex) { var $e = JsException.Unwrap(__ex); $handler }",
+    "notes": "Introduces the inverse of the already-used JsException.Wrap helper contract: recover the original JS value without coercion."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "caught_completion": "only Throw completion enters catch",
+    "binding": "catch parameter receives original JS value",
+    "identity": "object identity is preserved"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "catch primitive",
+      "input": "try{throw null}catch(e){console.log(e===null)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "catch object identity",
+      "input": "const x={}; try{throw x}catch(e){console.log(e===x)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

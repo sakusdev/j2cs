@@ -1,0 +1,40 @@
+{
+  "id": "error.constructor.empty",
+  "category": "errors",
+  "summary": "Create an Error instance with no own message when the message argument is omitted or undefined.",
+  "source": {
+    "pattern": "Error($message?)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "message_is_omitted_or_undefined": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateError",
+    "template": "JsRuntime.CreateError(JsUndefined.Value, JsUndefined.Value, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "call_and_new": "both create an Error object",
+    "message": "no own message property is created",
+    "prototype": "inherits from Error.prototype",
+    "brand": "has [[ErrorData]]"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "omitted message",
+      "input": "const e=Error(); console.log(Object.hasOwn(e,'message'), e.message==='')",
+      "expected_behavior": "prints false true"
+    },
+    {
+      "name": "explicit undefined",
+      "input": "const e=new Error(undefined); console.log(Object.hasOwn(e,'message'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

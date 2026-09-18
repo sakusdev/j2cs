@@ -1,0 +1,39 @@
+{
+  "id": "control.try.catch-omitted-binding",
+  "category": "control_flow",
+  "summary": "Support optional catch binding without materializing or coercing the thrown JavaScript value.",
+  "source": {
+    "pattern": "try { $body } catch { $handler }",
+    "requirements": {
+      "catch_binding": "omitted",
+      "sync_control_flow": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsException",
+    "template": "try { $body } catch (JsException) { $handler }"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "caught_completion": "only Throw completion enters catch",
+    "binding": "none is created",
+    "thrown_value": "remains unobserved unless rethrown through preserved completion state"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "omitted catch binding",
+      "input": "try{throw 1}catch{console.log('caught')}",
+      "expected_behavior": "prints caught"
+    },
+    {
+      "name": "normal path skips catch",
+      "input": "try{console.log('try')}catch{console.log('catch')}",
+      "expected_behavior": "prints try"
+    }
+  ]
+}

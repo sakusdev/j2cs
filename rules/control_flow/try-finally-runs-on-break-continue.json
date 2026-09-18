@@ -1,0 +1,39 @@
+{
+  "id": "control.try.finally-runs-on-break-continue",
+  "category": "control_flow",
+  "summary": "Execute finally when break or continue leaves a protected try block before transferring loop control.",
+  "source": {
+    "pattern": "try { $loopControl } finally { $finally }",
+    "requirements": {
+      "inside_iteration_or_labelled_statement": true,
+      "loop_control_may_cross_try": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion.TryFinally",
+    "template": "JsCompletion.TryFinally($body, $finally)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "break": "finally runs before the break target is resumed",
+    "continue": "finally runs before the next iteration",
+    "override": "abrupt completion from finally may replace break/continue"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "finally before break",
+      "input": "let s=[]; while(true){try{s.push('try');break}finally{s.push('fin')}} console.log(s.join(','))",
+      "expected_behavior": "prints try,fin"
+    },
+    {
+      "name": "finally before continue",
+      "input": "let s=[]; for(let i=0;i<2;i++){try{if(i===0)continue;s.push('body')}finally{s.push('f'+i)}} console.log(s.join(','))",
+      "expected_behavior": "prints f0,body,f1"
+    }
+  ]
+}

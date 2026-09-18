@@ -1,0 +1,40 @@
+{
+  "id": "control.abrupt.sync-function-propagation",
+  "category": "control_flow",
+  "summary": "Propagate an uncaught synchronous throw from a normal function call to its caller with the original JS value.",
+  "source": {
+    "pattern": "$f($args)",
+    "requirements": {
+      "callee_kind": "ordinary synchronous ECMAScript function",
+      "callee_may_throw": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsException.Wrap",
+    "template": "$invokeWithJsExceptionPropagation($f, $args)",
+    "notes": "Reuse JsException wrapping; no Task/Promise conversion occurs."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "boundary": "ordinary function calls propagate throw completions synchronously",
+    "value": "arbitrary thrown JS value is preserved",
+    "async_exclusion": "async functions are handled by ASYNC rules"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-throw-statement"
+  ],
+  "tests": [
+    {
+      "name": "sync throw reaches caller",
+      "input": "function f(){throw 'x'} try{f()}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "side effect before throw retained",
+      "input": "let x=0; function f(){x=1;throw 2} try{f()}catch(e){} console.log(x)",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "error.is-error-proxy",
+  "category": "errors",
+  "summary": "Do not treat a Proxy around an Error as Error-branded for Error.isError.",
+  "source": {
+    "pattern": "Error.isError($proxy)",
+    "requirements": {
+      "builtin_Error_isError_not_overridden": true,
+      "argument_is_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.IsError",
+    "template": "JsRuntime.IsError($proxy)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "proxy": "Proxy object does not itself carry target [[ErrorData]]",
+    "result": "false even when target is an Error",
+    "traps": "brand check does not call user Proxy traps"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "proxy around Error",
+      "input": "const p=new Proxy(new Error('x'),{}); console.log(Error.isError(p))",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "proxy traps not consulted",
+      "input": "let n=0; const p=new Proxy(new Error(),{get(){n++;}}); console.log(Error.isError(p),n)",
+      "expected_behavior": "prints false 0"
+    }
+  ]
+}

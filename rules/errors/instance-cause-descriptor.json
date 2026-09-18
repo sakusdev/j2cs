@@ -1,0 +1,40 @@
+{
+  "id": "error.instance.cause-descriptor",
+  "category": "errors",
+  "summary": "Preserve the specified descriptor of an installed Error cause property.",
+  "source": {
+    "pattern": "Object.getOwnPropertyDescriptor(Error($message, { cause: $cause }), 'cause')",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "cause_property_installed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.ErrorPropertyDescriptor",
+    "template": "JsRuntime.GetOwnErrorPropertyDescriptor($error, \"cause\")"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "writable": true,
+    "enumerable": false,
+    "configurable": true,
+    "value": "exact cause JS value"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "cause descriptor flags",
+      "input": "const d=Object.getOwnPropertyDescriptor(Error('x',{cause:1}),'cause'); console.log(d.writable,d.enumerable,d.configurable)",
+      "expected_behavior": "prints true false true"
+    },
+    {
+      "name": "cause configurable",
+      "input": "const e=Error('x',{cause:1}); console.log(delete e.cause,Object.hasOwn(e,'cause'))",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

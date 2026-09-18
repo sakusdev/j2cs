@@ -1,0 +1,37 @@
+{
+  "id": "error.stack-portability",
+  "category": "errors",
+  "summary": "Treat Error.stack as a non-standard engine extension unless a selected runtime profile explicitly implements it.",
+  "source": {
+    "pattern": "$error.stack",
+    "requirements": {
+      "stack_property_observed": true
+    }
+  },
+  "target": {
+    "kind": "unsupported",
+    "notes": "A future host profile may provide JsRuntime.ErrorStack for a chosen engine compatibility target."
+  },
+  "strategy": "unsupported",
+  "confidence": "high",
+  "semantics": {
+    "standard": "ECMAScript 2026 does not specify Error.stack",
+    "variation": "format, laziness, frame names, paths, async frames, and capture timing are engine-specific",
+    "policy": "no semantics-preserving generic C# stack-string lowering"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "stack may exist",
+      "input": "const e=Error('x'); console.log(typeof e.stack)",
+      "expected_behavior": "commonly string in Node/V8 but not guaranteed by ECMA-262"
+    },
+    {
+      "name": "stack formatting not asserted",
+      "input": "const e=Error('x'); console.log(String(e.stack).includes('x'))",
+      "expected_behavior": "engine-specific; do not use as cross-runtime conformance oracle"
+    }
+  ]
+}

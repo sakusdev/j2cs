@@ -1,0 +1,39 @@
+{
+  "id": "error.constructor.call-without-new",
+  "category": "errors",
+  "summary": "Calling Error as a function constructs a fresh Error object, equivalent to construction for the same arguments.",
+  "source": {
+    "pattern": "Error($message, $options?)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "called_without_new": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateError",
+    "template": "JsRuntime.CreateError($message, $options, JsRuntime.ActiveFunction)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "new_target": "when absent, active Error function is used as newTarget",
+    "identity": "each call creates a fresh object",
+    "prototype": "Error.prototype unless subclass/NewTarget behavior applies"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "call returns Error",
+      "input": "const e=Error('x'); console.log(e instanceof Error,e.message)",
+      "expected_behavior": "prints true x"
+    },
+    {
+      "name": "fresh objects",
+      "input": "console.log(Error('x')===Error('x'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

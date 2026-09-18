@@ -1,0 +1,44 @@
+{
+  "id": "error.constructor.cause",
+  "category": "errors",
+  "summary": "Install Error cause only when the options object has a cause property, preserving its exact JS value.",
+  "source": {
+    "pattern": "Error($message, $options)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "options_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.InstallErrorCause",
+    "template": "JsRuntime.InstallErrorCause($error, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "presence": "HasProperty(options, 'cause') including inherited properties",
+    "read": "Get(options, 'cause') after presence check",
+    "value": "no coercion",
+    "descriptor": {
+      "writable": true,
+      "enumerable": false,
+      "configurable": true
+    }
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "cause installed",
+      "input": "const x={}; const e=Error('m',{cause:x}); console.log(e.cause===x,Object.keys(e).length)",
+      "expected_behavior": "prints true 0"
+    },
+    {
+      "name": "inherited cause observed",
+      "input": "const p={cause:9}; const e=Error('m',Object.create(p)); console.log(e.cause)",
+      "expected_behavior": "prints 9"
+    }
+  ]
+}

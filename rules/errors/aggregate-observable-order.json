@@ -1,0 +1,43 @@
+{
+  "id": "error.aggregate.observable-order",
+  "category": "errors",
+  "summary": "Preserve AggregateError constructor ordering: message coercion, cause installation, then errors iteration.",
+  "source": {
+    "pattern": "AggregateError($errors, $message, $options)",
+    "requirements": {
+      "arguments_may_have_observable_conversion_or_iteration": true,
+      "builtin_AggregateError_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateAggregateError",
+    "template": "JsRuntime.CreateAggregateError($errors, $message, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": [
+      "allocate object",
+      "ToString message when present",
+      "InstallErrorCause",
+      "GetIterator/IteratorToList errors"
+    ],
+    "abrupt": "an earlier abrupt step prevents later steps"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "message before iterator",
+      "input": "let s=[]; const msg={toString(){s.push('msg');return 'm'}}; const it={[Symbol.iterator](){s.push('iter');return [][Symbol.iterator]()}}; AggregateError(it,msg); console.log(s.join(','))",
+      "expected_behavior": "prints msg,iter"
+    },
+    {
+      "name": "cause before iterator",
+      "input": "let s=[]; const opt={get cause(){s.push('cause');return 1}}; const it={[Symbol.iterator](){s.push('iter');return [][Symbol.iterator]()}}; AggregateError(it,'m',opt); console.log(s.join(','))",
+      "expected_behavior": "prints cause,iter"
+    }
+  ]
+}

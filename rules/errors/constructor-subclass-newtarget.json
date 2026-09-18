@@ -1,0 +1,38 @@
+{
+  "id": "error.constructor.subclass-newtarget",
+  "category": "errors",
+  "summary": "Honor NewTarget when Error is invoked through super() in a subclass.",
+  "source": {
+    "pattern": "super($message, $options?)",
+    "requirements": {
+      "inside_subclass_of_builtin_Error_or_native_error": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateError",
+    "template": "JsRuntime.CreateError($message, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "allocation": "OrdinaryCreateFromConstructor(newTarget, intrinsicErrorPrototype, [[ErrorData]])",
+    "prototype": "derived from newTarget.prototype",
+    "brand": "result keeps Error internal brand"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "Error subclass",
+      "input": "class E extends Error{} const e=new E('x'); console.log(e instanceof E,e instanceof Error,e.message)",
+      "expected_behavior": "prints true true x"
+    },
+    {
+      "name": "subclass cause",
+      "input": "class E extends Error{} const e=new E('x',{cause:1}); console.log(e.cause)",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

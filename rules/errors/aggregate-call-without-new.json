@@ -1,0 +1,40 @@
+{
+  "id": "error.aggregate-call-without-new",
+  "category": "errors",
+  "summary": "Calling AggregateError without new creates a fresh AggregateError object with the same constructor semantics.",
+  "source": {
+    "pattern": "AggregateError($errors, $message?, $options?)",
+    "requirements": {
+      "builtin_AggregateError_not_overridden": true,
+      "called_without_new": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateAggregateError",
+    "template": "JsRuntime.CreateAggregateError($errors, $message, $options, JsRuntime.ActiveFunction)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "new_target": "active AggregateError function when NewTarget is absent",
+    "identity": "fresh object",
+    "prototype": "AggregateError.prototype",
+    "brand": "[[ErrorData]] present"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "call works",
+      "input": "const e=AggregateError([1],'x'); console.log(e instanceof AggregateError,e.errors[0])",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "fresh objects",
+      "input": "console.log(AggregateError([])===AggregateError([]))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

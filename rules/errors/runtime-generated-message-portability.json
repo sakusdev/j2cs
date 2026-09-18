@@ -1,0 +1,41 @@
+{
+  "id": "error.runtime-generated-message-portability",
+  "category": "errors",
+  "summary": "Do not rely on exact implementation-generated message text for ECMAScript runtime errors.",
+  "source": {
+    "pattern": "$runtimeError.message",
+    "requirements": {
+      "error_created_by_engine_runtime_operation": true,
+      "exact_message_text_is_observed": true
+    }
+  },
+  "target": {
+    "kind": "unsupported",
+    "notes": "Exact engine diagnostic strings require an explicitly selected JavaScript engine compatibility profile; there is no generic C# lowering."
+  },
+  "strategy": "unsupported",
+  "confidence": "high",
+  "semantics": {
+    "specified": "error category/type and triggering semantics may be specified",
+    "not_portable": "exact diagnostic message text is implementation-defined or host/engine-sensitive",
+    "policy": "translation must not synthesize a CLR message and claim byte-for-byte JavaScript equivalence"
+  },
+  "caveats": [
+    "User-supplied Error(message) text is portable and is covered by error.constructor.message."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "typeerror message engine-specific",
+      "input": "try{null.x}catch(e){console.log(e.name,typeof e.message)}",
+      "expected_behavior": "name is TypeError and message is a string; exact text is not portable"
+    },
+    {
+      "name": "syntax errors diagnostic varies",
+      "input": "try{eval('let x = ;')}catch(e){console.log(e.name,typeof e.message)}",
+      "expected_behavior": "reports a SyntaxError-like diagnostic whose exact message should not be asserted cross-engine"
+    }
+  ]
+}
