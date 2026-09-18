@@ -39,6 +39,8 @@ Treat the current `main` branch as authoritative. Do not rely on stale conversat
 
 ## 2. Find a ready workstream issue
 
+**NEVER create a new GitHub Issue as part of worker discovery, testing, locking, or scratch work.** Only select from existing open workstream Issues. Do not create temporary/noop/test Issues.
+
 Search open issues in `sakusdev/j2cs` for a workstream task that is not already represented by an open PR and is not already claimed by an existing branch named:
 
 `work/issue-<ISSUE_NUMBER>`
@@ -240,9 +242,11 @@ Do not merge your own PR unless the issue explicitly instructs the worker to mer
 
 ## 13. Mark the issue ready for review
 
-After the PR exists, update/comment on the Issue when possible with:
+After the PR exists, **always update the Issue body** so its status line is exactly:
 
 - `STATUS: NEEDS_REVIEW`
+
+Do not leave `STATUS: READY`, `STATUS: IN_PROGRESS`, or invent variants such as `READY_FOR_REVIEW` after a PR has been opened. Then include:
 - PR number/link
 - branch
 - concise counts/results
