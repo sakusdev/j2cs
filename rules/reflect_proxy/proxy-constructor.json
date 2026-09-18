@@ -1,0 +1,45 @@
+{
+  "id": "proxy.constructor",
+  "category": "proxy",
+  "summary": "Create a Proxy exotic object only with new, requiring object target and handler and installing internal methods according to target capabilities.",
+  "source": {
+    "pattern": "new Proxy($target, $handler)",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyCreate($target, $handler)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "call_form": "Proxy(target,handler) without new throws TypeError",
+    "target": "must be Object",
+    "handler": "must be Object",
+    "identity": "returns distinct Proxy exotic object with target/handler internal slots",
+    "callability": "[[Call]] exists only if target is callable",
+    "constructability": "[[Construct]] exists only if target is constructable"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.2.1 Proxy Constructor",
+    "ECMAScript 2026 §10.5.15 ProxyCreate"
+  ],
+  "tests": [
+    {
+      "name": "basic proxy forwards absent traps",
+      "input": "const t={x:1};const p=new Proxy(t,{});console.log(p!==t,p.x);",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "invalid target or call form throws",
+      "input": "for(const f of [()=>Proxy({},{}),()=>new Proxy(1,{})]){try{f()}catch(e){console.log(e instanceof TypeError)}}",
+      "expected_behavior": "prints true twice"
+    }
+  ]
+}

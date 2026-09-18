@@ -1,0 +1,41 @@
+{
+  "id": "proxy.revoked-operations",
+  "category": "proxy",
+  "summary": "Reject Proxy internal-method operations after revocation while preserving operations such as typeof that do not invoke a Proxy internal method.",
+  "source": {
+    "pattern": "Proxy internal operation on $revokedProxy",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ValidateNonRevokedProxy($revokedProxy)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "validation": "Proxy internal methods call ValidateNonRevokedProxy and throw TypeError when [[ProxyTarget]] is null",
+    "typeof": "typeof does not invoke these internal methods and remains non-throwing",
+    "identity": "revocation does not replace the proxy reference"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.14 ValidateNonRevokedProxy"
+  ],
+  "tests": [
+    {
+      "name": "property get throws after revoke",
+      "input": "const {proxy,revoke}=Proxy.revocable({},{});revoke();try{proxy.x}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "typeof revoked proxy still works",
+      "input": "const {proxy,revoke}=Proxy.revocable({},{});revoke();console.log(typeof proxy);",
+      "expected_behavior": "prints object for an object-target proxy"
+    }
+  ]
+}

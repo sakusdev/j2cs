@@ -1,0 +1,41 @@
+{
+  "id": "reflect.is-extensible",
+  "category": "reflect",
+  "summary": "Return target [[IsExtensible]] and reject primitive targets.",
+  "source": {
+    "pattern": "Reflect.isExtensible($target)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectIsExtensible($target)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "return_value": "boolean from [[IsExtensible]]",
+    "proxy": "isExtensible trap must agree with target extensibility"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "fresh object is extensible",
+      "input": "console.log(Reflect.isExtensible({}));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive differs from Object API",
+      "input": "try{Reflect.isExtensible(1)}catch(e){console.log(e instanceof TypeError,Object.isExtensible(1))}",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

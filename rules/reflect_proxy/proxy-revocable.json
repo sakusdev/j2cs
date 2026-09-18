@@ -1,0 +1,42 @@
+{
+  "id": "proxy.revocable",
+  "category": "proxy",
+  "summary": "Create a proxy and a revoke function whose closure clears the proxy target/handler exactly once.",
+  "source": {
+    "pattern": "Proxy.revocable($target, $handler)",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyRevocable($target, $handler)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "ordinary object with proxy and revoke properties",
+    "proxy": "created with ProxyCreate semantics",
+    "revoke": "sets [[ProxyTarget]] and [[ProxyHandler]] to null; returns undefined",
+    "idempotence": "subsequent revoke calls have no additional effect"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.2.2 Proxy.revocable"
+  ],
+  "tests": [
+    {
+      "name": "revocation disables internal operations",
+      "input": "const {proxy,revoke}=Proxy.revocable({x:1},{});console.log(proxy.x);revoke();try{console.log(proxy.x)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints 1 then true"
+    },
+    {
+      "name": "revoke is idempotent",
+      "input": "const r=Proxy.revocable({},{});console.log(r.revoke(),r.revoke());",
+      "expected_behavior": "prints undefined undefined"
+    }
+  ]
+}

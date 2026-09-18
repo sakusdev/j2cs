@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.own-keys",
+  "category": "proxy",
+  "summary": "Implement Proxy [[OwnPropertyKeys]] via ownKeys trap, validating key types, duplicates, and target-key invariants.",
+  "source": {
+    "pattern": "Proxy [[OwnPropertyKeys]]($proxy)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyOwnKeys($proxy)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "ownKeys(target)",
+    "trap_result": "CreateListFromArrayLike; every element must be String or Symbol and no duplicates",
+    "ordering": "accepted trap list order is observable",
+    "invariants": "all non-configurable target keys must be present; if target non-extensible, result must contain exactly all target own keys"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.11 Proxy [[OwnPropertyKeys]]"
+  ],
+  "tests": [
+    {
+      "name": "trap controls observable order when legal",
+      "input": "const t={a:1,b:2};const p=new Proxy(t,{ownKeys(){return ['b','a']}});console.log(Reflect.ownKeys(p).join(','));",
+      "expected_behavior": "prints b,a"
+    },
+    {
+      "name": "duplicate keys throw",
+      "input": "const p=new Proxy({a:1},{ownKeys(){return ['a','a']}});try{Reflect.ownKeys(p)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

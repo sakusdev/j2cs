@@ -1,0 +1,43 @@
+{
+  "id": "reflect.has",
+  "category": "reflect",
+  "summary": "Perform [[HasProperty]] with an object target, including inherited properties.",
+  "source": {
+    "pattern": "Reflect.has($target, $key)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectHas($target, $key)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "key": "ToPropertyKey",
+    "prototype_chain": "inherited properties count",
+    "return_value": "boolean",
+    "proxy": "has trap and invariants are observable"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "inherited property counts",
+      "input": "const p={x:1}; const o=Object.create(p); console.log(Reflect.has(o,'x'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive target throws",
+      "input": "try{Reflect.has('abc','length')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

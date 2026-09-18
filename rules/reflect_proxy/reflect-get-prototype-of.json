@@ -1,0 +1,41 @@
+{
+  "id": "reflect.get-prototype-of",
+  "category": "reflect",
+  "summary": "Return [[Prototype]] while requiring an object target.",
+  "source": {
+    "pattern": "Reflect.getPrototypeOf($target)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectGetPrototypeOf($target)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object; unlike Object.getPrototypeOf no primitive boxing",
+    "return_value": "Object or null",
+    "proxy": "getPrototypeOf trap and non-extensible-target invariant are observable"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "ordinary prototype",
+      "input": "console.log(Reflect.getPrototypeOf({})===Object.prototype);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive throws",
+      "input": "try{Reflect.getPrototypeOf(1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.construct",
+  "category": "proxy",
+  "summary": "Implement constructable Proxy [[Construct]] via construct trap, forwarding newTarget and requiring an Object result.",
+  "source": {
+    "pattern": "Proxy [[Construct]]($proxy, $argumentsList, $newTarget)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyConstructTrap($proxy, $argumentsList, $newTarget)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "proxy has [[Construct]] only because target is a constructor",
+    "trap": "construct(target, CreateArrayFromList(argumentsList), newTarget)",
+    "missing": "absent trap performs Construct(target, argumentsList, newTarget)",
+    "result": "trap result must be Object or TypeError"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.13 Proxy [[Construct]]"
+  ],
+  "tests": [
+    {
+      "name": "newTarget forwarded",
+      "input": "function F(){};let seen;const P=new Proxy(F,{construct(t,args,n){seen=n;return {ok:true}}});const o=new P();console.log(o.ok,seen===P);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "primitive construct result throws",
+      "input": "function F(){};const P=new Proxy(F,{construct(){return 1}});try{new P()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

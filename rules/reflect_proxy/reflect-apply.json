@@ -1,0 +1,43 @@
+{
+  "id": "reflect.apply",
+  "category": "reflect",
+  "summary": "Call a target with an explicit thisArgument and an array-like argument list using Reflect.apply semantics.",
+  "source": {
+    "pattern": "Reflect.apply($target, $thisArgument, $argumentsList)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectApply($target, $thisArgument, $argumentsList)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be callable or TypeError",
+    "arguments_list": "CreateListFromArrayLike; iterability is not required",
+    "this_binding": "uses supplied thisArgument under ordinary JS call semantics",
+    "return_value": "target call result",
+    "evaluation_order": "target, thisArgument, argumentsList expressions are evaluated before the call"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "array-like arguments",
+      "input": "function f(a,b){return [this.x,a+b]}; console.log(Reflect.apply(f,{x:3},{0:2,1:4,length:2}));",
+      "expected_behavior": "prints an array equivalent to [3,6]; a non-iterable array-like argumentsList is accepted"
+    },
+    {
+      "name": "non-object argumentsList throws",
+      "input": "try{Reflect.apply(()=>1,null,null)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "proxy.callability-mirrors-target",
+  "category": "proxy",
+  "summary": "A Proxy is callable if and only if its target was callable when ProxyCreate ran; an apply trap cannot make a non-callable target callable.",
+  "source": {
+    "pattern": "call $proxy($args)",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyCall($proxy, $thisArg, $args)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "capability": "[[Call]] is installed only when IsCallable(target) is true",
+    "apply_trap": "can intercept calls only on a callable proxy",
+    "dynamic_handler": "later handler changes cannot add callability to a non-callable proxy"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.15 ProxyCreate",
+    "ECMAScript 2026 §10.5.12 [[Call]]"
+  ],
+  "tests": [
+    {
+      "name": "function target remains callable",
+      "input": "const p=new Proxy(function(x){return x+1},{});console.log(typeof p,p(2));",
+      "expected_behavior": "prints function 3"
+    },
+    {
+      "name": "apply trap cannot make object callable",
+      "input": "const p=new Proxy({}, {apply(){return 1}});console.log(typeof p);try{p()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints object then true"
+    }
+  ]
+}

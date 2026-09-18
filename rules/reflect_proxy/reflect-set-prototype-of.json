@@ -1,0 +1,44 @@
+{
+  "id": "reflect.set-prototype-of",
+  "category": "reflect",
+  "summary": "Set [[Prototype]] and return a boolean rather than Object.setPrototypeOf's target/throw-on-false behavior.",
+  "source": {
+    "pattern": "Reflect.setPrototypeOf($target, $proto)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectSetPrototypeOf($target, $proto)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "proto": "must be Object or null",
+    "return_value": "boolean from [[SetPrototypeOf]]",
+    "cycle_and_extensibility": "ordinary prototype cycle/non-extensible checks apply",
+    "proxy": "setPrototypeOf trap and invariants are observable"
+  },
+  "caveats": [
+    "Invalid proto still throws TypeError; only a normal false [[SetPrototypeOf]] result becomes false.",
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "successful change returns true",
+      "input": "const p={},o={};console.log(Reflect.setPrototypeOf(o,p),Reflect.getPrototypeOf(o)===p);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "non-extensible different prototype returns false",
+      "input": "const o={};Object.preventExtensions(o);console.log(Reflect.setPrototypeOf(o,{}));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

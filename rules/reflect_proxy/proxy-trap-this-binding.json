@@ -1,0 +1,41 @@
+{
+  "id": "proxy.trap-this-binding",
+  "category": "proxy",
+  "summary": "Invoke Proxy handler traps with the handler object as this.",
+  "source": {
+    "pattern": "Proxy trap call $trap($args)",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyCallTrap($handler, $trap, $args)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "this_value": "handler object",
+    "arguments": "trap-specific arguments are supplied after target extraction",
+    "exceptions": "trap exceptions propagate unchanged as abrupt completion"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5 Proxy Object Internal Methods and Internal Slots"
+  ],
+  "tests": [
+    {
+      "name": "get trap sees handler as this",
+      "input": "const h={marker:5,get(){return this.marker}};console.log(new Proxy({},h).x);",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "apply trap sees handler as this",
+      "input": "const h={marker:7,apply(){return this.marker}};console.log(new Proxy(()=>0,h)());",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

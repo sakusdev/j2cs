@@ -1,0 +1,44 @@
+{
+  "id": "reflect.get",
+  "category": "reflect",
+  "summary": "Read via [[Get]] with an optional explicit receiver.",
+  "source": {
+    "pattern": "Reflect.get($target, $key, $receiver?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectGet($target, $key, $receiver)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "key": "ToPropertyKey",
+    "receiver": "defaults to target; explicit receiver becomes accessor this",
+    "prototype_lookup": "uses full [[Get]] semantics",
+    "return_value": "property value or undefined",
+    "proxy": "get trap is observable"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "explicit receiver binds getter this",
+      "input": "const p={get x(){return this.v}}; console.log(Reflect.get(p,'x',{v:7}));",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "primitive target throws",
+      "input": "try{Reflect.get(1,'x')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

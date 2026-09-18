@@ -1,0 +1,44 @@
+{
+  "id": "reflect.define-property",
+  "category": "reflect",
+  "summary": "Define an own property and return the internal [[DefineOwnProperty]] boolean rather than Object.defineProperty's object/throw-on-false contract.",
+  "source": {
+    "pattern": "Reflect.defineProperty($target, $key, $attributes)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectDefineProperty($target, $key, $attributes)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "key": "ToPropertyKey",
+    "descriptor": "ToPropertyDescriptor; descriptor getters can execute",
+    "return_value": "boolean from [[DefineOwnProperty]]",
+    "proxy": "defineProperty trap and invariants are observable"
+  },
+  "caveats": [
+    "Unlike Object.defineProperty, a false internal result is returned as false instead of being converted to TypeError.",
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "successful definition returns true",
+      "input": "const o={}; console.log(Reflect.defineProperty(o,'x',{value:1}),o.x);",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "ordinary refusal returns false",
+      "input": "const o={}; Object.preventExtensions(o); console.log(Reflect.defineProperty(o,'x',{value:1}));",
+      "expected_behavior": "prints false rather than throwing solely because the definition is refused"
+    }
+  ]
+}

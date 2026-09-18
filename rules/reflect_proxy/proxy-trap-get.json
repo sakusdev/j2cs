@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.get",
+  "category": "proxy",
+  "summary": "Implement Proxy [[Get]] via get trap with receiver propagation and fixed-property value invariants.",
+  "source": {
+    "pattern": "Proxy [[Get]]($proxy, $key, $receiver)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyGet($proxy, $key, $receiver)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "get(target, P, Receiver)",
+    "result": "arbitrary ECMAScript value",
+    "receiver": "original Receiver is passed unchanged",
+    "invariants": "for non-configurable non-writable own data property trap result must SameValue target value; for non-configurable accessor with undefined getter result must be undefined"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.8 Proxy [[Get]]"
+  ],
+  "tests": [
+    {
+      "name": "receiver forwarded",
+      "input": "let ok=false;const p=new Proxy({}, {get(t,k,r){ok=r===p;return 4}});console.log(p.x,ok);",
+      "expected_behavior": "prints 4 true"
+    },
+    {
+      "name": "cannot lie about fixed data value",
+      "input": "const t={};Object.defineProperty(t,'x',{value:1,writable:false,configurable:false});const p=new Proxy(t,{get(){return 2}});try{p.x}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

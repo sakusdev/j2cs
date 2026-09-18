@@ -1,0 +1,43 @@
+{
+  "id": "reflect.set",
+  "category": "reflect",
+  "summary": "Set through [[Set]] and return its boolean result, with optional explicit receiver.",
+  "source": {
+    "pattern": "Reflect.set($target, $key, $value, $receiver?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectSet($target, $key, $value, $receiver)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "key": "ToPropertyKey",
+    "receiver": "defaults to target; explicit receiver is used by setters/ordinary assignment semantics",
+    "return_value": "boolean from [[Set]]",
+    "proxy": "set trap and invariants are observable"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "receiver becomes setter this",
+      "input": "const p={set x(v){this.y=v}},r={}; console.log(Reflect.set(p,'x',9,r),r.y,p.y);",
+      "expected_behavior": "prints true 9 undefined"
+    },
+    {
+      "name": "non-writable property returns false",
+      "input": "const o={};Object.defineProperty(o,'x',{value:1,writable:false});console.log(Reflect.set(o,'x',2),o.x);",
+      "expected_behavior": "prints false 1"
+    }
+  ]
+}

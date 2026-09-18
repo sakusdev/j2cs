@@ -1,0 +1,43 @@
+{
+  "id": "reflect.get-own-property-descriptor",
+  "category": "reflect",
+  "summary": "Return a descriptor object or undefined using [[GetOwnProperty]], without primitive boxing.",
+  "source": {
+    "pattern": "Reflect.getOwnPropertyDescriptor($target, $key)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectGetOwnPropertyDescriptor($target, $key)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object; primitives throw",
+    "key": "ToPropertyKey",
+    "return_value": "fresh descriptor object or undefined",
+    "getter_invocation": "described accessor getter is not invoked",
+    "proxy": "getOwnPropertyDescriptor trap and invariants are observable"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "getter is described, not invoked",
+      "input": "let n=0; const o={get x(){n++;return 1}}; const d=Reflect.getOwnPropertyDescriptor(o,'x'); console.log(typeof d.get,n);",
+      "expected_behavior": "prints function 0"
+    },
+    {
+      "name": "primitive differs from Object API",
+      "input": "try{Reflect.getOwnPropertyDescriptor(1,'x')}catch(e){console.log(e instanceof TypeError,Object.getOwnPropertyDescriptor(1,'x')===undefined)}",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

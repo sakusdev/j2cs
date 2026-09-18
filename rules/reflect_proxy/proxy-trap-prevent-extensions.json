@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.prevent-extensions",
+  "category": "proxy",
+  "summary": "Implement Proxy [[PreventExtensions]] and only accept a truthy trap result if the target is actually non-extensible afterward.",
+  "source": {
+    "pattern": "Proxy [[PreventExtensions]]($proxy)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyPreventExtensions($proxy)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "preventExtensions(target)",
+    "result": "ToBoolean of trap return",
+    "false_result": "returns false",
+    "invariant": "truthy result requires IsExtensible(target) to be false or TypeError"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.4 Proxy [[PreventExtensions]]"
+  ],
+  "tests": [
+    {
+      "name": "trap can prevent target then report true",
+      "input": "const t={};const p=new Proxy(t,{preventExtensions(x){Object.preventExtensions(x);return true}});console.log(Reflect.preventExtensions(p),Reflect.isExtensible(t));",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "truthy lie throws",
+      "input": "const p=new Proxy({}, {preventExtensions(){return true}});try{Reflect.preventExtensions(p)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
