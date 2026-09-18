@@ -558,8 +558,8 @@
       "priority": 40,
       "minimum_rules": 50,
       "match": {
-        "categories": [
-          "electron"
+        "category_prefixes": [
+          "electron."
         ]
       },
       "scope": [],
