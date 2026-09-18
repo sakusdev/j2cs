@@ -1,0 +1,42 @@
+{
+  "id": "web.url.origin",
+  "category": "web_url_fetch",
+  "summary": "Return the serialized origin for a WHATWG URL.",
+  "source": {
+    "pattern": "$url.origin",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.Origin",
+    "template": "WebUrl.Origin($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "serialized origin",
+    "tuple_origin": "scheme/host/effective port serialized without a trailing slash",
+    "opaque_origin": "string null",
+    "blob": "uses embedded URL origin where defined"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard §4.7 Origin",
+    "WHATWG URL Standard URL.origin"
+  ],
+  "tests": [
+    {
+      "name": "https origin omits default port",
+      "input": "console.log(new URL(\"https://example.com:443/x\").origin);",
+      "expected_behavior": "prints https://example.com"
+    },
+    {
+      "name": "file has opaque origin",
+      "input": "console.log(new URL(\"file:///tmp/x\").origin);",
+      "expected_behavior": "prints null"
+    }
+  ]
+}

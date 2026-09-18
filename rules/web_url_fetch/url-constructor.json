@@ -1,0 +1,45 @@
+{
+  "id": "web.url.constructor",
+  "category": "web_url_fetch",
+  "summary": "Parse and construct a WHATWG URL, optionally relative to a base URL.",
+  "source": {
+    "pattern": "new URL($input, $base)",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.Construct",
+    "template": "WebUrl.Construct($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "input_conversion": "Web IDL USVString conversion before parsing",
+    "parsing": "WHATWG basic URL parser",
+    "base": "optional base is parsed first when supplied",
+    "failure": "throws TypeError",
+    "serialization": "stored URL is canonicalized, including host/default-port/path processing"
+  },
+  "caveats": [
+    "System.Uri parsing/escaping is not a drop-in replacement for the WHATWG URL parser."
+  ],
+  "references": [
+    "WHATWG URL Standard §4 URL parsing",
+    "WHATWG URL Standard §6.1 URL class"
+  ],
+  "tests": [
+    {
+      "name": "canonicalizes host and default port",
+      "input": "console.log(new URL(\"https://EXAMPLE.com:443/a b\").href);",
+      "expected_behavior": "prints https://example.com/a%20b"
+    },
+    {
+      "name": "relative input without base throws",
+      "input": "try { new URL(\"../x\"); } catch (e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

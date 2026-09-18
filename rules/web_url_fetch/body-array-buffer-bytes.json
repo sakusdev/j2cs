@@ -1,0 +1,44 @@
+{
+  "id": "web.body.array-buffer-bytes",
+  "category": "web_url_fetch",
+  "summary": "Consume body bytes into a fresh ArrayBuffer or Uint8Array for arrayBuffer()/bytes().",
+  "source": {
+    "pattern": "$bodyOwner.arrayBuffer()",
+    "requirements": {
+      "receiver": "intrinsic Request or Response",
+      "builtin_body_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBody.Bytes",
+    "template": "WebBody.Bytes($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "arrayBuffer": "Promise<ArrayBuffer> containing consumed bytes",
+    "bytes": "Promise<Uint8Array> containing consumed bytes",
+    "consume_once": true,
+    "binary_contract": "reuse BINARY ArrayBuffer/Uint8Array representations"
+  },
+  "caveats": [
+    "bytes() availability depends on target Web API version; when supported it must not be emulated with a shared view over mutable internal storage."
+  ],
+  "references": [
+    "WHATWG Fetch Standard Body.arrayBuffer",
+    "WHATWG Fetch Standard Body.bytes"
+  ],
+  "tests": [
+    {
+      "name": "arrayBuffer returns bytes",
+      "input": "const r=new Response(\"A\"); const b=new Uint8Array(await r.arrayBuffer()); console.log(b.length,b[0]);",
+      "expected_behavior": "prints 1 65"
+    },
+    {
+      "name": "bytes returns Uint8Array when supported",
+      "input": "const r=new Response(\"AB\"); const b=await r.bytes(); console.log(b instanceof Uint8Array,b.length,b[1]);",
+      "expected_behavior": "prints true 2 66"
+    }
+  ]
+}

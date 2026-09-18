@@ -1,0 +1,40 @@
+{
+  "id": "web.urlsearchparams.size",
+  "category": "web_url_fetch",
+  "summary": "Return the number of name/value tuples, including duplicates.",
+  "source": {
+    "pattern": "$params.size",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Size",
+    "template": "WebUrlSearchParams.Size($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "tuple count",
+    "duplicates": "each duplicate contributes one",
+    "complexity": "representation-specific but result is live"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.size"
+  ],
+  "tests": [
+    {
+      "name": "duplicates count individually",
+      "input": "console.log(new URLSearchParams(\"a=1&a=2&b=3\").size);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "mutation changes size",
+      "input": "const p=new URLSearchParams(); p.append(\"x\",\"1\"); console.log(p.size);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

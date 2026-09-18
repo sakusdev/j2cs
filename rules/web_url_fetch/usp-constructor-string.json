@@ -1,0 +1,42 @@
+{
+  "id": "web.urlsearchparams.constructor-string",
+  "category": "web_url_fetch",
+  "summary": "Construct URLSearchParams from an optional form-urlencoded string.",
+  "source": {
+    "pattern": "new URLSearchParams($string)",
+    "requirements": {
+      "binding": "intrinsic URLSearchParams constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.FromString",
+    "template": "WebUrlSearchParams.FromString($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "leading_question_mark": "one leading ? is removed",
+    "parse": "application/x-www-form-urlencoded parser",
+    "plus": "U+002B decodes to SPACE",
+    "duplicates": "preserved in list order"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard §5.1 form-urlencoded parser",
+    "WHATWG URL Standard §6.2 constructor"
+  ],
+  "tests": [
+    {
+      "name": "leading question mark ignored",
+      "input": "console.log(new URLSearchParams(\"?a=1&a=2\").getAll(\"a\").join(\",\"));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "plus decodes to space",
+      "input": "console.log(new URLSearchParams(\"q=a+b\").get(\"q\"));",
+      "expected_behavior": "prints a b"
+    }
+  ]
+}

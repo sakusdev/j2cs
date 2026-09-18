@@ -1,0 +1,44 @@
+{
+  "id": "web.urlsearchparams.sort",
+  "category": "web_url_fetch",
+  "summary": "Stable-sort tuples by name using ascending UTF-16 code unit order.",
+  "source": {
+    "pattern": "$params.sort()",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Sort",
+    "template": "WebUrlSearchParams.Sort($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "key": "name only",
+    "ordering": "ascending UTF-16 code units",
+    "stable": true,
+    "return": "undefined",
+    "url_link": "updates associated URL even though values stay paired"
+  },
+  "caveats": [
+    "Do not use locale-sensitive or ordinal-code-point sorting; the standard uses UTF-16 code units."
+  ],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.sort"
+  ],
+  "tests": [
+    {
+      "name": "sort is stable for duplicate names",
+      "input": "const p=new URLSearchParams(\"b=1&a=2&a=1\"); p.sort(); console.log(p.toString());",
+      "expected_behavior": "prints a=2&a=1&b=1"
+    },
+    {
+      "name": "sort updates URL encoding",
+      "input": "const u=new URL(\"https://e.test/?q=a%20~&b=1\"); u.searchParams.sort(); console.log(u.search);",
+      "expected_behavior": "query is form-urlencoded and space is serialized as +"
+    }
+  ]
+}

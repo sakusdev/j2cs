@@ -1,0 +1,42 @@
+{
+  "id": "web.request.clone",
+  "category": "web_url_fetch",
+  "summary": "Clone an intrinsic Request, teeing its body and rejecting unusable body state.",
+  "source": {
+    "pattern": "$request.clone()",
+    "requirements": {
+      "receiver": "intrinsic Request",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebRequest.Clone",
+    "template": "WebRequest.Clone($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "new Request object",
+    "body": "body stream is cloned/teed; clone and original are independently consumable branches",
+    "unusable": "throws TypeError if body is disturbed or locked",
+    "signal": "clone gets a following signal"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Request.clone",
+    "WHATWG Streams tee"
+  ],
+  "tests": [
+    {
+      "name": "clone body can be consumed separately",
+      "input": "const r=new Request(\"https://e.test/\",{method:\"POST\",body:\"x\"}); const c=r.clone(); Promise.all([r.text(),c.text()]).then(v=>console.log(v.join(\",\")));",
+      "expected_behavior": "prints x,x"
+    },
+    {
+      "name": "used body cannot be cloned",
+      "input": "const r=new Request(\"https://e.test/\",{method:\"POST\",body:\"x\"}); await r.text(); try { r.clone(); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

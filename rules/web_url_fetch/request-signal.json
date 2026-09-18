@@ -1,0 +1,41 @@
+{
+  "id": "web.request.signal",
+  "category": "web_url_fetch",
+  "summary": "Expose the Request-associated AbortSignal as a following signal rather than aliasing an input signal by object identity.",
+  "source": {
+    "pattern": "$request.signal",
+    "requirements": {
+      "receiver": "intrinsic Request",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebRequest.Signal",
+    "template": "WebRequest.Signal($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "AbortSignal associated with Request",
+    "following": "when init.signal is supplied the request signal follows its abort state/reason",
+    "identity": "request.signal need not be the same object as init.signal"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Request.signal",
+    "WHATWG DOM Standard AbortSignal following"
+  ],
+  "tests": [
+    {
+      "name": "request signal follows abort",
+      "input": "const c=new AbortController(); const r=new Request(\"https://e.test/\",{signal:c.signal}); c.abort(\"why\"); console.log(r.signal.aborted,r.signal.reason);",
+      "expected_behavior": "prints true why"
+    },
+    {
+      "name": "request signal is distinct object",
+      "input": "const c=new AbortController(); const r=new Request(\"https://e.test/\",{signal:c.signal}); console.log(r.signal===c.signal);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

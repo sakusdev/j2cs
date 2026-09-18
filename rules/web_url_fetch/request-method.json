@@ -1,0 +1,46 @@
+{
+  "id": "web.request.method",
+  "category": "web_url_fetch",
+  "summary": "Normalize Request methods and reject forbidden methods exactly as Fetch specifies.",
+  "source": {
+    "pattern": "new Request($input,{method:$method})",
+    "requirements": {
+      "binding": "intrinsic Request constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebRequest.NormalizeMethod",
+    "template": "WebRequest.NormalizeMethod($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ByteString conversion",
+    "normalization": "DELETE, GET, HEAD, OPTIONS, POST, PUT are normalized to uppercase",
+    "forbidden": [
+      "CONNECT",
+      "TRACE",
+      "TRACK"
+    ],
+    "other": "valid HTTP method tokens retain casing"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard normalize a method",
+    "WHATWG Fetch Standard forbidden method"
+  ],
+  "tests": [
+    {
+      "name": "standard method normalized uppercase",
+      "input": "console.log(new Request(\"https://e.test/\",{method:\"post\"}).method);",
+      "expected_behavior": "prints POST"
+    },
+    {
+      "name": "forbidden method rejected case-insensitively",
+      "input": "try { new Request(\"https://e.test/\",{method:\"trace\"}); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

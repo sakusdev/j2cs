@@ -1,0 +1,42 @@
+{
+  "id": "web.body.used-state",
+  "category": "web_url_fetch",
+  "summary": "Expose body and bodyUsed as stream-backed state, distinguishing null body, locked stream, and disturbed stream.",
+  "source": {
+    "pattern": "$bodyOwner.bodyUsed",
+    "requirements": {
+      "receiver": "intrinsic Request or Response",
+      "builtin_body_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBody.State",
+    "template": "WebBody.State($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "null_body": "body is null and bodyUsed false",
+    "body": "ReadableStream when body is non-null",
+    "bodyUsed": "true iff body stream is disturbed",
+    "locked_vs_used": "locked alone makes body unusable but does not necessarily mean disturbed/bodyUsed true"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Body mixin",
+    "WHATWG Streams disturbed/locked"
+  ],
+  "tests": [
+    {
+      "name": "null body is unused",
+      "input": "const r=new Response(); console.log(r.body===null,r.bodyUsed);",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "reading marks used",
+      "input": "const r=new Response(\"x\"); const reader=r.body.getReader(); await reader.read(); console.log(r.bodyUsed); reader.releaseLock();",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

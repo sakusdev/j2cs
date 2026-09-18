@@ -1,0 +1,42 @@
+{
+  "id": "web.body.blob",
+  "category": "web_url_fetch",
+  "summary": "Consume body bytes into a Blob while propagating the MIME type from Content-Type.",
+  "source": {
+    "pattern": "$bodyOwner.blob()",
+    "requirements": {
+      "receiver": "intrinsic Request or Response",
+      "builtin_body_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBody.Blob",
+    "template": "WebBody.Blob($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Blob>",
+    "bytes": "consumed body bytes",
+    "type": "parsed MIME type from Content-Type header when valid, otherwise empty string",
+    "consume_once": true
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Body.blob",
+    "File API Blob"
+  ],
+  "tests": [
+    {
+      "name": "blob gets content type",
+      "input": "const r=new Response(\"x\",{headers:{\"Content-Type\":\"text/plain\"}}); const b=await r.blob(); console.log(b.type,b.size);",
+      "expected_behavior": "prints text/plain 1"
+    },
+    {
+      "name": "missing content type yields empty blob type",
+      "input": "const r=new Response(new Uint8Array([1])); const b=await r.blob(); console.log(JSON.stringify(b.type));",
+      "expected_behavior": "prints \"\""
+    }
+  ]
+}

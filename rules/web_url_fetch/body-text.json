@@ -1,0 +1,42 @@
+{
+  "id": "web.body.text",
+  "category": "web_url_fetch",
+  "summary": "Consume a Request/Response body once and decode it as UTF-8 text.",
+  "source": {
+    "pattern": "$bodyOwner.text()",
+    "requirements": {
+      "receiver": "intrinsic Request or Response",
+      "builtin_body_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBody.Text",
+    "template": "WebBody.Text($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<string>",
+    "consume": "fully reads body stream and marks it disturbed",
+    "decode": "UTF-8 decode with replacement behavior as Fetch specifies",
+    "unusable": "rejected TypeError when body stream is disturbed or locked"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Body.text",
+    "WHATWG Fetch Standard consume body"
+  ],
+  "tests": [
+    {
+      "name": "text consumes body",
+      "input": "const r=new Response(\"abc\"); console.log(await r.text(),r.bodyUsed);",
+      "expected_behavior": "prints abc true"
+    },
+    {
+      "name": "second consumption rejects",
+      "input": "const r=new Response(\"x\"); await r.text(); try { await r.text(); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

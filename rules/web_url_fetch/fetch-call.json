@@ -1,0 +1,45 @@
+{
+  "id": "web.fetch.call",
+  "category": "web_url_fetch",
+  "summary": "Lower global fetch to a Web-compatible host runtime that preserves Fetch networking, redirects, CORS, credentials, cache, and Promise behavior.",
+  "source": {
+    "pattern": "fetch($input,$init)",
+    "requirements": {
+      "binding": "intrinsic global fetch",
+      "host_fetch_runtime_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebFetch.Fetch",
+    "template": "JsRuntime.WebFetch.Fetch($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Response>",
+    "request": "constructs/derives a Fetch Request before network fetch",
+    "network": "HTTP semantics, redirects, credentials, CORS, cache, referrer and policy are host/runtime responsibilities",
+    "errors": "network/fetch failures reject the promise; ordinary HTTP error statuses resolve to Response",
+    "timing": "asynchronous Fetch/Promise integration"
+  },
+  "caveats": [
+    "HttpClient.SendAsync alone is not Fetch: browser CORS/redirect/header/filtering/body-stream semantics remain observable."
+  ],
+  "references": [
+    "WHATWG Fetch Standard §5.6 fetch method",
+    "WHATWG Fetch Standard main fetch"
+  ],
+  "tests": [
+    {
+      "name": "data URL resolves response",
+      "input": "const r=await fetch(\"data:text/plain,ok\"); console.log(r.status,await r.text());",
+      "expected_behavior": "prints 200 ok"
+    },
+    {
+      "name": "HTTP status is not promise rejection",
+      "input": "// A host test should return a 404 response and assert fetch resolves with response.ok === false.",
+      "expected_behavior": "404/500 HTTP responses resolve normally; only fetch/network failures reject"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.body.form-data",
+  "category": "web_url_fetch",
+  "summary": "Consume body as FormData using MIME-type-specific urlencoded or multipart parsing.",
+  "source": {
+    "pattern": "$bodyOwner.formData()",
+    "requirements": {
+      "receiver": "intrinsic Request or Response",
+      "builtin_body_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBody.FormData",
+    "template": "WebBody.FormData($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<FormData>",
+    "urlencoded": "parse application/x-www-form-urlencoded bytes as UTF-8 tuples",
+    "multipart": "parse multipart/form-data using boundary and File/Blob semantics",
+    "unsupported_type": "reject TypeError",
+    "consume_once": true
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Body.formData",
+    "WHATWG MIME sniffing/parsing references"
+  ],
+  "tests": [
+    {
+      "name": "urlencoded form data",
+      "input": "const r=new Response(\"a=1&a=2\",{headers:{\"Content-Type\":\"application/x-www-form-urlencoded\"}}); const f=await r.formData(); console.log(f.getAll(\"a\").join(\",\"));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "wrong media type rejects",
+      "input": "const r=new Response(\"x\",{headers:{\"Content-Type\":\"text/plain\"}}); try { await r.formData(); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.urlsearchparams.iteration",
+  "category": "web_url_fetch",
+  "summary": "Iterate URLSearchParams tuples in live list order for entries/keys/values/forEach and @@iterator.",
+  "source": {
+    "pattern": "$params.entries()",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Iterate",
+    "template": "WebUrlSearchParams.Iterate($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "order": "tuple list order",
+    "iterator": "default iterator is entries",
+    "forEach_args": "value, name, params object",
+    "liveness": "iteration observes the live list rather than a snapshot"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams iterable declaration"
+  ],
+  "tests": [
+    {
+      "name": "default iteration yields duplicates in order",
+      "input": "const p=new URLSearchParams(\"a=1&a=2&b=3\"); console.log([...p].map(x=>x.join(\":\" )).join(\",\"));",
+      "expected_behavior": "prints a:1,a:2,b:3"
+    },
+    {
+      "name": "forEach receives value then key",
+      "input": "const p=new URLSearchParams(\"a=1\"); p.forEach((v,k,self)=>console.log(v,k,self===p));",
+      "expected_behavior": "prints 1 a true"
+    }
+  ]
+}

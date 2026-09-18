@@ -1,0 +1,40 @@
+{
+  "id": "web.url.href",
+  "category": "web_url_fetch",
+  "summary": "Read or replace the full serialized URL through href.",
+  "source": {
+    "pattern": "$url.href",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.Href",
+    "template": "WebUrl.Href($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "getter": "returns URL serializer result",
+    "setter": "USVString-convert then parse as an absolute URL and replace components",
+    "setter_failure": "throws TypeError and does not partially replace the URL"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URL.href"
+  ],
+  "tests": [
+    {
+      "name": "href getter is canonical",
+      "input": "const u=new URL(\"https://EXAMPLE.com:443/a b\"); console.log(u.href);",
+      "expected_behavior": "prints https://example.com/a%20b"
+    },
+    {
+      "name": "href setter canonicalizes",
+      "input": "const u=new URL(\"https://a.example/\"); u.href=\"https://B.example:443/x y\"; console.log(u.href);",
+      "expected_behavior": "prints https://b.example/x%20y"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.response.json-static",
+  "category": "web_url_fetch",
+  "summary": "Create a Response whose body is JSON serialization of a JavaScript value and whose content type is application/json.",
+  "source": {
+    "pattern": "Response.json($data,$init)",
+    "requirements": {
+      "binding": "intrinsic Response",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebResponse.Json",
+    "template": "WebResponse.Json($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "JSON serialization to UTF-8 bytes",
+    "content_type": "application/json unless explicitly supplied by init headers",
+    "failure": "serialization failure throws TypeError",
+    "status_headers": "validated like Response constructor"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Response.json",
+    "ECMAScript JSON.stringify semantics"
+  ],
+  "tests": [
+    {
+      "name": "serializes JSON and sets content type",
+      "input": "const r=Response.json({a:1}); console.log(r.headers.get(\"content-type\"),await r.text());",
+      "expected_behavior": "prints application/json {\"a\":1}"
+    },
+    {
+      "name": "BigInt serialization throws",
+      "input": "try { Response.json(1n); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

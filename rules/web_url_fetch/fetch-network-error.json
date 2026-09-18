@@ -1,0 +1,41 @@
+{
+  "id": "web.fetch.network-error",
+  "category": "web_url_fetch",
+  "summary": "Preserve the distinction between a rejected fetch Promise and a synthetic Response.error() object.",
+  "source": {
+    "pattern": "fetch($unfetchable)",
+    "requirements": {
+      "binding": "intrinsic global fetch",
+      "host_fetch_runtime_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebFetch.NetworkErrors",
+    "template": "JsRuntime.WebFetch.NetworkErrors($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "fetch_failure": "promise rejects, generally with TypeError for a network error at the JS API boundary",
+    "response_error": "Response.error() is a Response object and is not what fetch returns on network failure",
+    "http_error": "HTTP 4xx/5xx is not a network error"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard network error",
+    "WHATWG Fetch Standard fetch method"
+  ],
+  "tests": [
+    {
+      "name": "unsupported scheme rejects",
+      "input": "try { await fetch(\"ftp://example.com/\"); } catch(e) { console.log(e instanceof TypeError); }",
+      "expected_behavior": "prints true in a Fetch host that does not support ftp"
+    },
+    {
+      "name": "Response.error is a value",
+      "input": "const r=Response.error(); console.log(r instanceof Response,r.type);",
+      "expected_behavior": "prints true error"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.request.constructor",
+  "category": "web_url_fetch",
+  "summary": "Construct a Fetch Request from a URL/string or another Request plus RequestInit.",
+  "source": {
+    "pattern": "new Request($input,$init)",
+    "requirements": {
+      "binding": "intrinsic Request constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebRequest.Construct",
+    "template": "WebRequest.Construct($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "url": "WHATWG URL parse; credentials in URL are rejected",
+    "defaults": "method GET and Fetch defaults unless inherited/overridden",
+    "headers": "new associated Headers object with request guard",
+    "signal": "associated following signal is created",
+    "body": "BodyInit extraction and stream state rules apply"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard §5.4 Request class"
+  ],
+  "tests": [
+    {
+      "name": "default request properties",
+      "input": "const r=new Request(\"https://EXAMPLE.com:443/a b\"); console.log(r.method,r.url);",
+      "expected_behavior": "prints GET https://example.com/a%20b"
+    },
+    {
+      "name": "credentials in URL rejected",
+      "input": "try { new Request(\"https://user:pw@example.com/\"); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

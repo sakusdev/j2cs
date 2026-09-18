@@ -1,0 +1,42 @@
+{
+  "id": "web.headers.append",
+  "category": "web_url_fetch",
+  "summary": "Append a header value while honoring normalization, header-list combining, and guard restrictions.",
+  "source": {
+    "pattern": "$headers.append($name,$value)",
+    "requirements": {
+      "receiver": "intrinsic Headers",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebHeaders.Append",
+    "template": "WebHeaders.Append($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normalization": "name lowercased; value normalized",
+    "existing": "append another field value to the header list; retrieval may combine values",
+    "return": "undefined",
+    "guard": "mutation can be rejected or ignored according to Headers guard and forbidden-name rules"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Headers.append",
+    "WHATWG Fetch Standard header list"
+  ],
+  "tests": [
+    {
+      "name": "append combines normal header values",
+      "input": "const h=new Headers(); h.append(\"X-A\",\"1\"); h.append(\"x-a\",\"2\"); console.log(h.get(\"X-A\"));",
+      "expected_behavior": "prints 1, 2"
+    },
+    {
+      "name": "bad value with newline throws",
+      "input": "try { new Headers().append(\"x\",\"a\\nb\"); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

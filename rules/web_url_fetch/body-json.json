@@ -1,0 +1,42 @@
+{
+  "id": "web.body.json",
+  "category": "web_url_fetch",
+  "summary": "Consume body bytes as UTF-8 text and parse with JSON.parse semantics.",
+  "source": {
+    "pattern": "$bodyOwner.json()",
+    "requirements": {
+      "receiver": "intrinsic Request or Response",
+      "builtin_body_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBody.Json",
+    "template": "WebBody.Json($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<any>",
+    "consume": "body becomes disturbed even if JSON parsing fails",
+    "parse": "JSON.parse on decoded bytes",
+    "syntax_error": "promise rejects with SyntaxError"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Body.json",
+    "ECMAScript JSON.parse"
+  ],
+  "tests": [
+    {
+      "name": "valid JSON",
+      "input": "const r=new Response(\"{\\\"a\\\":1}\"); console.log((await r.json()).a,r.bodyUsed);",
+      "expected_behavior": "prints 1 true"
+    },
+    {
+      "name": "invalid JSON rejects and consumes",
+      "input": "const r=new Response(\"{\"); try { await r.json(); } catch(e) { console.log(e.name,r.bodyUsed); }",
+      "expected_behavior": "prints SyntaxError true"
+    }
+  ]
+}

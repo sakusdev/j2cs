@@ -1,0 +1,41 @@
+{
+  "id": "web.urlsearchparams.set",
+  "category": "web_url_fetch",
+  "summary": "Set one name to a value, retaining the first tuple position and removing later duplicates.",
+  "source": {
+    "pattern": "$params.set($name,$value)",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Set",
+    "template": "WebUrlSearchParams.Set($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "existing_name": "replace first tuple value and remove all later same-name tuples",
+    "missing_name": "append new tuple",
+    "return": "undefined",
+    "url_link": "updates associated URL"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.set"
+  ],
+  "tests": [
+    {
+      "name": "set collapses duplicates at first position",
+      "input": "const p=new URLSearchParams(\"a=1&b=2&a=3\"); p.set(\"a\",\"4\"); console.log(p.toString());",
+      "expected_behavior": "prints a=4&b=2"
+    },
+    {
+      "name": "missing set appends",
+      "input": "const p=new URLSearchParams(\"a=1\"); p.set(\"b\",\"2\"); console.log(p.toString());",
+      "expected_behavior": "prints a=1&b=2"
+    }
+  ]
+}

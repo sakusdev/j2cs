@@ -1,0 +1,52 @@
+{
+  "id": "web.response.properties",
+  "category": "web_url_fetch",
+  "summary": "Read Fetch Response type, URL, status, statusText, headers, ok, redirected, body, and bodyUsed exactly.",
+  "source": {
+    "pattern": "$response.$property",
+    "requirements": {
+      "receiver": "intrinsic Response",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebResponse.GetProperty",
+    "template": "WebResponse.GetProperty($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "properties": [
+      "type",
+      "url",
+      "redirected",
+      "status",
+      "ok",
+      "statusText",
+      "headers",
+      "body",
+      "bodyUsed"
+    ],
+    "ok": "true exactly for status 200 through 299",
+    "constructed_url": "synthetic Response constructor has empty URL",
+    "bodyUsed": "stream disturbed state"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Response class",
+    "WHATWG Fetch Standard Body mixin"
+  ],
+  "tests": [
+    {
+      "name": "ok boundary",
+      "input": "console.log(new Response(null,{status:299}).ok,new Response(null,{status:300}).ok);",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "synthetic response URL is empty",
+      "input": "console.log(JSON.stringify(new Response().url));",
+      "expected_behavior": "prints \"\""
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "web.headers.iteration",
+  "category": "web_url_fetch",
+  "summary": "Iterate Headers using Fetch sorted-and-combined header list semantics.",
+  "source": {
+    "pattern": "$headers.entries()",
+    "requirements": {
+      "receiver": "intrinsic Headers",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebHeaders.Iterate",
+    "template": "WebHeaders.Iterate($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "order": "sorted by header name per Fetch header-list sort and combine",
+    "keys_values": "same sorted view",
+    "forEach_args": "value, name, Headers object",
+    "set_cookie": "must preserve standard special handling instead of blindly comma-joining where applicable"
+  },
+  "caveats": [
+    "Dictionary enumeration order is not the Fetch Headers iterator contract."
+  ],
+  "references": [
+    "WHATWG Fetch Standard Headers iterator",
+    "WHATWG Fetch Standard sort and combine"
+  ],
+  "tests": [
+    {
+      "name": "iteration is name-sorted",
+      "input": "const h=new Headers(); h.set(\"z\",\"1\"); h.set(\"a\",\"2\"); console.log([...h.keys()].join(\",\"));",
+      "expected_behavior": "prints a,z"
+    },
+    {
+      "name": "forEach argument order",
+      "input": "const h=new Headers({x:\"1\"}); h.forEach((v,k,self)=>console.log(v,k,self===h));",
+      "expected_behavior": "prints 1 x true"
+    }
+  ]
+}

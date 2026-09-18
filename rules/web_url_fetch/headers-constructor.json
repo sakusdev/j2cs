@@ -1,0 +1,41 @@
+{
+  "id": "web.headers.constructor",
+  "category": "web_url_fetch",
+  "summary": "Construct Headers from another Headers object, a pair sequence, or a record with Fetch header validation.",
+  "source": {
+    "pattern": "new Headers($init)",
+    "requirements": {
+      "binding": "intrinsic Headers constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebHeaders.Construct",
+    "template": "WebHeaders.Construct($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "names": "validated and normalized to lowercase",
+    "values": "validated and HTTP whitespace trimmed",
+    "sequence": "each item must have exactly two entries",
+    "guard": "new standalone Headers has guard none"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard §5.1 Headers class"
+  ],
+  "tests": [
+    {
+      "name": "normalizes name and trims value",
+      "input": "const h=new Headers([[\"X-Test\",\"  a  \"]]); console.log([...h][0].join(\":\"));",
+      "expected_behavior": "prints x-test:a"
+    },
+    {
+      "name": "invalid name throws",
+      "input": "try { new Headers({\"bad name\":\"x\"}); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.url.object-url",
+  "category": "web_url_fetch",
+  "summary": "Treat blob/object URL creation and revocation as a host-managed URL store boundary.",
+  "source": {
+    "pattern": "URL.createObjectURL($blob)",
+    "requirements": {
+      "binding": "intrinsic URL API",
+      "host_supports_object_url_store": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebUrl.ObjectUrl",
+    "template": "JsRuntime.WebUrl.ObjectUrl($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "create": "returns a unique blob: URL associated with a host/object URL store",
+    "revoke": "removes the mapping for future dereference",
+    "lifetime": "host/global lifetime and Blob/File integration are observable"
+  },
+  "caveats": [
+    "Object URL stores and lifetime are host concepts, not pure URL parsing."
+  ],
+  "references": [
+    "File API createObjectURL/revokeObjectURL"
+  ],
+  "tests": [
+    {
+      "name": "create returns blob scheme",
+      "input": "const u=URL.createObjectURL(new Blob([\"x\"])); console.log(u.startsWith(\"blob:\")); URL.revokeObjectURL(u);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "distinct calls produce distinct URLs",
+      "input": "const b=new Blob([\"x\"]); const a=URL.createObjectURL(b), c=URL.createObjectURL(b); console.log(a!==c); URL.revokeObjectURL(a); URL.revokeObjectURL(c);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.headers.delete",
+  "category": "web_url_fetch",
+  "summary": "Delete all values for a header name while respecting guard restrictions.",
+  "source": {
+    "pattern": "$headers.delete($name)",
+    "requirements": {
+      "receiver": "intrinsic Headers",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebHeaders.Delete",
+    "template": "WebHeaders.Delete($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutation": "remove all matching values",
+    "absent": "no-op",
+    "return": "undefined",
+    "guard": "guard can prevent mutation"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Headers.delete"
+  ],
+  "tests": [
+    {
+      "name": "delete removes header",
+      "input": "const h=new Headers({x:\"1\"}); h.delete(\"X\"); console.log(h.has(\"x\"));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "delete absent is no-op",
+      "input": "const h=new Headers(); console.log(h.delete(\"x\"),h.has(\"x\"));",
+      "expected_behavior": "prints undefined false"
+    }
+  ]
+}
