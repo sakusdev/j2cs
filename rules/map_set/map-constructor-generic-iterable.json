@@ -1,0 +1,44 @@
+{
+  "id": "map.constructor.generic-iterable",
+  "category": "map_set",
+  "summary": "Use runtime semantics for a Map constructed from an arbitrary iterable because iterator hooks, entry property access, adder lookup, and IteratorClose are observable.",
+  "source": {
+    "pattern": "new Map($iterable)",
+    "requirements": {
+      "global_map_binding_builtin": true,
+      "iterable_not_proven_safe_builtin_fast_path": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ConstructMap($iterable)",
+    "notes": "Runtime must perform Get(set), GetIterator, per-entry object validation, Get(entry,'0'/'1'), Call(adder), and IteratorClose on abrupt completion."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "adder_lookup": "Get map.set once before iteration",
+    "iterator_protocol": "fully observable",
+    "entry_requirement": "each yielded item must be Object",
+    "iterator_close_on_abrupt": true
+  },
+  "caveats": [
+    "Custom Symbol.iterator, getters on pair indices, overridden Map.prototype.set, and thrown JS values prevent a simple foreach lowering."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/keyed-collections.html",
+    "https://tc39.es/ecma262/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "custom iterable insertion order",
+      "input": "const it={*[Symbol.iterator](){yield ['x',1];yield ['y',2]}}; console.log([...new Map(it)]);",
+      "expected_behavior": "iterates x then y"
+    },
+    {
+      "name": "primitive entry throws and closes iterator",
+      "input": "let closed=false; const it={ [Symbol.iterator](){return {next(){return {value:1,done:false}},return(){closed=true;return {done:true}}}}}; try{new Map(it)}catch(e){} console.log(closed);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

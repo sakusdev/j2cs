@@ -1,0 +1,45 @@
+{
+  "id": "map.constructor.empty",
+  "category": "map_set",
+  "summary": "Construct an empty builtin Map using the JS-compatible ordered Map representation.",
+  "source": {
+    "pattern": "new Map()",
+    "requirements": {
+      "global_map_binding_builtin": true,
+      "new_target_is_builtin_map": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsMap.Create()",
+    "helper": "JsMap.Create",
+    "notes": "The representation must preserve insertion order, SameValueZero-equivalent keyed lookup, and live iterator behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "requires_new": true,
+    "initial_size": 0,
+    "key_equality": "SameValueZero via key canonicalization",
+    "insertion_order": "preserved"
+  },
+  "caveats": [
+    "Do not lower to Dictionary<object, object> unless its comparer and ordered/live-iterator behavior are proven JS-compatible."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "empty map",
+      "input": "const m = new Map(); console.log(m.size);",
+      "expected_csharp": "var m = JsMap.Create();",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "constructor requires new",
+      "input": "try { Map(); } catch (e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

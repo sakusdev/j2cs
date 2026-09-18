@@ -1,0 +1,13 @@
+{
+  "id": "map.prototype.get",
+  "category": "map_set",
+  "summary": "Read a builtin Map key with SameValueZero-equivalent matching and return undefined when absent.",
+  "source": {"pattern": "$map.get($key)", "requirements": {"receiver_inferred_builtin_map": true, "builtin_member_not_overridden_or_shadowed": true, "receiver_not_proxy": true}},
+  "target": {"kind": "helper", "template": "JsMap.Get($map, $key)", "helper": "JsMap.Get"},
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {"key_equality": "SameValueZero / CanonicalizeKeyedCollectionKey", "absent_result": "undefined", "mutates_receiver": false},
+  "caveats": ["C# Dictionary.TryGetValue default(TValue) is not equivalent to JavaScript undefined.", "NaN keys match NaN; -0 and +0 designate the same key."],
+  "references": ["https://tc39.es/ecma262/multipage/keyed-collections.html", "https://tc39.es/ecma262/multipage/abstract-operations.html"],
+  "tests": [{"name": "returns stored value", "input": "const m=new Map([['x',7]]); console.log(m.get('x'));", "expected_behavior": "prints 7"}, {"name": "NaN and absent semantics", "input": "const m=new Map([[NaN,1]]); console.log(m.get(NaN), m.get('missing') === undefined);", "expected_behavior": "prints 1 true"}]
+}

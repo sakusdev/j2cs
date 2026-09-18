@@ -1,0 +1,13 @@
+{
+  "id": "map.prototype.foreach.dynamic-callback",
+  "category": "map_set",
+  "summary": "Use runtime fallback when Map.forEach callback identity/callability or this-binding semantics are dynamic.",
+  "source": {"pattern": "$map.forEach($callback, $thisArg)", "requirements": {"receiver_inferred_builtin_map": true, "builtin_member_not_overridden_or_shadowed": true, "receiver_not_proxy": true, "callback_not_statically_lowerable": true}},
+  "target": {"kind": "runtime", "template": "JsRuntime.MapForEach($map, $callback, $thisArg)"},
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {"callback_callability_checked": "at runtime", "callback_throw": "propagates immediately after prior side effects", "iteration": "live ordered Map iteration"},
+  "caveats": [],
+  "references": ["https://tc39.es/ecma262/multipage/keyed-collections.html"],
+  "tests": [{"name": "non-callable throws", "input": "try { new Map([[1,2]]).forEach(1); } catch(e) { console.log(e.name); }", "expected_behavior": "prints TypeError"}, {"name": "callback abrupt completion stops iteration", "input": "const m=new Map([[1,1],[2,2]]); let n=0; try{m.forEach(()=>{n++;throw 'x'})}catch(e){} console.log(n);", "expected_behavior": "prints 1"}]
+}
