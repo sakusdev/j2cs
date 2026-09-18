@@ -1,0 +1,42 @@
+{
+  "id": "bigint.prototype.to-string",
+  "category": "bigint",
+  "summary": "BigInt.prototype.toString formats the BigInt in radix 2..36 after ToIntegerOrInfinity(radix).",
+  "source": {
+    "pattern": "$bigint.toString($radix)",
+    "requirements": {
+      "receiver_is_bigint_or_bigint_wrapper": true,
+      "property_resolves_to_builtin": "BigInt.prototype.toString"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsBigInt.ToString($bigint, $radix)",
+    "helper": "JsBigInt.ToString",
+    "notes": "Do not route through Number or CLR integer formatting that would overflow or lose precision."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default_radix": 10,
+    "radix_conversion": "ToIntegerOrInfinity",
+    "valid_radix": "2..36 inclusive",
+    "invalid_radix": "RangeError",
+    "invalid_receiver": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "hex formatting",
+      "input": "console.log((255n).toString(16));",
+      "expected_behavior": "prints ff"
+    },
+    {
+      "name": "invalid radix",
+      "input": "try{(1n).toString(1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

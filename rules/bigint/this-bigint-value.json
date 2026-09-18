@@ -1,0 +1,38 @@
+{
+  "id": "bigint.this-bigint-value",
+  "category": "bigint",
+  "summary": "ThisBigIntValue accepts a BigInt primitive or object with [[BigIntData]] and otherwise throws TypeError.",
+  "source": {
+    "pattern": "[[ThisBigIntValue]]($value)",
+    "requirements": {
+      "semantic_operation": "ThisBigIntValue"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsBigInt.ThisBigIntValue($value)",
+    "helper": "JsBigInt.ThisBigIntValue"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "primitive": "identity",
+    "wrapper": "extract [[BigIntData]]",
+    "other": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "primitive accepted",
+      "input": "// semantic IR: ThisBigIntValue(1n)",
+      "expected_behavior": "returns 1n"
+    },
+    {
+      "name": "ordinary object rejected",
+      "input": "// semantic IR: ThisBigIntValue({})",
+      "expected_behavior": "throws TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

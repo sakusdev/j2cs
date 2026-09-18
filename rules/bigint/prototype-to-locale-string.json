@@ -1,0 +1,39 @@
+{
+  "id": "bigint.prototype.to-locale-string",
+  "category": "bigint",
+  "summary": "BigInt.prototype.toLocaleString is locale/Intl dependent and must not be replaced by invariant BigInteger formatting.",
+  "source": {
+    "pattern": "$bigint.toLocaleString($locales, $options)",
+    "requirements": {
+      "property_resolves_to_builtin": "BigInt.prototype.toLocaleString",
+      "receiver_is_bigint_or_bigint_wrapper": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.BigIntToLocaleString($bigint, $locales, $options)",
+    "helper": "JsRuntime.BigIntToLocaleString"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "intl": "ECMA-402 when available",
+    "fallback": "implementation-defined host locale formatting",
+    "receiver_check": "ThisBigIntValue"
+  },
+  "tests": [
+    {
+      "name": "returns string",
+      "input": "console.log(typeof (1234n).toLocaleString());",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "wrong receiver rejected",
+      "input": "try{BigInt.prototype.toLocaleString.call({})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

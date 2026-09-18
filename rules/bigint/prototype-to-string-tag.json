@@ -1,0 +1,40 @@
+{
+  "id": "bigint.prototype.to-string-tag",
+  "category": "bigint",
+  "summary": "The intrinsic BigInt prototype exposes the configurable @@toStringTag value \"BigInt\".",
+  "source": {
+    "pattern": "BigInt.prototype[Symbol.toStringTag]",
+    "requirements": {
+      "bindings_resolve_to_intrinsics": true,
+      "property_lookup_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "\"BigInt\"",
+    "helper": "JsBigInt.Metadata"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "BigInt",
+    "writable": false,
+    "enumerable": false,
+    "configurable": true
+  },
+  "tests": [
+    {
+      "name": "tag value",
+      "input": "console.log(BigInt.prototype[Symbol.toStringTag]);",
+      "expected_behavior": "prints BigInt"
+    },
+    {
+      "name": "object tag",
+      "input": "console.log(Object.prototype.toString.call(Object(1n)));",
+      "expected_behavior": "prints [object BigInt]"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "symbol.prototype.to-string",
+  "category": "symbol",
+  "summary": "Symbol.prototype.toString returns Symbol(description) text and accepts Symbol primitives or wrappers only.",
+  "source": {
+    "pattern": "$symbol.toString()",
+    "requirements": {
+      "property_resolves_to_builtin": "Symbol.prototype.toString",
+      "receiver_is_symbol_or_symbol_wrapper": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.ToDescriptiveString($symbol)",
+    "helper": "JsSymbol.ToDescriptiveString"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "absent_description": "Symbol()",
+    "empty_description": "Symbol()",
+    "nonempty_description": "Symbol(desc)",
+    "invalid_receiver": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "description rendering",
+      "input": "console.log(Symbol(\"x\").toString(), Symbol().toString());",
+      "expected_behavior": "prints Symbol(x) Symbol()"
+    },
+    {
+      "name": "not generic",
+      "input": "try{Symbol.prototype.toString.call({})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

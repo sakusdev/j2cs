@@ -1,0 +1,41 @@
+{
+  "id": "symbol.function.object-description",
+  "category": "symbol",
+  "summary": "Symbol(object) can execute user code while applying ToString to the description before creating a fresh Symbol.",
+  "source": {
+    "pattern": "Symbol($description)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "builtin_not_replaced": true,
+      "description_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.SymbolCreate($description)",
+    "helper": "JsRuntime.SymbolCreate",
+    "notes": "Reuse canonical object ToString/ToPrimitive behavior; create the Symbol only after conversion succeeds."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToString(description)",
+    "can_execute_user_code": true,
+    "fresh_identity_after_conversion": true
+  },
+  "tests": [
+    {
+      "name": "custom toString observed",
+      "input": "let n=0; const s=Symbol({toString(){n++;return \"k\"}}); console.log(n,s.description);",
+      "expected_behavior": "prints 1 k"
+    },
+    {
+      "name": "throw propagates",
+      "input": "try{Symbol({toString(){throw 7}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints 7"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}
