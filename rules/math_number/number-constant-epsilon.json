@@ -1,0 +1,41 @@
+{
+  "id": "number.constant.epsilon",
+  "category": "math_number",
+  "summary": "Lower intrinsic Number.EPSILON to the corresponding binary64 constant.",
+  "source": {
+    "pattern": "Number.EPSILON",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "intrinsic_constant_property": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "2.2204460492503130808472633361816E-16d"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "value": "2^-52",
+    "property_read": "safe only when Number binding resolves to intrinsic constructor"
+  },
+  "caveats": [
+    "Number.EPSILON is 2^-52 and is not .NET double.Epsilon."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "constant value",
+      "input": "console.log(Number.EPSILON === Math.pow(2,-52));",
+      "expected_csharp": "var x = 2.2204460492503130808472633361816E-16d;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "binding requirement",
+      "input": "const N={}; N.EPSILON=123; console.log(N.EPSILON);",
+      "expected_behavior": "prints 123; this rule does not apply to a non-intrinsic receiver"
+    }
+  ]
+}

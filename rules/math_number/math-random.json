@@ -1,0 +1,47 @@
+{
+  "id": "math.random",
+  "category": "math_number",
+  "summary": "Provide Math.random through a realm-scoped non-cryptographic PRNG contract.",
+  "source": {
+    "pattern": "Math.random()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "realm_identity_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Random",
+    "template": "JsMath.Random($realm)",
+    "notes": "Return positive-sign Number in [0,1), approximately uniform; distinct realms need distinct successive sequences."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "range": "0 <= x < 1",
+    "sign": "positive",
+    "distribution": "approximately uniform",
+    "algorithm": "implementation-defined",
+    "realm_state": "distinct sequences per realm"
+  },
+  "caveats": [
+    "Do not promise deterministic cross-runtime sequences.",
+    "A process-global RNG may violate the distinct-realm sequence requirement."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "range",
+      "input": "const x=Math.random(); console.log(x>=0 && x<1);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "finite",
+      "input": "console.log(Number.isFinite(Math.random()));",
+      "expected_behavior": "prints true; no cryptographic guarantee is implied"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "number.prototype.to-string",
+  "category": "math_number",
+  "summary": "Convert a Number to string with ECMAScript radix and signed-zero semantics.",
+  "source": {
+    "pattern": "$number.toString($radix)",
+    "requirements": {
+      "method_resolution_intrinsic": "%Number.prototype.toString%",
+      "receiver_proven_number_or_number_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ToString",
+    "template": "JsNumber.ToString($number, $radix)",
+    "notes": "Base-10 uses ECMAScript shortest-number spelling; nondecimal radices require 2..36 semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ThisNumberValue",
+    "radix": "undefined means 10; otherwise ToIntegerOrInfinity in 2..36",
+    "negative_zero": "0",
+    "nan_infinity": "ECMAScript spellings"
+  },
+  "caveats": [
+    "C# double.ToString is culture-sensitive by default and does not implement arbitrary radix conversion."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "hex conversion",
+      "input": "console.log((255).toString(16));",
+      "expected_behavior": "prints ff"
+    },
+    {
+      "name": "negative zero spelling",
+      "input": "console.log((-0).toString());",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

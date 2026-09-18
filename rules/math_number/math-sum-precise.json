@@ -1,0 +1,47 @@
+{
+  "id": "math.sum-precise",
+  "category": "math_number",
+  "summary": "Use runtime iterator semantics for Math.sumPrecise and preserve precision, signed zero, and IteratorClose.",
+  "source": {
+    "pattern": "Math.sumPrecise($items)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "generic_iterator_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.MathSumPrecise",
+    "template": "JsRuntime.MathSumPrecise($items)",
+    "notes": "GetIterator(sync); reject non-Number elements without coercion; close on abrupt completion; handle infinities/NaN; preserve all-minus-zero; use precision-safe summation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "iteration": "full ECMAScript sync iterator protocol",
+    "element_coercion": "none; every yielded value must already be Number",
+    "non_number": "TypeError with IteratorClose",
+    "precision": "mathematical sum rounded once to Number",
+    "all_negative_zero": "-0"
+  },
+  "caveats": [
+    "A naive double accumulator is not equivalent.",
+    "Generic iterator protocol remains owned by ITERATORS_GENERATORS; this rule consumes it."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "cancellation precision",
+      "input": "console.log(Math.sumPrecise([1e20,1,-1e20]));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "non-number",
+      "input": "try{Math.sumPrecise([1,'2'])}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

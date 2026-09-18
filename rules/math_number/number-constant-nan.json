@@ -1,0 +1,41 @@
+{
+  "id": "number.constant.nan",
+  "category": "math_number",
+  "summary": "Lower intrinsic Number.NaN to the corresponding binary64 constant.",
+  "source": {
+    "pattern": "Number.NaN",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "intrinsic_constant_property": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "double.NaN"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "value": "NaN",
+    "property_read": "safe only when Number binding resolves to intrinsic constructor"
+  },
+  "caveats": [
+    "Apply only to the intrinsic Number constructor binding."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "constant value",
+      "input": "console.log(Number.isNaN(Number.NaN));",
+      "expected_csharp": "var x = double.NaN;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "binding requirement",
+      "input": "const N={}; N.NaN=123; console.log(N.NaN);",
+      "expected_behavior": "prints 123; this rule does not apply to a non-intrinsic receiver"
+    }
+  ]
+}

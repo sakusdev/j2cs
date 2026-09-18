@@ -1,0 +1,42 @@
+{
+  "id": "math.sin",
+  "category": "math_number",
+  "summary": "Compute implementation-approximated sine preserving signed zero.",
+  "source": {
+    "pattern": "Math.sin($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Sin",
+    "template": "JsMath.Sin($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "negative_zero": "preserved",
+    "infinities": "NaN",
+    "units": "radians"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.sin(-0),-0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "infinity",
+      "input": "console.log(Number.isNaN(Math.sin(Infinity)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

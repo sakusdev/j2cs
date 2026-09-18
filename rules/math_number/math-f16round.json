@@ -1,0 +1,45 @@
+{
+  "id": "math.f16round",
+  "category": "math_number",
+  "summary": "Round directly from binary64 to IEEE-754 binary16 using roundTiesToEven, then widen back.",
+  "source": {
+    "pattern": "Math.f16round($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.F16round",
+    "template": "JsMath.F16round($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "format": "binary16 then binary64",
+    "rounding": "direct roundTiesToEven",
+    "negative_zero_nan_infinity": "preserved"
+  },
+  "caveats": [
+    "Do not implement by Math.fround followed by binary16 conversion; double rounding can differ."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "exact value",
+      "input": "console.log(Math.f16round(1.5));",
+      "expected_behavior": "prints 1.5"
+    },
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.f16round(-0),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

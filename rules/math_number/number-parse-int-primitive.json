@@ -1,0 +1,48 @@
+{
+  "id": "number.parse-int.primitive",
+  "category": "math_number",
+  "summary": "Parse primitive text using ECMAScript parseInt radix normalization and longest-prefix rules.",
+  "source": {
+    "pattern": "Number.parseInt($value, $radix)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": "%parseInt%",
+      "value_is_primitive": true,
+      "radix_coercion_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ParseIntPrimitive",
+    "template": "JsNumber.ParseIntPrimitive($value, $radix)",
+    "notes": "Use canonical primitive ToString plus ToInt32-compatible radix normalization; do not use culture-sensitive CLR parsing."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "string_conversion": "ECMAScript ToString",
+    "radix": "ToInt32 then 0/inferred or 2..36",
+    "hex_prefix": "recognized for radix 0 or 16",
+    "invalid_digit": "terminates parse",
+    "no_digits": "NaN"
+  },
+  "caveats": [
+    "Radices outside 2..36 after normalization yield NaN."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html",
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "hex inference",
+      "input": "console.log(Number.parseInt('0x10',0));",
+      "expected_behavior": "prints 16"
+    },
+    {
+      "name": "invalid digit terminates",
+      "input": "console.log(Number.parseInt('15',2));",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "math.max",
+  "category": "math_number",
+  "summary": "Return the greatest coerced Number with ECMAScript NaN and signed-zero ordering.",
+  "source": {
+    "pattern": "Math.max(...$args)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "all_argument_to_number_lowerings": "reuse COERCION left-to-right"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Max",
+    "template": "JsMath.Max($args)",
+    "notes": "All arguments are ToNumber-coerced before selection; +0 wins a zero tie."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "-Infinity",
+    "nan": "NaN",
+    "signed_zero": "prefer +0",
+    "conversion": "all arguments ToNumber first"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "empty",
+      "input": "console.log(Math.max());",
+      "expected_behavior": "prints -Infinity"
+    },
+    {
+      "name": "zero tie",
+      "input": "console.log(Object.is(Math.max(-0,+0),+0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

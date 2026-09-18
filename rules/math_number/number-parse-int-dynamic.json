@@ -1,0 +1,42 @@
+{
+  "id": "number.parse-int.dynamic",
+  "category": "math_number",
+  "summary": "Use runtime fallback when Number.parseInt conversions can execute arbitrary JavaScript.",
+  "source": {
+    "pattern": "Number.parseInt($value, $radix)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": "%parseInt%",
+      "value_or_radix_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NumberParseInt",
+    "template": "JsRuntime.NumberParseInt($value, $radix)",
+    "notes": "Preserve ToString(value), ToInt32(radix), their side effects/exceptions, and parseInt grammar."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion_order": "ToString(value) then radix normalization",
+    "user_code": "may execute during object conversion",
+    "exceptions": "propagate before parsing"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html",
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "value conversion side effect",
+      "input": "let n=0; Number.parseInt({toString(){n++; return '10'}},10); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "radix conversion throws",
+      "input": "try{Number.parseInt('10',{valueOf(){throw 'r'}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints r"
+    }
+  ]
+}

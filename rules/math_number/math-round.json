@@ -1,0 +1,46 @@
+{
+  "id": "math.round",
+  "category": "math_number",
+  "summary": "Round to nearest integral Number with ties toward +Infinity and preserve -0 near zero.",
+  "source": {
+    "pattern": "Math.round($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Round",
+    "template": "JsMath.Round($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "ties": "toward +Infinity",
+    "negative_half": "-0 for -0.5; -3 for -3.5",
+    "negative_fraction_near_zero": "-0",
+    "nan_infinity": "preserved"
+  },
+  "caveats": [
+    "C# Math.Round defaults to ties-to-even and is not equivalent."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "negative tie",
+      "input": "console.log(Math.round(-3.5));",
+      "expected_behavior": "prints -3"
+    },
+    {
+      "name": "negative zero result",
+      "input": "console.log(Object.is(Math.round(-0.1),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

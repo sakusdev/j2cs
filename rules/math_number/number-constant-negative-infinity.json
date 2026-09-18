@@ -1,0 +1,41 @@
+{
+  "id": "number.constant.negative-infinity",
+  "category": "math_number",
+  "summary": "Lower intrinsic Number.NEGATIVE_INFINITY to the corresponding binary64 constant.",
+  "source": {
+    "pattern": "Number.NEGATIVE_INFINITY",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "intrinsic_constant_property": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "double.NegativeInfinity"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "value": "negative infinity",
+    "property_read": "safe only when Number binding resolves to intrinsic constructor"
+  },
+  "caveats": [
+    "Apply only to the intrinsic Number constructor binding."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "constant value",
+      "input": "console.log(Number.NEGATIVE_INFINITY < 0);",
+      "expected_csharp": "var x = double.NegativeInfinity;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "binding requirement",
+      "input": "const N={}; N.NEGATIVE_INFINITY=123; console.log(N.NEGATIVE_INFINITY);",
+      "expected_behavior": "prints 123; this rule does not apply to a non-intrinsic receiver"
+    }
+  ]
+}

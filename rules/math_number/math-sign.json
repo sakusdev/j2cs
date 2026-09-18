@@ -1,0 +1,44 @@
+{
+  "id": "math.sign",
+  "category": "math_number",
+  "summary": "Return -1, +1, or original NaN/+0/-0 according to Math.sign.",
+  "source": {
+    "pattern": "Math.sign($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Sign",
+    "template": "JsMath.Sign($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "negative": "-1",
+    "positive": "+1",
+    "nan": "NaN",
+    "positive_zero": "+0",
+    "negative_zero": "-0"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(Math.sign(-3));",
+      "expected_behavior": "prints -1"
+    },
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.sign(-0),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

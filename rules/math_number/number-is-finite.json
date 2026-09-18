@@ -1,0 +1,45 @@
+{
+  "id": "number.is-finite",
+  "category": "math_number",
+  "summary": "Implement Number.isFinite without coercing non-Number values.",
+  "source": {
+    "pattern": "Number.isFinite($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.IsFinite",
+    "template": "JsNumber.IsFinite($value)",
+    "notes": "Check the JavaScript value tag first; unlike global isFinite this performs no ToNumber."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "none",
+    "non_number": false,
+    "nan_and_infinities": false,
+    "finite_numbers": true,
+    "negative_zero": true
+  },
+  "caveats": [
+    "Do not lower to global isFinite or Convert.ToDouble because Number.isFinite never coerces."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "finite number",
+      "input": "console.log(Number.isFinite(3));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "string not coerced",
+      "input": "console.log(Number.isFinite('3'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

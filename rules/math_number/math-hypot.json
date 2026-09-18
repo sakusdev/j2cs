@@ -1,0 +1,42 @@
+{
+  "id": "math.hypot",
+  "category": "math_number",
+  "summary": "Compute a precision-safe hypotenuse after coercing every argument before inspecting Infinity/NaN.",
+  "source": {
+    "pattern": "Math.hypot(...$args)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "all_argument_to_number_lowerings": "reuse COERCION left-to-right"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Hypot",
+    "template": "JsMath.Hypot($args)",
+    "notes": "Coerce every argument left-to-right first. Infinity dominates NaN; all-zero input yields +0; use scaling to avoid overflow/underflow."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToNumber for every argument before result checks",
+    "infinity_dominates_nan": true,
+    "all_zero": "+0",
+    "precision": "avoid naive sum-of-squares overflow/underflow"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "pythagorean",
+      "input": "console.log(Math.hypot(3,4));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "infinity dominates NaN",
+      "input": "console.log(Math.hypot(Infinity,NaN));",
+      "expected_behavior": "prints Infinity"
+    }
+  ]
+}

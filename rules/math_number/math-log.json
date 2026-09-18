@@ -1,0 +1,43 @@
+{
+  "id": "math.log",
+  "category": "math_number",
+  "summary": "Compute implementation-approximated natural logarithm.",
+  "source": {
+    "pattern": "Math.log($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Log",
+    "template": "JsMath.Log($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "one": "+0",
+    "both_zeros": "-Infinity",
+    "negative": "NaN",
+    "positive_infinity": "Infinity"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "one",
+      "input": "console.log(Object.is(Math.log(1),0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "zero",
+      "input": "console.log(Math.log(0));",
+      "expected_behavior": "prints -Infinity"
+    }
+  ]
+}

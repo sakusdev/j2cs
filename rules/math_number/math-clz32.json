@@ -1,0 +1,41 @@
+{
+  "id": "math.clz32",
+  "category": "math_number",
+  "summary": "Count leading zero bits after ECMAScript ToUint32 conversion.",
+  "source": {
+    "pattern": "Math.clz32($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_uint32_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Clz32",
+    "template": "JsMath.Clz32($x)",
+    "notes": "Reuse canonical ToUint32; zero returns 32."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToUint32 via COERCION",
+    "zero": 32,
+    "result_range": "0..32"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "one",
+      "input": "console.log(Math.clz32(1));",
+      "expected_behavior": "prints 31"
+    },
+    {
+      "name": "zero",
+      "input": "console.log(Math.clz32(0));",
+      "expected_behavior": "prints 32"
+    }
+  ]
+}

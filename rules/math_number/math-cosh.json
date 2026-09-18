@@ -1,0 +1,41 @@
+{
+  "id": "math.cosh",
+  "category": "math_number",
+  "summary": "Compute implementation-approximated hyperbolic cosine.",
+  "source": {
+    "pattern": "Math.cosh($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Cosh",
+    "template": "JsMath.Cosh($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "zero": 1,
+    "positive_or_negative_infinity": "Infinity"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "zero",
+      "input": "console.log(Math.cosh(0));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "negative infinity",
+      "input": "console.log(Math.cosh(-Infinity));",
+      "expected_behavior": "prints Infinity"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "number.parse-float.dynamic",
+  "category": "math_number",
+  "summary": "Use runtime fallback when Number.parseFloat must ToString an object or Proxy.",
+  "source": {
+    "pattern": "Number.parseFloat($object)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": "%parseFloat%",
+      "argument_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NumberParseFloat",
+    "template": "JsRuntime.NumberParseFloat($object)",
+    "notes": "Perform object ToString including Symbol.toPrimitive/getters/Proxy traps, then parseFloat grammar."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "to_string_can_execute_user_code": true,
+    "exceptions": "propagate",
+    "parse_after_conversion": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html",
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "custom toString",
+      "input": "console.log(Number.parseFloat({toString(){return '3.5px'}}));",
+      "expected_behavior": "prints 3.5"
+    },
+    {
+      "name": "throwing conversion",
+      "input": "try{Number.parseFloat({toString(){throw 'x'}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}
