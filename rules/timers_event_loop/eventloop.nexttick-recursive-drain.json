@@ -1,0 +1,44 @@
+{
+  "id": "eventloop.nexttick-recursive-drain",
+  "category": "event_loop",
+  "summary": "Drain recursively-enqueued process.nextTick callbacks before moving on to microtasks or later event-loop phases.",
+  "source": {
+    "pattern": "process.nextTick(()=>{ ... process.nextTick($nested); ... })",
+    "requirements": {
+      "host_profile": "Node.js",
+      "builtin_process_nextTick_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.EnqueueNextTickRecursive($callback)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "drain_policy": "next-tick queue is fully drained, including callbacks appended while draining",
+    "starvation": "unbounded recursive nextTick scheduling can prevent I/O/timers from progressing",
+    "microtask_relation": "microtasks run after the next-tick queue drain checkpoint"
+  },
+  "caveats": [
+    "A naive one-item-per-turn scheduler changes ordering and avoids starvation that real Node code can observe.",
+    "Compiler/runtime may add diagnostics, but compatibility mode must preserve semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/process.html#processnexttickcallback-args",
+    "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick"
+  ],
+  "tests": [
+    {
+      "name": "nested tick before promise",
+      "input": "process.nextTick(()=>{console.log('t1');Promise.resolve().then(()=>console.log('p'));process.nextTick(()=>console.log('t2'))});",
+      "expected_behavior": "prints t1, t2, p"
+    },
+    {
+      "name": "recursive chain can starve timer",
+      "input": "let n=0;function f(){if(++n<1000)process.nextTick(f)}process.nextTick(f);setTimeout(()=>console.log(n),0);",
+      "expected_behavior": "the nextTick chain completes before the timer callback can run"
+    }
+  ]
+}

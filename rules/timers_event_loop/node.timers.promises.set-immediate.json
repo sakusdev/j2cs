@@ -1,0 +1,45 @@
+{
+  "id": "node.timers.promises.set-immediate",
+  "category": "timers",
+  "summary": "Model node:timers/promises setImmediate as a Promise fulfilled from Node's Immediate/check phase.",
+  "source": {
+    "pattern": "timersPromises.setImmediate($value, $options)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "binding": "node:timers/promises setImmediate",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeTimersPromises.SetImmediate($value, $options)",
+    "notes": "Integrate with the Node-compatible timer scheduler and existing JsPromise/async-iteration semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise",
+    "fulfillment": "fulfills with value when the Immediate runs in the check phase",
+    "options": "ref defaults true; signal may abort",
+    "promise_job": "then/await continuation follows existing Promise microtask semantics"
+  },
+  "caveats": [
+    "Do not substitute Task.Yield because it does not represent Node's check phase or ref state."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html#timers-promises-api",
+    "rules/async/promise-then.json"
+  ],
+  "tests": [
+    {
+      "name": "fulfills supplied value",
+      "input": "const {setImmediate}=require('node:timers/promises');setImmediate('v').then(console.log);",
+      "expected_behavior": "prints v after the Immediate becomes eligible"
+    },
+    {
+      "name": "runs asynchronously",
+      "input": "const {setImmediate}=require('node:timers/promises');setImmediate('later').then(console.log);console.log('now');",
+      "expected_behavior": "prints now before later"
+    }
+  ]
+}

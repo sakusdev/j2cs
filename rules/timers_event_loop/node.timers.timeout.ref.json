@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.timeout.ref",
+  "category": "timers",
+  "summary": "Mark a Node Timeout as event-loop-ref'ed and return the same handle.",
+  "source": {
+    "pattern": "$timeout.ref()",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.Ref",
+    "template": "NodeTimers.Ref($timeout)",
+    "notes": "Set liveness ref state idempotently and return the receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same Timeout object",
+    "effect": "requests that active timer keep event loop alive",
+    "idempotent": true
+  },
+  "caveats": [
+    "Ref state affects process liveness, not callback scheduling priority."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns same object",
+      "input": "const t=setTimeout(()=>{},1000); t.unref(); console.log(t.ref()===t); clearTimeout(t);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "restores hasRef",
+      "input": "const t=setTimeout(()=>{},1000); t.unref(); t.ref(); console.log(t.hasRef()); clearTimeout(t);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

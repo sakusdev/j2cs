@@ -1,0 +1,46 @@
+{
+  "id": "eventloop.nexttick-before-microtasks-cjs",
+  "category": "event_loop",
+  "summary": "Preserve the ordinary CommonJS-turn ordering where the next-tick queue drains before Promise/queueMicrotask jobs.",
+  "source": {
+    "pattern": "process.nextTick($tick); queueMicrotask($micro)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "module_kind": "CommonJS",
+      "scheduling_context": "ordinary JavaScript turn, not already executing a microtask",
+      "builtins_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.ScheduleNextTickAndMicrotask($tick, $micro)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "nextTick callback before V8 microtask callbacks queued in the same ordinary CommonJS turn",
+    "queues": "nextTick queue drains first; microtask queue drains immediately after"
+  },
+  "caveats": [
+    "This ordering must not be generalized to code already running inside a microtask.",
+    "ES module top-level evaluation has different ordering because it executes as part of the microtask queue."
+  ],
+  "references": [
+    "https://nodejs.org/api/process.html#processnexttickcallback-args",
+    "rules/async/queue-microtask.json",
+    "rules/async/promise-then.json"
+  ],
+  "tests": [
+    {
+      "name": "CJS nextTick precedes Promise and queueMicrotask",
+      "input": "Promise.resolve().then(()=>console.log('promise')); queueMicrotask(()=>console.log('micro')); process.nextTick(()=>console.log('tick'));",
+      "expected_behavior": "in CommonJS prints tick, promise, micro"
+    },
+    {
+      "name": "microtask context is excluded",
+      "input": "Promise.resolve().then(()=>{process.nextTick(()=>console.log('tick'));queueMicrotask(()=>console.log('micro'))});",
+      "expected_behavior": "this rule does not apply because scheduling occurs while draining microtasks"
+    }
+  ]
+}

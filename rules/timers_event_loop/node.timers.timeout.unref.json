@@ -1,0 +1,44 @@
+{
+  "id": "node.timers.timeout.unref",
+  "category": "timers",
+  "summary": "Mark a Node Timeout as not keeping the event loop alive while preserving the same scheduled handle.",
+  "source": {
+    "pattern": "$timeout.unref()",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.Unref",
+    "template": "NodeTimers.Unref($timeout)",
+    "notes": "Clear liveness ref state idempotently and return the receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same Timeout object",
+    "effect": "timer alone no longer keeps process alive",
+    "callback": "may never run if no other ref'ed work remains",
+    "idempotent": true
+  },
+  "caveats": [
+    "unref() does not cancel the timer."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns same handle and clears ref",
+      "input": "const t=setTimeout(()=>{},1000); console.log(t.unref()===t,t.hasRef());",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "does not equal cancellation",
+      "input": "const t=setTimeout(()=>console.log('ran'),1); t.unref(); setTimeout(()=>{},5);",
+      "expected_behavior": "ran can print because other ref'ed work keeps the loop alive"
+    }
+  ]
+}

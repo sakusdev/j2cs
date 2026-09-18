@@ -1,0 +1,45 @@
+{
+  "id": "eventloop.top-level-timeout-immediate-unspecified",
+  "category": "event_loop",
+  "summary": "Avoid inventing a deterministic order between top-level setTimeout(0) and setImmediate when Node does not guarantee one.",
+  "source": {
+    "pattern": "setTimeout($timeout, 0); setImmediate($immediate)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "scheduling_context": "top-level or otherwise not proven I/O poll callback",
+      "builtins_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.ScheduleContextSensitiveTimeoutAndImmediate($timeout, $immediate)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "host/event-loop context dependent; no source-level fixed order may be assumed",
+    "timer": "0 ms is a threshold/minimum-delay request, not synchronous",
+    "immediate": "runs in check phase"
+  },
+  "caveats": [
+    "Node/libuv version and surrounding I/O can affect which becomes eligible first.",
+    "A translator must not constant-fold this pair into a hard-coded callback order."
+  ],
+  "references": [
+    "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick",
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "do not assert top-level winner",
+      "input": "setTimeout(()=>console.log('timeout'),0);setImmediate(()=>console.log('immediate'));",
+      "expected_behavior": "both callbacks eventually run; translation must preserve Node runtime scheduling rather than require one fixed order"
+    },
+    {
+      "name": "contrast with I/O context",
+      "input": "require('node:fs').readFile(__filename,()=>{setTimeout(()=>console.log('timeout'),0);setImmediate(()=>console.log('immediate'))});",
+      "expected_behavior": "inside the I/O callback a separate rule guarantees immediate before timeout"
+    }
+  ]
+}

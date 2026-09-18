@@ -1,0 +1,45 @@
+{
+  "id": "node.timers.timeout.refresh",
+  "category": "timers",
+  "summary": "Restart a Timeout's timing window from the current time without allocating a new JavaScript handle.",
+  "source": {
+    "pattern": "$timeout.refresh()",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.Refresh",
+    "template": "NodeTimers.Refresh($timeout)",
+    "notes": "Reschedule using the original duration and return the same handle; preserve ref state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same Timeout object",
+    "identity": "no new handle allocation",
+    "timing": "start time becomes now with original delay",
+    "reactivation": "a timeout that already fired can be reactivated"
+  },
+  "caveats": [
+    "refresh() changes when the callback becomes eligible; it is not merely metadata.",
+    "Do not allocate a replacement object because handle identity is observable."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "preserves identity",
+      "input": "const t=setTimeout(()=>{},1000); console.log(t.refresh()===t); clearTimeout(t);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "can reactivate fired timeout",
+      "input": "let n=0; const t=setTimeout(()=>{n++; if(n===1)t.refresh(); else {console.log(n);clearTimeout(t)}},1);",
+      "expected_behavior": "prints 2 using the same handle"
+    }
+  ]
+}

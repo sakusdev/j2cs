@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.immediate.ref",
+  "category": "timers",
+  "summary": "Mark an Immediate as keeping the Node event loop alive and return the same handle.",
+  "source": {
+    "pattern": "$immediate.ref()",
+    "requirements": {
+      "receiver": "Node.js Immediate handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.RefImmediate",
+    "template": "NodeTimers.RefImmediate($immediate)",
+    "notes": "Set Immediate liveness ref state and return receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same Immediate object",
+    "effect": "active Immediate keeps loop alive",
+    "idempotent": true
+  },
+  "caveats": [
+    "Ref state is distinct from whether the Immediate has already executed."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns receiver",
+      "input": "const i=setImmediate(()=>{}); i.unref(); console.log(i.ref()===i); clearImmediate(i);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "restores hasRef",
+      "input": "const i=setImmediate(()=>{}); i.unref(); i.ref(); console.log(i.hasRef()); clearImmediate(i);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

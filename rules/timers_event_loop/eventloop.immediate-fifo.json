@@ -1,0 +1,42 @@
+{
+  "id": "eventloop.immediate-fifo",
+  "category": "event_loop",
+  "summary": "Preserve FIFO ordering among Immediates queued for the same check-phase iteration.",
+  "source": {
+    "pattern": "setImmediate($a); setImmediate($b)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true,
+      "same_queue_turn": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.EnqueueImmediateFifo($a, $b)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "callbacks execute in creation order within the Immediate queue",
+    "queue_processing": "the current Immediate queue is processed as one check-phase batch"
+  },
+  "caveats": [
+    "FIFO applies within the same Immediate queue; other phase work and nested scheduling have separate rules."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "two immediates keep creation order",
+      "input": "setImmediate(()=>console.log('a'));setImmediate(()=>console.log('b'));",
+      "expected_behavior": "prints a then b"
+    },
+    {
+      "name": "three immediates keep FIFO",
+      "input": "for(const x of ['a','b','c'])setImmediate(()=>console.log(x));",
+      "expected_behavior": "prints a b c in that order"
+    }
+  ]
+}

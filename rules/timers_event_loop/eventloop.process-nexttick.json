@@ -1,0 +1,46 @@
+{
+  "id": "eventloop.process-nexttick",
+  "category": "event_loop",
+  "summary": "Enqueue process.nextTick callbacks on Node's dedicated next-tick queue rather than the Promise/V8 microtask queue.",
+  "source": {
+    "pattern": "process.nextTick($callback, ...$args)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "builtin_process_nextTick_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.EnqueueNextTick($callback, $args)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "callback_validation": "non-callable callback throws TypeError synchronously",
+    "queue": "Node next-tick queue",
+    "timing": "after current JavaScript operation completes and before event loop continues",
+    "arguments": "extra arguments are passed to callback"
+  },
+  "caveats": [
+    "process.nextTick is legacy in current Node documentation; queueMicrotask is preferred for portable deferral.",
+    "Do not lower to JsMicrotaskQueue.Enqueue because Node gives nextTick its own queue and ordering."
+  ],
+  "references": [
+    "https://nodejs.org/api/process.html#processnexttickcallback-args",
+    "rules/async/queue-microtask.json"
+  ],
+  "tests": [
+    {
+      "name": "runs after current stack",
+      "input": "process.nextTick(()=>console.log('tick')); console.log('sync');",
+      "expected_behavior": "prints sync then tick"
+    },
+    {
+      "name": "passes extra arguments",
+      "input": "process.nextTick((a,b)=>console.log(a+b),2,3);",
+      "expected_behavior": "prints 5 asynchronously"
+    }
+  ]
+}

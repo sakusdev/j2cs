@@ -1,0 +1,46 @@
+{
+  "id": "eventloop.immediate-check-phase",
+  "category": "event_loop",
+  "summary": "Run setImmediate callbacks in Node's check phase after poll/I/O callbacks for the current iteration.",
+  "source": {
+    "pattern": "setImmediate($callback)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true,
+      "semantic_focus": "event-loop phase ordering"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.EnqueueCheckPhaseImmediate($callback)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "phase": "check",
+    "relative_to_io": "scheduled Immediate callbacks run after the poll phase's I/O callbacks",
+    "turn": "eligible in the check phase of an event-loop iteration"
+  },
+  "caveats": [
+    "The setImmediate API handle/arguments contract is owned by node.timers.set-immediate; this rule owns phase ordering only.",
+    "Do not model check-phase work as arbitrary Task scheduling."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html",
+    "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick",
+    "rules/timers_event_loop/set-immediate.json"
+  ],
+  "tests": [
+    {
+      "name": "I/O callback completes before its immediate",
+      "input": "require('node:fs').readFile(__filename,()=>{console.log('io');setImmediate(()=>console.log('immediate'))});",
+      "expected_behavior": "prints io before immediate"
+    },
+    {
+      "name": "phase rule not synchronous",
+      "input": "setImmediate(()=>console.log('later'));console.log('now');",
+      "expected_behavior": "prints now before later"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "node.timers.timeout-dispose",
+  "category": "timers",
+  "summary": "Cancel a Timeout through its Symbol.dispose hook and return undefined.",
+  "source": {
+    "pattern": "$timeout[Symbol.dispose]()",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "node_version": ">=24.2 for stable API",
+      "builtin_symbol_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.DisposeTimeout",
+    "template": "NodeTimers.DisposeTimeout($timeout)",
+    "notes": "Cancel pending timer similarly to clearTimeout and return undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "effect": "cancels Timeout",
+    "disposal": "integrates with explicit resource management when available"
+  },
+  "caveats": [
+    "The API existed experimentally in earlier Node releases; gate stability/version assumptions explicitly."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns undefined",
+      "input": "const t=setTimeout(()=>{},1000); console.log(t[Symbol.dispose]()===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "prevents callback",
+      "input": "const t=setTimeout(()=>console.log('bad'),5); t[Symbol.dispose](); setTimeout(()=>console.log('ok'),10);",
+      "expected_behavior": "prints ok but not bad"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "node.timers.clear-timeout",
+  "category": "timers",
+  "summary": "Cancel a Node Timeout by handle or compatible primitive and return undefined.",
+  "source": {
+    "pattern": "clearTimeout($timeout)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.ClearTimeout",
+    "template": "NodeTimers.ClearTimeout($timeout)",
+    "notes": "Cancel matching Timeout state without invoking its callback; return JavaScript undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "cancellation": "prevents future callback if still pending",
+    "accepted_handle": "Timeout from setTimeout or setInterval; same-thread primitive token is also accepted",
+    "cross_api": "can cancel an interval Timeout handle"
+  },
+  "caveats": [
+    "Do not assume the handle is a plain integer; Node returns a Timeout object.",
+    "Unknown numeric/string ids are effectively non-matching rather than arbitrary OS timer ids."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "cancels timeout",
+      "input": "const t=setTimeout(()=>console.log('bad'),5); clearTimeout(t); setTimeout(()=>console.log('ok'),10);",
+      "expected_behavior": "prints ok but not bad"
+    },
+    {
+      "name": "also cancels interval handle",
+      "input": "let n=0; const i=setInterval(()=>n++,1); clearTimeout(i); setTimeout(()=>console.log(n),5);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

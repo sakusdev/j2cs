@@ -1,0 +1,48 @@
+{
+  "id": "node.timers.promises.abort",
+  "category": "timers",
+  "summary": "Preserve AbortSignal cancellation of Node promise-based timers, including AbortError rejection and interval iteration failure.",
+  "source": {
+    "pattern": "timersPromises.$method(...$args, { signal: $signal, ...$options })",
+    "requirements": {
+      "host_profile": "Node.js",
+      "method": "setTimeout, setImmediate, or setInterval",
+      "builtin_not_overridden": true,
+      "signal": "AbortSignal"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeTimersPromises.ScheduleAbortable($method, $args, $signal, $options)",
+    "notes": "Integrate with the Node-compatible timer scheduler and existing JsPromise/async-iteration semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "abort": "aborting prevents the pending timer completion from succeeding",
+    "setTimeout_setImmediate": "returned Promise rejects with an AbortError",
+    "setInterval": "pending/future async-iterator operation terminates by throwing/rejecting AbortError",
+    "reason": "host AbortSignal cancellation is observable Promise/iterator failure"
+  },
+  "caveats": [
+    "Do not map abort to silent cancellation or a successfully fulfilled default value.",
+    "Preserve Node AbortError identity/name/code according to the selected host profile."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html#timers-promises-api",
+    "rules/async/promise-then.json",
+    "rules/async/for-await-of.json"
+  ],
+  "tests": [
+    {
+      "name": "timeout abort rejects",
+      "input": "const {setTimeout}=require('node:timers/promises');const ac=new AbortController();const p=setTimeout(100,'x',{signal:ac.signal});ac.abort();p.catch(e=>console.log(e.name,e.code));",
+      "expected_behavior": "prints AbortError ABORT_ERR on current Node profiles"
+    },
+    {
+      "name": "interval abort terminates iteration",
+      "input": "const {setInterval}=require('node:timers/promises');const ac=new AbortController();(async()=>{try{let n=0;for await(const x of setInterval(1,'x',{signal:ac.signal})){if(++n===2)ac.abort()}}catch(e){console.log(e.name)}})();",
+      "expected_behavior": "after two yields the iterator terminates by throwing AbortError"
+    }
+  ]
+}

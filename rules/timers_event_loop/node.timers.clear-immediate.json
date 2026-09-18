@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.clear-immediate",
+  "category": "timers",
+  "summary": "Cancel a Node Immediate handle before its check-phase callback runs.",
+  "source": {
+    "pattern": "clearImmediate($immediate)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.ClearImmediate",
+    "template": "NodeTimers.ClearImmediate($immediate)",
+    "notes": "Cancel an Immediate object and return undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "cancellation": "prevents pending Immediate callback",
+    "handle_type": "Immediate object from setImmediate"
+  },
+  "caveats": [
+    "Immediate and Timeout are distinct Node handle families; do not coerce a Timeout into an Immediate cancellation token."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "cancels immediate",
+      "input": "const i=setImmediate(()=>console.log('bad')); clearImmediate(i); setImmediate(()=>console.log('ok'));",
+      "expected_behavior": "prints ok but not bad"
+    },
+    {
+      "name": "returns undefined",
+      "input": "const i=setImmediate(()=>{}); console.log(clearImmediate(i)===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
