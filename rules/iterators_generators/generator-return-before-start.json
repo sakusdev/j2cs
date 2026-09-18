@@ -1,0 +1,41 @@
+{
+  "id": "generator.return.before-start",
+  "category": "generators",
+  "summary": "Generator.prototype.return on suspended-start completes without executing the body.",
+  "source": {
+    "pattern": "$generator.return($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "suspended-start",
+      "builtin_return_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Return($generator, $value)",
+    "helper": "JsGenerator.Return"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "body_execution": false,
+    "result": "{value: argument, done: true}",
+    "state_after": "completed"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "body skipped",
+      "input": "function* g(){console.log(\"run\");yield 1} const r=g().return(3); console.log(r.value,r.done);",
+      "expected_behavior": "prints 3 true and does not print run"
+    },
+    {
+      "name": "finally before first suspension not entered",
+      "input": "function* g(){try{yield 1}finally{console.log(\"f\")}} const it=g(); it.return();",
+      "expected_behavior": "does not print f"
+    }
+  ]
+}

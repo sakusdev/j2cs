@@ -1,0 +1,39 @@
+{
+  "id": "generator.yield-star.resume-forward",
+  "category": "generators",
+  "summary": "Values sent with outer next after a delegated yield are forwarded to the inner iterator next method.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "first_inner_next": "no argument",
+    "subsequent_normal_resume": "Call inner next with received value"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "sent value reaches inner generator",
+      "input": "function* inner(){console.log(yield 1)} function* outer(){yield* inner()} const it=outer();it.next();it.next(7);",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "first outer next argument not forwarded",
+      "input": "function* inner(){console.log(yield 1)} function* outer(){yield* inner()} const it=outer();it.next(9);it.next(3);",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

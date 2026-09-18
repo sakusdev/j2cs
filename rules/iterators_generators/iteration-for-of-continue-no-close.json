@@ -1,0 +1,39 @@
+{
+  "id": "iteration.for-of.continue-no-close",
+  "category": "iteration",
+  "summary": "A continue targeting the same for...of loop continues iteration without IteratorClose.",
+  "source": {
+    "pattern": "for ($binding of $iterable) { continue; }",
+    "requirements": {
+      "continue_targets_same_for_of": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.ForOf($iterable, $body)",
+    "helper": "JsIterator.ForOf"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "continue_same_loop": "request next item",
+    "iterator_close": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "continue consumes next values",
+      "input": "let a=[]; for(const x of [1,2,3]){if(x<3)continue;a.push(x)} console.log(a);",
+      "expected_behavior": "prints [3]"
+    },
+    {
+      "name": "continue does not call return",
+      "input": "let r=0; const it={i:0,next(){return this.i<2?{value:++this.i,done:false}:{done:true}},return(){r++;return {done:true}},[Symbol.iterator](){return this}}; for(const x of it){continue} console.log(r);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

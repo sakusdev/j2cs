@@ -1,0 +1,39 @@
+{
+  "id": "iteration.for-of.throw-close",
+  "category": "iteration",
+  "summary": "A throw from the for...of body closes the iterator while preserving the original throw precedence.",
+  "source": {
+    "pattern": "for ($binding of $iterable) { throw $error; }",
+    "requirements": {
+      "throw_originates_after_iterator_acquisition": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.ForOfThrowAware($iterable, $body)",
+    "helper": "JsIterator.ForOfThrowAware"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "on_throw": "IteratorClose attempted",
+    "original_throw": "preserved if close also fails"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "throw closes iterator",
+      "input": "let closed=false; const it={next(){return {value:1,done:false}},return(){closed=true;return {done:true}},[Symbol.iterator](){return this}}; try{for(const x of it){throw \"x\"}}catch{} console.log(closed);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "body throw wins over close throw",
+      "input": "const it={next(){return {value:1,done:false}},return(){throw \"close\"},[Symbol.iterator](){return this}}; try{for(const x of it){throw \"body\"}}catch(e){console.log(e)}",
+      "expected_behavior": "prints body"
+    }
+  ]
+}

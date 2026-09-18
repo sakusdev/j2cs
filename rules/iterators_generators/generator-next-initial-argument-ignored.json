@@ -1,0 +1,42 @@
+{
+  "id": "generator.next.initial-argument-ignored",
+  "category": "generators",
+  "summary": "Ignore the argument supplied to the first next call of a suspended-start generator.",
+  "source": {
+    "pattern": "$generator.next($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "suspended-start",
+      "builtin_next_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Next($generator, $value)",
+    "helper": "JsGenerator.Next"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "initial_argument": "ignored",
+    "body_start": "begins from function entry",
+    "yield_result": "first yielded value"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "first next argument ignored",
+      "input": "function* g(){const x=yield 1; return x} const it=g(); console.log(it.next(99).value);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "second next is observed",
+      "input": "function* g(){const x=yield 1; return x} const it=g(); it.next(99); console.log(it.next(7).value);",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

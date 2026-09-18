@@ -1,0 +1,51 @@
+{
+  "id": "iterator.helper.map",
+  "category": "iterators",
+  "summary": "Implement lazy Iterator.prototype.map with value/index callback semantics and close propagation.",
+  "source": {
+    "pattern": "$iterator.map($mapper)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Map($iterator, $mapper)",
+    "helper": "JsIterator.Map",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "lazy": true,
+    "callback_args": [
+      "value",
+      "index"
+    ],
+    "callback_this": "undefined",
+    "index_start": 0,
+    "callback_throw": "close underlying iterator then propagate",
+    "consumer_close": "closes underlying iterator"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "lazy indexed mapping",
+      "input": "const seen=[];const it=Iterator.from([10,20]).map((v,i)=>{seen.push(i);return v+i});console.log(seen.length);console.log(it.next().value,seen.join(\",\"));",
+      "expected_behavior": "prints 0 then 10 0"
+    },
+    {
+      "name": "mapper throw closes generator",
+      "input": "let closed=false;function* g(){try{yield 1}finally{closed=true}}const it=g().map(()=>{throw \"x\"});try{it.next()}catch{}console.log(closed);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

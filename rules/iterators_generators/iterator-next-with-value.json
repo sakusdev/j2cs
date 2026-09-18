@@ -1,0 +1,45 @@
+{
+  "id": "iterator.next.with-value",
+  "category": "iterators",
+  "summary": "Invoke iterator next with an explicit value while preserving argument presence.",
+  "source": {
+    "pattern": "$iterator.next($value)",
+    "requirements": {
+      "receiver_is_canonical_sync_iterator": true,
+      "next_method_proven_builtin_or_captured": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Next($iterator, $value)",
+    "helper": "JsIterator.Next"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_count": 1,
+    "value": "passed without coercion",
+    "this_binding": "iterator",
+    "return": "IteratorResult object"
+  },
+  "caveats": [
+    "Many built-in iterators ignore the value, while generators can observe it as the result of a suspended yield."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "generator receives sent value",
+      "input": "function* g(){const x=yield 1; return x} const it=g(); it.next(); console.log(it.next(9).value);",
+      "expected_behavior": "prints 9"
+    },
+    {
+      "name": "array iterator ignores sent value",
+      "input": "const it=[1,2].values(); console.log(it.next(99).value,it.next(88).value);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

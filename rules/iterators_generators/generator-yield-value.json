@@ -1,0 +1,40 @@
+{
+  "id": "generator.yield.value",
+  "category": "generators",
+  "summary": "Suspend a sync generator and produce an IteratorResult with done false for yield value.",
+  "source": {
+    "pattern": "yield $value",
+    "requirements": {
+      "inside_sync_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Yield($context, $value)",
+    "helper": "JsGenerator.Yield"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "{ value: supplied value, done: false }",
+    "suspends": true,
+    "resume_result": "completion supplied by next/return/throw"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "yield result shape",
+      "input": "function* g(){yield 5} console.log(g().next());",
+      "expected_behavior": "result has value 5 and done false"
+    },
+    {
+      "name": "yield preserves object identity",
+      "input": "const o={}; function* g(){yield o} console.log(g().next().value===o);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

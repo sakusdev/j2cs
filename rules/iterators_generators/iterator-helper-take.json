@@ -1,0 +1,47 @@
+{
+  "id": "iterator.helper.take",
+  "category": "iterators",
+  "summary": "Implement lazy Iterator.prototype.take with ToNumber/ToIntegerOrInfinity limit semantics and early close.",
+  "source": {
+    "pattern": "$iterator.take($limit)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Take($iterator, $limit)",
+    "helper": "JsIterator.Take",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "limit": "ToNumber then ToIntegerOrInfinity",
+    "negative_or_nan": "RangeError with close",
+    "lazy": true,
+    "on_reaching_limit": "close underlying iterator",
+    "infinity": "consume to exhaustion"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "takes prefix and closes",
+      "input": "let closed=false;function* g(){try{yield 1;yield 2}finally{closed=true}}const a=g().take(1).toArray();console.log(a,closed);",
+      "expected_behavior": "prints [1] true"
+    },
+    {
+      "name": "negative throws RangeError",
+      "input": "try{Iterator.from([1]).take(-1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "generator.return.finally-yield",
+  "category": "generators",
+  "summary": "A return completion can be temporarily suspended by yield inside finally before final completion.",
+  "source": {
+    "pattern": "$generator.return($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "suspended-yield",
+      "generator_contains_yield_in_finally": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Return($generator, $value)",
+    "helper": "JsGenerator.Return"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "first_return_call_may_yield": "done false",
+    "pending_return": "retained across finally yield",
+    "subsequent_next": "continues finally then completes original return unless overridden"
+  },
+  "caveats": [
+    "A direct C# Dispose/return path that cannot yield from finally changes observable control flow."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "return can yield from finally",
+      "input": "function* g(){try{yield 1}finally{yield 2}} const it=g();it.next();console.log(it.return(9));console.log(it.next());",
+      "expected_behavior": "first result value 2 done false; second value 9 done true"
+    },
+    {
+      "name": "finally return overrides pending return",
+      "input": "function* g(){try{yield 1}finally{return 4}} const it=g();it.next();console.log(it.return(9).value);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

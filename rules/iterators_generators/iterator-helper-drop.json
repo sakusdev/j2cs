@@ -1,0 +1,46 @@
+{
+  "id": "iterator.helper.drop",
+  "category": "iterators",
+  "summary": "Implement lazy Iterator.prototype.drop by skipping the requested number of source values on consumption.",
+  "source": {
+    "pattern": "$iterator.drop($limit)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Drop($iterator, $limit)",
+    "helper": "JsIterator.Drop",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "limit": "ToNumber then ToIntegerOrInfinity",
+    "negative_or_nan": "RangeError with close",
+    "lazy": true,
+    "skipping": "occurs during helper iteration, not eager method call"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "drops prefix",
+      "input": "console.log(Iterator.from([1,2,3]).drop(2).toArray().join(\",\"));",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "lazy skip",
+      "input": "let n=0;function* g(){n++;yield 1;n++;yield 2}const it=g().drop(1);console.log(n);it.next();console.log(n);",
+      "expected_behavior": "prints 0 then 2"
+    }
+  ]
+}

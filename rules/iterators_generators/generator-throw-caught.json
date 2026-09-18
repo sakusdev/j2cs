@@ -1,0 +1,42 @@
+{
+  "id": "generator.throw.caught",
+  "category": "generators",
+  "summary": "Generator.prototype.throw injects a throw completion that generator code may catch and continue from.",
+  "source": {
+    "pattern": "$generator.throw($error)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "suspended-yield",
+      "builtin_throw_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Throw($generator, $error)",
+    "helper": "JsGenerator.Throw"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "resume_completion": "throw completion",
+    "catch_inside_generator": "can intercept",
+    "continuation": "may yield more values"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "throw caught and yields",
+      "input": "function* g(){try{yield 1}catch(e){yield e}} const it=g();it.next();console.log(it.throw(\"x\"));",
+      "expected_behavior": "result has value x done false"
+    },
+    {
+      "name": "catch may return",
+      "input": "function* g(){try{yield 1}catch(e){return 7}} const it=g();it.next();console.log(it.throw(\"x\"));",
+      "expected_behavior": "result has value 7 done true"
+    }
+  ]
+}

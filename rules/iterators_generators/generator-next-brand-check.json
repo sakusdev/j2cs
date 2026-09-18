@@ -1,0 +1,39 @@
+{
+  "id": "generator.next.brand-check",
+  "category": "generators",
+  "summary": "Intrinsic Generator.prototype.next requires a genuine generator receiver.",
+  "source": {
+    "pattern": "%GeneratorPrototype%.next.call($receiver, $value)",
+    "requirements": {
+      "intrinsic_generator_next_method": true,
+      "receiver_not_proven_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.NextChecked($receiver, $value)",
+    "helper": "JsGenerator.NextChecked"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "brand_check": "required",
+    "invalid_receiver": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object rejected",
+      "input": "const next=Object.getPrototypeOf(function*(){}()).next; try{next.call({})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "generator accepted",
+      "input": "const it=(function*(){yield 1})(); const next=Object.getPrototypeOf(it).next; console.log(next.call(it).value);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

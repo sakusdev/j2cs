@@ -1,0 +1,45 @@
+{
+  "id": "iterator.acquire.sync",
+  "category": "iterators",
+  "summary": "Acquire a synchronous iterator through the observable Symbol.iterator protocol.",
+  "source": {
+    "pattern": "$iterable[Symbol.iterator]()",
+    "requirements": {
+      "iteration_kind": "sync",
+      "iterator_method_not_statically_proven_builtin": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.GetIterator($iterable)",
+    "notes": "Runtime performs GetMethod(Symbol.iterator), calls it with the iterable as this, validates the returned object, and captures its next method."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "symbol_iterator_lookup": "observable getter/proxy lookup",
+    "this_binding": "iterable object/value",
+    "result_requirement": "iterator object",
+    "next_lookup": "captured after iterator creation"
+  },
+  "caveats": [
+    "Do not replace the protocol with IEnumerable discovery for arbitrary JS values.",
+    "A Symbol.iterator getter, callable Proxy, or non-object iterator result is observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "custom iterable",
+      "input": "const x={*[Symbol.iterator](){yield 1;yield 2}}; console.log([...x].join(\",\"));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "iterator method must return object",
+      "input": "const x={[Symbol.iterator](){return 1}}; try{[...x]}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

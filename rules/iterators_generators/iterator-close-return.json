@@ -1,0 +1,45 @@
+{
+  "id": "iterator.close.return",
+  "category": "iterators",
+  "summary": "Close an iterator by conditionally invoking its return method and validating the returned object.",
+  "source": {
+    "pattern": "IteratorClose($iterator, $completion)",
+    "requirements": {
+      "iterator_record_available": true,
+      "completion_is_not_throw": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Close($iterator, $completion)",
+    "helper": "JsIterator.Close",
+    "notes": "Looks up return at close time; if absent, propagates the completion. If present, calls with iterator as this and requires an object result."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_lookup": "observable at close time",
+    "missing_return": "preserve original completion",
+    "return_call_this": "iterator",
+    "non_object_return_result": "TypeError",
+    "close_error_for_nonthrow_completion": "overrides original nonthrow completion"
+  },
+  "caveats": [
+    "C# foreach disposal is not equivalent to JavaScript IteratorClose and does not reproduce dynamic return lookup or result validation."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "break calls return",
+      "input": "let closed=false; const it={next(){return {value:1,done:false}},return(){closed=true;return {done:true}},[Symbol.iterator](){return this}}; for(const x of it){break} console.log(closed);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive return result on break throws",
+      "input": "const it={next(){return {value:1,done:false}},return(){return 1},[Symbol.iterator](){return this}}; try{for(const x of it){break}}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "iterator.helper.to-array",
+  "category": "iterators",
+  "summary": "Consume the iterator into a new JavaScript Array in iteration order.",
+  "source": {
+    "pattern": "$iterator.toArray()",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.ToArray($iterator)",
+    "helper": "JsIterator.ToArray",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "eager": true,
+    "result": "fresh dense JS Array of yielded values",
+    "source_exhausted": true,
+    "abrupt": "propagate iterator errors"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "collects values",
+      "input": "console.log(Iterator.from(new Set([2,1])).toArray().join(\",\"));",
+      "expected_behavior": "prints 2,1"
+    },
+    {
+      "name": "fresh array",
+      "input": "const a=Iterator.from([1]).toArray(); const b=Iterator.from([1]).toArray(); console.log(a===b);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

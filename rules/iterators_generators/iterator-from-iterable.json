@@ -1,0 +1,45 @@
+{
+  "id": "iterator.from.iterable",
+  "category": "iterators",
+  "summary": "Implement Iterator.from for an arbitrary iterable through GetIteratorFlattenable semantics.",
+  "source": {
+    "pattern": "Iterator.from($value)",
+    "requirements": {
+      "global_iterator_binding_builtin": true,
+      "value_not_proven_intrinsic_iterator": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IteratorFrom($value)",
+    "notes": "Accepts iterable objects and string primitives, or iterator-like objects with next when no Symbol.iterator method exists; wraps non-Iterator instances."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "string_primitive": "iterated",
+    "symbol_iterator": "used when present",
+    "iterator_like_without_symbol_iterator": "accepted if object with next",
+    "already_iterator_instance": "returned unchanged",
+    "wrapper": "inherits Iterator.prototype"
+  },
+  "caveats": [
+    "Iterator.from is not equivalent to Enumerable.Cast or materialization; it returns a live iterator/wrapper."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "string primitive accepted",
+      "input": "console.log(Iterator.from(\"😄a\").toArray().join(\"|\"));",
+      "expected_behavior": "prints 😄|a"
+    },
+    {
+      "name": "iterable accepted",
+      "input": "console.log(Iterator.from(new Set([2,3])).toArray().join(\",\"));",
+      "expected_behavior": "prints 2,3"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "generator.reentrancy",
+  "category": "generators",
+  "summary": "Reject attempts to resume a generator while it is already executing.",
+  "source": {
+    "pattern": "$generator.next($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_may_be_executing": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Next($generator, $value)",
+    "helper": "JsGenerator.Next"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "executing_state_resume": "TypeError",
+    "state_machine_guard": "required"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "self reentry throws TypeError",
+      "input": "let it; function* g(){try{it.next()}catch(e){console.log(e.name)} yield 1} it=g();it.next();",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "normal sequential next works",
+      "input": "function* g(){yield 1;yield 2} const it=g();console.log(it.next().value,it.next().value);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

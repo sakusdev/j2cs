@@ -1,0 +1,42 @@
+{
+  "id": "generator.yield-star.throw-forward",
+  "category": "generators",
+  "summary": "Outer generator throw during yield* forwards to inner throw when present.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true,
+      "outer_resume_kind": "throw",
+      "inner_throw_present": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "forward": "Call inner throw with thrown value",
+    "inner_done_false": "yield returned value",
+    "inner_done_true": "yield* evaluates to returned value"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "throw forwarded to inner generator",
+      "input": "function* inner(){try{yield 1}catch(e){yield e}} function* outer(){yield* inner()} const it=outer();it.next();console.log(it.throw(\"x\"));",
+      "expected_behavior": "result has value x done false"
+    },
+    {
+      "name": "inner throw completion value continues outer",
+      "input": "const inner={next(){return {value:1,done:false}},throw(){return {value:6,done:true}},[Symbol.iterator](){return this}};function* g(){return yield* inner}const it=g();it.next();console.log(it.throw(\"x\"));",
+      "expected_behavior": "result has value 6 done true"
+    }
+  ]
+}
