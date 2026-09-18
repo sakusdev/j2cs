@@ -1,0 +1,42 @@
+{
+  "id": "node.http.create-server",
+  "category": "node_http_crypto",
+  "summary": "Create a Node HTTP server with Node request/response stream and EventEmitter semantics.",
+  "source": {
+    "pattern": "$http.createServer($options?, $requestListener?)",
+    "requirements": {
+      "module_binding": "node:http builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.CreateServer",
+    "template": "NodeHttp.CreateServer($options, $requestListener)",
+    "notes": "Returns a Server; request listeners receive IncomingMessage Readable and ServerResponse Writable objects; parser/subclass options are observable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns a Server; request listeners receive IncomingMessage Readable and ServerResponse Writable objects; parser/subclass options are observable."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "http.createServer((req,res)=>res.end('ok'))",
+      "expected_behavior": "returns a Server and registers the request listener"
+    },
+    {
+      "name": "edge semantics",
+      "input": "http.createServer({IncomingMessage: CustomMessage})",
+      "expected_behavior": "custom request class semantics must be preserved"
+    }
+  ]
+}

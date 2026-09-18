@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-bytes-async",
+  "category": "node_http_crypto",
+  "summary": "Generate random bytes asynchronously.",
+  "source": {
+    "pattern": "$crypto.randomBytes($size, $callback)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.RandomBytesAsync",
+    "template": "NodeCrypto.RandomBytesAsync($size, $callback)",
+    "notes": "Returns undefined; callback receives (err, Buffer) asynchronously through Node/libuv scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; callback receives (err, Buffer) asynchronously through Node/libuv scheduling."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.randomBytes(4,(e,b)=>console.log(b.length))",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let s=true; crypto.randomBytes(1,()=>console.log(s)); s=false",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

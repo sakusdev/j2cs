@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-int-sync",
+  "category": "node_http_crypto",
+  "summary": "Generate an unbiased random safe integer synchronously.",
+  "source": {
+    "pattern": "$crypto.randomInt($min?, $max)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.RandomInt",
+    "template": "NodeCrypto.RandomInt($min, $max)",
+    "notes": "Returns integer n with min<=n<max; max exclusive; range must be <2^48 and endpoints safe integers."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns integer n with min<=n<max; max exclusive; range must be <2^48 and endpoints safe integers."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "const n=crypto.randomInt(5,10); n>=5&&n<10",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.randomInt(0,2**48+1)",
+      "expected_behavior": "throws range/value error"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hash.digest",
+  "category": "node_http_crypto",
+  "summary": "Finalize Hash output.",
+  "source": {
+    "pattern": "$hash.digest($encoding?)",
+    "requirements": {
+      "receiver_inferred_as": "node:crypto Hash",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.HashDigest",
+    "template": "NodeCrypto.HashDigest($hash, $encoding)",
+    "notes": "Returns Buffer without encoding or string with encoding; finalization makes Hash unusable and repeated digest throws."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns Buffer without encoding or string with encoding; finalization makes Hash unusable and repeated digest throws."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Buffer.isBuffer(hash.digest())",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "hash.digest(); hash.digest()",
+      "expected_behavior": "throws finalized-state error"
+    }
+  ]
+}

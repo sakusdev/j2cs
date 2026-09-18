@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-fill-async",
+  "category": "node_http_crypto",
+  "summary": "Fill existing binary storage asynchronously.",
+  "source": {
+    "pattern": "$crypto.randomFill($buffer, $offset?, $size?, $callback)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.RandomFillAsync",
+    "template": "NodeCrypto.RandomFillAsync($buffer, $offset, $size, $callback)",
+    "notes": "Returns undefined; callback receives same mutated buffer/view and is not inline."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; callback receives same mutated buffer/view and is not inline."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.randomFill(b,(e,x)=>console.log(x===b))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let s=true; crypto.randomFill(b,()=>console.log(s)); s=false",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

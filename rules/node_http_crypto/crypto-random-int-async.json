@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-int-async",
+  "category": "node_http_crypto",
+  "summary": "Generate an unbiased random integer asynchronously.",
+  "source": {
+    "pattern": "$crypto.randomInt($min?, $max, $callback)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.RandomIntAsync",
+    "template": "NodeCrypto.RandomIntAsync($min, $max, $callback)",
+    "notes": "Returns undefined; callback receives (err,n) later with same inclusive/exclusive and validation rules as sync form."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; callback receives (err,n) later with same inclusive/exclusive and validation rules as sync form."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.randomInt(2,4,(e,n)=>console.log(n>=2&&n<4))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let s=true; crypto.randomInt(2,()=>console.log(s)); s=false",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

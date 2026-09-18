@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hash.copy",
+  "category": "node_http_crypto",
+  "summary": "Clone Hash internal state before finalization.",
+  "source": {
+    "pattern": "$hash.copy($options?)",
+    "requirements": {
+      "receiver_inferred_as": "node:crypto Hash",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.HashCopy",
+    "template": "NodeCrypto.HashCopy($hash, $options)",
+    "notes": "Copy captures current state and then diverges independently; copy after finalization is invalid."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Copy captures current state and then diverges independently; copy after finalization is invalid."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "const c=h.copy(); c.update('b')",
+      "expected_behavior": "copy can diverge from original"
+    },
+    {
+      "name": "edge semantics",
+      "input": "h.digest(); h.copy()",
+      "expected_behavior": "throws finalized-state error"
+    }
+  ]
+}

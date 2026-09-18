@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.has-header",
+  "category": "node_http_crypto",
+  "summary": "Test whether an outgoing request header is queued.",
+  "source": {
+    "pattern": "$request.hasHeader($name)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.HasHeader",
+    "template": "NodeHttp.HasHeader($request, $name)",
+    "notes": "Case-insensitive boolean membership test over logical outgoing headers."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Case-insensitive boolean membership test over logical outgoing headers."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.setHeader('X','v'); req.hasHeader('x')",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.removeHeader('x'); req.hasHeader('X')",
+      "expected_behavior": "false"
+    }
+  ]
+}

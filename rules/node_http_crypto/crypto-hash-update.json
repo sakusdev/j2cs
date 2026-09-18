@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hash.update",
+  "category": "node_http_crypto",
+  "summary": "Feed data into a Hash.",
+  "source": {
+    "pattern": "$hash.update($data, $inputEncoding?)",
+    "requirements": {
+      "receiver_inferred_as": "node:crypto Hash",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.HashUpdate",
+    "template": "NodeCrypto.HashUpdate($hash, $data, $inputEncoding)",
+    "notes": "Returns receiver; strings default UTF-8; Buffer/TypedArray/DataView use raw bytes and ignore inputEncoding; repeatable before digest."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns receiver; strings default UTF-8; Buffer/TypedArray/DataView use raw bytes and ignore inputEncoding; repeatable before digest."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "hash.update('a')===hash",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "hash.update(Buffer.from([255]),'utf8')",
+      "expected_behavior": "binary bytes are used directly"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-fill-sync",
+  "category": "node_http_crypto",
+  "summary": "Fill existing binary storage synchronously.",
+  "source": {
+    "pattern": "$crypto.randomFillSync($buffer, $offset?, $size?)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.RandomFillSync",
+    "template": "NodeCrypto.RandomFillSync($buffer, $offset, $size)",
+    "notes": "Mutates and returns same object; offset/size units differ for TypedArray versus ArrayBuffer/DataView and bounds are validated."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Mutates and returns same object; offset/size units differ for TypedArray versus ArrayBuffer/DataView and bounds are validated."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.randomFillSync(buf)===buf",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "fill only middle subrange",
+      "expected_behavior": "bytes outside requested range remain unchanged"
+    }
+  ]
+}

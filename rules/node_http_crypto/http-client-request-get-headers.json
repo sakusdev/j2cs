@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.get-headers",
+  "category": "node_http_crypto",
+  "summary": "Return a shallow null-prototype snapshot of outgoing request headers.",
+  "source": {
+    "pattern": "$request.getHeaders()",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.GetHeaders",
+    "template": "NodeHttp.GetHeaders($request)",
+    "notes": "Keys are lowercase; result has null prototype; array values are shallow-shared references."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Keys are lowercase; result has null prototype; array values are shallow-shared references."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Object.getPrototypeOf(req.getHeaders())===null",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const a=['x']; req.setHeader('Cookie',a); req.getHeaders().cookie.push('y')",
+      "expected_behavior": "stored array value is observably mutated"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-bytes-sync",
+  "category": "node_http_crypto",
+  "summary": "Generate cryptographically strong random bytes synchronously.",
+  "source": {
+    "pattern": "$crypto.randomBytes($size)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.RandomBytes",
+    "template": "NodeCrypto.RandomBytes($size)",
+    "notes": "Returns new Buffer of requested length; size validation and possible entropy blocking are observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns new Buffer of requested length; size validation and possible entropy blocking are observable."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.randomBytes(7).length",
+      "expected_behavior": "7"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.randomBytes(-1)",
+      "expected_behavior": "throws invalid size/range error"
+    }
+  ]
+}

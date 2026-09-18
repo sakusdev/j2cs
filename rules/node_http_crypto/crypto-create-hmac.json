@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.create-hmac",
+  "category": "node_http_crypto",
+  "summary": "Create an Hmac with Node key interpretation.",
+  "source": {
+    "pattern": "$crypto.createHmac($algorithm, $key, $options?)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.CreateHmac",
+    "template": "NodeCrypto.CreateHmac($algorithm, $key, $options)",
+    "notes": "Returns Hmac Transform; algorithm availability is runtime-dependent; string/binary/secret-key inputs preserve Node encoding rules."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns Hmac Transform; algorithm availability is runtime-dependent; string/binary/secret-key inputs preserve Node encoding rules."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.createHmac('sha256','k').constructor.name",
+      "expected_behavior": "Hmac"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.createHmac('sha256',Buffer.from([255]))",
+      "expected_behavior": "binary key bytes are preserved"
+    }
+  ]
+}

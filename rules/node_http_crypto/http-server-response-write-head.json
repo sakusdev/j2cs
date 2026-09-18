@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.write-head",
+  "category": "node_http_crypto",
+  "summary": "Commit response status and headers.",
+  "source": {
+    "pattern": "$response.writeHead($statusCode, $statusMessage?, $headers?)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.WriteHead",
+    "template": "NodeHttp.WriteHead($response, $statusCode, $statusMessage, $headers)",
+    "notes": "Returns receiver; writeHead headers override matching setHeader values; validation and send timing are observable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns receiver; writeHead headers override matching setHeader values; validation and send timing are observable."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "res.writeHead(201)===res",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "res.setHeader('Content-Type','text/html'); res.writeHead(200,{'Content-Type':'text/plain'})",
+      "expected_behavior": "wire value is text/plain"
+    }
+  ]
+}

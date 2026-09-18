@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.destroy",
+  "category": "node_http_crypto",
+  "summary": "Destroy ClientRequest/socket state with stream error/close semantics.",
+  "source": {
+    "pattern": "$request.destroy($error?)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.DestroyRequest",
+    "template": "NodeHttp.DestroyRequest($request, $error)",
+    "notes": "Returns receiver; optional error participates in Node Writable/socket error behavior; differs from graceful end()."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns receiver; optional error participates in Node Writable/socket error behavior; differs from graceful end()."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.destroy()===req",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.destroy(new Error('stop'))",
+      "expected_behavior": "aborts/destroys rather than gracefully ending"
+    }
+  ]
+}

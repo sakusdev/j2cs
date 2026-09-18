@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.timing-safe-equal",
+  "category": "node_http_crypto",
+  "summary": "Compare equal-length byte sequences with timing-safe primitive.",
+  "source": {
+    "pattern": "$crypto.timingSafeEqual($a, $b)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.TimingSafeEqual",
+    "template": "NodeCrypto.TimingSafeEqual($a, $b)",
+    "notes": "Returns boolean for equal byte lengths and throws when byte lengths differ; surrounding code is not automatically timing-safe."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns boolean for equal byte lengths and throws when byte lengths differ; surrounding code is not automatically timing-safe."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.timingSafeEqual(Buffer.from('aa'),Buffer.from('aa'))",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.timingSafeEqual(Buffer.from('a'),Buffer.from('aa'))",
+      "expected_behavior": "throws length/range error"
+    }
+  ]
+}

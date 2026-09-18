@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.end",
+  "category": "node_http_crypto",
+  "summary": "Finish an HTTP response using Writable.end semantics.",
+  "source": {
+    "pattern": "$response.end($data?, $encoding?, $callback?)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.ResponseEnd",
+    "template": "NodeHttp.ResponseEnd($response, $data, $encoding, $callback)",
+    "notes": "Returns receiver; commits pending headers, optionally writes final data, sets writableEnded, and preserves finish/callback timing."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns receiver; commits pending headers, optionally writes final data, sets writableEnded, and preserves finish/callback timing."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "res.end('ok')===res",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "res.setHeader('X','v'); res.end()",
+      "expected_behavior": "commits headers and completes empty body"
+    }
+  ]
+}

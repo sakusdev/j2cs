@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.remove-header",
+  "category": "node_http_crypto",
+  "summary": "Remove a queued implicit response header.",
+  "source": {
+    "pattern": "$response.removeHeader($name)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.ResponseRemoveHeader",
+    "template": "NodeHttp.ResponseRemoveHeader($response, $name)",
+    "notes": "Returns undefined and only affects unsent queued headers."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined and only affects unsent queued headers."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "res.setHeader('X','v'); res.removeHeader('x'); res.getHeader('X')",
+      "expected_behavior": "undefined"
+    },
+    {
+      "name": "edge semantics",
+      "input": "remove after commit",
+      "expected_behavior": "does not retroactively change wire bytes"
+    }
+  ]
+}

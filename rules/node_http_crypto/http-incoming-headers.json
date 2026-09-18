@@ -1,0 +1,42 @@
+{
+  "id": "node.http.incoming-message.headers",
+  "category": "node_http_crypto",
+  "summary": "Expose normalized incoming headers with Node duplicate handling.",
+  "source": {
+    "pattern": "$message.headers",
+    "requirements": {
+      "receiver_inferred_as": "node:http IncomingMessage",
+      "builtin_property_or_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.IncomingHeaders",
+    "template": "NodeHttp.IncomingHeaders($message)",
+    "notes": "Keys are lowercase; set-cookie is array; cookie duplicates join with '; '; most others with ', '; singleton handling honors joinDuplicateHeaders."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Keys are lowercase; set-cookie is array; cookie duplicates join with '; '; most others with ', '; singleton handling honors joinDuplicateHeaders."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Object.keys(req.headers).every(k=>k===k.toLowerCase())",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "multiple Set-Cookie lines",
+      "expected_behavior": "headers['set-cookie'] is an array"
+    }
+  ]
+}

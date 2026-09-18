@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.create-hash",
+  "category": "node_http_crypto",
+  "summary": "Create a Node Hash using a runtime-supported digest algorithm.",
+  "source": {
+    "pattern": "$crypto.createHash($algorithm, $options?)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.CreateHash",
+    "template": "NodeCrypto.CreateHash($algorithm, $options)",
+    "notes": "Returns Hash Transform; algorithm inventory depends on Node/OpenSSL provider/FIPS configuration and unknown names fail."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns Hash Transform; algorithm inventory depends on Node/OpenSSL provider/FIPS configuration and unknown names fail."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.createHash('sha256').constructor.name",
+      "expected_behavior": "Hash"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.createHash('definitely-not-a-hash')",
+      "expected_behavior": "throws rather than choosing fallback"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.http.incoming-message.complete",
+  "category": "node_http_crypto",
+  "summary": "Read whether a complete HTTP message was received and parsed.",
+  "source": {
+    "pattern": "$message.complete",
+    "requirements": {
+      "receiver_inferred_as": "node:http IncomingMessage",
+      "builtin_property_or_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.IncomingComplete",
+    "template": "NodeHttp.IncomingComplete($message)",
+    "notes": "True only after complete message parsing; premature transport close can leave false."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "True only after complete message parsing; premature transport close can leave false."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "res.on('end',()=>console.log(res.complete))",
+      "expected_behavior": "true for normal complete response"
+    },
+    {
+      "name": "edge semantics",
+      "input": "peer closes mid-message",
+      "expected_behavior": "complete remains false"
+    }
+  ]
+}

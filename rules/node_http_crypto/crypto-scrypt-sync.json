@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.scrypt-sync",
+  "category": "node_http_crypto",
+  "summary": "Derive a scrypt key synchronously.",
+  "source": {
+    "pattern": "$crypto.scryptSync($password, $salt, $keylen, $options?)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.ScryptSync",
+    "template": "NodeCrypto.ScryptSync($password, $salt, $keylen, $options)",
+    "notes": "Returns Buffer; Node option aliases N/cost, r/blockSize, p/parallelization and maxmem validation are preserved."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns Buffer; Node option aliases N/cost, r/blockSize, p/parallelization and maxmem validation are preserved."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.scryptSync('p','s',16).length",
+      "expected_behavior": "16"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.scryptSync('p','s',16,{N:16384,maxmem:1024})",
+      "expected_behavior": "throws parameter/range error"
+    }
+  ]
+}
