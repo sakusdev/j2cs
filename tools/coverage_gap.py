@@ -58,10 +58,12 @@ def helper_root(helper: str | None) -> str | None:
 def matches(rule: Rule, target: dict[str, Any]) -> bool:
     match = target.get("match", {})
     categories = set(match.get("categories", []))
+    category_prefixes = tuple(match.get("category_prefixes", []))
     prefixes = tuple(match.get("id_prefixes", []))
     exact_ids = set(match.get("ids", []))
     return (
         rule.category in categories
+        or (bool(category_prefixes) and rule.category.startswith(category_prefixes))
         or rule.id in exact_ids
         or (bool(prefixes) and rule.id.startswith(prefixes))
     )
