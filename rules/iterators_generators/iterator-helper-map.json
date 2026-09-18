@@ -7,14 +7,15 @@
     "requirements": {
       "receiver_proven_sync_iterator_object": true,
       "builtin_iterator_helper_member_not_overridden": true,
-      "receiver_not_proxy": true
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
     }
   },
   "target": {
     "kind": "helper",
     "template": "JsIterator.Map($iterator, $mapper)",
     "helper": "JsIterator.Map",
-    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks."
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
   },
   "strategy": "helper",
   "confidence": "high",
