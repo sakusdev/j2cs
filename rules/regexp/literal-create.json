@@ -1,0 +1,44 @@
+{
+  "id": "regexp.literal.create",
+  "category": "regexp",
+  "summary": "Create a fresh ECMAScript RegExp object for every regular-expression literal evaluation.",
+  "source": {
+    "pattern": "/$pattern/$flags",
+    "requirements": {
+      "ast_node": "RegExpLiteral",
+      "pattern_and_flags_statically_known": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpLiteral",
+    "template": "JsRuntime.RegExpLiteral($pattern, $flags)",
+    "notes": "A literal may be compiled ahead of time, but each evaluation must produce a distinct stateful RegExp object with lastIndex initialized to 0."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "fresh_object_per_evaluation": true,
+    "lastIndex_initial": 0,
+    "engine": "ECMAScript RegExp grammar and matching semantics"
+  },
+  "caveats": [
+    "Do not cache and reuse the mutable RegExp object itself; global/sticky lastIndex would leak between evaluations.",
+    ".NET Regex grammar and matching semantics are not a general substitute for ECMAScript RegExp."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor"
+  ],
+  "tests": [
+    {
+      "name": "literal evaluation returns fresh objects",
+      "input": "function f(){ return /a/g; } console.log(f() === f());",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "literal state is not shared",
+      "input": "function f(){ return /a/g; } const a=f(); a.test('a'); const b=f(); console.log(a.lastIndex,b.lastIndex);",
+      "expected_behavior": "prints 1 0"
+    }
+  ]
+}

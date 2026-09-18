@@ -1,0 +1,45 @@
+{
+  "id": "regexp.prototype.source",
+  "category": "regexp",
+  "summary": "Return an ECMAScript-literal-safe source string from the builtin RegExp source accessor.",
+  "source": {
+    "pattern": "$regexp.source",
+    "requirements": {
+      "receiver_inferred_as": "builtin RegExp instance",
+      "property_resolution": "builtin accessor proven unshadowed",
+      "prototype_not_mutated": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRegExp.GetSource",
+    "template": "JsRegExp.GetSource($regexp)",
+    "notes": "The source accessor exposes the original pattern escaped so the returned text can appear inside a RegExp literal; empty source becomes (?:)."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty_source": "(?:)",
+    "escapes_literal_delimiter_and_line_terminators": true,
+    "brand_check": true
+  },
+  "caveats": [
+    "Returning a .NET Regex.ToString() value is not equivalent.",
+    "Shadowed source properties require ordinary property lookup."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "empty source",
+      "input": "console.log(new RegExp().source);",
+      "expected_behavior": "prints (?:)"
+    },
+    {
+      "name": "slash is escaped",
+      "input": "console.log(/\\//.source);",
+      "expected_behavior": "prints \\/"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "regexp.constructor.symbol-match-classification",
+  "category": "regexp",
+  "summary": "Honor Symbol.match when deciding whether a constructor argument is RegExp-like.",
+  "source": {
+    "pattern": "new RegExp($value)",
+    "requirements": {
+      "pattern_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate($value, JsUndefined.Value)",
+    "notes": "IsRegExp first reads value[Symbol.match]; an ordinary object can opt in, and a RegExp instance can opt out of IsRegExp classification."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "IsRegExp": "Symbol.match when present, otherwise [[RegExpMatcher]] brand",
+    "property_get_observable": true
+  },
+  "caveats": [
+    "A Proxy/getter for Symbol.match may have side effects or throw.",
+    "Internal-slot RegExp instances still have special source extraction in the constructor even if Symbol.match is false."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor",
+    "https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isregexp"
+  ],
+  "tests": [
+    {
+      "name": "ordinary object opts in",
+      "input": "const x={ [Symbol.match]:true, source:'a', flags:'g' }; const r=new RegExp(x); console.log(r.source,r.flags);",
+      "expected_behavior": "prints a g"
+    },
+    {
+      "name": "regexp can opt out of identity classification",
+      "input": "const r=/a/g; r[Symbol.match]=false; console.log(RegExp(r)===r,RegExp(r).source);",
+      "expected_behavior": "prints false a"
+    }
+  ]
+}

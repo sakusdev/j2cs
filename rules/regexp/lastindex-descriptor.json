@@ -1,0 +1,46 @@
+{
+  "id": "regexp.lastindex.descriptor",
+  "category": "regexp",
+  "summary": "Preserve the unusual own data-property descriptor of RegExp lastIndex.",
+  "source": {
+    "pattern": "$regexp.lastIndex",
+    "requirements": {
+      "receiver_inferred_as": "initialized RegExp instance",
+      "reflection_or_assignment_semantics_may_be_observed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpGetLastIndex",
+    "template": "JsRuntime.RegExpGetLastIndex($regexp)",
+    "notes": "Each initialized RegExp has an own lastIndex data property: writable true, enumerable false, configurable false, initially +0."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "own_property": true,
+    "initial_value": "+0",
+    "writable": true,
+    "enumerable": false,
+    "configurable": false
+  },
+  "caveats": [
+    "A plain C# field/property does not automatically reproduce Object.getOwnPropertyDescriptor, defineProperty, or strict assignment behavior."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor",
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "descriptor attributes",
+      "input": "const d=Object.getOwnPropertyDescriptor(/a/g,'lastIndex'); console.log(d.value,d.writable,d.enumerable,d.configurable);",
+      "expected_behavior": "prints 0 true false false"
+    },
+    {
+      "name": "cannot delete",
+      "input": "'use strict'; const r=/a/; try{delete r.lastIndex}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

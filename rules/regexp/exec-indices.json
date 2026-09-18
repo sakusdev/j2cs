@@ -1,0 +1,44 @@
+{
+  "id": "regexp.exec.has-indices-result",
+  "category": "regexp",
+  "summary": "Create ECMAScript match index pairs when the d flag is present.",
+  "source": {
+    "pattern": "$regexp.exec($input).indices",
+    "requirements": {
+      "receiver_flags_include": "d",
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "With d, result.indices parallels the match/capture array using [start,end] UTF-16 code-unit pairs, undefined for nonparticipating captures, and an optional null-prototype groups mapping."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "pair_units": "UTF-16 code units",
+    "nonparticipating": "undefined",
+    "named_groups_mapping": true
+  },
+  "caveats": [
+    "Indices are half-open [start,end].",
+    "Do not expose .NET UTF-16 indices without also preserving JS capture/result shape."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "indices pairs",
+      "input": "const m=/(a)(b)/d.exec('zab'); console.log(JSON.stringify(m.indices));",
+      "expected_behavior": "prints [[1,3],[1,2],[2,3]]"
+    },
+    {
+      "name": "unmatched capture index undefined",
+      "input": "const m=/(a)?b/d.exec('b'); console.log(m.indices[1]===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

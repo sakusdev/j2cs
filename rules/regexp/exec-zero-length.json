@@ -1,0 +1,47 @@
+{
+  "id": "regexp.exec.zero-length-no-auto-advance",
+  "category": "regexp",
+  "summary": "Do not automatically advance lastIndex after a zero-length direct exec/test match.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include_any": [
+        "g",
+        "y"
+      ],
+      "pattern_may_match_empty": true,
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "On a successful zero-length g/y match, builtin exec sets lastIndex to the match end, which can equal the start. AdvanceStringIndex is used by higher-level iteration algorithms, not by direct success handling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "zero_length_success": "lastIndex may remain unchanged",
+    "caller_iteration_must_handle_progress_separately": true
+  },
+  "caveats": [
+    "A naive exec loop can become infinite on an empty match.",
+    "String/RegExp Symbol.match iteration has separate zero-length advancement semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "zero length keeps zero",
+      "input": "const r=/(?:)/g; r.exec('a'); console.log(r.lastIndex);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "test also can keep index",
+      "input": "const r=/(?=a)/g; console.log(r.test('a'),r.lastIndex);",
+      "expected_behavior": "prints true 0"
+    }
+  ]
+}

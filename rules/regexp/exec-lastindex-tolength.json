@@ -1,0 +1,48 @@
+{
+  "id": "regexp.exec.lastindex-tolength",
+  "category": "regexp",
+  "summary": "Apply ECMAScript ToLength to lastIndex before global/sticky matching.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include_any": [
+        "g",
+        "y"
+      ],
+      "lastIndex_not_proven_nonnegative_integer": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "lastIndex may hold arbitrary JS values. RegExpBuiltinExec performs Get followed by ToLength, clamping negatives/NaN to zero and truncating fractions."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToLength(Get(lastIndex))",
+    "negative_or_nan": 0,
+    "fraction": "truncate toward zero",
+    "max": "2^53-1"
+  },
+  "caveats": [
+    "ToLength can invoke conversion hooks and throw.",
+    "Do not use a C# integer cast with different overflow/NaN semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "negative clamps to zero",
+      "input": "const r=/a/g; r.lastIndex=-10; const m=r.exec('a'); console.log(m.index,r.lastIndex);",
+      "expected_behavior": "prints 0 1"
+    },
+    {
+      "name": "fraction truncates",
+      "input": "const r=/a/g; r.lastIndex=1.9; const m=r.exec('ba'); console.log(m.index,r.lastIndex);",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

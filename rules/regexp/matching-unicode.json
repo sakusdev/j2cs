@@ -1,0 +1,44 @@
+{
+  "id": "regexp.matching.unicode-mode",
+  "category": "regexp",
+  "summary": "Preserve u-mode parsing and code-point matching instead of legacy UTF-16-code-unit RegExp behavior.",
+  "source": {
+    "pattern": "/$pattern/u",
+    "requirements": {
+      "flags_include": "u"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpLiteral",
+    "template": "JsRuntime.RegExpLiteral($pattern, \"u\")",
+    "notes": "The u flag changes grammar validation, escape interpretation, and matching iteration to Unicode code points while observable String indices remain code-unit based."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "grammar": "Unicode mode",
+    "matching_unit": "Unicode code point",
+    "observable_indices": "UTF-16 code units"
+  },
+  "caveats": [
+    "u and v are mutually exclusive.",
+    "Without u/v, dot may match one half of a surrogate pair."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor",
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "dot sees astral code point",
+      "input": "console.log(/^.$/u.test('😀'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "legacy dot sees two code units",
+      "input": "console.log(/^.$/.test('😀'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

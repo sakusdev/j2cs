@@ -1,0 +1,44 @@
+{
+  "id": "regexp.symbol.matchall",
+  "category": "regexp",
+  "summary": "Implement the RegExp-side Symbol.matchAll protocol with a cloned matcher and lazy iterator.",
+  "source": {
+    "pattern": "$regexp[Symbol.matchAll]($string)",
+    "requirements": {
+      "builtin_RegExp_Symbol_matchAll": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpSymbolMatchAll",
+    "template": "JsRuntime.RegExpSymbolMatchAll($regexp, $string)",
+    "notes": "The builtin hook species-constructs a matcher from the receiver, copies lastIndex via ToLength, and returns a RegExp String Iterator; iteration uses RegExpExec and Unicode-aware empty-match advancement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "lazy iterator",
+    "matcher": "species-created clone",
+    "copies_lastIndex": true,
+    "original_lastIndex_mutated": false
+  },
+  "caveats": [
+    "String.prototype.matchAll performs its own global-RegExp validation before invoking the hook; direct hook invocation is a different surface.",
+    "Species and overridden exec/properties are observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "original lastIndex preserved",
+      "input": "const r=/a/g; r.lastIndex=1; const it=r[Symbol.matchAll]('baab'); console.log([...it].map(x=>x.index).join(','),r.lastIndex);",
+      "expected_behavior": "prints 1,2 1"
+    },
+    {
+      "name": "returns iterator",
+      "input": "const it=/a/g[Symbol.matchAll]('a'); console.log(typeof it.next,it[Symbol.iterator]()===it);",
+      "expected_behavior": "prints function true"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "regexp.matching.unicode-sets-mode",
+  "category": "regexp",
+  "summary": "Preserve v-mode UnicodeSets grammar and set operations.",
+  "source": {
+    "pattern": "new RegExp($pattern, 'v')",
+    "requirements": {
+      "flags_include": "v"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate($pattern, \"v\")",
+    "notes": "The v flag enables Unicode mode plus UnicodeSets grammar, including class set intersection/subtraction and additional string/property semantics not represented by ordinary .NET character classes."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "grammar": "UnicodeSets mode",
+    "full_unicode": true,
+    "set_operations": true,
+    "mutually_exclusive_with_u": true
+  },
+  "caveats": [
+    "Do not downgrade v to u; pattern grammar and character-class semantics differ."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor"
+  ],
+  "tests": [
+    {
+      "name": "class intersection",
+      "input": "const r=new RegExp('[\\\\p{ASCII}&&\\\\p{Letter}]','v'); console.log(r.test('A'),r.test('1'));",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "u and v cannot combine",
+      "input": "try{new RegExp('a','uv')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints SyntaxError"
+    }
+  ]
+}

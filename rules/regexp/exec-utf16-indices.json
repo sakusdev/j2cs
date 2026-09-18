@@ -1,0 +1,42 @@
+{
+  "id": "regexp.exec.utf16-indices",
+  "category": "regexp",
+  "summary": "Report exec index/lastIndex/d-indices in UTF-16 code units even under Unicode matching modes.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "input_may_contain_astral_characters": true,
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "u/v matching can operate on code points internally, but observable match positions are converted back to ECMAScript String indices measured in UTF-16 code units."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "observable_index_unit": "UTF-16 code units",
+    "unicode_internal_matching": "code points"
+  },
+  "caveats": [
+    "C# string indices are also UTF-16, but matching-engine boundaries and Unicode grammar still must follow ECMAScript."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "astral match starts after one code unit char",
+      "input": "const m=/😀/du.exec('x😀'); console.log(m.index,JSON.stringify(m.indices[0]));",
+      "expected_behavior": "prints 1 [1,3]"
+    },
+    {
+      "name": "global lastIndex counts surrogate pair as two code units",
+      "input": "const r=/😀/gu; r.exec('😀'); console.log(r.lastIndex);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

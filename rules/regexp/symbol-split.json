@@ -1,0 +1,45 @@
+{
+  "id": "regexp.symbol.split",
+  "category": "regexp",
+  "summary": "Implement the RegExp-side Symbol.split protocol with species construction, sticky matching, captures, limit, and Unicode-aware progress.",
+  "source": {
+    "pattern": "$regexp[Symbol.split]($string, $limit)",
+    "requirements": {
+      "builtin_RegExp_Symbol_split": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpSymbolSplit",
+    "template": "JsRuntime.RegExpSymbolSplit($regexp, $string, $limit)",
+    "notes": "The builtin split hook creates a species matcher with y added, scans according to ECMAScript rules, inserts captures (including undefined), honors ToUint32(limit), and advances empty matches safely."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "species_clone": true,
+    "forces_sticky_on_clone": true,
+    "captures_inserted": true,
+    "limit": "ToUint32",
+    "unicode_progress": true
+  },
+  "caveats": [
+    "String.prototype.split owns initial Symbol.split dispatch; this rule owns the RegExp protocol implementation.",
+    ".NET Regex.Split has different capture/limit/empty-match semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-properties-of-the-regexp-prototype-object"
+  ],
+  "tests": [
+    {
+      "name": "captures inserted",
+      "input": "console.log(JSON.stringify(/(-)/[Symbol.split]('a-b')));",
+      "expected_behavior": "prints [\"a\",\"-\",\"b\"]"
+    },
+    {
+      "name": "limit honored",
+      "input": "console.log(JSON.stringify(/,/[Symbol.split]('a,b,c',2)));",
+      "expected_behavior": "prints [\"a\",\"b\"]"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "regexp.prototype.exec",
+  "category": "regexp",
+  "summary": "Execute ECMAScript RegExp.prototype.exec with full RegExp matching and result-object semantics.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_inferred_as": "ECMAScript RegExp or runtime RegExp value",
+      "builtin_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "Builtin exec requires a RegExp internal slot, ToString-coerces input, performs RegExpBuiltinExec, updates lastIndex when g/y apply, and creates JS match arrays."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "match array or null",
+    "input_coercion": "ToString",
+    "stateful_flags": [
+      "g",
+      "y"
+    ],
+    "captures": "ECMAScript result array"
+  },
+  "caveats": [
+    "Do not replace with Regex.Match: grammar, Unicode/case semantics, lastIndex state, captures, and result shape differ.",
+    "If the exec property itself may be overridden, ordinary method-property dispatch must be preserved before choosing this builtin rule."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "successful exec",
+      "input": "const r=/(a)(b)/; const m=r.exec('zab'); console.log(m[0],m[1],m[2],m.index,m.input);",
+      "expected_behavior": "prints ab a b 1 zab"
+    },
+    {
+      "name": "failed exec",
+      "input": "console.log(/x/.exec('abc')===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "regexp.exec.failure-reset",
+  "category": "regexp",
+  "summary": "Reset lastIndex to +0 after failed global or sticky builtin execution.",
+  "source": {
+    "pattern": "$regexp.exec($input)",
+    "requirements": {
+      "receiver_flags_include_any": [
+        "g",
+        "y"
+      ],
+      "builtin_exec_selected": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpExecBuiltin",
+    "template": "JsRuntime.RegExpExecBuiltin($regexp, $input)",
+    "notes": "RegExpBuiltinExec writes +0 when g/y execution fails, including when the starting lastIndex is beyond the input length."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "failure_write": "lastIndex = +0",
+    "out_of_range": "also resets"
+  },
+  "caveats": [
+    "The write uses Set(..., throw=true), so a non-writable lastIndex can turn failure into TypeError."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexpbuiltinexec"
+  ],
+  "tests": [
+    {
+      "name": "failed global resets",
+      "input": "const r=/x/g; r.lastIndex=2; console.log(r.exec('abc'),r.lastIndex);",
+      "expected_behavior": "prints null 0"
+    },
+    {
+      "name": "out of range resets sticky",
+      "input": "const r=/a/y; r.lastIndex=99; console.log(r.exec('a'),r.lastIndex);",
+      "expected_behavior": "prints null 0"
+    }
+  ]
+}

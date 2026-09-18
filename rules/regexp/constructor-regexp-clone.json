@@ -1,0 +1,44 @@
+{
+  "id": "regexp.constructor.regexp-clone",
+  "category": "regexp",
+  "summary": "Clone RegExp pattern/flags when construction requires a new RegExp object.",
+  "source": {
+    "pattern": "new RegExp($regexp, $flags?)",
+    "requirements": {
+      "pattern_inferred_as": "RegExp instance",
+      "builtin_RegExp_constructor": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.RegExpCreate",
+    "template": "JsRuntime.RegExpCreate($regexp, $flags)",
+    "notes": "Construction copies original source and, when flags are omitted, original flags, but does not copy lastIndex."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "new_object": true,
+    "lastIndex_reset": 0,
+    "flags_override_when_supplied": true
+  },
+  "caveats": [
+    "For RegExp-like objects classified through Symbol.match, source and flags may be dynamic properties rather than internal slots."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-constructor",
+    "https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isregexp"
+  ],
+  "tests": [
+    {
+      "name": "clone resets lastIndex",
+      "input": "const r=/a/g; r.lastIndex=7; const c=new RegExp(r); console.log(c===r,c.flags,c.lastIndex);",
+      "expected_behavior": "prints false g 0"
+    },
+    {
+      "name": "explicit flags replace source flags",
+      "input": "const r=/a/g; const c=new RegExp(r,'i'); console.log(c.source,c.flags);",
+      "expected_behavior": "prints a i"
+    }
+  ]
+}
