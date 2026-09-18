@@ -1,0 +1,45 @@
+{
+  "id": "electron.screen.getcursorscreenpoint",
+  "category": "electron.screen",
+  "summary": "Read current cursor position in Electron DIP coordinates.",
+  "source": {
+    "pattern": "screen.getCursorScreenPoint()",
+    "requirements": {
+      "module_binding": "electron.screen",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Screen.GetCursorScreenPoint()",
+    "helper": "ElectronCompat.Screen.GetCursorScreenPoint"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Point",
+    "units": "DIP",
+    "host_state": true
+  },
+  "caveats": [
+    "Not supported on Wayland; do not substitute physical pixels."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/screen"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const p=screen.getCursorScreenPoint();",
+      "expected_csharp": "var p = ElectronCompat.Screen.GetCursorScreenPoint();",
+      "expected_behavior": "returns current cursor point in DIP"
+    },
+    {
+      "name": "edge semantics",
+      "input": "/* Wayland */ screen.getCursorScreenPoint();",
+      "expected_behavior": "retains Electron's unsupported-host boundary rather than fabricating coordinates"
+    }
+  ]
+}

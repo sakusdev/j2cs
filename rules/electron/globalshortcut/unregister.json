@@ -1,0 +1,42 @@
+{
+  "id": "electron.globalshortcut.unregister",
+  "category": "electron.globalshortcut",
+  "summary": "Unregister one global shortcut owned by this application.",
+  "source": {
+    "pattern": "globalShortcut.unregister($accelerator)",
+    "requirements": {
+      "module_binding": "electron.globalShortcut",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.GlobalShortcut.Unregister($accelerator)",
+    "helper": "ElectronCompat.GlobalShortcut.Unregister"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_host_registration": true
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/global-shortcut"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "globalShortcut.unregister('F1');",
+      "expected_csharp": "ElectronCompat.GlobalShortcut.Unregister(accel);",
+      "expected_behavior": "removes this app's registration"
+    },
+    {
+      "name": "edge semantics",
+      "input": "globalShortcut.unregister('F9');",
+      "expected_behavior": "remains non-throwing when the accelerator was not registered by this app"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.menu.setapplicationmenu",
+  "category": "electron.menu",
+  "summary": "Set or suppress the Electron application menu with platform-specific presentation.",
+  "source": {
+    "pattern": "Menu.setApplicationMenu($menu)",
+    "requirements": {
+      "module_binding": "electron.Menu",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Menu.SetApplicationMenu($menu)",
+    "helper": "ElectronCompat.Menu.SetApplicationMenu"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "global_app_state": true,
+    "null": "suppresses/removes application menu"
+  },
+  "caveats": [
+    "macOS has one application menu; Windows/Linux apply top menus to windows."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "Menu.setApplicationMenu(menu);",
+      "expected_csharp": "ElectronCompat.Menu.SetApplicationMenu(menu);",
+      "expected_behavior": "installs the menu according to platform"
+    },
+    {
+      "name": "edge semantics",
+      "input": "Menu.setApplicationMenu(null);",
+      "expected_behavior": "suppresses/removes the application menu"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.screen.getdisplaymatching",
+  "category": "electron.screen",
+  "summary": "Return the Display that most closely intersects a DIP rectangle.",
+  "source": {
+    "pattern": "screen.getDisplayMatching($rect)",
+    "requirements": {
+      "module_binding": "electron.screen",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Screen.GetDisplayMatching($rect)",
+    "helper": "ElectronCompat.Screen.GetDisplayMatching"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Display",
+    "input_units": "DIP",
+    "selection": "closest intersection"
+  },
+  "caveats": [
+    "Multi-monitor scale factors and negative coordinates remain host-aware."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/screen"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const d=screen.getDisplayMatching({x:0,y:0,width:100,height:100});",
+      "expected_csharp": "var d = ElectronCompat.Screen.GetDisplayMatching(rect);",
+      "expected_behavior": "returns the closest-intersecting Display"
+    },
+    {
+      "name": "edge semantics",
+      "input": "screen.getDisplayMatching({x:-2000,y:0,width:10,height:10});",
+      "expected_behavior": "handles negative-coordinate layouts rather than clamping to zero"
+    }
+  ]
+}

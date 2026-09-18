@@ -1,0 +1,42 @@
+{
+  "id": "electron.menu.getmenuitembyid",
+  "category": "electron.menu",
+  "summary": "Look up a MenuItem by id while preserving null for no match.",
+  "source": {
+    "pattern": "$menu.getMenuItemById($id)",
+    "requirements": {
+      "receiver": "Electron Menu",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$menu.GetMenuItemById($id)",
+    "helper": "ElectronCompat.Menu.GetMenuItemById"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "MenuItem|null",
+    "side_effects": false,
+    "identity": "existing item"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const item=menu.getMenuItemById('open');",
+      "expected_csharp": "var item = menu.GetMenuItemById(\"open\");",
+      "expected_behavior": "returns the matching MenuItem wrapper"
+    },
+    {
+      "name": "edge semantics",
+      "input": "menu.getMenuItemById('missing');",
+      "expected_behavior": "returns null instead of a synthetic item or exception"
+    }
+  ]
+}

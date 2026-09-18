@@ -1,0 +1,45 @@
+{
+  "id": "electron.screen.getdisplaynearestpoint",
+  "category": "electron.screen",
+  "summary": "Select the Display nearest a DIP point.",
+  "source": {
+    "pattern": "screen.getDisplayNearestPoint($point)",
+    "requirements": {
+      "module_binding": "electron.screen",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Screen.GetDisplayNearestPoint($point)",
+    "helper": "ElectronCompat.Screen.GetDisplayNearestPoint"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Display",
+    "input_units": "DIP",
+    "selection": "nearest host display"
+  },
+  "caveats": [
+    "Do not compare DIP points against physical-pixel bounds without host scaling."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/screen"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const d=screen.getDisplayNearestPoint({x:10,y:10});",
+      "expected_csharp": "var d = ElectronCompat.Screen.GetDisplayNearestPoint(point);",
+      "expected_behavior": "returns the nearest Display"
+    },
+    {
+      "name": "edge semantics",
+      "input": "screen.getDisplayNearestPoint({x:-10000,y:-10000});",
+      "expected_behavior": "still returns the nearest display according to host geometry"
+    }
+  ]
+}

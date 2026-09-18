@@ -1,0 +1,45 @@
+{
+  "id": "electron.power.getsystemidletime",
+  "category": "electron.power",
+  "summary": "Read system user-idle time in seconds.",
+  "source": {
+    "pattern": "powerMonitor.getSystemIdleTime()",
+    "requirements": {
+      "module_binding": "electron.powerMonitor",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.PowerMonitor.GetSystemIdleTime()",
+    "helper": "ElectronCompat.PowerMonitor.GetSystemIdleTime"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Integer",
+    "units": "seconds",
+    "host_state": true
+  },
+  "caveats": [
+    "Do not substitute process uptime or a generic stopwatch."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/power-monitor"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const t=powerMonitor.getSystemIdleTime();",
+      "expected_csharp": "var t = ElectronCompat.PowerMonitor.GetSystemIdleTime();",
+      "expected_behavior": "returns current host user-idle seconds"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const a=powerMonitor.getSystemIdleTime(); const b=powerMonitor.getSystemIdleTime();",
+      "expected_behavior": "each read observes current host state rather than a cached startup value"
+    }
+  ]
+}

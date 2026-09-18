@@ -1,0 +1,45 @@
+{
+  "id": "electron.menu.buildfromtemplate",
+  "category": "electron.menu",
+  "summary": "Build a Menu from arbitrary Electron templates with roles, callbacks and extra fields.",
+  "source": {
+    "pattern": "Menu.buildFromTemplate($template)",
+    "requirements": {
+      "module_binding": "electron.Menu",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronMenuBuildFromTemplate($template)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Menu",
+    "order": "template order preserved",
+    "extra_fields": "copied onto constructed MenuItems",
+    "callbacks_and_roles": true
+  },
+  "caveats": [
+    "Arbitrary extra fields become MenuItem properties.",
+    "Nested submenu objects, closures and JS property semantics require runtime support for the general case."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const m=Menu.buildFromTemplate([{label:'Open',click:cb}]);",
+      "expected_csharp": "var m = JsRuntime.ElectronMenuBuildFromTemplate(template);",
+      "expected_behavior": "retains callback identity in the constructed item"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const t={label:'X',custom:42}; const m=Menu.buildFromTemplate([t]);",
+      "expected_behavior": "the constructed item retains custom=42 per Electron template semantics"
+    }
+  ]
+}

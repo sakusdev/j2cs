@@ -1,0 +1,46 @@
+{
+  "id": "electron.notification.constructor",
+  "category": "electron.notification",
+  "summary": "Construct an Electron Notification object without displaying it.",
+  "source": {
+    "pattern": "new Notification($options?)",
+    "requirements": {
+      "module_binding": "electron.Notification",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Notification.Create($options)",
+    "helper": "ElectronCompat.Notification.Create"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Notification host wrapper",
+    "shows_immediately": false,
+    "event_source": true
+  },
+  "caveats": [
+    "Construction is not equivalent to show().",
+    "Options and permissions are platform-specific."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/notification"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const n=new Notification({title:'Hi'});",
+      "expected_csharp": "var n = ElectronCompat.Notification.Create(options);",
+      "expected_behavior": "creates a wrapper but does not display it"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const n=new Notification();",
+      "expected_behavior": "uses Electron defaults and still requires show()"
+    }
+  ]
+}

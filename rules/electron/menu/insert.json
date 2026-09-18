@@ -1,0 +1,44 @@
+{
+  "id": "electron.menu.insert",
+  "category": "electron.menu",
+  "summary": "Insert a MenuItem at a specific position.",
+  "source": {
+    "pattern": "$menu.insert($position, $menuItem)",
+    "requirements": {
+      "receiver": "Electron Menu",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$menu.Insert($position, $menuItem)",
+    "helper": "ElectronCompat.Menu.Insert"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_receiver": true,
+    "order": "later items shift"
+  },
+  "caveats": [
+    "Position validation/error behavior must match Electron."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "menu.insert(0,item);",
+      "expected_csharp": "menu.Insert(0, item);",
+      "expected_behavior": "places item at index zero"
+    },
+    {
+      "name": "edge semantics",
+      "input": "menu.append(a); menu.insert(0,b);",
+      "expected_behavior": "order becomes b then a"
+    }
+  ]
+}

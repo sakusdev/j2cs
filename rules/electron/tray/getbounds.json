@@ -1,0 +1,48 @@
+{
+  "id": "electron.tray.getbounds",
+  "category": "electron.tray",
+  "summary": "Read Tray bounds on Electron-supported desktop platforms.",
+  "source": {
+    "pattern": "$tray.getBounds()",
+    "requirements": {
+      "receiver": "Electron Tray",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "platform": [
+        "darwin",
+        "win32"
+      ]
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$tray.GetBounds()",
+    "helper": "ElectronCompat.Tray.GetBounds"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Rectangle",
+    "host_coordinates": true,
+    "side_effects": false
+  },
+  "caveats": [
+    "Electron exposes getBounds on macOS/Windows, not as a portable Linux API."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const r=tray.getBounds();",
+      "expected_csharp": "var r = tray.GetBounds();",
+      "expected_behavior": "returns host tray-icon bounds"
+    },
+    {
+      "name": "edge semantics",
+      "input": "/* Linux target */ tray.getBounds();",
+      "expected_behavior": "must not synthesize cross-platform bounds where Electron does not expose this API"
+    }
+  ]
+}

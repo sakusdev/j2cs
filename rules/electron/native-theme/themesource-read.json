@@ -1,0 +1,41 @@
+{
+  "id": "electron.native-theme.themesource-read",
+  "category": "electron.native-theme",
+  "summary": "Read the current nativeTheme source override.",
+  "source": {
+    "pattern": "nativeTheme.themeSource",
+    "requirements": {
+      "module_binding": "electron.nativeTheme",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.NativeTheme.ThemeSource",
+    "helper": "ElectronCompat.NativeTheme.GetThemeSource"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "system|light|dark",
+    "side_effects": false
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/native-theme"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const s=nativeTheme.themeSource;",
+      "expected_csharp": "var s = ElectronCompat.NativeTheme.ThemeSource;",
+      "expected_behavior": "returns the current source"
+    },
+    {
+      "name": "edge semantics",
+      "input": "nativeTheme.themeSource='system'; console.log(nativeTheme.themeSource);",
+      "expected_behavior": "returns system after removing the override"
+    }
+  ]
+}

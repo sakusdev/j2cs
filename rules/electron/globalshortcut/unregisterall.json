@@ -1,0 +1,44 @@
+{
+  "id": "electron.globalshortcut.unregisterall",
+  "category": "electron.globalshortcut",
+  "summary": "Unregister all global shortcuts owned by this application.",
+  "source": {
+    "pattern": "globalShortcut.unregisterAll()",
+    "requirements": {
+      "module_binding": "electron.globalShortcut",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.GlobalShortcut.UnregisterAll()",
+    "helper": "ElectronCompat.GlobalShortcut.UnregisterAll"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_host_registration": true
+  },
+  "caveats": [
+    "Must not alter shortcuts owned by other processes."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/global-shortcut"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "globalShortcut.unregisterAll();",
+      "expected_csharp": "ElectronCompat.GlobalShortcut.UnregisterAll();",
+      "expected_behavior": "removes all this app's registrations"
+    },
+    {
+      "name": "edge semantics",
+      "input": "globalShortcut.unregisterAll(); globalShortcut.unregisterAll();",
+      "expected_behavior": "repeated clearing is tolerated and does not affect other applications"
+    }
+  ]
+}

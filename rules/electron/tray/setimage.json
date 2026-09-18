@@ -1,0 +1,43 @@
+{
+  "id": "electron.tray.setimage",
+  "category": "electron.tray",
+  "summary": "Update a Tray image through Electron-compatible NativeImage/path handling.",
+  "source": {
+    "pattern": "$tray.setImage($image)",
+    "requirements": {
+      "receiver": "Electron Tray",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$tray.SetImage($image)",
+    "helper": "ElectronCompat.Tray.SetImage"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_host_state": true
+  },
+  "caveats": [
+    "String paths and NativeImage objects retain Electron codec/platform behavior."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tray.setImage(icon2);",
+      "expected_csharp": "tray.SetImage(icon2);",
+      "expected_behavior": "updates the existing tray icon"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tray.setImage('/missing.png');",
+      "expected_behavior": "failure/empty-image handling must follow Electron/nativeImage semantics rather than generic File IO behavior"
+    }
+  ]
+}

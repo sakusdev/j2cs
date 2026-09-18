@@ -1,0 +1,45 @@
+{
+  "id": "electron.tray.setcontextmenu",
+  "category": "electron.tray",
+  "summary": "Attach or clear a Tray context menu while preserving Menu identity.",
+  "source": {
+    "pattern": "$tray.setContextMenu($menu)",
+    "requirements": {
+      "receiver": "Electron Tray",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$tray.SetContextMenu($menu)",
+    "helper": "ElectronCompat.Tray.SetContextMenu"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "menu_identity": "preserved",
+    "mutates_host_state": true
+  },
+  "caveats": [
+    "On Linux, MenuItem changes may require calling setContextMenu again for host UI refresh.",
+    "null clears the context menu."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tray.setContextMenu(menu);",
+      "expected_csharp": "tray.SetContextMenu(menu);",
+      "expected_behavior": "associates the same Menu wrapper"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tray.setContextMenu(null);",
+      "expected_behavior": "clears the configured tray menu"
+    }
+  ]
+}

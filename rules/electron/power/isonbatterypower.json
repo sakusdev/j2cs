@@ -1,0 +1,44 @@
+{
+  "id": "electron.power.isonbatterypower",
+  "category": "electron.power",
+  "summary": "Read whether the system is currently running on battery power.",
+  "source": {
+    "pattern": "powerMonitor.isOnBatteryPower()",
+    "requirements": {
+      "module_binding": "electron.powerMonitor",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.PowerMonitor.IsOnBatteryPower()",
+    "helper": "ElectronCompat.PowerMonitor.IsOnBatteryPower"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "host_state": true
+  },
+  "caveats": [
+    "on-battery/on-ac event listener mechanics reuse EVENTS_STREAMS."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/power-monitor"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const b=powerMonitor.isOnBatteryPower();",
+      "expected_csharp": "var b = ElectronCompat.PowerMonitor.IsOnBatteryPower();",
+      "expected_behavior": "returns current host power-source state"
+    },
+    {
+      "name": "edge semantics",
+      "input": "/* host switches power source */ powerMonitor.isOnBatteryPower();",
+      "expected_behavior": "subsequent reads observe the new state"
+    }
+  ]
+}

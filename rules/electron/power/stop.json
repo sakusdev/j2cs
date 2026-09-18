@@ -1,0 +1,44 @@
+{
+  "id": "electron.power.powersave.stop",
+  "category": "electron.power",
+  "summary": "Stop a specific power-save blocker token.",
+  "source": {
+    "pattern": "powerSaveBlocker.stop($id)",
+    "requirements": {
+      "module_binding": "electron.powerSaveBlocker",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.PowerSaveBlocker.Stop($id)",
+    "helper": "ElectronCompat.PowerSaveBlocker.Stop"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "mutates_host_state": true
+  },
+  "caveats": [
+    "Stopping a higher-precedence blocker can reveal a still-active lower-precedence blocker."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/power-save-blocker"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const ok=powerSaveBlocker.stop(id);",
+      "expected_csharp": "var ok = ElectronCompat.PowerSaveBlocker.Stop(id);",
+      "expected_behavior": "returns whether the specified blocker was stopped"
+    },
+    {
+      "name": "edge semantics",
+      "input": "powerSaveBlocker.stop(unknownId);",
+      "expected_behavior": "returns false for an inactive/unknown token"
+    }
+  ]
+}

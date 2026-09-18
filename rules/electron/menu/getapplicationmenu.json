@@ -1,0 +1,44 @@
+{
+  "id": "electron.menu.getapplicationmenu",
+  "category": "electron.menu",
+  "summary": "Return the current application Menu or null.",
+  "source": {
+    "pattern": "Menu.getApplicationMenu()",
+    "requirements": {
+      "module_binding": "electron.Menu",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Menu.GetApplicationMenu()",
+    "helper": "ElectronCompat.Menu.GetApplicationMenu"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Menu|null",
+    "identity": "installed Menu wrapper"
+  },
+  "caveats": [
+    "The returned application Menu does not support dynamic addition/removal, though item properties may change."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const m=Menu.getApplicationMenu();",
+      "expected_csharp": "var m = ElectronCompat.Menu.GetApplicationMenu();",
+      "expected_behavior": "returns the installed Menu wrapper"
+    },
+    {
+      "name": "edge semantics",
+      "input": "Menu.setApplicationMenu(null); console.log(Menu.getApplicationMenu());",
+      "expected_behavior": "returns null after removal"
+    }
+  ]
+}

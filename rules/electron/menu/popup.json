@@ -1,0 +1,49 @@
+{
+  "id": "electron.menu.popup",
+  "category": "electron.menu",
+  "summary": "Open a native context menu and preserve popup lifecycle behavior.",
+  "source": {
+    "pattern": "$menu.popup($options?)",
+    "requirements": {
+      "receiver": "Electron Menu",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$menu.Popup($options)",
+    "helper": "ElectronCompat.Menu.Popup"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "host_ui": true,
+    "events": [
+      "menu-will-show",
+      "menu-will-close"
+    ],
+    "callback": "optional callback on close"
+  },
+  "caveats": [
+    "x and y must be supplied together when coordinates are used.",
+    "Default target is the focused window and default position is the cursor."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "menu.popup({window:win});",
+      "expected_csharp": "menu.Popup(options);",
+      "expected_behavior": "opens the native popup and emits menu-will-show"
+    },
+    {
+      "name": "edge semantics",
+      "input": "menu.popup({x:10});",
+      "expected_behavior": "preserves Electron option validation instead of inventing y"
+    }
+  ]
+}

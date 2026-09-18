@@ -1,0 +1,48 @@
+{
+  "id": "electron.power.powersave.start",
+  "category": "electron.power",
+  "summary": "Start a power-save blocker and return its Electron integer token.",
+  "source": {
+    "pattern": "powerSaveBlocker.start($type)",
+    "requirements": {
+      "module_binding": "electron.powerSaveBlocker",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.PowerSaveBlocker.Start($type)",
+    "helper": "ElectronCompat.PowerSaveBlocker.Start"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Integer blocker id",
+    "types": [
+      "prevent-app-suspension",
+      "prevent-display-sleep"
+    ],
+    "precedence": "prevent-display-sleep wins while active"
+  },
+  "caveats": [
+    "Multiple blockers coexist; only the highest-precedence active type controls the host."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/power-save-blocker"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const id=powerSaveBlocker.start('prevent-display-sleep');",
+      "expected_csharp": "var id = ElectronCompat.PowerSaveBlocker.Start(\"prevent-display-sleep\");",
+      "expected_behavior": "returns an active blocker token"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const a=powerSaveBlocker.start('prevent-app-suspension'); const b=powerSaveBlocker.start('prevent-display-sleep');",
+      "expected_behavior": "display-sleep prevention takes precedence without deleting blocker a"
+    }
+  ]
+}

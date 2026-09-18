@@ -1,0 +1,42 @@
+{
+  "id": "electron.menu.append",
+  "category": "electron.menu",
+  "summary": "Append a MenuItem while preserving identity and order.",
+  "source": {
+    "pattern": "$menu.append($menuItem)",
+    "requirements": {
+      "receiver": "Electron Menu",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$menu.Append($menuItem)",
+    "helper": "ElectronCompat.Menu.Append"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_receiver": true,
+    "order": "item becomes last"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "menu.append(item);",
+      "expected_csharp": "menu.Append(item);",
+      "expected_behavior": "appends the same MenuItem identity"
+    },
+    {
+      "name": "edge semantics",
+      "input": "menu.append(a); menu.append(b);",
+      "expected_behavior": "items remain ordered a then b"
+    }
+  ]
+}

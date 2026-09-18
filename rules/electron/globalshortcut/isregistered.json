@@ -1,0 +1,44 @@
+{
+  "id": "electron.globalshortcut.isregistered",
+  "category": "electron.globalshortcut",
+  "summary": "Check whether this application registered a global accelerator.",
+  "source": {
+    "pattern": "globalShortcut.isRegistered($accelerator)",
+    "requirements": {
+      "module_binding": "electron.globalShortcut",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.GlobalShortcut.IsRegistered($accelerator)",
+    "helper": "ElectronCompat.GlobalShortcut.IsRegistered"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "scope": "this application"
+  },
+  "caveats": [
+    "Returns false if another application owns the accelerator."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/global-shortcut"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const v=globalShortcut.isRegistered('F1');",
+      "expected_csharp": "var v = ElectronCompat.GlobalShortcut.IsRegistered(accel);",
+      "expected_behavior": "reports this app's registration state"
+    },
+    {
+      "name": "edge semantics",
+      "input": "globalShortcut.isRegistered(takenByOtherApp);",
+      "expected_behavior": "returns false even though the accelerator is occupied globally"
+    }
+  ]
+}
