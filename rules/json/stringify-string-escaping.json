@@ -1,0 +1,46 @@
+{
+  "id": "json.stringify.string-escaping",
+  "category": "json",
+  "summary": "Quote JSON strings by UTF-16 code-unit semantics, escaping controls, quotes, backslashes, and lone surrogates as required.",
+  "source": {
+    "pattern": "JSON.stringify($string)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_known_string": true,
+      "no_json_rawjson_values": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($string)",
+    "helper": "JsJson.Stringify",
+    "notes": "QuoteJSONString must operate on ECMAScript UTF-16 code units. Required escapes must be emitted without locale/encoding-dependent transformations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "quote_and_backslash": "escaped",
+    "control_chars": "use permitted JSON escapes or unicode escapes",
+    "lone_surrogate": "escaped as a \\uXXXX sequence to produce well-formed JSON text",
+    "ordinary_unicode": "preserved according to QuoteJSONString"
+  },
+  "caveats": [
+    "Do not rely on a UTF-8 encoder that replaces lone surrogates before JSON quoting."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2.3 QuoteJSONString"
+  ],
+  "tests": [
+    {
+      "name": "lone surrogate is escaped",
+      "input": "console.log(JSON.stringify('\\ud800'));",
+      "expected_behavior": "prints \"\\\\ud800\""
+    },
+    {
+      "name": "quotes backslashes and controls escaped",
+      "input": "console.log(JSON.stringify('\"\\\\\\n'));",
+      "expected_behavior": "result is a valid JSON string with escaped quote, backslash, and newline"
+    }
+  ]
+}

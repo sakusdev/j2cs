@@ -1,0 +1,54 @@
+{
+  "id": "json.parse.reviver",
+  "category": "json",
+  "summary": "Apply a callable JSON.parse reviver in ECMAScript post-order with the correct holder this-value and deletion semantics.",
+  "source": {
+    "pattern": "JSON.parse($text, $reviver)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "reviver_call_semantics_available": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Parse($text, $reviver)",
+    "helper": "JsJson.Parse",
+    "notes": "JsJson.Parse must compose existing function-call and object-property semantics. A callable reviver is invoked after recursively processing children; a non-callable reviver is ignored."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "traversal": "Depth-first post-order: child properties are internalized before their containing object/array and the root empty-string property is visited last.",
+    "this_binding": "reviver this is the current holder object.",
+    "arguments": "key string, current value, and the standardized context argument when applicable.",
+    "return_value": "undefined deletes the property; any other result replaces it via data-property creation.",
+    "object_order": "Object child keys use own enumerable string-key order; arrays visit 0..length-1.",
+    "non_callable": "If reviver is not callable it is ignored."
+  },
+  "caveats": [
+    "Reviver callbacks may mutate the holder; later Get/Delete/CreateDataProperty operations must observe those mutations.",
+    "Generic callback semantics remain owned by the FUNCTIONS workstream."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.1 JSON.parse",
+    "ECMAScript 2026 §25.5.1.2 InternalizeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "children before parents and root last",
+      "input": "const order=[]; JSON.parse('{\"a\":{\"b\":1},\"c\":2}', function(k,v){order.push(k); return v;}); console.log(order.join(','));",
+      "expected_behavior": "prints b,a,c, (the final empty key is visited last)"
+    },
+    {
+      "name": "undefined deletes and leaves array hole",
+      "input": "const a=JSON.parse('[1,2]',(k,v)=>k==='0'?undefined:v); console.log(a.length, 0 in a, a[1]);",
+      "expected_behavior": "prints 2 false 2"
+    },
+    {
+      "name": "non-callable reviver ignored",
+      "input": "console.log(JSON.parse('{\"a\":1}', 123).a);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

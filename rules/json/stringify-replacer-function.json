@@ -1,0 +1,50 @@
+{
+  "id": "json.stringify.replacer-function",
+  "category": "json",
+  "summary": "Apply a callable JSON.stringify replacer after toJSON with holder this-binding, root empty key, and omission/replacement semantics.",
+  "source": {
+    "pattern": "JSON.stringify($value, $replacer, $space)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "replacer_statically_callable": true,
+      "function_call_semantics_available": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value, $replacer, $space)",
+    "helper": "JsJson.Stringify",
+    "notes": "The helper must use canonical function call semantics. The replacer is called for the synthetic root property and then for traversed properties/elements after toJSON processing."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "this_binding": "current holder object",
+    "arguments": "key string and post-toJSON value",
+    "root": "first call uses key '' on a synthetic wrapper holding the input",
+    "undefined_result": "causes object property omission or array null substitution; for root returns undefined",
+    "exceptions": "propagate synchronously"
+  },
+  "caveats": [
+    "A C# delegate invoked without JS holder-this semantics is not generally equivalent."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "root callback occurs first",
+      "input": "const ks=[]; JSON.stringify({a:1},function(k,v){ks.push(k);return v}); console.log(ks.join('|'));",
+      "expected_behavior": "prints |a"
+    },
+    {
+      "name": "can remove a property",
+      "input": "console.log(JSON.stringify({a:1,b:2},(k,v)=>k==='a'?undefined:v));",
+      "expected_behavior": "prints {\"b\":2}"
+    }
+  ]
+}

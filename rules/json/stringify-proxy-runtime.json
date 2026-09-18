@@ -1,0 +1,43 @@
+{
+  "id": "json.stringify.proxy-runtime",
+  "category": "json",
+  "summary": "Use JS runtime fallback when JSON.stringify can observe Proxy internal methods that the static object model cannot prove equivalent.",
+  "source": {
+    "pattern": "JSON.stringify($value, $replacer, $space)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "reachable_proxy_or_unmodeled_exotic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsonStringify($value, $replacer, $space)",
+    "notes": "Proxy ownKeys/get/getOwnPropertyDescriptor and related traps can be invoked by JSON serialization. If those semantics are reachable and not fully lowered by the compiler, retain runtime dispatch instead of pretending the object is an ordinary dictionary."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "proxy": "trap calls, ordering invariants, exceptions, and mutations are observable",
+    "fallback": "runtime executes JSON serialization with the canonical JS object model"
+  },
+  "caveats": [
+    "This rule does not redefine Proxy semantics; it only selects runtime fallback when JSON traversal crosses that boundary."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "proxy get trap is observable",
+      "input": "const p=new Proxy({a:1},{get(t,k,r){if(k==='a') console.log('get a'); return Reflect.get(t,k,r)}}); console.log(JSON.stringify(p));",
+      "expected_behavior": "prints get a before the JSON text"
+    },
+    {
+      "name": "proxy ownKeys affects traversal",
+      "input": "const p=new Proxy({a:1,b:2},{ownKeys(){return ['b','a']}}); console.log(JSON.stringify(p));",
+      "expected_behavior": "prints {\"b\":2,\"a\":1} when proxy invariants are satisfied"
+    }
+  ]
+}

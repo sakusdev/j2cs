@@ -1,0 +1,51 @@
+{
+  "id": "json.stringify.replacer-array",
+  "category": "json",
+  "summary": "Build JSON.stringify's ordered de-duplicated property list from a replacer array, including its non-enumerability and inheritance effects.",
+  "source": {
+    "pattern": "JSON.stringify($value, $replacer, $space)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "replacer_known_array": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value, $replacer, $space)",
+    "helper": "JsJson.Stringify",
+    "notes": "Only String/Number primitives and boxed String/Number entries contribute property names after ToString, in first-occurrence order. For objects this PropertyList is used directly, so selected non-enumerable or inherited names can be serialized."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "accepted_entries": "String and Number primitives plus boxed String/Number values",
+    "conversion": "accepted entries use ToString",
+    "duplicates": "first occurrence wins",
+    "order": "PropertyList order controls serialized object member order",
+    "enumerability": "PropertyList lookup is not limited to own enumerable properties",
+    "inherited": "Get can serialize an inherited selected property",
+    "arrays": "PropertyList does not filter array indices; arrays serialize their indexed elements"
+  },
+  "caveats": [
+    "Using Object.keys(value).Where(replacerContains) is wrong: it loses replacer order and cannot include inherited/non-enumerable selected properties."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "order and duplicate suppression",
+      "input": "console.log(JSON.stringify({a:1,b:2},['b','a','b']));",
+      "expected_behavior": "prints {\"b\":2,\"a\":1}"
+    },
+    {
+      "name": "can include nonenumerable and inherited selected names",
+      "input": "const p={x:7}; const o=Object.create(p); Object.defineProperty(o,'y',{value:8}); o.z=9; console.log(JSON.stringify(o,['y','x']));",
+      "expected_behavior": "prints {\"y\":8,\"x\":7}"
+    }
+  ]
+}

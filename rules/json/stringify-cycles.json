@@ -1,0 +1,49 @@
+{
+  "id": "json.stringify.cycles",
+  "category": "json",
+  "summary": "Detect only active ancestor cycles during JSON.stringify, throwing TypeError while allowing repeated non-cyclic references.",
+  "source": {
+    "pattern": "JSON.stringify($value)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_may_have_shared_or_cyclic_identity": true,
+      "object_identity_preserved": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value)",
+    "helper": "JsJson.Stringify",
+    "notes": "The helper must maintain the ECMAScript serialization Stack. Re-entering an object already on that active stack throws TypeError; an object reused after its prior serialization completed is allowed."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "cycle": "TypeError",
+    "identity": "cycle detection uses object identity, not structural equality",
+    "shared_reference": "same object in separate non-ancestor positions serializes more than once",
+    "stack_unwind": "objects are removed from the active stack after each object/array completes"
+  },
+  "caveats": [
+    "A global visited set is wrong because it rejects harmless repeated references."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "ancestor cycle throws",
+      "input": "const a={}; a.self=a; try { JSON.stringify(a); } catch(e) { console.log(e instanceof TypeError); }",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "repeated sibling reference is allowed",
+      "input": "const x={v:1}; console.log(JSON.stringify([x,x]));",
+      "expected_behavior": "prints [{\"v\":1},{\"v\":1}]"
+    }
+  ]
+}

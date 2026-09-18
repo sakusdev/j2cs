@@ -1,0 +1,49 @@
+{
+  "id": "json.stringify.array-null-substitution",
+  "category": "json",
+  "summary": "Serialize array holes and undefined/Function/Symbol elements as null while preserving array length.",
+  "source": {
+    "pattern": "JSON.stringify($array)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_known_array": true,
+      "replacer_not_function": true,
+      "no_json_rawjson_values": true,
+      "reachable_proxy_or_unmodeled_exotic": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($array)",
+    "helper": "JsJson.Stringify",
+    "notes": "Array serialization walks integer indices from 0 through length-1 using Get. Missing or otherwise unrepresentable elements contribute the JSON token null rather than being omitted."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "holes": "serialize as null",
+    "undefined_function_symbol": "serialize as null",
+    "length": "captured from the array and all positions are represented",
+    "extra_properties": "non-index ordinary properties are not serialized as array members"
+  },
+  "caveats": [
+    "This differs from object member omission and from treating a sparse JS array as a compact C# list."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "hole and unrepresentable elements become null",
+      "input": "const a=[]; a.length=4; a[1]=undefined; a[2]=()=>1; a[3]=Symbol(); console.log(JSON.stringify(a));",
+      "expected_behavior": "prints [null,null,null,null]"
+    },
+    {
+      "name": "non-index array property omitted",
+      "input": "const a=[1]; a.x=2; console.log(JSON.stringify(a));",
+      "expected_behavior": "prints [1]"
+    }
+  ]
+}

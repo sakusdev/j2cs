@@ -1,0 +1,48 @@
+{
+  "id": "json.stringify.number-specials",
+  "category": "json",
+  "summary": "Preserve JSON.stringify handling of non-finite Numbers and signed zero.",
+  "source": {
+    "pattern": "JSON.stringify($value)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_may_contain_number": true,
+      "no_json_rawjson_values": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($value)",
+    "helper": "JsJson.Stringify",
+    "notes": "Number serialization must use ECMAScript Number/ToString JSON behavior, not locale formatting or .NET non-finite literal names."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "finite": "serialize with ECMAScript Number string formatting required by JSON.stringify",
+    "nan": "null",
+    "positive_infinity": "null",
+    "negative_infinity": "null",
+    "negative_zero": "0"
+  },
+  "caveats": [
+    "C# serializers may reject or spell NaN/Infinity differently; neither behavior is equivalent."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "nonfinite numbers and minus zero",
+      "input": "console.log(JSON.stringify([NaN,Infinity,-Infinity,-0]));",
+      "expected_behavior": "prints [null,null,null,0]"
+    },
+    {
+      "name": "nonfinite object property retained as null",
+      "input": "console.log(JSON.stringify({x:NaN}));",
+      "expected_behavior": "prints {\"x\":null}"
+    }
+  ]
+}

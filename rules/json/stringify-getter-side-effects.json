@@ -1,0 +1,50 @@
+{
+  "id": "json.stringify.getter-side-effects",
+  "category": "json",
+  "summary": "Preserve property Get timing and side effects while serializing object members.",
+  "source": {
+    "pattern": "JSON.stringify($object)",
+    "requirements": {
+      "builtin_json_method_not_overridden": true,
+      "ecmascript_value_model_available": true,
+      "value_known_ordinary_object": true,
+      "accessors_may_be_present": true,
+      "replacer_array_not_active": true,
+      "reachable_proxy_or_unmodeled_exotic": false,
+      "no_json_rawjson_values": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsJson.Stringify($object)",
+    "helper": "JsJson.Stringify",
+    "notes": "After the object's key list is chosen, each property is obtained with JS Get immediately before serializing that property. Getters may delete or change later properties; those later Gets observe the mutation."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "getter_invocation": "once when its selected key is processed unless hooks trigger additional user code",
+    "order": "selected keys are processed in list order",
+    "mutation": "deleting a later property before its turn causes its later Get to produce undefined and therefore omission",
+    "exceptions": "getter exceptions abort serialization and propagate"
+  },
+  "caveats": [
+    "Materializing all values before serialization changes side-effect ordering."
+  ],
+  "references": [
+    "ECMAScript 2026 §25.5.2 JSON.stringify",
+    "ECMAScript 2026 §25.5.2.2 SerializeJSONProperty"
+  ],
+  "tests": [
+    {
+      "name": "getter can delete later selected property",
+      "input": "const o={a:1,b:2}; Object.defineProperty(o,'a',{enumerable:true,get(){delete o.b; return 1}}); console.log(JSON.stringify(o));",
+      "expected_behavior": "prints {\"a\":1}"
+    },
+    {
+      "name": "getter exception aborts",
+      "input": "const o={}; Object.defineProperty(o,'a',{enumerable:true,get(){throw new Error('x')}}); try{JSON.stringify(o)}catch(e){console.log(e.message)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}
