@@ -1,0 +1,71 @@
+name: Coverage gaps
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "rules/**"
+      - "coverage/**"
+      - "tools/coverage_gap.py"
+      - "tools/create_gap_issues.py"
+  pull_request:
+    paths:
+      - "rules/**"
+      - "coverage/**"
+      - "tools/coverage_gap.py"
+      - "tools/create_gap_issues.py"
+  workflow_dispatch:
+    inputs:
+      create_issues:
+        description: "Create READY issues from the highest-ranked gaps"
+        required: true
+        type: boolean
+        default: false
+      top_n:
+        description: "Maximum number of issues to create"
+        required: true
+        default: "10"
+      min_score:
+        description: "Minimum gap score"
+        required: true
+        default: "60"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Analyze coverage
+        run: |
+          python tools/coverage_gap.py \
+            --top 30 \
+            --json-out coverage-report.json \
+            --markdown-out coverage-report.md \
+            --issues-out coverage-issues.json
+
+      - name: Publish summary
+        run: cat coverage-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-gap-report
+          path: |
+            coverage-report.json
+            coverage-report.md
+            coverage-issues.json
+
+      - name: Create READY issues
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_issues }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python tools/create_gap_issues.py \
+            --apply \
+            --top "${{ inputs.top_n }}" \
+            --min-score "${{ inputs.min_score }}"
