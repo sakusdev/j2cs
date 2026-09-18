@@ -1,0 +1,45 @@
+{
+  "id": "date.constructor.one-nonstring-primitive",
+  "category": "date_time",
+  "summary": "Constructing Date from one proven non-String primitive applies ToNumber then TimeClip.",
+  "source": {
+    "pattern": "new Date($value)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "argument_is_primitive": true,
+      "argument_static_type_excludes": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.FromPrimitive",
+    "template": "JsDate.FromTimeValue(JsCoercion.ToNumberPrimitive($value))",
+    "notes": "Reuse coercion.to-number.*; JsDate.FromTimeValue applies TimeClip and allocates the Date."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "reuse canonical ToNumber semantics",
+    "time_clip": true,
+    "bigint_or_symbol": "TypeError"
+  },
+  "caveats": [
+    "Do not route String primitives here: Strings use Date parsing, not StringToNumber."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "numeric timestamp is clipped",
+      "input": "console.log(new Date(0.9).getTime());",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "BigInt rejected by ToNumber",
+      "input": "try { new Date(1n); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

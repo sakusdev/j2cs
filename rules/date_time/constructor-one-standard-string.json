@@ -1,0 +1,46 @@
+{
+  "id": "date.constructor.one-standard-string",
+  "category": "date_time",
+  "summary": "Constructing Date from a proven ECMAScript Date Time String Format string uses Date.parse semantics then TimeClip.",
+  "source": {
+    "pattern": "new Date($string)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "argument_static_type": "String",
+      "string_proven_ecmascript_date_time_format": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.ParseStandardToDate",
+    "template": "JsDate.ParseStandardToDate($string)",
+    "notes": "Implement the normative Date Time String Format. An absent offset is UTC for date-only forms and local time for date-time forms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parsing": "ECMAScript Date Time String Format",
+    "date_only_without_offset": "UTC",
+    "date_time_without_offset": "local time",
+    "result": "fresh Date with parsed or NaN time value"
+  },
+  "caveats": [
+    "Do not use DateTime.Parse: accepted grammar and absent-offset semantics differ."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "date-only is UTC",
+      "input": "console.log(new Date(\"1970-01-01\").getTime());",
+      "expected_behavior": "prints 0 in every host time zone"
+    },
+    {
+      "name": "invalid standard field becomes invalid Date",
+      "input": "console.log(Number.isNaN(new Date(\"2020-13-01\").getTime()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "date.prototype.toisostring",
+  "category": "date_time",
+  "summary": "toISOString formats a valid Date in the simplified ECMAScript ISO UTC format and throws RangeError for an invalid time value.",
+  "source": {
+    "pattern": "$date.toISOString()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.toISOString"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.ToISOString",
+    "template": "JsDate.ToISOString($date)",
+    "notes": "Do not use a culture-sensitive formatter. Preserve extended-year formatting and exact 3-digit milliseconds."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "timezone": "UTC",
+    "format": "YYYY-MM-DDTHH:mm:ss.sssZ with expanded signed year when required",
+    "invalid_date": "RangeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "epoch formatting",
+      "input": "console.log(new Date(0).toISOString());",
+      "expected_behavior": "prints 1970-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "invalid throws RangeError",
+      "input": "try { new Date(NaN).toISOString(); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

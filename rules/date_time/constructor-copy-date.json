@@ -1,0 +1,43 @@
+{
+  "id": "date.constructor.copy-date",
+  "category": "date_time",
+  "summary": "new Date(existingDate) copies the source Date internal [[DateValue]] directly, without invoking overridden valueOf/toString hooks.",
+  "source": {
+    "pattern": "new Date($date)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "argument_has_date_value_internal_slot": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.Copy",
+    "template": "JsDate.Copy($date)",
+    "notes": "Do not lower through generic ToPrimitive/ToNumber when the argument is proven to be a Date object with [[DateValue]]."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "creates_new_object": true,
+    "copies_internal_slot": true,
+    "calls_to_primitive": false,
+    "preserves_invalid_nan": true
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "copies timestamp",
+      "input": "const a=new Date(1234); const b=new Date(a); console.log(b.getTime(),a===b);",
+      "expected_behavior": "prints 1234 false"
+    },
+    {
+      "name": "overridden valueOf is ignored",
+      "input": "const a=new Date(1234); a.valueOf=()=>999999; console.log(new Date(a).getTime());",
+      "expected_behavior": "prints 1234"
+    }
+  ]
+}

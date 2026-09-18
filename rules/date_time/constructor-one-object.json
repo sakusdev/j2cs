@@ -1,0 +1,46 @@
+{
+  "id": "date.constructor.one-object-runtime",
+  "category": "date_time",
+  "summary": "Constructing Date from one non-Date object performs ToPrimitive with default hint, then branches to Date parsing for String primitives or ToNumber otherwise.",
+  "source": {
+    "pattern": "new Date($object)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "argument_may_be_object": true,
+      "argument_proven_not_date_internal_slot": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DateConstructObject",
+    "template": "JsRuntime.DateConstructObject($object)",
+    "notes": "Reuse the canonical ToPrimitive/ToNumber/ToString machinery; getters and conversion methods may execute arbitrary user code."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToPrimitive(default), potentially user code",
+    "string_primitive": "Date.parse path",
+    "other_primitive": "ToNumber then TimeClip",
+    "can_throw": true
+  },
+  "caveats": [
+    "Proxy traps, @@toPrimitive, valueOf, or toString can throw or mutate state."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valueOf may supply number",
+      "input": "const o={valueOf(){return 5;}}; console.log(new Date(o).getTime());",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "toString may supply date string",
+      "input": "const o={valueOf(){return {};},toString(){return \"1970-01-01\";}}; console.log(new Date(o).getTime());",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

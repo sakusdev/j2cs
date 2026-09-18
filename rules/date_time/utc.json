@@ -1,0 +1,52 @@
+{
+  "id": "date.utc",
+  "category": "date_time",
+  "summary": "Date.UTC coerces components, applies the 0..99 year adjustment, interprets them as UTC, TimeClips, and returns a Number rather than a Date.",
+  "source": {
+    "pattern": "Date.UTC($year, $month?, $date?, $hours?, $minutes?, $seconds?, $ms?)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "property_lookup_resolves_builtin": "Date.UTC"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.Utc",
+    "template": "JsDate.Utc($year, ...)",
+    "notes": "Reuse canonical ToNumber semantics. Omitted optional fields differ from explicitly supplied undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToNumber supplied arguments",
+    "defaults": {
+      "month": 0,
+      "date": 1,
+      "hours": 0,
+      "minutes": 0,
+      "seconds": 0,
+      "ms": 0
+    },
+    "year_0_99": "1900 + year",
+    "timezone": "UTC",
+    "return_type": "Number",
+    "time_clip": true
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "year 99 adjustment",
+      "input": "console.log(Date.UTC(99,0,1));",
+      "expected_behavior": "prints 915148800000"
+    },
+    {
+      "name": "missing required year becomes NaN",
+      "input": "console.log(Number.isNaN(Date.UTC()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

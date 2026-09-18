@@ -1,0 +1,44 @@
+{
+  "id": "date.prototype.gettimezoneoffset",
+  "category": "date_time",
+  "summary": "getTimezoneOffset returns (UTC time - local time) in minutes for the represented instant; Invalid Date returns NaN.",
+  "source": {
+    "pattern": "$date.getTimezoneOffset()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.getTimezoneOffset"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.GetTimezoneOffset",
+    "template": "JsDate.GetTimezoneOffset($date)",
+    "notes": "Use the time-zone offset for the Date instant, not the current offset. The sign convention is opposite some platform APIs."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "invalid_date": "NaN",
+    "unit": "minutes",
+    "sign": "positive when local time is behind UTC",
+    "timezone_rules": "offset depends on represented instant"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "returns number for valid Date",
+      "input": "console.log(typeof new Date(0).getTimezoneOffset());",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "invalid returns NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).getTimezoneOffset()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "date.prototype.setseconds",
+  "category": "date_time",
+  "summary": "setSeconds mutates the Date: replace local seconds and optional milliseconds; it returns the resulting millisecond time value.",
+  "source": {
+    "pattern": "$date.setSeconds($seconds, $ms?)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.setSeconds"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.setSeconds",
+    "template": "JsDate.setSeconds($date, ...)",
+    "notes": "Reuse canonical ToNumber helpers/runtime as required by argument static types; preserve mutation only after the specified conversions/calculations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "new [[DateValue]] after TimeClip, or NaN",
+    "coercion": "ToNumber supplied arguments in specification order",
+    "timezone": "host local",
+    "description": "replace local seconds and optional milliseconds",
+    "invalid_receiver_recovery": false
+  },
+  "caveats": [
+    "Explicit undefined is a supplied argument and ToNumber(undefined) is NaN; omitted optional arguments instead use current component defaults.",
+    "Local setters are DST-sensitive; elapsed milliseconds can differ from nominal component changes."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid mutation returns time value",
+      "input": "const d=new Date(2024,0,15,1,2,3,4); d.setSeconds(40); console.log(d.getSeconds(),d.getMilliseconds());",
+      "expected_behavior": "prints 40 4"
+    },
+    {
+      "name": "semantic edge case",
+      "input": "const d=new Date(NaN); console.log(Number.isNaN(d.setSeconds(1)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

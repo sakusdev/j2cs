@@ -1,0 +1,46 @@
+{
+  "id": "date.parse.general-runtime",
+  "category": "date_time",
+  "summary": "General Date.parse first ToStrings its argument and must preserve implementation-defined parsing extensions when the string is not a standard Date Time String Format.",
+  "source": {
+    "pattern": "Date.parse($value)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true,
+      "property_lookup_resolves_builtin": "Date.parse",
+      "standard_format_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DateParse",
+    "template": "JsRuntime.DateParse($value)",
+    "notes": "Reuse canonical ToString. Compatibility runtime must choose/emulate a JavaScript engine policy for permitted non-standard forms."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToString, potentially user code for objects",
+    "standard_forms": "normative ECMAScript parsing",
+    "nonstandard_forms": "implementation-defined",
+    "return": "milliseconds or NaN"
+  },
+  "caveats": [
+    "Do not claim cross-engine portability for implementation-defined date strings."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "object ToString side effect",
+      "input": "let n=0; Date.parse({toString(){n++; return \"1970-01-01\";}}); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "non-standard input cannot assume CLR parser",
+      "input": "console.log(Date.parse(\"01/02/2003\"));",
+      "expected_behavior": "result follows the selected JavaScript compatibility policy and may differ across engines"
+    }
+  ]
+}

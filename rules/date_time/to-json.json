@@ -1,0 +1,46 @@
+{
+  "id": "date.prototype.tojson-runtime",
+  "category": "date_time",
+  "summary": "Date.prototype.toJSON is generic: it ToPrimitives this with number hint, returns null for a non-finite Number primitive, otherwise dynamically invokes this.toISOString().",
+  "source": {
+    "pattern": "$receiver.toJSON($key?)",
+    "requirements": {
+      "property_lookup_resolves_builtin": "Date.prototype.toJSON"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DateToJSON",
+    "template": "JsRuntime.DateToJSON($receiver, $key)",
+    "notes": "Reuse canonical ToPrimitive and dynamic property Invoke/call semantics; a fixed call to JsDate.ToISOString would be incorrect for generic receivers."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "generic": true,
+    "key_argument": "ignored by algorithm after ordinary call evaluation",
+    "primitive_conversion": "ToPrimitive(number)",
+    "nonfinite_number": "null",
+    "otherwise": "Invoke(receiver, \"toISOString\")",
+    "can_execute_user_code": true
+  },
+  "caveats": [
+    "The receiver need not be a Date object. User valueOf/@@toPrimitive/toISOString hooks are observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "invalid Date serializes as null",
+      "input": "console.log(new Date(NaN).toJSON());",
+      "expected_behavior": "prints null"
+    },
+    {
+      "name": "custom toISOString is invoked for generic receiver",
+      "input": "const o={valueOf(){return 1},toISOString(){return \"custom\"}}; console.log(Date.prototype.toJSON.call(o));",
+      "expected_behavior": "prints custom"
+    }
+  ]
+}

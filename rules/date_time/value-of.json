@@ -1,0 +1,43 @@
+{
+  "id": "date.prototype.valueof",
+  "category": "date_time",
+  "summary": "Date.prototype.valueOf returns the Date internal [[DateValue]] exactly.",
+  "source": {
+    "pattern": "$date.valueOf()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.valueOf",
+      "canonical_jsdate_representation": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$date.TimeValue",
+    "notes": "This does not authorize replacing arbitrary object valueOf calls; it applies only to intrinsic Date.prototype.valueOf on a proven Date representation."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "return": "internal [[DateValue]]",
+    "invalid_date": "NaN"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "returns time value",
+      "input": "console.log(new Date(42).valueOf());",
+      "expected_csharp": "double t = date.TimeValue;",
+      "expected_behavior": "prints 42"
+    },
+    {
+      "name": "invalid Date returns NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).valueOf()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "date.time-clip",
+  "category": "date_time",
+  "summary": "ECMAScript TimeClip rejects non-finite/out-of-range time values, truncates fractional milliseconds toward zero, and normalizes signed zero to +0.",
+  "source": {
+    "pattern": "[[TimeClip]]($time)",
+    "requirements": {
+      "semantic_operation": "TimeClip"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.TimeClip",
+    "template": "JsDate.TimeClip($time)",
+    "notes": "This is Date-specific time-value normalization; numeric coercion itself remains owned by coercion rules."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "finite_range": "absolute value <= 8.64e15 milliseconds",
+    "outside_range": "NaN",
+    "fractional": "truncate toward zero",
+    "negative_zero": "normalize to +0"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "inclusive upper bound",
+      "input": "console.log(new Date(8640000000000000).getTime());",
+      "expected_behavior": "prints 8640000000000000"
+    },
+    {
+      "name": "fraction and negative zero normalize",
+      "input": "const t=new Date(-0.5).getTime(); console.log(t,Object.is(t,-0));",
+      "expected_behavior": "prints 0 false"
+    }
+  ]
+}

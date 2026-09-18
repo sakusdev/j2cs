@@ -1,0 +1,43 @@
+{
+  "id": "date.prototype.getminutes",
+  "category": "date_time",
+  "summary": "getMinutes reads local minutes 0..59 after converting the Date time value through host local-time rules; Invalid Date returns NaN.",
+  "source": {
+    "pattern": "$date.getMinutes()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.getMinutes"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.getMinutes",
+    "template": "JsDate.getMinutes($date)",
+    "notes": "LocalTime conversion must use the host time-zone rules applicable to that instant, including historical/DST transitions."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "invalid_date": "NaN",
+    "timezone": "host local",
+    "operation": "MinFromTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid local component",
+      "input": "const d=new Date(2024,0,15,13,42); console.log(d.getMinutes());",
+      "expected_behavior": "prints 42"
+    },
+    {
+      "name": "invalid Date returns NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).getMinutes()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

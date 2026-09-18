@@ -1,0 +1,42 @@
+{
+  "id": "date.prototype.getutcmonth",
+  "category": "date_time",
+  "summary": "getUTCMonth reads UTC month 0..11 directly from the UTC time value; Invalid Date returns NaN.",
+  "source": {
+    "pattern": "$date.getUTCMonth()",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.getUTCMonth"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.getUTCMonth",
+    "template": "JsDate.getUTCMonth($date)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver_mutated": false,
+    "invalid_date": "NaN",
+    "timezone": "UTC",
+    "operation": "MonthFromTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid UTC component",
+      "input": "console.log(new Date(Date.UTC(2024,6,1)).getUTCMonth());",
+      "expected_behavior": "prints 6"
+    },
+    {
+      "name": "invalid Date returns NaN",
+      "input": "console.log(Number.isNaN(new Date(NaN).getUTCMonth()));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

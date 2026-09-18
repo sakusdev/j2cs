@@ -1,0 +1,47 @@
+{
+  "id": "date.prototype.setutcmonth",
+  "category": "date_time",
+  "summary": "setUTCMonth mutates the Date: replace UTC month; optional date defaults from current UTC time; it returns the resulting millisecond time value.",
+  "source": {
+    "pattern": "$date.setUTCMonth($month, $day?)",
+    "requirements": {
+      "receiver_has_date_value_internal_slot": true,
+      "property_lookup_resolves_builtin": "Date.prototype.setUTCMonth"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.setUTCMonth",
+    "template": "JsDate.setUTCMonth($date, ...)",
+    "notes": "Reuse canonical ToNumber helpers/runtime as required by argument static types; preserve mutation only after the specified conversions/calculations."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutates_receiver": true,
+    "return": "new [[DateValue]] after TimeClip, or NaN",
+    "coercion": "ToNumber supplied arguments in specification order",
+    "timezone": "UTC",
+    "description": "replace UTC month; optional date defaults from current UTC time",
+    "invalid_receiver_recovery": false
+  },
+  "caveats": [
+    "Explicit undefined is a supplied argument and ToNumber(undefined) is NaN; omitted optional arguments instead use current component defaults."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "valid mutation returns time value",
+      "input": "const d=new Date(Date.UTC(2024,0,15)); d.setUTCMonth(6); console.log(d.getUTCMonth(),d.getUTCDate());",
+      "expected_behavior": "prints 6 15"
+    },
+    {
+      "name": "semantic edge case",
+      "input": "const d=new Date(NaN); console.log(Number.isNaN(d.setUTCMonth(1)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

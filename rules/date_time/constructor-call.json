@@ -1,0 +1,46 @@
+{
+  "id": "date.constructor.call",
+  "category": "date_time",
+  "summary": "Calling Date as a function returns a string for the current local date/time and ignores the argument values after normal argument evaluation.",
+  "source": {
+    "pattern": "Date(...$args)",
+    "requirements": {
+      "global_date_binding_is_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsDate.Call",
+    "template": "JsDate.Call()",
+    "notes": "Capture the current time and format it with ECMAScript Date string semantics in the host local time zone. Do not use the supplied argument values."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "constructs_object": false,
+    "return_type": "String",
+    "uses_current_time": true,
+    "argument_values_ignored": true,
+    "argument_expressions_evaluated": "left-to-right before call"
+  },
+  "caveats": [
+    "The exact local time-zone name in the returned string is host-sensitive.",
+    "Normal function-call argument evaluation is owned by the canonical function/call rules."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-objects",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date"
+  ],
+  "tests": [
+    {
+      "name": "call returns string",
+      "input": "console.log(typeof Date());",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "arguments are evaluated but values ignored",
+      "input": "let n=0; Date(n++); console.log(n);",
+      "expected_behavior": "prints 1; argument expression side effect occurs even though its value does not affect the Date result"
+    }
+  ]
+}
