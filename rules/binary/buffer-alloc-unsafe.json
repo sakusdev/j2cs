@@ -1,0 +1,12 @@
+{
+  "id": "binary.buffer.alloc-unsafe",
+  "category": "binary",
+  "summary": "Allocate Node Buffer storage whose bytes are intentionally not initialized by the API contract.",
+  "source": {"pattern": "Buffer.allocUnsafe($size)", "requirements": {"builtin_Buffer_binding": true, "method_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.AllocUnsafe", "template": "NodeBuffer.AllocUnsafe($size)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"initialized": false, "contents": "unspecified until written", "pooling": "small allocations may use internal pool", "size_validation": "Node Buffer limits", "security": "must not expose memory outside runtime allocation guarantees"},
+  "tests": [{"name": "length", "input": "const {Buffer}=require(\"node:buffer\"); console.log(Buffer.allocUnsafe(3).length);", "expected_behavior": "prints 3"}, {"name": "negative rejects", "input": "const {Buffer}=require(\"node:buffer\"); try{Buffer.allocUnsafe(-1)}catch(e){console.log(e.code)}", "expected_behavior": "prints ERR_OUT_OF_RANGE"}],
+  "caveats": ["Byte contents are intentionally unspecified; tests must not assert particular preexisting byte values."],
+  "references": ["Node.js Buffer API (current)"]
+}

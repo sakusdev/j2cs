@@ -1,0 +1,9 @@
+{
+  "id": "binary.buffer.write", "category": "binary", "summary": "Write Node Buffer integer, BigInt, float, and double values with method-specific validation and returned next offset.",
+  "source": {"pattern": "$buffer.write{Int,UInt,BigInt64,BigUInt64,Float,Double}*($value, $offset, $byteLength)", "requirements": {"receiver": "Node Buffer", "builtin_method_not_overridden": true, "method_resolved": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.Write", "template": "NodeBuffer.Write($kind, $buffer, $value, $offset, $byteLength, $endian)", "notes": "Preserve Node range/type validation and the integer return value offset + bytes written."},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"mutates_receiver": true, "return": "offset plus bytes written", "endianness": "method-specific LE/BE", "numeric_integer": "documented signed/unsigned range required", "bigint": "BigInt required for BigInt methods", "float": "Number written as IEEE-754", "bounds": "Node Buffer error categories preserved"},
+  "references": ["Node.js Buffer API write methods"],
+  "tests": [{"name": "integer bytes and return", "input": "const {Buffer}=require(\"node:buffer\"); const b=Buffer.alloc(2); console.log(b.writeUInt16BE(0x1234,0),[...b]);", "expected_behavior": "prints 2 and 18,52"}, {"name": "range error", "input": "const {Buffer}=require(\"node:buffer\"); try{Buffer.alloc(1).writeUInt8(256)}catch(e){console.log(e.code)}", "expected_behavior": "prints ERR_OUT_OF_RANGE"}, {"name": "BigInt methods reject Number", "input": "const {Buffer}=require(\"node:buffer\"); try{Buffer.alloc(8).writeBigUInt64LE(1)}catch(e){console.log(e.name)}", "expected_behavior": "prints TypeError"}]
+}

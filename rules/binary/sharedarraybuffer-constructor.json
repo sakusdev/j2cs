@@ -1,0 +1,9 @@
+{
+  "id": "binary.sharedarraybuffer.constructor", "category": "binary", "summary": "Create SharedArrayBuffer storage with JavaScript shared-memory semantics.",
+  "source": {"pattern": "new SharedArrayBuffer($length, $options)", "requirements": {"builtin_constructor_not_overridden": true}},
+  "target": {"kind": "runtime", "helper": "JsRuntime.Binary.NewSharedArrayBuffer", "template": "JsRuntime.Binary.NewSharedArrayBuffer($length, $options)", "notes": "Requires a runtime shared-memory representation when the buffer can cross agents."},
+  "strategy": "runtime", "confidence": "high",
+  "semantics": {"zero_initialized": true, "never_detached": true, "may_be_growable": true, "cross_agent_visibility": "ECMAScript shared memory model"},
+  "tests": [{"name": "fixed shared buffer", "input": "const b=new SharedArrayBuffer(4); console.log(b.byteLength,b.growable);", "expected_behavior": "prints 4 false"}, {"name": "growable metadata", "input": "const b=new SharedArrayBuffer(2,{maxByteLength:8}); console.log(b.byteLength,b.maxByteLength,b.growable);", "expected_behavior": "prints 2 8 true"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

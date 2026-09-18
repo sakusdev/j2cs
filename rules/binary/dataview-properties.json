@@ -1,0 +1,9 @@
+{
+  "id": "binary.dataview.properties", "category": "binary", "summary": "Read DataView buffer, byteOffset, and byteLength with out-of-bounds checks.",
+  "source": {"pattern": "$view.buffer / $view.byteOffset / $view.byteLength", "requirements": {"receiver": "builtin DataView"}},
+  "target": {"kind": "helper", "helper": "JsBinary.DataViewMetadata", "template": "JsBinary.DataViewMetadata($view)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"buffer": "original backing buffer identity", "byteOffset": "throws TypeError if view is out of bounds", "byteLength": "dynamic for length-tracking views; throws TypeError if out of bounds"},
+  "tests": [{"name": "metadata", "input": "const b=new ArrayBuffer(8); const v=new DataView(b,2,3); console.log(v.buffer===b,v.byteOffset,v.byteLength);", "expected_behavior": "prints true 2 3"}, {"name": "tracking length", "input": "const b=new ArrayBuffer(4,{maxByteLength:8}); const v=new DataView(b,1); b.resize(6); console.log(v.byteLength);", "expected_behavior": "prints 5"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

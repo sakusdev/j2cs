@@ -1,0 +1,42 @@
+{
+  "id": "binary.arraybuffer.is-view",
+  "category": "binary",
+  "summary": "Implement ArrayBuffer.isView using binary-view internal-slot semantics, not duck typing.",
+  "source": {
+    "pattern": "ArrayBuffer.isView($value)",
+    "requirements": {
+      "builtin_ArrayBuffer_binding": true,
+      "method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsBinary.IsArrayBufferView",
+    "template": "JsBinary.IsArrayBufferView($value)",
+    "notes": "Return true for TypedArray and DataView objects (including Node Buffer as a Uint8Array subclass), false for ArrayBuffer itself and ordinary lookalikes."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "typed_arrays": true,
+    "data_view": true,
+    "array_buffer": false,
+    "ordinary_objects": false,
+    "proxy_wrapping_view": "false because the Proxy lacks the view internal slots"
+  },
+  "references": [
+    "ECMAScript 2026 ArrayBuffer.isView"
+  ],
+  "tests": [
+    {
+      "name": "views vs buffer",
+      "input": "console.log(ArrayBuffer.isView(new Uint8Array(1)),ArrayBuffer.isView(new DataView(new ArrayBuffer(1))),ArrayBuffer.isView(new ArrayBuffer(1)));",
+      "expected_behavior": "prints true true false"
+    },
+    {
+      "name": "proxy is not view",
+      "input": "console.log(ArrayBuffer.isView(new Proxy(new Uint8Array(1),{})));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

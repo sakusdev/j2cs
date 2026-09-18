@@ -1,0 +1,9 @@
+{
+  "id": "binary.typedarray.constructor.length", "category": "binary", "summary": "Construct a TypedArray by element count.",
+  "source": {"pattern": "new $TypedArray($length)", "requirements": {"builtin_constructor_not_overridden": true, "typed_array_constructor_known": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.NewTypedArrayLength", "template": "JsBinary.NewTypedArrayLength($kind, $length)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"length_coercion": "ToIndex", "zero_initialized": true, "new_backing_store": true, "element_kind": "constructor-specific Number or BigInt content type"},
+  "tests": [{"name": "zero init", "input": "console.log([...new Uint16Array(3)]);", "expected_behavior": "prints 0,0,0"}, {"name": "fractional length", "input": "console.log(new Uint8Array(2.9).length);", "expected_behavior": "prints 2"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

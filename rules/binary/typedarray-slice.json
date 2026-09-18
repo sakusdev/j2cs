@@ -1,0 +1,9 @@
+{
+  "id": "binary.typedarray.slice", "category": "binary", "summary": "Copy a TypedArray range into a new TypedArray backing store.",
+  "source": {"pattern": "$array.slice($start, $end)", "requirements": {"receiver": "builtin TypedArray", "builtin_method_not_overridden": true, "builtin_species": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.TypedArraySlice", "template": "JsBinary.TypedArraySlice($array, $start, $end)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"copies_elements": true, "shares_backing_store": false, "species_sensitive": true, "element_values": "read then copied with target typed-array semantics"},
+  "tests": [{"name": "copy independent", "input": "const a=new Uint8Array([1,2,3]); const b=a.slice(1); a[1]=9; console.log([...b]);", "expected_behavior": "prints 2,3"}, {"name": "negative start", "input": "console.log([...new Int16Array([1,2,3]).slice(-2)]);", "expected_behavior": "prints 2,3"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

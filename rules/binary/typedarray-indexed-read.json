@@ -1,0 +1,10 @@
+{
+  "id": "binary.typedarray.indexed-read", "category": "binary", "summary": "Read integer-indexed TypedArray elements without prototype fallback for invalid numeric indices.",
+  "source": {"pattern": "$array[$index]", "requirements": {"receiver": "builtin TypedArray", "indexed_access_not_intercepted_by_outer_proxy": true}},
+  "target": {"kind": "helper", "helper": "JsBinary.TypedArrayGet", "template": "JsBinary.TypedArrayGet($array, $index)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"canonical_numeric_index": "reuse coercion canonical numeric index semantics", "valid_index": "returns stored numeric/BigInt value", "invalid_or_oob": "undefined", "negative_zero": "-0 is invalid integer index for TypedArray"},
+  "tests": [{"name": "oob undefined", "input": "const a=new Uint8Array([7]); console.log(a[0],a[1]);", "expected_behavior": "prints 7 undefined"}, {"name": "negative index no prototype lookup", "input": "const a=new Uint8Array([7]); Uint8Array.prototype[\"-1\"]=9; console.log(a[-1]);", "expected_behavior": "prints undefined"}],
+  "caveats": ["Non-canonical property keys such as \"01\" are ordinary object properties and belong to object-property semantics."],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

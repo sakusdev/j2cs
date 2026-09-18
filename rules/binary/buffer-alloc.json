@@ -1,0 +1,9 @@
+{
+  "id": "binary.buffer.alloc", "category": "binary", "summary": "Allocate a zero-filled Node Buffer with Node argument validation.",
+  "source": {"pattern": "Buffer.alloc($size, $fill, $encoding)", "requirements": {"builtin_Buffer_binding": true, "method_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.Alloc", "template": "NodeBuffer.Alloc($size, $fill, $encoding)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"zero_filled_default": true, "size_validation": "integer within Buffer limits; invalid size throws Node argument/range error", "optional_fill": "Buffer fill semantics", "return": "Buffer"},
+  "tests": [{"name": "zero fill", "input": "const {Buffer}=require(\"node:buffer\"); console.log([...Buffer.alloc(3)]);", "expected_behavior": "prints 0,0,0"}, {"name": "negative rejects", "input": "const {Buffer}=require(\"node:buffer\"); try{Buffer.alloc(-1)}catch(e){console.log(e.code)}", "expected_behavior": "prints ERR_OUT_OF_RANGE"}],
+  "references": ["Node.js Buffer API (current)"]
+}

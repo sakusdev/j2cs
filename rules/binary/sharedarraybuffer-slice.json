@@ -1,0 +1,9 @@
+{
+  "id": "binary.sharedarraybuffer.slice", "category": "binary", "summary": "Copy SharedArrayBuffer bytes into a distinct shared buffer while preserving shared-memory semantics.",
+  "source": {"pattern": "$buffer.slice($start, $end)", "requirements": {"receiver": "builtin SharedArrayBuffer", "builtin_method_not_overridden": true, "builtin_species": true}},
+  "target": {"kind": "runtime", "helper": "JsRuntime.Binary.SliceSharedArrayBuffer", "template": "JsRuntime.Binary.SliceSharedArrayBuffer($buffer, $start, $end)"},
+  "strategy": "runtime", "confidence": "high",
+  "semantics": {"copies_bytes": true, "result": "SharedArrayBuffer", "species_sensitive": true, "concurrent_reads": "must obey shared-memory no-tearing requirements"},
+  "tests": [{"name": "copy range", "input": "const b=new SharedArrayBuffer(3); new Uint8Array(b).set([1,2,3]); const c=b.slice(1); console.log([...new Uint8Array(c)]);", "expected_behavior": "prints 2,3"}, {"name": "distinct storage", "input": "const b=new SharedArrayBuffer(2); new Uint8Array(b)[0]=1; const c=b.slice(0); new Uint8Array(b)[0]=9; console.log(new Uint8Array(c)[0]);", "expected_behavior": "prints 1"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

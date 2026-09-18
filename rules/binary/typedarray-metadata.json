@@ -1,0 +1,9 @@
+{
+  "id": "binary.typedarray.metadata", "category": "binary", "summary": "Read buffer, byteOffset, byteLength, and length with resizable/out-of-bounds semantics.",
+  "source": {"pattern": "$array.buffer / $array.byteOffset / $array.byteLength / $array.length", "requirements": {"receiver": "builtin TypedArray"}},
+  "target": {"kind": "helper", "helper": "JsBinary.TypedArrayMetadata", "template": "JsBinary.TypedArrayMetadata($array)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"buffer": "backing buffer identity", "length": "dynamic for length-tracking views", "out_of_bounds": "length/byteLength/byteOffset become 0 for out-of-bounds typed arrays under current ECMAScript semantics"},
+  "tests": [{"name": "fixed metadata", "input": "const b=new ArrayBuffer(8); const a=new Uint16Array(b,2,2); console.log(a.buffer===b,a.byteOffset,a.byteLength,a.length);", "expected_behavior": "prints true 2 4 2"}, {"name": "length tracking resize", "input": "const b=new ArrayBuffer(4,{maxByteLength:8}); const a=new Uint8Array(b); b.resize(6); console.log(a.length,a.byteLength);", "expected_behavior": "prints 6 6"}],
+  "references": ["ECMAScript 2026 binary data semantics"]
+}

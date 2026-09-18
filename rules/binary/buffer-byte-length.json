@@ -1,0 +1,9 @@
+{
+  "id": "binary.buffer.byte-length", "category": "binary", "summary": "Compute encoded byte length of string-like input using Node Buffer encoding semantics.",
+  "source": {"pattern": "Buffer.byteLength($value, $encoding)", "requirements": {"builtin_Buffer_binding": true, "method_not_overridden": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.ByteLength", "template": "NodeBuffer.ByteLength($value, $encoding)"},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"string_encoding": "encoding-specific byte count, not JavaScript string length or C# char count", "default_encoding": "utf8", "invalid_encoding": "falls back to utf8 per Node Buffer.byteLength behavior for unknown encodings"},
+  "tests": [{"name": "utf8 differs from string length", "input": "const {Buffer}=require(\"node:buffer\"); console.log(\"é\".length,Buffer.byteLength(\"é\"));", "expected_behavior": "prints 1 2"}, {"name": "ascii", "input": "const {Buffer}=require(\"node:buffer\"); console.log(Buffer.byteLength(\"abc\",\"utf8\"));", "expected_behavior": "prints 3"}],
+  "references": ["Node.js Buffer API (current)"]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "binary.buffer.from", "category": "binary", "summary": "Dispatch Node Buffer.from overloads while preserving copy-vs-shared-backing-store behavior and encoding semantics.",
+  "source": {"pattern": "Buffer.from($value, $arg2, $arg3)", "requirements": {"builtin_Buffer_binding": true, "method_not_overridden": true, "overload_resolved_by_static_analysis_or_runtime_helper": true}},
+  "target": {"kind": "helper", "helper": "NodeBuffer.From", "template": "NodeBuffer.From($value, $arg2, $arg3)", "notes": "String input decodes according to Node encodings; Array/TypedArray inputs copy converted byte values; ArrayBuffer/SharedArrayBuffer input creates a sharing view."},
+  "strategy": "helper", "confidence": "high",
+  "semantics": {"string": "new storage; default utf8; Node encoding rules", "array_like": "copy bytes with Uint8-style conversion", "typed_array": "copy visible element values", "array_buffer": "share backing store with byteOffset/length view", "critical_overload_difference": "Buffer.from(typedArray) copies, Buffer.from(typedArray.buffer) shares"},
+  "references": ["Node.js Buffer API: Buffer.from"],
+  "tests": [{"name": "string utf8", "input": "const {Buffer}=require(\"node:buffer\"); console.log([...Buffer.from(\"é\",\"utf8\")]);", "expected_behavior": "prints 195,169"}, {"name": "typed array copies but arraybuffer shares", "input": "const {Buffer}=require(\"node:buffer\"); const a=new Uint8Array([1]); const c=Buffer.from(a); const s=Buffer.from(a.buffer); a[0]=9; console.log(c[0],s[0]);", "expected_behavior": "prints 1 9"}, {"name": "array byte conversion", "input": "const {Buffer}=require(\"node:buffer\"); console.log([...Buffer.from([257,-1,3.9])]);", "expected_behavior": "prints 1,255,3"}]
+}
