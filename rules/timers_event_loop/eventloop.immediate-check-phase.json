@@ -29,7 +29,7 @@
   "references": [
     "https://nodejs.org/api/timers.html",
     "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick",
-    "rules/timers_event_loop/set-immediate.json"
+    "rules/timers_event_loop/node.timers.set-immediate.json"
   ],
   "tests": [
     {

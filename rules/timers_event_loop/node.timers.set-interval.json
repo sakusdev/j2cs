@@ -19,15 +19,17 @@
   "semantics": {
     "return_value": "Timeout handle object",
     "callback_validation": "non-callable callback throws TypeError synchronously",
-    "delay": "same Node delay normalization as setTimeout; default 1 ms",
+    "delay": "default 1 ms; numeric delay <1, NaN, or >2147483647 becomes 1; non-integer delays are truncated for scheduling",
     "arguments": "extra arguments are passed on every invocation",
     "callback_this": "ordinary function receives the Timeout handle as this",
     "overlap": "callbacks execute serially on the JS event loop; no concurrent callback overlap",
-    "liveness": "handle is ref'ed by default"
+    "liveness": "handle is ref'ed by default",
+    "overflow_warning": "out-of-range delays may emit Node TimeoutOverflowWarning under the selected host profile"
   },
   "caveats": [
     "Do not model an interval as a concurrent .NET periodic callback that can overlap JavaScript execution.",
-    "Elapsed wall-clock time does not guarantee exact callback count."
+    "Elapsed wall-clock time does not guarantee exact callback count.",
+    "Preserve host-visible warning behavior when compatibility requires Node TimeoutOverflowWarning."
   ],
   "references": [
     "https://nodejs.org/api/timers.html",
