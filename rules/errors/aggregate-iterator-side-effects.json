@@ -11,8 +11,9 @@
   },
   "target": {
     "kind": "runtime",
-    "helper": "JsRuntime.IteratorToList",
-    "template": "JsRuntime.CreateAggregateErrorFromIterable($iterable, $message, $options)"
+    "helper": "JsRuntime.CreateAggregateError",
+    "template": "JsRuntime.CreateAggregateError($iterable, $message, $options, $newTarget)",
+    "notes": "This API-specific runtime contract must consume the errors argument through the ECMAScript synchronous iterator protocol; generic iterator protocol ownership remains with ITERATORS_GENERATORS."
   },
   "strategy": "runtime",
   "confidence": "high",
