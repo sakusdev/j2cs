@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.observe-invalid-options",
+  "category": "web_performance",
+  "summary": "Validate PerformanceObserver.observe option shape before registering the observer.",
+  "source": {
+    "pattern": "$observer.observe($options)",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ValidateObserverOptions($args)",
+    "helper": "WebPerformance.ValidateObserverOptions"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "neither_entryTypes_nor_type": "TypeError",
+    "entryTypes_with_other_member": "TypeError",
+    "unsupported_types": "filtered rather than converted into registrations",
+    "no_partial_registration_on_throw": true
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "missing selector",
+      "input": "const o=new PerformanceObserver(()=>{}); try{o.observe({})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "entryTypes plus type",
+      "input": "const o=new PerformanceObserver(()=>{}); try{o.observe({entryTypes:['mark'],type:'measure'})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

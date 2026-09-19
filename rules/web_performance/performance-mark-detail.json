@@ -1,0 +1,44 @@
+{
+  "id": "web.performance.mark-detail",
+  "category": "web_performance",
+  "summary": "Clone PerformanceMark detail with structured serialization/deserialization before storing it.",
+  "source": {
+    "pattern": "performance.mark($name,{detail:$detail,$rest?})",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "detail_may_be_arbitrary_js_value": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.MarkWithDetail($args)",
+    "helper": "JsRuntime.WebPerformance.MarkWithDetail"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "detail": "structured clone into current realm",
+    "clone_failure": "DataCloneError",
+    "identity": "cloned objects are not aliased to source",
+    "ordering": "serialization occurs during mark construction before entry is returned"
+  },
+  "caveats": [
+    "Reuse the canonical structured-clone runtime when available; do not JSON-stringify detail."
+  ],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "detail is cloned",
+      "input": "const d={x:1}; const m=performance.mark('x',{detail:d}); d.x=2; console.log(m.detail.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "uncloneable detail",
+      "input": "try{performance.mark('x',{detail:()=>{}})}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws DataCloneError"
+    }
+  ]
+}

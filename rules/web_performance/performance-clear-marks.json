@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.clear-marks",
+  "category": "web_performance",
+  "summary": "Remove all marks or all marks matching the optional name while leaving other entry types untouched.",
+  "source": {
+    "pattern": "performance.clearMarks($name?)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ClearMarks($args)",
+    "helper": "WebPerformance.ClearMarks"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "omitted_name": "remove all PerformanceMark entries",
+    "provided_name": "remove all mark entries whose name matches",
+    "other_entry_types": "unchanged"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "named clear",
+      "input": "performance.clearMarks(); performance.mark('a'); performance.mark('b'); performance.clearMarks('a'); console.log(performance.getEntriesByName('a','mark').length,performance.getEntriesByName('b','mark').length);",
+      "expected_behavior": "prints 0 1"
+    },
+    {
+      "name": "clear all marks",
+      "input": "performance.mark('a'); performance.mark('b'); performance.clearMarks(); console.log(performance.getEntriesByType('mark').length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

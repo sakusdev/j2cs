@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.get-entries-by-name",
+  "category": "web_performance",
+  "summary": "Filter timeline-visible entries by exact name across available entry types.",
+  "source": {
+    "pattern": "performance.getEntriesByName($name)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.GetEntriesByName($args)",
+    "helper": "WebPerformance.GetEntriesByName"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "name_conversion": "WebIDL DOMString",
+    "type_filter": "none",
+    "matching": "exact name",
+    "ordering": "chronological by startTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "same name across mark and measure",
+      "input": "performance.clearMarks();performance.clearMeasures();performance.mark('x',{startTime:1});performance.measure('x',{start:0,end:2});console.log(performance.getEntriesByName('x').length);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "missing name",
+      "input": "console.log(performance.getEntriesByName('__missing__').length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

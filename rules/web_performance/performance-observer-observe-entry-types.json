@@ -1,0 +1,42 @@
+{
+  "id": "web.performance-observer.observe-entry-types",
+  "category": "web_performance",
+  "summary": "Register multiple entry types; unsupported types are ignored and repeated entryTypes-mode calls replace the options list.",
+  "source": {
+    "pattern": "$observer.observe({entryTypes:$types})",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.ObserverObserveEntryTypes($args)",
+    "helper": "JsRuntime.WebPerformance.ObserverObserveEntryTypes"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mode": "multiple",
+    "unsupported_types": "ignored",
+    "all_unsupported": "registration aborts",
+    "repeated_call": "replaces prior multiple-mode options",
+    "other_members_with_entryTypes": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "multiple types",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({entryTypes:['mark','measure']}); console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "entryTypes with buffered invalid",
+      "input": "const o=new PerformanceObserver(()=>{}); try{o.observe({entryTypes:['mark'],buffered:true})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

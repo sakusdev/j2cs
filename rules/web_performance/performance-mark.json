@@ -1,0 +1,44 @@
+{
+  "id": "web.performance.mark",
+  "category": "web_performance",
+  "summary": "Create and queue a PerformanceMark, using now() by default or an explicit non-negative startTime.",
+  "source": {
+    "pattern": "performance.mark($name, $options?)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "detail_absent_or_null": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.Mark($args)",
+    "helper": "WebPerformance.Mark"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "PerformanceMark",
+    "entryType": "mark",
+    "duration": 0,
+    "default_startTime": "performance.now()",
+    "explicit_startTime": "WebIDL DOMHighResTimeStamp; negative throws TypeError",
+    "buffer": "entry is queued and added to mark buffer"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "default mark",
+      "input": "performance.clearMarks(); const m=performance.mark('x'); console.log(m.name,m.entryType,m.duration);",
+      "expected_behavior": "prints x mark 0"
+    },
+    {
+      "name": "negative explicit time",
+      "input": "try{performance.mark('x',{startTime:-1})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

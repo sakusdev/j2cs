@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.mark-properties",
+  "category": "web_performance",
+  "summary": "Expose PerformanceMark invariants: entryType mark, duration zero, stored startTime, and cloned detail.",
+  "source": {
+    "pattern": "$mark /* PerformanceMark properties */",
+    "requirements": {
+      "receiver": "proven PerformanceMark representation",
+      "builtin_getters_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.MarkProperties($args)",
+    "helper": "WebPerformance.MarkProperties"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "entryType": "mark",
+    "duration": 0,
+    "startTime": "mark time",
+    "detail": "stored structured-cloned detail or null"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "mark invariants",
+      "input": "const m=performance.mark('x',{startTime:4}); console.log(m.entryType,m.startTime,m.duration);",
+      "expected_behavior": "prints mark 4 0"
+    },
+    {
+      "name": "default detail",
+      "input": "const m=performance.mark('x'); console.log(m.detail===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

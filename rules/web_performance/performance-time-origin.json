@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.time-origin",
+  "category": "web_performance",
+  "summary": "Read the epoch-related timestamp corresponding to the relevant global's performance time origin.",
+  "source": {
+    "pattern": "performance.timeOrigin",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_getter_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.TimeOrigin($args)",
+    "helper": "WebPerformance.TimeOrigin"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "DOMHighResTimeStamp Number",
+    "relationship": "performance.timeOrigin + performance.now() maps relative timestamps to the shared epoch timeline",
+    "clock": "derived from the shared monotonic clock and time origin",
+    "wall_clock_equivalence": "must not be assumed equal to Date.now()-performance.now()"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/2026/WD-hr-time-3-20260225/"
+  ],
+  "tests": [
+    {
+      "name": "finite time origin",
+      "input": "console.log(Number.isFinite(performance.timeOrigin));",
+      "expected_behavior": "prints true in Window/Worker environments exposing Performance"
+    },
+    {
+      "name": "stable getter",
+      "input": "console.log(performance.timeOrigin===performance.timeOrigin);",
+      "expected_behavior": "prints true for a given global"
+    }
+  ]
+}

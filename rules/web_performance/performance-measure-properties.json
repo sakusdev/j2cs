@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.measure-properties",
+  "category": "web_performance",
+  "summary": "Expose PerformanceMeasure invariants: entryType measure, computed startTime/duration, and cloned detail.",
+  "source": {
+    "pattern": "$measure /* PerformanceMeasure properties */",
+    "requirements": {
+      "receiver": "proven PerformanceMeasure representation",
+      "builtin_getters_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.MeasureProperties($args)",
+    "helper": "WebPerformance.MeasureProperties"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "entryType": "measure",
+    "startTime": "computed start timestamp",
+    "duration": "end-start",
+    "detail": "stored structured-cloned detail or null"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "measure invariants",
+      "input": "const m=performance.measure('m',{start:2,end:8}); console.log(m.entryType,m.startTime,m.duration);",
+      "expected_behavior": "prints measure 2 6"
+    },
+    {
+      "name": "default detail",
+      "input": "const m=performance.measure('m',{start:0,end:1}); console.log(m.detail===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

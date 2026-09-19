@@ -1,0 +1,43 @@
+{
+  "id": "web.performance.clock-coarsening",
+  "category": "web_performance",
+  "summary": "Preserve host-defined clock precision reduction and isolation-dependent timing resolution for high-resolution timestamps.",
+  "source": {
+    "pattern": "[[CoarsenPerformanceTime]]($timestamp)",
+    "requirements": {
+      "semantic_operation": "High Resolution Time coarsening",
+      "host_timing_policy_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.CoarsenTime($args)",
+    "helper": "JsRuntime.WebPerformance.CoarsenTime"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "resolution": "implementation/privacy-policy dependent",
+    "monotonicity": "coarsening must preserve required monotonic-clock semantics",
+    "cross_origin_isolation": "may affect exposed resolution",
+    "no_fixed_precision_assumption": true
+  },
+  "caveats": [
+    "Do not promise a specific timer resolution or map directly to DateTime.UtcNow."
+  ],
+  "references": [
+    "https://www.w3.org/TR/2026/WD-hr-time-3-20260225/"
+  ],
+  "tests": [
+    {
+      "name": "precision may be reduced",
+      "input": "const x=performance.now(); console.log(typeof x);",
+      "expected_behavior": "returns a Number; fractional precision is host-policy dependent"
+    },
+    {
+      "name": "do not hardcode microseconds",
+      "input": "console.log((performance.now()*1000)%1);",
+      "expected_behavior": "no portable fixed result; implementation may coarsen time"
+    }
+  ]
+}

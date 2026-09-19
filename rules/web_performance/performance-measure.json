@@ -1,0 +1,44 @@
+{
+  "id": "web.performance.measure",
+  "category": "web_performance",
+  "summary": "Create a measure from default/current time or named marks using User Timing mark-to-timestamp rules.",
+  "source": {
+    "pattern": "performance.measure($name, $startMark?, $endMark?)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "second_argument_not_options_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.MeasureLegacy($args)",
+    "helper": "WebPerformance.MeasureLegacy"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "PerformanceMeasure",
+    "default_start": 0,
+    "default_end": "performance.now()",
+    "string_arguments": "resolve named marks via convert-a-mark-to-a-timestamp",
+    "missing_mark": "SyntaxError",
+    "duration": "end-start and may be negative"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "between marks",
+      "input": "performance.clearMarks(); performance.mark('a',{startTime:2}); performance.mark('b',{startTime:5}); const m=performance.measure('m','a','b'); console.log(m.startTime,m.duration);",
+      "expected_behavior": "prints 2 3"
+    },
+    {
+      "name": "missing named mark",
+      "input": "try{performance.measure('m','missing')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints SyntaxError"
+    }
+  ]
+}

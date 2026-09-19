@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.clear-measures",
+  "category": "web_performance",
+  "summary": "Remove all measures or all measures matching the optional name without removing marks or other entries.",
+  "source": {
+    "pattern": "performance.clearMeasures($name?)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ClearMeasures($args)",
+    "helper": "WebPerformance.ClearMeasures"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "omitted_name": "remove all PerformanceMeasure entries",
+    "provided_name": "remove measures with matching name",
+    "other_entry_types": "unchanged"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "named clear measure",
+      "input": "performance.clearMeasures(); performance.measure('a',{start:0,end:1}); performance.measure('b',{start:0,end:1}); performance.clearMeasures('a'); console.log(performance.getEntriesByName('a','measure').length,performance.getEntriesByName('b','measure').length);",
+      "expected_behavior": "prints 0 1"
+    },
+    {
+      "name": "marks remain",
+      "input": "performance.mark('k'); performance.measure('m',{start:0,end:1}); performance.clearMeasures(); console.log(performance.getEntriesByName('k','mark').length);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

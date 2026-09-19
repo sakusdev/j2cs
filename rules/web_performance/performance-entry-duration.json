@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.entry-duration",
+  "category": "web_performance",
+  "summary": "Compute PerformanceEntry.duration from its internal end time, returning zero when the end time is zero.",
+  "source": {
+    "pattern": "$entry.duration",
+    "requirements": {
+      "receiver": "proven PerformanceEntry representation",
+      "builtin_getter_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.EntryDuration($args)",
+    "helper": "WebPerformance.EntryDuration"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "end_time_zero": "duration 0",
+    "otherwise": "endTime-startTime",
+    "negative": "possible where defining specification permits it"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/",
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "mark duration zero",
+      "input": "const e=performance.mark('x',{startTime:3}); console.log(e.duration);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "measure may be negative",
+      "input": "const e=performance.measure('m',{start:5,end:2}); console.log(e.duration);",
+      "expected_behavior": "prints -3"
+    }
+  ]
+}

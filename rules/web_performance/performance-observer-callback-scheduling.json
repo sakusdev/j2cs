@@ -1,0 +1,44 @@
+{
+  "id": "web.performance-observer.callback-scheduling",
+  "category": "web_performance",
+  "summary": "Queue the spec-defined PerformanceObserver task and invoke interested observers asynchronously with drained entry lists.",
+  "source": {
+    "pattern": "[[QueuePerformanceObserverTask]]($global)",
+    "requirements": {
+      "semantic_operation": "Performance Timeline queue PerformanceObserver task",
+      "relevant_global_known": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.QueueObserverTask($args)",
+    "helper": "JsRuntime.WebPerformance.QueueObserverTask"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scheduling": "host task, not synchronous callback",
+    "coalescing": "uses global task-queued flag",
+    "delivery": "copies and empties observer buffer before callback",
+    "callback_arguments": "entry list, observer, callback options",
+    "callback_throw": "reported by host without restoring drained buffer"
+  },
+  "caveats": [
+    "Do not lower observer delivery to direct delegate invocation."
+  ],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "callback later than mark call",
+      "input": "let order=[]; const o=new PerformanceObserver(()=>order.push('cb')); o.observe({type:'mark'}); performance.mark('x'); order.push('sync'); setTimeout(()=>console.log(order[0]),0);",
+      "expected_behavior": "first ordering element is sync"
+    },
+    {
+      "name": "queued entries may batch",
+      "input": "const o=new PerformanceObserver(l=>console.log(l.getEntries().length)); o.observe({type:'mark'}); performance.mark('a'); performance.mark('b');",
+      "expected_behavior": "delivery can batch queued entries rather than synchronously invoking once per mark"
+    }
+  ]
+}

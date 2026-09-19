@@ -1,0 +1,42 @@
+{
+  "id": "web.performance.measure-options-invalid",
+  "category": "web_performance",
+  "summary": "Throw TypeError for structurally invalid PerformanceMeasureOptions combinations before creating or buffering an entry.",
+  "source": {
+    "pattern": "performance.measure($name,$options,$endMark?)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "options_object_form": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ValidateMeasureOptions($args)",
+    "helper": "WebPerformance.ValidateMeasureOptions"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "endMark_with_options": "TypeError",
+    "start_end_both_omitted_with_nonempty_options": "TypeError",
+    "start_duration_end_all_present": "TypeError",
+    "no_entry_on_failure": true
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "all three timing members",
+      "input": "try{performance.measure('m',{start:1,duration:2,end:3})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "options plus third argument",
+      "input": "try{performance.measure('m',{start:1,end:2},'x')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.performance.entry-properties",
+  "category": "web_performance",
+  "summary": "Expose initialized PerformanceEntry name, entryType, startTime, id, and navigationId through the host representation.",
+  "source": {
+    "pattern": "$entry.name /* entryType/startTime/id/navigationId */",
+    "requirements": {
+      "receiver": "proven PerformanceEntry representation",
+      "builtin_getters_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.EntryProperties($args)",
+    "helper": "WebPerformance.EntryProperties"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "name": "initialized DOMString",
+    "entryType": "registered entry type",
+    "startTime": "initialized DOMHighResTimeStamp",
+    "id": "initialized unsigned identifier",
+    "navigationId": "initialized navigation identifier"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/",
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "mark base properties",
+      "input": "const e=performance.mark('x',{startTime:7}); console.log(e.name,e.entryType,e.startTime);",
+      "expected_behavior": "prints x mark 7"
+    },
+    {
+      "name": "name need not be unique",
+      "input": "const a=performance.mark('x'); const b=performance.mark('x'); console.log(a.name===b.name);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

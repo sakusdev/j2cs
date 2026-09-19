@@ -1,0 +1,42 @@
+{
+  "id": "web.performance.measure-options-start-end",
+  "category": "web_performance",
+  "summary": "Create a PerformanceMeasure from options.start and options.end, each accepting a named mark or numeric timestamp.",
+  "source": {
+    "pattern": "performance.measure($name,{start:$start,end:$end})",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "detail_absent_or_null": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.MeasureStartEnd($args)",
+    "helper": "WebPerformance.MeasureStartEnd"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "start": "convert a mark to timestamp",
+    "end": "convert a mark to timestamp",
+    "duration": "end-start; negative is allowed",
+    "return": "PerformanceMeasure"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "numeric start/end",
+      "input": "const m=performance.measure('m',{start:10,end:4}); console.log(m.startTime,m.duration);",
+      "expected_behavior": "prints 10 -6"
+    },
+    {
+      "name": "named start numeric end",
+      "input": "performance.mark('a',{startTime:2}); const m=performance.measure('m',{start:'a',end:7}); console.log(m.startTime,m.duration);",
+      "expected_behavior": "prints 2 5"
+    }
+  ]
+}

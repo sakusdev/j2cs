@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.get-entries",
+  "category": "web_performance",
+  "summary": "Return timeline-visible buffered entries sorted chronologically by startTime.",
+  "source": {
+    "pattern": "performance.getEntries()",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.GetEntries($args)",
+    "helper": "WebPerformance.GetEntries"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "new sequence/array of timeline-visible PerformanceEntry objects",
+    "filter": "all availableFromTimeline entry types",
+    "ordering": "chronological by startTime",
+    "buffer_mutation": "none"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "chronological order",
+      "input": "performance.clearMarks(); performance.mark('b',{startTime:5}); performance.mark('a',{startTime:1}); console.log(performance.getEntriesByType('mark').map(x=>x.name).join(','));",
+      "expected_behavior": "prints a,b"
+    },
+    {
+      "name": "array mutation does not clear timeline",
+      "input": "performance.clearMarks(); performance.mark('x'); const a=performance.getEntries(); a.length=0; console.log(performance.getEntriesByName('x').length);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}
