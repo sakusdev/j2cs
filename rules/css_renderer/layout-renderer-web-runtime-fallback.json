@@ -1,0 +1,48 @@
+{
+  "id": "layout.renderer-web-runtime-fallback",
+  "category": "css_renderer",
+  "summary": "Retained web-runtime rendering is required when observable CSS/layout behavior exceeds the native renderer's proven compatibility profile.",
+  "source": {
+    "pattern": "[[CssRendererFallback]]($operation)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "native_renderer_equivalence_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "fallback": "retained browser/web renderer runtime",
+    "preserve": [
+      "CSS parser",
+      "cascade",
+      "layout",
+      "scrollbars",
+      "quirks mode",
+      "shadow/flat tree",
+      "font/intrinsic sizing as applicable"
+    ]
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "complex CSS feature outside native profile",
+      "expected_behavior": "operation is delegated to compatibility runtime"
+    },
+    {
+      "name": "edge",
+      "input": "layout-dependent metric affected by unsupported feature",
+      "expected_behavior": "no guessed C# geometry result is emitted"
+    }
+  ]
+}

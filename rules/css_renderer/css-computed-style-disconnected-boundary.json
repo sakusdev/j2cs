@@ -1,0 +1,39 @@
+{
+  "id": "css.computed-style.disconnected-boundary",
+  "category": "css_renderer",
+  "summary": "Computed declarations are populated only when CSSOM's connected/flat-tree/rendering conditions hold.",
+  "source": {
+    "pattern": "getComputedStyle($element) when element is disconnected or not in rendered browsing context",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "failed_conditions": "declaration list is empty under CSSOM algorithm",
+    "renderer_context": "must not invent used layout values for an unrendered node"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); document.body.append(e); console.log(typeof getComputedStyle(e).display);",
+      "expected_behavior": "connected rendered element receives resolved declarations"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); console.log(getComputedStyle(e).getPropertyValue('display'));",
+      "expected_behavior": "do not assume normal rendered display value for a detached element"
+    }
+  ]
+}

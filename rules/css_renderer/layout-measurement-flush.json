@@ -1,0 +1,41 @@
+{
+  "id": "layout.measurement-flush",
+  "category": "css_renderer",
+  "summary": "A synchronous resolved-style or layout metric read must observe all prior relevant DOM/style mutations, requiring style/layout update when dirty.",
+  "source": {
+    "pattern": "[[EnsureLayoutUpToDateForRead]]($document,$metric)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "native_renderer_or_retained_web_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "all prior synchronous mutations are visible",
+    "flush": "style/layout work may be forced before return",
+    "implementation": "may avoid work if dependency analysis proves clean"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.style.width='20px'; const w=element.offsetWidth",
+      "expected_behavior": "w reflects width mutation in the same script turn"
+    },
+    {
+      "name": "edge",
+      "input": "class change followed immediately by clientWidth",
+      "expected_behavior": "read cannot return stale pre-class-change geometry"
+    }
+  ]
+}

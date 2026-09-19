@@ -1,0 +1,40 @@
+{
+  "id": "css.style.remove-property",
+  "category": "css_renderer",
+  "summary": "removeProperty removes a declaration and returns its prior serialized value.",
+  "source": {
+    "pattern": "$declaration.removeProperty($property)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "previous getPropertyValue result",
+    "mutation": "remove matching declaration",
+    "missing": "returns empty string"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.color='red'; console.log(e.style.removeProperty('color'),e.style.color==='');",
+      "expected_behavior": "returns prior value then removes it"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); console.log(e.style.removeProperty('color')==='');",
+      "expected_behavior": "missing property returns empty string"
+    }
+  ]
+}

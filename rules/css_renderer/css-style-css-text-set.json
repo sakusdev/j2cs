@@ -1,0 +1,41 @@
+{
+  "id": "css.style.css-text.set",
+  "category": "css_renderer",
+  "summary": "Setting cssText reparses the declaration block and replaces its declarations.",
+  "source": {
+    "pattern": "$declaration.cssText = $text",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "CSSOMString",
+    "parse": "parse a CSS declaration block",
+    "replacement": "replace existing declarations with parsed declarations",
+    "update": "update associated inline style/rule state"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.cssText='color:red'; e.style.cssText='width:1px'; console.log(e.style.color,e.style.width);",
+      "expected_behavior": "old color declaration is replaced; width remains"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.cssText='color:???'; console.log(e.style.color);",
+      "expected_behavior": "invalid declaration content is discarded by CSS parsing rather than stored verbatim"
+    }
+  ]
+}

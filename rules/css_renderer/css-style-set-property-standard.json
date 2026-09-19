@@ -1,0 +1,41 @@
+{
+  "id": "css.style.set-property-standard",
+  "category": "css_renderer",
+  "summary": "setProperty parses and sets a supported standard CSS property using canonical lowercase naming.",
+  "source": {
+    "pattern": "$declaration.setProperty($property,$value,$priority?)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "standard_property": "ASCII lowercase",
+    "unsupported": "no-op",
+    "parse": "property-specific CSS parser",
+    "return": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); console.log(e.style.setProperty('COLOR','red'),e.style.color);",
+      "expected_behavior": "returns undefined and stores color"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.setProperty('definitely-not-css','x'); console.log(e.style.length);",
+      "expected_behavior": "unsupported standard name is a no-op"
+    }
+  ]
+}

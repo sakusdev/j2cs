@@ -1,0 +1,42 @@
+{
+  "id": "layout.metric.client-border-offset",
+  "category": "css_renderer",
+  "summary": "Abstract clientTop/clientLeft metric combines unscaled border width with scrollbar between padding and border edges, ignoring transforms.",
+  "source": {
+    "pattern": "[[LayoutClientBorderOffset]]($element,$axis)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "no_box_or_inline": "0",
+    "ordinary": "unscaled top/left border width plus intervening scrollbar size",
+    "transforms": "ignored"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.clientTop / element.clientLeft",
+      "expected_behavior": "DOM getter can delegate to renderer border/scrollbar metric"
+    },
+    {
+      "name": "edge",
+      "input": "transformedElement.clientTop",
+      "expected_behavior": "transform does not alter this unscaled metric"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "css.style.readonly-mutation-error",
+  "category": "css_renderer",
+  "summary": "Mutation of a readonly CSS declaration block throws NoModificationAllowedError before property/value work.",
+  "source": {
+    "pattern": "mutation of readonly CSSStyleDeclaration",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "error": "NoModificationAllowedError DOMException",
+    "ordering": "readonly check precedes normal mutation algorithm"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const cs=getComputedStyle(document.documentElement); try{cs.setProperty('color','red')}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws NoModificationAllowedError"
+    },
+    {
+      "name": "edge",
+      "input": "const cs=getComputedStyle(document.documentElement); try{cs.setProperty('fake-property','','bogus')}catch(e){console.log(e.name)}",
+      "expected_behavior": "readonly failure is not bypassed by unsupported/empty inputs"
+    }
+  ]
+}

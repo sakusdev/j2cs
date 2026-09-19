@@ -1,0 +1,40 @@
+{
+  "id": "layout.metric.transforms-unscaled",
+  "category": "css_renderer",
+  "summary": "CSSOM View client/offset metrics use unscaled geometry and explicitly ignore transforms where their algorithms say so.",
+  "source": {
+    "pattern": "[[LayoutUnscaledMetric]]($element)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "transform": "must not be applied to clientTop/clientLeft/clientWidth/clientHeight/offset metrics covered here",
+    "zoom": "effective zoom/unscaled rules remain distinct"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element with transform:scale(2) then clientWidth",
+      "expected_behavior": "client metric is based on unscaled padding geometry"
+    },
+    {
+      "name": "edge",
+      "input": "element with rotated transform then offsetWidth",
+      "expected_behavior": "do not substitute transformed getBoundingClientRect width"
+    }
+  ]
+}

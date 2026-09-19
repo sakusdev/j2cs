@@ -1,0 +1,40 @@
+{
+  "id": "css.style.css-float-alias",
+  "category": "css_renderer",
+  "summary": "cssFloat is an IDL alias for get/set of the CSS float property.",
+  "source": {
+    "pattern": "$style.cssFloat",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "get": "getPropertyValue('float')",
+    "set": "setProperty('float', value) with no priority",
+    "null": "LegacyNullToEmptyString on setter"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.cssFloat='left'; console.log(e.style.getPropertyValue('float'));",
+      "expected_behavior": "returns left"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.cssFloat='left'; e.style.cssFloat=null; console.log(e.style.cssFloat==='');",
+      "expected_behavior": "null becomes empty and removes the declaration"
+    }
+  ]
+}

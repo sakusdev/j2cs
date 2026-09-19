@@ -1,0 +1,39 @@
+{
+  "id": "css.style.length",
+  "category": "css_renderer",
+  "summary": "CSSStyleDeclaration.length is the current declaration count.",
+  "source": {
+    "pattern": "$declaration.length",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "unsigned long count of declarations",
+    "live": true
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.cssText='color:red;width:1px'; console.log(e.style.length);",
+      "expected_behavior": "returns 2"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.color='red'; e.style.removeProperty('color'); console.log(e.style.length);",
+      "expected_behavior": "live count becomes 0"
+    }
+  ]
+}

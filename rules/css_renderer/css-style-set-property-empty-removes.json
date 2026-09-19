@@ -1,0 +1,39 @@
+{
+  "id": "css.style.set-property-empty-removes",
+  "category": "css_renderer",
+  "summary": "An empty setProperty value removes the property before invalid-priority rejection is considered.",
+  "source": {
+    "pattern": "$declaration.setProperty($property,'',$priority?)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "operation": "invoke removeProperty and return",
+    "ordering": "empty value branch precedes priority validation"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.color='red'; e.style.setProperty('color',''); console.log(e.style.color==='');",
+      "expected_behavior": "property is removed"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.color='red'; e.style.setProperty('color','','bogus'); console.log(e.style.color==='');",
+      "expected_behavior": "empty value removes even with otherwise-invalid priority"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "css.computed-style.origin-clean-boundary",
+  "category": "css_renderer",
+  "summary": "getComputedStyle resolution is not equivalent to reading cssRules and has CSSOM-defined exposure even when stylesheet origin-clean differs.",
+  "source": {
+    "pattern": "getComputedStyle($element) with styles from stylesheets",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cssRules_security": "stylesheet cssRules has origin-clean SecurityError rules",
+    "computed_style": "resolved values are exposed through its own CSSOM algorithm",
+    "ownership": "do not implement by enumerating cross-origin cssRules"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "getComputedStyle(document.documentElement).color",
+      "expected_behavior": "computed style is obtained from style engine"
+    },
+    {
+      "name": "edge",
+      "input": "cross-origin stylesheet contributes to cascade",
+      "expected_behavior": "implementation must not require script-readable cssRules to compute resolved style"
+    }
+  ]
+}

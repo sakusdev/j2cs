@@ -1,0 +1,40 @@
+{
+  "id": "css.computed-style.custom-properties",
+  "category": "css_renderer",
+  "summary": "Computed style includes custom properties whose computed value is not the guaranteed-invalid value.",
+  "source": {
+    "pattern": "getComputedStyle($element).getPropertyValue('--$name')",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inclusion": "computed custom properties except guaranteed-invalid",
+    "name": "case-sensitive",
+    "inheritance": "CSS custom-property computation applies"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.setProperty('--x','7px'); document.body.append(e); console.log(getComputedStyle(e).getPropertyValue('--x'));",
+      "expected_behavior": "returns computed custom property value"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); document.body.append(e); console.log(getComputedStyle(e).getPropertyValue('--missing')==='');",
+      "expected_behavior": "missing/guaranteed-invalid custom property is not exposed as an invented value"
+    }
+  ]
+}

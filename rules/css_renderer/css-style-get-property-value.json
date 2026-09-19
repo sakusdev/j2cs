@@ -1,0 +1,41 @@
+{
+  "id": "css.style.get-property-value",
+  "category": "css_renderer",
+  "summary": "getPropertyValue lowercases standard property names, preserves custom-property case, and serializes the declaration value.",
+  "source": {
+    "pattern": "$declaration.getPropertyValue($property)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "standard_name": "ASCII lowercase before lookup",
+    "custom_name": "case-sensitive",
+    "missing": "empty string",
+    "value": "CSS serialization"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.setProperty('COLOR','red'); console.log(e.style.getPropertyValue('color'));",
+      "expected_behavior": "returns serialized red"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); console.log(e.style.getPropertyValue('not-a-supported-property')==='');",
+      "expected_behavior": "missing/unsupported property returns empty string"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "layout.metric.client-root-quirks",
+  "category": "css_renderer",
+  "summary": "Client-size renderer metric special-cases root in standards mode and body in quirks mode to viewport size excluding scrollbars.",
+  "source": {
+    "pattern": "[[LayoutClientSize]]($rootOrBody)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "standards_root": "viewport dimension excluding rendered scrollbar",
+    "quirks_body": "viewport dimension excluding rendered scrollbar",
+    "mode": "document quirks state is observable"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "document.documentElement.clientWidth",
+      "expected_behavior": "in standards mode reflects viewport width excluding scrollbar"
+    },
+    {
+      "name": "edge",
+      "input": "document.body.clientWidth in quirks document",
+      "expected_behavior": "quirks body takes viewport-special path"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "css.computed-style.pseudo",
+  "category": "css_renderer",
+  "summary": "getComputedStyle may target a parsed supported pseudo-element while invalid/unsupported pseudo parsing follows CSSOM behavior.",
+  "source": {
+    "pattern": "getComputedStyle($element,$pseudo)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "parse": "pseudo-element selector parsing",
+    "valid": "resolve pseudo-element style",
+    "unsupported_special": "::slotted()/::part() do not yield an ordinary target declaration",
+    "single_colon": "legacy CSS2 pseudo spellings may parse"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "getComputedStyle(document.body,'::before')",
+      "expected_behavior": "returns a CSSStyleProperties object for the pseudo-element target when applicable"
+    },
+    {
+      "name": "edge",
+      "input": "getComputedStyle(document.body,'::part(x)')",
+      "expected_behavior": "does not fabricate ordinary element style for a pseudo target CSSOM excludes"
+    }
+  ]
+}

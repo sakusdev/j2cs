@@ -1,0 +1,43 @@
+{
+  "id": "layout.metric.scroll-size",
+  "category": "css_renderer",
+  "summary": "Abstract scroll-size operation returns active-document scrolling-area width/height with CSSOM View box rules.",
+  "source": {
+    "pattern": "[[LayoutScrollSize]]($element,$axis)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inactive_document": "0",
+    "no_box": "0",
+    "ordinary": "scrolling area dimension",
+    "result": "integer"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.scrollWidth / element.scrollHeight",
+      "expected_behavior": "DOM getter delegates to renderer scrolling-area metric"
+    },
+    {
+      "name": "edge",
+      "input": "element in inactive document",
+      "expected_behavior": "metric returns 0"
+    }
+  ]
+}

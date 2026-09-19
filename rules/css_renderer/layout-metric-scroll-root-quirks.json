@@ -1,0 +1,41 @@
+{
+  "id": "layout.metric.scroll-root-quirks",
+  "category": "css_renderer",
+  "summary": "Scroll-size renderer metric special-cases standards root and quirks body using maximum scrolling-area/viewport dimensions.",
+  "source": {
+    "pattern": "[[LayoutScrollSize]]($rootOrBody,$axis)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "standards_root": "max viewport scrolling-area dimension and viewport dimension",
+    "quirks_body_when_not_potentially_scrollable": "same viewport-max behavior"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "document.documentElement.scrollWidth",
+      "expected_behavior": "standards root uses viewport/document scrolling-area max"
+    },
+    {
+      "name": "edge",
+      "input": "quirks body with non-scrollable axis",
+      "expected_behavior": "uses quirks body viewport-max special case"
+    }
+  ]
+}

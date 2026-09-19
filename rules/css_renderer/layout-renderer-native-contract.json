@@ -1,0 +1,42 @@
+{
+  "id": "layout.renderer-native-contract",
+  "category": "css_renderer",
+  "summary": "A native renderer may satisfy CSSOM/layout rules only when it exposes CSS parsing, cascade, box/layout and metric semantics compatible with the declared profile.",
+  "source": {
+    "pattern": "[[NativeCssRenderer]] operation",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "renderer_profile_proves_supported_css_subset": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Renderer",
+    "template": "NativeCss.Renderer($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "bridge": "NativeCss.Renderer",
+    "identity": "reuse NativeDom node identity",
+    "supported_subset": "explicitly declared",
+    "fallback": "unsupported CSS/features escape to runtime rather than approximation"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "supported property + supported layout model",
+      "expected_behavior": "native renderer helper may answer CSSOM-compatible style/metric operation"
+    },
+    {
+      "name": "edge",
+      "input": "unsupported layout feature",
+      "expected_behavior": "must fall back instead of silently approximating browser behavior"
+    }
+  ]
+}

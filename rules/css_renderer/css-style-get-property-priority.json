@@ -1,0 +1,41 @@
+{
+  "id": "css.style.get-property-priority",
+  "category": "css_renderer",
+  "summary": "getPropertyPriority reports important or empty string using CSSOM property-name rules.",
+  "source": {
+    "pattern": "$declaration.getPropertyPriority($property)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "important": "returns 'important'",
+    "otherwise": "empty string",
+    "standard_name": "ASCII lowercase",
+    "custom_name": "case-sensitive"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.setProperty('color','red','IMPORTANT'); console.log(e.style.getPropertyPriority('color'));",
+      "expected_behavior": "returns important"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.color='red'; console.log(e.style.getPropertyPriority('color')==='');",
+      "expected_behavior": "non-important returns empty string"
+    }
+  ]
+}

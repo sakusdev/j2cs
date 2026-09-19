@@ -1,0 +1,43 @@
+{
+  "id": "layout.metric.client-size",
+  "category": "css_renderer",
+  "summary": "Abstract renderer client-size operation computes unscaled padding-edge dimensions minus rendered scrollbar and ignores transforms.",
+  "source": {
+    "pattern": "[[LayoutClientSize]]($element)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "no_box_or_inline": "0 per axis",
+    "ordinary": "unscaled padding edge minus relevant scrollbar",
+    "transforms": "ignored",
+    "result": "integer CSSOM View metric"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.clientWidth / element.clientHeight",
+      "expected_behavior": "DOM getter can delegate to this renderer metric"
+    },
+    {
+      "name": "edge",
+      "input": "inlineElement.clientWidth",
+      "expected_behavior": "renderer metric returns 0 for an inline box per CSSOM View"
+    }
+  ]
+}

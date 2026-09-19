@@ -1,0 +1,41 @@
+{
+  "id": "layout.style-invalidation",
+  "category": "css_renderer",
+  "summary": "CSS declaration changes mark affected computed-style state dirty according to cascade dependencies.",
+  "source": {
+    "pattern": "[[InvalidateStyle]]($mutation)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "native_renderer_or_retained_web_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "affected element/subtree/rule matches determined by style engine",
+    "lazy_or_eager": "implementation choice until observable read/render",
+    "correctness": "next observable style result must include mutation"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.style.color='red'; getComputedStyle(element).color",
+      "expected_behavior": "computed read reflects mutation"
+    },
+    {
+      "name": "edge",
+      "input": "ancestor custom property changes",
+      "expected_behavior": "descendant inherited/custom-property-dependent style can require invalidation"
+    }
+  ]
+}

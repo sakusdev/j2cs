@@ -1,0 +1,43 @@
+{
+  "id": "layout.metric.offset-size",
+  "category": "css_renderer",
+  "summary": "Abstract offsetWidth/offsetHeight metric uses unscaled axis-aligned border-box bounds of generated fragments and ignores transforms.",
+  "source": {
+    "pattern": "[[LayoutOffsetSize]]($element,$axis)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "no_box": "0",
+    "fragments": "axis-aligned bounding box of border boxes for principal/inline fragments as CSSOM View specifies",
+    "transforms": "ignored",
+    "result": "integer"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.offsetWidth / element.offsetHeight",
+      "expected_behavior": "DOM getter can delegate to unscaled border-box renderer metric"
+    },
+    {
+      "name": "edge",
+      "input": "element with transform:scale(2)",
+      "expected_behavior": "transform does not simply double offset metric"
+    }
+  ]
+}

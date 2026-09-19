@@ -1,0 +1,39 @@
+{
+  "id": "css.style.remove-property-shorthand",
+  "category": "css_renderer",
+  "summary": "removeProperty on a shorthand removes all mapped longhand declarations and returns the pre-removal shorthand serialization.",
+  "source": {
+    "pattern": "$declaration.removeProperty($shorthand)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "pre-removal getPropertyValue(shorthand)",
+    "mutation": "remove mapped longhands present"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.margin='1px'; console.log(e.style.removeProperty('margin'),e.style.marginTop==='');",
+      "expected_behavior": "returns prior shorthand and removes mapped longhands"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.marginTop='1px'; console.log(e.style.removeProperty('margin'));",
+      "expected_behavior": "return can be empty when a serializable complete shorthand did not exist, while present mapped longhands are still removed"
+    }
+  ]
+}

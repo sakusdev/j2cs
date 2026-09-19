@@ -1,0 +1,48 @@
+{
+  "id": "layout.pixel-perfect-browser-boundary",
+  "category": "css_renderer",
+  "summary": "Do not promise pixel-identical browser layout from a generic C# lowering without an explicit renderer/version/font/platform compatibility profile.",
+  "source": {
+    "pattern": "require pixel-exact browser layout for arbitrary CSS/document",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "explicit_renderer_compatibility_profile": false
+    }
+  },
+  "target": {
+    "kind": "unsupported",
+    "notes": "Use a defined renderer compatibility runtime/profile when pixel-exact output is a requirement."
+  },
+  "strategy": "unsupported",
+  "confidence": "high",
+  "semantics": {
+    "portable_equivalence": "not established",
+    "dependencies": [
+      "CSS implementation",
+      "fonts",
+      "platform text shaping",
+      "viewport",
+      "scrollbars",
+      "device scale",
+      "browser version"
+    ],
+    "policy": "unsupported rather than false native claim"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom-view/",
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "arbitrary browser page rendered by an unspecified native UI toolkit",
+      "expected_behavior": "no generic semantics-preserving pixel-exact lowering is claimed"
+    },
+    {
+      "name": "edge",
+      "input": "same CSS across different installed fonts/platform text stacks",
+      "expected_behavior": "pixel geometry can legitimately differ without a pinned compatibility environment"
+    }
+  ]
+}
