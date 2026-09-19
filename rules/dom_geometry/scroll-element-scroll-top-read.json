@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-top-read",
+  "category": "dom_geometry",
+  "summary": "Read vertical scroll offset with CSSOM View special cases and current layout state.",
+  "source": {
+    "pattern": "$element.scrollTop",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetScrollTop($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "double CSS pixel offset",
+    "root": "special root/body viewport behavior",
+    "range": "can be fractional and engine/layout-direction dependent"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(typeof el.scrollTop);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "initial",
+      "input": "const e=document.createElement('div');console.log(e.scrollTop);",
+      "expected_behavior": "normally 0 before scrolling"
+    }
+  ]
+}

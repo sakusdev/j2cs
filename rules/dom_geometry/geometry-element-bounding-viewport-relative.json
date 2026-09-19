@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.bounding-viewport-relative",
+  "category": "dom_geometry",
+  "summary": "Return client rect coordinates relative to the viewport, so document scrolling can change x/y/top/left.",
+  "source": {
+    "pattern": "$element.getBoundingClientRect()",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetBoundingClientRect($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coordinate_space": "viewport",
+    "scroll": "document scroll offset affects reported client coordinates",
+    "document_coords": "caller must combine with scroll offsets if document-relative position is desired"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "viewport coordinates",
+      "input": "const r=el.getBoundingClientRect();",
+      "expected_behavior": "x/y are viewport-relative CSS pixels"
+    },
+    {
+      "name": "scroll sensitivity",
+      "input": "const y1=el.getBoundingClientRect().y;scrollBy(0,10);const y2=el.getBoundingClientRect().y;",
+      "expected_behavior": "y can change with viewport scroll"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.offset-parent",
+  "category": "dom_geometry",
+  "summary": "Resolve offsetParent using CSSOM View containing-block/positioning rules.",
+  "source": {
+    "pattern": "$element.offsetParent",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetOffsetParent($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "Element or null",
+    "layout": "depends on positioning/layout/tree/zoom rules",
+    "identity": "returns actual DOM element identity"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "nullable",
+      "input": "const p=el.offsetParent;console.log(p===null||p instanceof Element);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "not DOM parent alias",
+      "input": "console.log(el.offsetParent===el.parentElement);",
+      "expected_behavior": "not guaranteed"
+    }
+  ]
+}

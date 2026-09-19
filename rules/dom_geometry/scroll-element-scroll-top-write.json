@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-top-write",
+  "category": "dom_geometry",
+  "summary": "Set vertical scroll position through scrolling algorithm rather than mutating a plain field.",
+  "source": {
+    "pattern": "$element.scrollTop = $value",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.SetScrollTop($element,$value)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "unrestricted double semantics",
+    "effect": "invokes element/document scrolling behavior",
+    "clamping": "actual reachable offset determined by scrollable area/layout"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "write",
+      "input": "el.scrollTop=10;console.log(typeof el.scrollTop);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "non-scrollable",
+      "input": "const e=document.createElement('div');e.scrollTop=10;console.log(e.scrollTop);",
+      "expected_behavior": "may remain 0 without scrollable box"
+    }
+  ]
+}

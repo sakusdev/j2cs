@@ -1,0 +1,40 @@
+{
+  "id": "dom.geometry.element.bounding-transforms",
+  "category": "dom_geometry",
+  "summary": "Include CSS transforms in client rect geometry according to renderer rules.",
+  "source": {
+    "pattern": "$element.getBoundingClientRect() with transforms",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetBoundingClientRect($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "layout_renderer": "transform matrices affect returned geometry",
+    "not_layout_size_alias": "cannot substitute raw style width/height"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "transform",
+      "input": "el.style.transform='translateX(10px)';const r=el.getBoundingClientRect();",
+      "expected_behavior": "reported position reflects transform"
+    },
+    {
+      "name": "scale",
+      "input": "el.style.transform='scale(2)';const r=el.getBoundingClientRect();",
+      "expected_behavior": "reported bounding dimensions can reflect transform"
+    }
+  ]
+}

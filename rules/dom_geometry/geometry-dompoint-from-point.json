@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.dompoint.from-point",
+  "category": "dom_geometry",
+  "summary": "Create a fresh DOMPoint from DOMPointInit.",
+  "source": {
+    "pattern": "DOMPoint.fromPoint($init?)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.PointFromInit($init)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.PointFromInit"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "dictionary": "defaults as DOMPointInit",
+    "return_value": "fresh point",
+    "copy": "coordinates copied"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "partial",
+      "input": "const p=DOMPoint.fromPoint({x:2});console.log(p.x,p.y,p.z,p.w);",
+      "expected_behavior": "prints 2 0 0 1"
+    },
+    {
+      "name": "fresh",
+      "input": "const a=new DOMPoint(1,2),b=DOMPoint.fromPoint(a);console.log(a!==b,b.x);",
+      "expected_behavior": "prints true 1"
+    }
+  ]
+}

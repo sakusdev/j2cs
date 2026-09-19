@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-to",
+  "category": "dom_geometry",
+  "summary": "Treat scrollTo as CSSOM View absolute scrolling API with same overload semantics as scroll.",
+  "source": {
+    "pattern": "$element.scrollTo($arg1,$arg2?)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.ScrollToOverload($element,$arg1,$arg2)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "absolute": "not relative",
+    "overloads": "numeric pair or options dictionary",
+    "layout": "renderer/scroll container runtime"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "numeric",
+      "input": "el.scrollTo(1,2);",
+      "expected_behavior": "targets absolute 1,2"
+    },
+    {
+      "name": "options",
+      "input": "el.scrollTo({left:3,top:4});",
+      "expected_behavior": "targets supplied absolute coordinates"
+    }
+  ]
+}

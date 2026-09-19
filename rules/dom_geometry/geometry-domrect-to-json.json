@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.domrect.to-json",
+  "category": "dom_geometry",
+  "summary": "Serialize DOMRect geometry fields through toJSON without exposing renderer internals.",
+  "source": {
+    "pattern": "$rect.toJSON()",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.RectToJson($rect)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.RectToJson"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "plain object containing x,y,width,height,top,right,bottom,left",
+    "snapshot": "values copied at call time"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "keys",
+      "input": "const o=new DOMRect(1,2,3,4).toJSON();console.log(o.x,o.right,o.bottom);",
+      "expected_behavior": "prints 1 4 6"
+    },
+    {
+      "name": "plain object",
+      "input": "const o=new DOMRect().toJSON();console.log(o instanceof DOMRect);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

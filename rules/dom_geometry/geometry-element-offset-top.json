@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.offset-top",
+  "category": "dom_geometry",
+  "summary": "Measure offsetTop using CSSOM View offset-parent coordinate rules.",
+  "source": {
+    "pattern": "$element.offsetTop",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetOffsetTop($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "units": "CSS pixels",
+    "layout": "renderer-derived",
+    "coordinate_space": "relative to offset parent algorithm, not viewport"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(typeof el.offsetTop);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "not rect top alias",
+      "input": "console.log(el.offsetTop===el.getBoundingClientRect().top);",
+      "expected_behavior": "not guaranteed"
+    }
+  ]
+}

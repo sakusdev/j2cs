@@ -1,0 +1,43 @@
+{
+  "id": "dom.scroll.element.scroll-into-view-boolean",
+  "category": "dom_geometry",
+  "summary": "Preserve legacy boolean scrollIntoView alignment mapping.",
+  "source": {
+    "pattern": "$element.scrollIntoView($boolean)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.ScrollIntoViewLegacy($element,$boolean)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "true": "block start",
+    "false": "block end",
+    "inline": "nearest",
+    "behavior": "auto",
+    "ancestors": "scroll relevant ancestor boxes per algorithm"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "true",
+      "input": "el.scrollIntoView(true);",
+      "expected_behavior": "uses block:start legacy mapping"
+    },
+    {
+      "name": "false",
+      "input": "el.scrollIntoView(false);",
+      "expected_behavior": "uses block:end legacy mapping"
+    }
+  ]
+}

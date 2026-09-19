@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.element.get-client-rects",
+  "category": "dom_geometry",
+  "summary": "Return a fresh DOMRectList snapshot for element CSS boxes.",
+  "source": {
+    "pattern": "$element.getClientRects()",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetClientRects($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "layout": "requires current renderer box tree",
+    "return_value": "DOMRectList snapshot",
+    "fragments": "can contain multiple rects for fragmented/inline layout",
+    "transforms": "coordinates reflect applicable transforms"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "list-like",
+      "input": "const rs=el.getClientRects();console.log(typeof rs.length);",
+      "expected_behavior": "length is numeric in browser DOM"
+    },
+    {
+      "name": "fresh layout snapshot",
+      "input": "const a=el.getClientRects(),b=el.getClientRects();",
+      "expected_behavior": "results describe layout at each call and are not a live list"
+    }
+  ]
+}

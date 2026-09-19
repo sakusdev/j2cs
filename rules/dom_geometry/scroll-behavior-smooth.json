@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.behavior-smooth",
+  "category": "dom_geometry",
+  "summary": "Treat smooth scrolling as asynchronous renderer animation/state, not immediate coordinate assignment.",
+  "source": {
+    "pattern": "$scrollApi({behavior:\"smooth\",...})",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.SmoothScroll($target,$options)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timing": "scroll position changes over time/renderer frames",
+    "events": "scroll/scrollend delivery belongs renderer/event integration",
+    "cancellation": "new scroll/user input may alter animation"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "not immediate assumption",
+      "input": "el.scrollTo({top:100,behavior:'smooth'});const now=el.scrollTop;",
+      "expected_behavior": "must not require now===100 immediately"
+    },
+    {
+      "name": "host animation",
+      "input": "el.scrollIntoView({behavior:'smooth'});",
+      "expected_behavior": "renderer controls animation timing"
+    }
+  ]
+}

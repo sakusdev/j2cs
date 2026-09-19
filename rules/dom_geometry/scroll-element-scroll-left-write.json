@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-left-write",
+  "category": "dom_geometry",
+  "summary": "Set horizontal scroll position via CSSOM View scrolling algorithm.",
+  "source": {
+    "pattern": "$element.scrollLeft = $value",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.SetScrollLeft($element,$value)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "unrestricted double",
+    "effect": "scroll operation",
+    "clamping": "layout determines reachable position"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "write",
+      "input": "el.scrollLeft=10;console.log(typeof el.scrollLeft);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "non-scrollable",
+      "input": "const e=document.createElement('div');e.scrollLeft=10;console.log(e.scrollLeft);",
+      "expected_behavior": "may remain 0"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.viewport.window-scroll-offset",
+  "category": "dom_geometry",
+  "summary": "Expose Window scrollX/scrollY (pageXOffset/pageYOffset aliases) from viewport scrolling state.",
+  "source": {
+    "pattern": "window.scrollX / window.scrollY",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetWindowScrollOffset()",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coordinates": "document scroll offset in CSS pixels",
+    "aliases": "pageXOffset/pageYOffset correspond to scrollX/scrollY",
+    "precision": "double"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "numbers",
+      "input": "console.log(typeof scrollX,typeof scrollY);",
+      "expected_behavior": "prints number number"
+    },
+    {
+      "name": "aliases",
+      "input": "console.log(scrollX===pageXOffset,scrollY===pageYOffset);",
+      "expected_behavior": "prints true true in browser Window"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.client-width",
+  "category": "dom_geometry",
+  "summary": "Return inner padding-box viewport width excluding borders/scrollbars per CSSOM View.",
+  "source": {
+    "pattern": "$element.clientWidth",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetClientWidth($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "integer": "CSS pixel integer",
+    "box": "client/padding box semantics",
+    "root_special_case": "viewport rules can apply to root/body depending mode"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "integer",
+      "input": "console.log(Number.isInteger(el.clientWidth));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "border distinction",
+      "input": "/* bordered box */ console.log(el.clientWidth<=el.offsetWidth);",
+      "expected_behavior": "typically true under ordinary box geometry"
+    }
+  ]
+}

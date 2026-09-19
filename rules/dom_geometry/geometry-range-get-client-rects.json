@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.range.get-client-rects",
+  "category": "dom_geometry",
+  "summary": "Return fragment rects for rendered Range contents.",
+  "source": {
+    "pattern": "$range.getClientRects()",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetRangeClientRects($range)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "layout": "aggregates rendered boxes for range contents",
+    "return_value": "DOMRectList snapshot",
+    "empty": "can be empty"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "list",
+      "input": "const rs=range.getClientRects();console.log(typeof rs.length);",
+      "expected_behavior": "prints number in browser DOM"
+    },
+    {
+      "name": "snapshot",
+      "input": "const a=range.getClientRects();",
+      "expected_behavior": "rect list is measurement result, not live layout binding"
+    }
+  ]
+}

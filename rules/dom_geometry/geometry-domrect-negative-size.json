@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.domrect.negative-size",
+  "category": "dom_geometry",
+  "summary": "Preserve negative width/height rather than normalizing stored dimensions.",
+  "source": {
+    "pattern": "new DOMRect($x,$y,$negativeWidth,$negativeHeight)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.CreateRect($x,$y,$negativeWidth,$negativeHeight)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.CreateRect"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "width": "stored exactly including negative",
+    "height": "stored exactly including negative",
+    "edges": "derived getters account for sign"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "negative retained",
+      "input": "const r=new DOMRect(0,0,-2,-3);console.log(r.width,r.height);",
+      "expected_behavior": "prints -2 -3"
+    },
+    {
+      "name": "edges adjusted",
+      "input": "const r=new DOMRect(5,6,-2,-3);console.log(r.left,r.top);",
+      "expected_behavior": "prints 3 3"
+    }
+  ]
+}

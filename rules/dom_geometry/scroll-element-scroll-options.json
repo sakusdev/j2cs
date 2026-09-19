@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-options",
+  "category": "dom_geometry",
+  "summary": "Scroll element using ScrollToOptions dictionary.",
+  "source": {
+    "pattern": "$element.scroll($options)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.ScrollOptions($element,$options)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "left_top": "optional absolute coordinates",
+    "behavior": "auto/instant/smooth profile behavior",
+    "dictionary": "missing members retain current axis position per scrolling algorithm"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "top only",
+      "input": "el.scroll({top:20});",
+      "expected_behavior": "updates vertical target while horizontal handling follows CSSOM View"
+    },
+    {
+      "name": "behavior",
+      "input": "el.scroll({top:0,behavior:'smooth'});",
+      "expected_behavior": "may animate according to scroll behavior/runtime"
+    }
+  ]
+}
