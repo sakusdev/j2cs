@@ -1,0 +1,44 @@
+{
+  "id": "iterator.from.iterator-like",
+  "category": "iterators",
+  "summary": "Wrap an iterator-like object that has next but no Symbol.iterator.",
+  "source": {
+    "pattern": "Iterator.from($iteratorLike)",
+    "requirements": {
+      "global_iterator_binding_builtin": true,
+      "argument_is_object": true,
+      "symbol_iterator_method_absent": true,
+      "next_property_callable_at_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IteratorFrom($iteratorLike)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "source": "direct iterator-like object",
+    "wrapper_required": "unless already %Iterator% instance",
+    "next_forwarding": "preserves this binding and result object"
+  },
+  "caveats": [
+    "The wrapper must forward return when present and preserve dynamic method semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "plain next-only iterator accepted",
+      "input": "let n=0; const x={next(){return n<2?{value:++n,done:false}:{done:true}}}; console.log(Iterator.from(x).toArray().join(\",\"));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "noncallable next fails when consumed",
+      "input": "const x={next:1}; try{Iterator.from(x).next()}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

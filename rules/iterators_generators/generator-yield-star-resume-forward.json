@@ -1,0 +1,39 @@
+{
+  "id": "generator.yield-star.resume-forward",
+  "category": "generators",
+  "summary": "Values sent with outer next after a delegated yield are forwarded to the inner iterator next method.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "first_inner_next": "one explicit undefined argument; the argument of the first outer next() is ignored by the outer generator",
+    "subsequent_normal_resume": "Call inner next with received value"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "sent value reaches inner generator",
+      "input": "function* inner(){console.log(yield 1)} function* outer(){yield* inner()} const it=outer();it.next();it.next(7);",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "first outer next value is not forwarded but undefined is explicitly sent",
+      "input": "const seen=[];const inner={next(v){seen.push([arguments.length,v]);return seen.length===1?{value:1,done:false}:{done:true}},[Symbol.iterator](){return this}};function* outer(){yield* inner}const it=outer();it.next(9);console.log(seen[0][0],seen[0][1]===undefined);",
+      "expected_behavior": "prints 1 true"
+    }
+  ]
+}

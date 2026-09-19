@@ -1,0 +1,40 @@
+{
+  "id": "generator.return.statement-value",
+  "category": "generators",
+  "summary": "A generator return statement completes the generator with done true and the return value.",
+  "source": {
+    "pattern": "return $value;",
+    "requirements": {
+      "inside_sync_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.ReturnFromBody($context, $value)",
+    "helper": "JsGenerator.ReturnFromBody"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "iterator_result_done": true,
+    "iterator_result_value": "return expression value",
+    "generator_state_after": "completed"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "return value exposed",
+      "input": "function* g(){return 9} console.log(g().next());",
+      "expected_behavior": "result has value 9 and done true"
+    },
+    {
+      "name": "bare end returns undefined",
+      "input": "function* g(){} const r=g().next(); console.log(r.value===undefined,r.done);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

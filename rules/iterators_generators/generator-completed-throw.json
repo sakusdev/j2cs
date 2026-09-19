@@ -1,0 +1,41 @@
+{
+  "id": "generator.completed.throw",
+  "category": "generators",
+  "summary": "throw on a completed generator throws the supplied value rather than returning an IteratorResult.",
+  "source": {
+    "pattern": "$generator.throw($error)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "completed",
+      "builtin_throw_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Throw($generator, $error)",
+    "helper": "JsGenerator.Throw"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "abrupt throw",
+    "thrown_value": "supplied argument",
+    "body_resume": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "throw after completion",
+      "input": "function* g(){} const it=g();it.next();try{it.throw(\"x\")}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "throw undefined when omitted",
+      "input": "function* g(){} const it=g();it.next();try{it.throw()}catch(e){console.log(e===undefined)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

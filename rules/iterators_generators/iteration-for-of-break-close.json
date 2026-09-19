@@ -1,0 +1,42 @@
+{
+  "id": "iteration.for-of.break-close",
+  "category": "iteration",
+  "summary": "A break that exits a for...of loop must close the iterator.",
+  "source": {
+    "pattern": "for ($binding of $iterable) { ... break; }",
+    "requirements": {
+      "break_exits_this_for_of": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.ForOfWithClose($iterable, $body)",
+    "helper": "JsIterator.ForOfWithClose"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "on_break": "IteratorClose with break completion",
+    "return_lookup": "conditional",
+    "normal_exhaustion": "does not call return"
+  },
+  "caveats": [
+    "A break targeting an inner construct but not exiting the for...of does not close this iterator."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "break runs generator finally",
+      "input": "function* g(){try{yield 1;yield 2}finally{console.log(\"close\")}} for(const x of g()){break}",
+      "expected_behavior": "prints close"
+    },
+    {
+      "name": "full exhaustion does not force extra return",
+      "input": "let r=0; const it={i:0,next(){return this.i++?{done:true}:{value:1,done:false}},return(){r++;return {done:true}},[Symbol.iterator](){return this}}; for(const x of it){} console.log(r);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

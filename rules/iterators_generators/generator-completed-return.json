@@ -1,0 +1,41 @@
+{
+  "id": "generator.completed.return",
+  "category": "generators",
+  "summary": "return on a completed generator returns the supplied value with done true without resuming code.",
+  "source": {
+    "pattern": "$generator.return($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "completed",
+      "builtin_return_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Return($generator, $value)",
+    "helper": "JsGenerator.Return"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "supplied argument",
+    "done": true,
+    "body_resume": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "return after completion",
+      "input": "function* g(){} const it=g();it.next();console.log(it.return(8));",
+      "expected_behavior": "result has value 8 done true"
+    },
+    {
+      "name": "undefined if omitted",
+      "input": "function* g(){} const it=g();it.next();const r=it.return();console.log(r.value===undefined,r.done);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

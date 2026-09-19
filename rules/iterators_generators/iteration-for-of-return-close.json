@@ -1,0 +1,40 @@
+{
+  "id": "iteration.for-of.return-close",
+  "category": "iteration",
+  "summary": "A return from within for...of closes the iterator before leaving the containing function.",
+  "source": {
+    "pattern": "function $f(){ for ($binding of $iterable) { return $value; } }",
+    "requirements": {
+      "return_exits_containing_function_and_loop": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.ForOfReturnAware($iterable, $body)",
+    "helper": "JsIterator.ForOfReturnAware"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "on_return": "IteratorClose first",
+    "function_return": "original return value unless close throws",
+    "close_error": "can replace return completion"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "return closes generator",
+      "input": "function* g(){try{yield 1}finally{console.log(\"close\")}} function f(){for(const x of g())return 9} console.log(f());",
+      "expected_behavior": "prints close then 9"
+    },
+    {
+      "name": "close throw replaces return",
+      "input": "const it={next(){return {value:1,done:false}},return(){throw \"close\"},[Symbol.iterator](){return this}}; function f(){for(const x of it)return 9} try{f()}catch(e){console.log(e)}",
+      "expected_behavior": "prints close"
+    }
+  ]
+}

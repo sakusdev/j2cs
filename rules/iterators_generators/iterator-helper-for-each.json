@@ -1,0 +1,51 @@
+{
+  "id": "iterator.helper.for-each",
+  "category": "iterators",
+  "summary": "Consume Iterator.prototype.forEach with value/index callbacks and undefined return.",
+  "source": {
+    "pattern": "$iterator.forEach($procedure)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.ForEach($iterator, $procedure)",
+    "helper": "JsIterator.ForEach",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "eager": true,
+    "callback_args": [
+      "value",
+      "index"
+    ],
+    "callback_this": "undefined",
+    "return_value": "undefined",
+    "callback_throw": "close iterator then propagate"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "value and index",
+      "input": "let a=[];const r=Iterator.from([5,6]).forEach((v,i)=>a.push(v+i));console.log(a.join(\",\"),r===undefined);",
+      "expected_behavior": "prints 5,7 true"
+    },
+    {
+      "name": "callback throw closes",
+      "input": "let c=false;function* g(){try{yield 1}finally{c=true}}try{g().forEach(()=>{throw 1})}catch{}console.log(c);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

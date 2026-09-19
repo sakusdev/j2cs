@@ -1,0 +1,46 @@
+{
+  "id": "iteration.for-of.generic",
+  "category": "iteration",
+  "summary": "Lower generic for...of through the JavaScript iterator protocol rather than C# IEnumerable assumptions.",
+  "source": {
+    "pattern": "for ($binding of $iterable) { $body }",
+    "requirements": {
+      "iteration_kind": "sync",
+      "rhs_not_proven_specialized_builtin_fast_path": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ForOf($iterable, $bodyCompletionAware)",
+    "notes": "Acquires the iterator once, repeatedly calls next with no arguments, applies ToBoolean to done, reads value, executes binding/body, and performs IteratorClose for abrupt exits that leave the loop."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "iterator_acquisition": "once before loop",
+    "next_arguments": 0,
+    "done": "ToBoolean(Get(result,\"done\"))",
+    "value": "Get(result,\"value\")",
+    "body": "completion-aware",
+    "normal_exhaustion": "no return call"
+  },
+  "caveats": [
+    "C# foreach may use different method discovery, exception/disposal precedence, and cannot model arbitrary JS iterator objects or Proxy hooks."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "custom iterable order",
+      "input": "const x={*[Symbol.iterator](){yield 3;yield 4}}; let s=\"\"; for(const v of x)s+=v; console.log(s);",
+      "expected_behavior": "prints 34"
+    },
+    {
+      "name": "noniterable throws",
+      "input": "try{for(const x of {0:1,length:1}){}}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

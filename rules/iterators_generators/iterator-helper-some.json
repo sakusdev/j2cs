@@ -1,0 +1,51 @@
+{
+  "id": "iterator.helper.some",
+  "category": "iterators",
+  "summary": "Consume until Iterator.prototype.some finds a truthy predicate result, then close early.",
+  "source": {
+    "pattern": "$iterator.some($predicate)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Some($iterator, $predicate)",
+    "helper": "JsIterator.Some",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "eager": true,
+    "callback_args": [
+      "value",
+      "index"
+    ],
+    "predicate_result": "ToBoolean",
+    "short_circuit_true": "close underlying then return true",
+    "exhaustion": "false"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "short circuits",
+      "input": "let n=0;console.log(Iterator.from([1,2,3]).some(x=>{n++;return x===2}),n);",
+      "expected_behavior": "prints true 2"
+    },
+    {
+      "name": "early true closes generator",
+      "input": "let c=false;function* g(){try{yield 1;yield 2}finally{c=true}}console.log(g().some(()=>true),c);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

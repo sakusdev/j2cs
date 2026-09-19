@@ -1,0 +1,43 @@
+{
+  "id": "generator.call-lazy",
+  "category": "generators",
+  "summary": "Calling a sync generator creates a suspended generator without executing its body.",
+  "source": {
+    "pattern": "$generatorFunction($args)",
+    "requirements": {
+      "callee_statically_known_sync_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Create($generatorFunction, $thisArg, $args)",
+    "helper": "JsGenerator.Create",
+    "notes": "Argument expressions and ordinary call setup occur, but generator body code starts only on first successful next()."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "call_return": "generator object",
+    "body_start": "first next",
+    "promise": false
+  },
+  "caveats": [
+    "C# iterator blocks are also lazy in some respects, but their object/prototype, next/return/throw, and completion semantics differ."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "body not run at call",
+      "input": "function* g(){console.log(\"run\");yield 1} const it=g(); console.log(\"made\");",
+      "expected_behavior": "prints made only"
+    },
+    {
+      "name": "body runs on next",
+      "input": "function* g(){console.log(\"run\");yield 1} const it=g(); console.log(\"made\"); it.next();",
+      "expected_behavior": "prints made then run"
+    }
+  ]
+}

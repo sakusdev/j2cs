@@ -1,0 +1,53 @@
+{
+  "id": "iterator.helper.filter",
+  "category": "iterators",
+  "summary": "Implement lazy Iterator.prototype.filter using JS truthiness and value/index callback semantics.",
+  "source": {
+    "pattern": "$iterator.filter($predicate)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Filter($iterator, $predicate)",
+    "helper": "JsIterator.Filter",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "lazy": true,
+    "callback_args": [
+      "value",
+      "index"
+    ],
+    "predicate_result": "JsCoercion.ToBoolean",
+    "index_counts_source_values": true,
+    "abrupt": "close underlying"
+  },
+  "caveats": [
+    "Do not require a C# bool callback result; JavaScript predicate results undergo ToBoolean."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "filters with JS truthiness",
+      "input": "console.log(Iterator.from([0,1,2]).filter(x=>x%2).toArray().join(\",\"));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "index is source index",
+      "input": "console.log(Iterator.from([10,20]).filter((v,i)=>i===1).toArray()[0]);",
+      "expected_behavior": "prints 20"
+    }
+  ]
+}

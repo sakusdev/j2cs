@@ -1,0 +1,42 @@
+{
+  "id": "generator.next.resume-value",
+  "category": "generators",
+  "summary": "Resume a suspended generator with the explicit next value as the result of the yield expression.",
+  "source": {
+    "pattern": "$generator.next($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "suspended-yield",
+      "builtin_next_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Next($generator, $value)",
+    "helper": "JsGenerator.Next"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "resume_completion": "normal completion carrying value",
+    "yield_expression_result": "sent value",
+    "value_coercion": "none"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "yield expression receives value",
+      "input": "function* g(){console.log(yield \"ready\")} const it=g(); it.next(); it.next(42);",
+      "expected_behavior": "prints 42"
+    },
+    {
+      "name": "undefined when omitted",
+      "input": "function* g(){console.log((yield 1)===undefined)} const it=g(); it.next(); it.next();",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

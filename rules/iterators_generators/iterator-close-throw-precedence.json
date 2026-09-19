@@ -1,0 +1,43 @@
+{
+  "id": "iterator.close.throw-precedence",
+  "category": "iterators",
+  "summary": "Preserve original throw completion precedence when IteratorClose itself fails.",
+  "source": {
+    "pattern": "IteratorClose($iterator, throw $error)",
+    "requirements": {
+      "iterator_record_available": true,
+      "completion_is_throw": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.CloseAfterThrow($iterator, $error)",
+    "helper": "JsIterator.CloseAfterThrow",
+    "notes": "The return getter/call is attempted as specified, but the original throw completion wins over errors from return lookup/call/result validation."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "close_attempt": "performed",
+    "original_throw": "has precedence",
+    "return_failure": "suppressed when completion already throw"
+  },
+  "caveats": [
+    "This differs from naively wrapping disposal in a C# finally whose exception can replace the original exception."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "body throw wins over return throw",
+      "input": "const it={next(){return {value:1,done:false}},return(){throw \"close\"},[Symbol.iterator](){return this}}; try{for(const x of it){throw \"body\"}}catch(e){console.log(e)}",
+      "expected_behavior": "prints body"
+    },
+    {
+      "name": "break lets return throw escape",
+      "input": "const it={next(){return {value:1,done:false}},return(){throw \"close\"},[Symbol.iterator](){return this}}; try{for(const x of it){break}}catch(e){console.log(e)}",
+      "expected_behavior": "prints close"
+    }
+  ]
+}

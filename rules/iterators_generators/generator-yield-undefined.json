@@ -1,0 +1,39 @@
+{
+  "id": "generator.yield.undefined",
+  "category": "generators",
+  "summary": "A bare yield yields undefined and suspends.",
+  "source": {
+    "pattern": "yield;",
+    "requirements": {
+      "inside_sync_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Yield($context, JsValue.Undefined)",
+    "helper": "JsGenerator.Yield"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "yielded_value": "undefined",
+    "done": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "bare yield",
+      "input": "function* g(){yield} const r=g().next(); console.log(r.value===undefined,r.done);",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "resume after bare yield",
+      "input": "function* g(){return yield} const it=g(); it.next(); console.log(it.next(8).value);",
+      "expected_behavior": "prints 8"
+    }
+  ]
+}

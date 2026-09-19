@@ -1,0 +1,39 @@
+{
+  "id": "generator.return.brand-check",
+  "category": "generators",
+  "summary": "Intrinsic Generator.prototype.return requires a genuine generator receiver.",
+  "source": {
+    "pattern": "%GeneratorPrototype%.return.call($receiver, $value)",
+    "requirements": {
+      "intrinsic_generator_return_method": true,
+      "receiver_not_proven_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.ReturnChecked($receiver, $value)",
+    "helper": "JsGenerator.ReturnChecked"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "brand_check": "required",
+    "invalid_receiver": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object rejected",
+      "input": "const ret=Object.getPrototypeOf(function*(){}()).return; try{ret.call({},1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "generator accepted",
+      "input": "const it=(function*(){yield 1})(); console.log(it.return(2));",
+      "expected_behavior": "result has value 2 done true"
+    }
+  ]
+}

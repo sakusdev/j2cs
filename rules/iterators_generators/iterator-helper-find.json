@@ -1,0 +1,51 @@
+{
+  "id": "iterator.helper.find",
+  "category": "iterators",
+  "summary": "Consume until Iterator.prototype.find finds a truthy predicate result, returning the value and closing early.",
+  "source": {
+    "pattern": "$iterator.find($predicate)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Find($iterator, $predicate)",
+    "helper": "JsIterator.Find",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "eager": true,
+    "callback_args": [
+      "value",
+      "index"
+    ],
+    "predicate_result": "ToBoolean",
+    "match": "return source value and close underlying",
+    "no_match": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "finds value",
+      "input": "console.log(Iterator.from([1,4,6]).find(x=>x>3));",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "missing is undefined",
+      "input": "console.log(Iterator.from([1]).find(x=>x>5)===undefined);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

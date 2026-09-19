@@ -1,0 +1,44 @@
+{
+  "id": "generator.yield-star.delegate-next",
+  "category": "generators",
+  "summary": "yield* delegates values from an inner synchronous iterator and yields each non-done IteratorResult.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar",
+    "notes": "Uses GetIterator(sync), calls the inner next method initially with one explicit undefined argument, validates IteratorResults, and yields inner values until done."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inner_iterator": "GetIterator(sync)",
+    "initial_inner_next_arguments": 1,
+    "yield_order": "inner iterator order",
+    "non_object_inner_result": "TypeError",
+    "initial_inner_next_value": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "delegates sequence",
+      "input": "function* g(){yield* [1,2]} console.log([...g()].join(\",\"));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "initial delegated next receives explicit undefined",
+      "input": "const inner={first:true,next(v){if(this.first){this.first=false;console.log(arguments.length,v===undefined);return {value:1,done:false}}return {done:true}},[Symbol.iterator](){return this}}; function* g(){yield* inner} g().next();",
+      "expected_behavior": "prints 1 true"
+    }
+  ]
+}

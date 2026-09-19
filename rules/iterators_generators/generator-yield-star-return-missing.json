@@ -1,0 +1,41 @@
+{
+  "id": "generator.yield-star.return-missing",
+  "category": "generators",
+  "summary": "If delegated iterator has no return method, an outer return completes directly with the outer return value.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true,
+      "outer_resume_kind": "return",
+      "inner_return_absent": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inner_return_absent": "do not throw",
+    "outer_return_value": "preserved"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "missing return preserves outer value",
+      "input": "const inner={next(){return {value:1,done:false}},[Symbol.iterator](){return this}}; function* g(){yield* inner} const it=g();it.next();console.log(it.return(8));",
+      "expected_behavior": "result has value 8 done true"
+    },
+    {
+      "name": "no extra inner next on return",
+      "input": "let n=0;const inner={next(){n++;return {value:1,done:false}},[Symbol.iterator](){return this}};function* g(){yield* inner}const it=g();it.next();it.return();console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

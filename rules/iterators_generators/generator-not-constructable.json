@@ -1,0 +1,39 @@
+{
+  "id": "generator.not-constructable",
+  "category": "generators",
+  "summary": "Sync generator functions are callable but not constructors.",
+  "source": {
+    "pattern": "new $generatorFunction($args)",
+    "requirements": {
+      "callee_statically_known_sync_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.ThrowNotConstructor($generatorFunction)",
+    "helper": "JsGenerator.ThrowNotConstructor"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "constructable": false,
+    "exception": "TypeError",
+    "body_execution": false
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "new generator function throws",
+      "input": "function* g(){} try{new g()}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "ordinary call succeeds",
+      "input": "function* g(){} console.log(typeof g().next);",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

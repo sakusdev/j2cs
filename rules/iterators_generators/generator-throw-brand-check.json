@@ -1,0 +1,39 @@
+{
+  "id": "generator.throw.brand-check",
+  "category": "generators",
+  "summary": "Intrinsic Generator.prototype.throw requires a genuine generator receiver.",
+  "source": {
+    "pattern": "%GeneratorPrototype%.throw.call($receiver, $value)",
+    "requirements": {
+      "intrinsic_generator_throw_method": true,
+      "receiver_not_proven_generator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.ThrowChecked($receiver, $value)",
+    "helper": "JsGenerator.ThrowChecked"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "brand_check": "required",
+    "invalid_receiver": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object rejected",
+      "input": "const thr=Object.getPrototypeOf(function*(){}()).throw; try{thr.call({},1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "generator receives throw",
+      "input": "const it=(function*(){try{yield 1}catch(e){return e}})();it.next();console.log(it.throw(5).value);",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "iteration.for-of.binding-abrupt-close",
+  "category": "iteration",
+  "summary": "Close the iterator if per-iteration binding/destructuring initialization abruptly fails.",
+  "source": {
+    "pattern": "for ($bindingPattern of $iterable) { $body }",
+    "requirements": {
+      "binding_initialization_may_abrupt": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ForOf($iterable, $bindingAndBody)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "binding_initialization": "after IteratorValue",
+    "abrupt_binding": "IteratorClose before propagation"
+  },
+  "caveats": [
+    "Destructuring can run getters/default expressions and throw before the loop body starts."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "destructuring throw closes",
+      "input": "let closed=false; const outer={*[Symbol.iterator](){try{yield {get x(){throw \"boom\"}}}finally{closed=true}}}; try{for(const {x} of outer){}}catch{} console.log(closed);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "binding value used normally",
+      "input": "for(const {x} of [{x:4}]) console.log(x);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

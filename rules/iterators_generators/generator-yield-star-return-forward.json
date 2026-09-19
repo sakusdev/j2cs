@@ -1,0 +1,42 @@
+{
+  "id": "generator.yield-star.return-forward",
+  "category": "generators",
+  "summary": "Outer generator return during yield* calls inner return when present and processes its IteratorResult.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true,
+      "outer_resume_kind": "return"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inner_return_lookup": "conditional",
+    "forwarded_argument": "outer return value",
+    "inner_return_done_false": "yield inner value and keep pending return flow",
+    "inner_return_done_true": "complete outer return with inner returned value"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "return forwarded",
+      "input": "function* inner(){try{yield 1}finally{console.log(\"inner close\")}} function* outer(){yield* inner()} const it=outer();it.next();it.return(9);",
+      "expected_behavior": "prints inner close"
+    },
+    {
+      "name": "inner return can yield done false",
+      "input": "const inner={next(){return {value:1,done:false}},return(v){return {value:v+1,done:false}},[Symbol.iterator](){return this}}; function* g(){yield* inner} const it=g();it.next();console.log(it.return(4));",
+      "expected_behavior": "result has value 5 done false"
+    }
+  ]
+}

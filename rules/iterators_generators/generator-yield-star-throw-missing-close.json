@@ -1,0 +1,43 @@
+{
+  "id": "generator.yield-star.throw-missing-close",
+  "category": "generators",
+  "summary": "If delegated iterator lacks throw, yield* closes it via return then throws TypeError.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true,
+      "outer_resume_kind": "throw",
+      "inner_throw_absent": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "cleanup": "IteratorClose inner",
+    "protocol_violation": "TypeError after successful close",
+    "close_throw": "propagates according to IteratorClose rules"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html"
+  ],
+  "tests": [
+    {
+      "name": "missing throw closes then TypeError",
+      "input": "let closed=false;const inner={next(){return {value:1,done:false}},return(){closed=true;return {done:true}},[Symbol.iterator](){return this}};function* g(){yield* inner}const it=g();it.next();try{it.throw(\"x\")}catch(e){console.log(closed,e.name)}",
+      "expected_behavior": "prints true TypeError"
+    },
+    {
+      "name": "return absent still TypeError",
+      "input": "const inner={next(){return {value:1,done:false}},[Symbol.iterator](){return this}};function* g(){yield* inner}const it=g();it.next();try{it.throw(1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

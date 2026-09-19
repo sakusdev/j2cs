@@ -1,0 +1,41 @@
+{
+  "id": "generator.throw.uncaught",
+  "category": "generators",
+  "summary": "An uncaught injected throw propagates the exact JavaScript value and permanently completes the generator.",
+  "source": {
+    "pattern": "$generator.throw($error)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "builtin_throw_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Throw($generator, $error)",
+    "helper": "JsGenerator.Throw"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "uncaught_throw": "propagate arbitrary JS value",
+    "state_after": "completed",
+    "next_after": "done true undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "arbitrary thrown value propagates",
+      "input": "function* g(){yield 1} const it=g();it.next();try{it.throw(\"x\")}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "then completed",
+      "input": "function* g(){yield 1} const it=g();it.next();try{it.throw(3)}catch{} const r=it.next();console.log(r.value===undefined,r.done);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

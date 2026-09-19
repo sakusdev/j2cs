@@ -1,0 +1,47 @@
+{
+  "id": "iterator.helper.find.dynamic-callback",
+  "category": "iterators",
+  "summary": "Use runtime dispatch for Iterator.prototype.find when the callback cannot be statically lowered with canonical function-call semantics.",
+  "source": {
+    "pattern": "$iterator.find($predicate)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_not_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IteratorFind($iterator, $predicate)",
+    "notes": "Runtime reuses the generic JavaScript [[Call]]/Proxy callability semantics owned by FUNCTIONS while preserving the Iterator helper protocol, close behavior, callback argument order, and arbitrary thrown values."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callback_dispatch": "generic JavaScript call semantics, including callable Proxy when applicable",
+    "iterator_protocol": "same as paired helper fast-path rule",
+    "result": "matched value or undefined",
+    "abrupt_callback": "preserve iterator close and thrown-value semantics"
+  },
+  "caveats": [
+    "Do not model a dynamic callback with a plain C# delegate or dynamic invocation; Proxy apply traps and JavaScript callability are observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "proxy predicate selects value",
+      "input": "const f=new Proxy(()=>false,{apply(t,th,args){return args[0]>1}});console.log(Iterator.from([1,2,3]).find(f));",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "noncallable predicate throws",
+      "input": "try{Iterator.from([1]).find({})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

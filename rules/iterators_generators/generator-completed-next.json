@@ -1,0 +1,41 @@
+{
+  "id": "generator.completed.next",
+  "category": "generators",
+  "summary": "next on a completed sync generator returns done true with undefined.",
+  "source": {
+    "pattern": "$generator.next($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "completed",
+      "builtin_next_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Next($generator, $value)",
+    "helper": "JsGenerator.Next"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "body_resume": false,
+    "value": "undefined",
+    "done": true
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "next after completion",
+      "input": "function* g(){} const it=g();it.next();const r=it.next(5);console.log(r.value===undefined,r.done);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "next after return completion",
+      "input": "function* g(){return 1} const it=g();it.next();console.log(it.next().done);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "iterator.helper.flat-map",
+  "category": "iterators",
+  "summary": "Implement lazy Iterator.prototype.flatMap, flattening each mapper result through GetIteratorFlattenable with primitive rejection.",
+  "source": {
+    "pattern": "$iterator.flatMap($mapper)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.FlatMap($iterator, $mapper)",
+    "helper": "JsIterator.FlatMap",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "callback_args": [
+      "value",
+      "index"
+    ],
+    "lazy": true,
+    "mapped_value": "must be object accepted by GetIteratorFlattenable(reject-primitives)",
+    "inner_and_outer_close": "both preserved on abrupt completion"
+  },
+  "caveats": [
+    "Unlike Iterator.from, flatMap uses reject-primitives; a primitive string mapper result is not flattened."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "flattens iterables",
+      "input": "console.log(Iterator.from([1,2]).flatMap(x=>[x,x*10]).toArray().join(\",\"));",
+      "expected_behavior": "prints 1,10,2,20"
+    },
+    {
+      "name": "string primitive mapper result rejected",
+      "input": "try{Iterator.from([1]).flatMap(()=>\"ab\").next()}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

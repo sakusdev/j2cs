@@ -1,0 +1,39 @@
+{
+  "id": "generator.yield-star.completion-value",
+  "category": "generators",
+  "summary": "The final done-true value of the delegated iterator becomes the value of the yield* expression.",
+  "source": {
+    "pattern": "yield* $iterable",
+    "requirements": {
+      "inside_sync_generator": true,
+      "delegation_is_active": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.YieldStar($context, $iterable)",
+    "helper": "JsGenerator.YieldStar"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inner_done_true_value": "yield* expression result",
+    "outer_generator": "continues after delegation"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "inner return becomes yield-star value",
+      "input": "function* inner(){return 4} function* outer(){return yield* inner()} console.log(outer().next());",
+      "expected_behavior": "result has value 4 done true"
+    },
+    {
+      "name": "outer can transform completion value",
+      "input": "function* inner(){yield 1;return 4} function* outer(){const x=yield* inner();return x+1} const it=outer();it.next();console.log(it.next());",
+      "expected_behavior": "result has value 5 done true"
+    }
+  ]
+}

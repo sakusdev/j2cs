@@ -1,0 +1,42 @@
+{
+  "id": "generator.return.suspended",
+  "category": "generators",
+  "summary": "Generator.prototype.return injects a return completion at the suspended yield point.",
+  "source": {
+    "pattern": "$generator.return($value)",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "generator_state": "suspended-yield",
+      "builtin_return_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsGenerator.Return($generator, $value)",
+    "helper": "JsGenerator.Return"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "resume_completion": "return completion",
+    "finally_blocks": "execute",
+    "default_result_after_unintercepted_return": "{value: argument, done: true}"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html"
+  ],
+  "tests": [
+    {
+      "name": "return completes suspended generator",
+      "input": "function* g(){yield 1;yield 2} const it=g(); it.next(); console.log(it.return(8));",
+      "expected_behavior": "result has value 8 done true"
+    },
+    {
+      "name": "return runs finally",
+      "input": "function* g(){try{yield 1}finally{console.log(\"finally\")}} const it=g();it.next();it.return();",
+      "expected_behavior": "prints finally"
+    }
+  ]
+}

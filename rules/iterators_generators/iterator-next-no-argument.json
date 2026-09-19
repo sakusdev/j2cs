@@ -1,0 +1,45 @@
+{
+  "id": "iterator.next.no-argument",
+  "category": "iterators",
+  "summary": "Invoke a proven iterator next method with no argument and preserve IteratorResult validation.",
+  "source": {
+    "pattern": "$iterator.next()",
+    "requirements": {
+      "receiver_is_canonical_sync_iterator": true,
+      "next_method_proven_builtin_or_captured": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Next($iterator)",
+    "helper": "JsIterator.Next",
+    "notes": "Calls the captured next method with the iterator as this; the result must be an object. No undefined argument is supplied unless source actually supplies one."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_count": 0,
+    "this_binding": "iterator",
+    "return": "IteratorResult object",
+    "non_object_result": "TypeError"
+  },
+  "caveats": [
+    "Calling next() is observably different from next(undefined) for custom iterator methods that inspect arguments.length."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "next without value",
+      "input": "const it=[7][Symbol.iterator](); const r=it.next(); console.log(r.value,r.done);",
+      "expected_behavior": "prints 7 false"
+    },
+    {
+      "name": "omitted differs from explicit undefined for custom next",
+      "input": "const it={next(){console.log(arguments.length);return {done:true}}}; it.next(); it.next(undefined);",
+      "expected_behavior": "prints 0 then 1"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "iterator.helper.reduce",
+  "category": "iterators",
+  "summary": "Implement eager Iterator.prototype.reduce with omitted-initial-value distinction.",
+  "source": {
+    "pattern": "$iterator.reduce($reducer, $initialValue?)",
+    "requirements": {
+      "receiver_proven_sync_iterator_object": true,
+      "builtin_iterator_helper_member_not_overridden": true,
+      "receiver_not_proxy": true,
+      "callback_statically_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsIterator.Reduce($iterator, $reducer, $initialValue, $hasInitialValue)",
+    "helper": "JsIterator.Reduce",
+    "notes": "Helper reuses canonical JsIterator protocol operations and existing JsFunction.Call semantics for callbacks. The callback must satisfy the repository canonical JsFunction call lowering; callable Proxy or otherwise dynamic dispatch uses the paired runtime rule."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "eager": true,
+    "callback_args": [
+      "accumulator",
+      "value",
+      "index"
+    ],
+    "omitted_initial": "first source element becomes accumulator",
+    "empty_without_initial": "TypeError",
+    "callback_throw": "close underlying then propagate"
+  },
+  "caveats": [
+    "Omitted initialValue must be distinguished from explicitly supplied undefined."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html",
+    "https://tc39.es/ecma262/2026/multipage/abstract-operations.html",
+    "rules/functions/dynamic-callable-dispatch.json",
+    "rules/functions/prototype-call.json"
+  ],
+  "tests": [
+    {
+      "name": "reduce with initial",
+      "input": "console.log(Iterator.from([1,2,3]).reduce((a,b)=>a+b,10));",
+      "expected_behavior": "prints 16"
+    },
+    {
+      "name": "empty without initial throws",
+      "input": "try{Iterator.from([]).reduce((a,b)=>a+b)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

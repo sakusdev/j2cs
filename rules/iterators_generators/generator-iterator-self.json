@@ -1,0 +1,38 @@
+{
+  "id": "generator.iterator-self",
+  "category": "generators",
+  "summary": "A generator object is iterable and its intrinsic Symbol.iterator returns itself.",
+  "source": {
+    "pattern": "$generator[Symbol.iterator]()",
+    "requirements": {
+      "receiver_proven_sync_generator": true,
+      "builtin_symbol_iterator_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$generator"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same generator identity",
+    "enables_for_of": true
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "self iterator",
+      "input": "function* g(){} const it=g();console.log(it[Symbol.iterator]()===it);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "for-of consumes same generator",
+      "input": "function* g(){yield 1} const it=g();for(const x of it)console.log(x);console.log(it.next().done);",
+      "expected_behavior": "prints 1 then true"
+    }
+  ]
+}

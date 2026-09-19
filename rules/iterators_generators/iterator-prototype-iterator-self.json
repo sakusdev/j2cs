@@ -1,0 +1,40 @@
+{
+  "id": "iterator.prototype.iterator-self",
+  "category": "iterators",
+  "summary": "Lower the intrinsic Iterator.prototype Symbol.iterator method to identity.",
+  "source": {
+    "pattern": "$iterator[Symbol.iterator]()",
+    "requirements": {
+      "receiver_is_intrinsic_iterator_instance": true,
+      "builtin_symbol_iterator_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$iterator"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same object identity",
+    "mutation": "none"
+  },
+  "caveats": [
+    "Only native when property resolution is proven to the intrinsic method; overridden Symbol.iterator remains observable."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html"
+  ],
+  "tests": [
+    {
+      "name": "iterator helper is self iterable",
+      "input": "const it=Iterator.from([1]); console.log(it[Symbol.iterator]()===it);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "override blocks specialization",
+      "input": "const it=Iterator.from([1]); it[Symbol.iterator]=()=>({next(){return {done:true}}}); console.log(it[Symbol.iterator]()===it);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}
