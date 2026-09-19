@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.spawn-timeout",
+  "category": "node_process_workers",
+  "summary": "Honor spawn timeout by sending configured killSignal after the timeout rather than merely rejecting a managed Task.",
+  "source": {
+    "pattern": "spawn($command,$args,{timeout:$ms,killSignal:$signal})",
+    "requirements": {
+      "binding": "node:child_process.spawn",
+      "timeout_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_timeout",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_timeout($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timer": "host Node timer",
+    "action": "send killSignal when timeout elapses",
+    "events": "normal process error/exit/close ordering still applies"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "timeout lifecycle",
+      "input": "// spawn(longCommand,{timeout:10})",
+      "expected_behavior": "child is signaled after timeout and lifecycle events follow process termination"
+    },
+    {
+      "name": "zero/omitted",
+      "input": "// spawn(cmd,{timeout:0})",
+      "expected_behavior": "no timeout-triggered kill"
+    }
+  ]
+}

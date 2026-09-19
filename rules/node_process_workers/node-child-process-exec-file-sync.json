@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.exec-file-sync",
+  "category": "node_process_workers",
+  "summary": "Execute a file directly and synchronously, returning buffered output or throwing with process result data.",
+  "source": {
+    "pattern": "execFileSync($file,$args?,$options?)",
+    "requirements": {
+      "binding": "node:child_process.execFileSync"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_exec_file_sync",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_exec_file_sync($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "blocking": true,
+    "shell_default": false,
+    "return": "Buffer|string",
+    "failure": "throws with status/output metadata"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "success",
+      "input": "const {execFileSync}=require('node:child_process');console.log(execFileSync(process.execPath,['-e','process.stdout.write(\"x\")'],{encoding:'utf8'}));",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "no shell default",
+      "input": "// execFileSync(file,['$HOME'])",
+      "expected_behavior": "argument is direct argv unless shell option explicitly changes behavior"
+    }
+  ]
+}

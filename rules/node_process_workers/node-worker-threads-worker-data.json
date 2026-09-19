@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.worker-data",
+  "category": "node_process_workers",
+  "summary": "Expose workerData as the cloned constructor data in the worker environment using Node worker serialization semantics.",
+  "source": {
+    "pattern": "workerData",
+    "requirements": {
+      "binding": "node:worker_threads.workerData",
+      "inside_worker": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_worker_data",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_worker_data($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "source": "Worker options.workerData",
+    "clone": "Node worker message-clone semantics",
+    "identity": "not ordinary shared object identity"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "primitive",
+      "input": "// new Worker(code,{workerData:3})",
+      "expected_behavior": "inside worker workerData is 3"
+    },
+    {
+      "name": "object clone",
+      "input": "// pass {x:1} as workerData then mutate parent object",
+      "expected_behavior": "worker observes its cloned value rather than parent object identity"
+    }
+  ]
+}

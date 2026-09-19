@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.spawn-detached",
+  "category": "node_process_workers",
+  "summary": "Preserve platform-specific detached process-group/session behavior separately from event-loop ref state.",
+  "source": {
+    "pattern": "spawn($command,$args,{detached:true})",
+    "requirements": {
+      "binding": "node:child_process.spawn",
+      "detached": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_detached",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_detached($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "os_behavior": "platform-specific detached process group/session",
+    "parent_wait": "still affected by referenced handle",
+    "stdio": "inherited stdio can keep terminal relationship",
+    "unref": "separate operation"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "detached option",
+      "input": "// spawn(process.execPath,['child.js'],{detached:true,stdio:'ignore'}).unref()",
+      "expected_behavior": "can allow independent long-running child when OS/stdio/ref conditions are met"
+    },
+    {
+      "name": "not same as unref",
+      "input": "// detached child without child.unref()",
+      "expected_behavior": "parent event loop may still wait; detached and unref are distinct"
+    }
+  ]
+}

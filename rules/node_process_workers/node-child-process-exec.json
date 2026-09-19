@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.exec",
+  "category": "node_process_workers",
+  "summary": "Run a command through a shell and buffer stdout/stderr until completion, preserving shell parsing and callback semantics.",
+  "source": {
+    "pattern": "exec($command,$options?,$callback?)",
+    "requirements": {
+      "binding": "node:child_process.exec"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_exec",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_exec($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "shell": true,
+    "output": "buffered",
+    "callback": "after process termination with error/stdout/stderr",
+    "security": "shell metacharacters are interpreted"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "shell expansion",
+      "input": "const {exec}=require('node:child_process');exec('printf x',(e,out)=>console.log(out));",
+      "expected_behavior": "prints x on a compatible shell"
+    },
+    {
+      "name": "not execFile",
+      "input": "// exec('echo $HOME')",
+      "expected_behavior": "shell expansion can occur; direct executable lowering is not equivalent"
+    }
+  ]
+}

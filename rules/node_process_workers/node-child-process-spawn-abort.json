@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.spawn-abort",
+  "category": "node_process_workers",
+  "summary": "Integrate AbortSignal cancellation with child process APIs, emitting AbortError behavior and using killSignal.",
+  "source": {
+    "pattern": "spawn($command,$args,{signal:$signal,killSignal:$killSignal})",
+    "requirements": {
+      "binding": "node:child_process.spawn",
+      "abort_signal_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_abort",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_abort($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "pre_or_later_abort": "cancels child operation per Node contract",
+    "error": "AbortError surfaced through API/event path",
+    "kill_signal": "configured signal",
+    "reuse_abort": "canonical AbortSignal semantics"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "aborted signal",
+      "input": "const {spawn}=require('node:child_process');const c=new AbortController();c.abort();const p=spawn(process.execPath,['-e','setTimeout(()=>{},1000)'],{signal:c.signal});p.once('error',e=>console.log(e.name));",
+      "expected_behavior": "emits AbortError"
+    },
+    {
+      "name": "not generic Task cancel",
+      "input": "// abort running child",
+      "expected_behavior": "must also preserve process signal/kill and ChildProcess events"
+    }
+  ]
+}

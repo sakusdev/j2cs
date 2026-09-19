@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.fork-advanced-serialization",
+  "category": "node_process_workers",
+  "summary": "Use Node V8 advanced IPC serialization for richer values without claiming full browser structured-clone equivalence.",
+  "source": {
+    "pattern": "fork($module,$args,{serialization:'advanced'})",
+    "requirements": {
+      "binding": "node:child_process.fork",
+      "serialization": "advanced"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_fork_advanced_serialization",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_fork_advanced_serialization($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "format": "node:v8-based advanced serialization",
+    "supports": "BigInt Map Set ArrayBuffer TypedArray Buffer Error RegExp and more",
+    "not_full_superset_of_json": true,
+    "owner_note": "related to but distinct from WORKERS_MESSAGING HTML structured clone"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "rich values",
+      "input": "// parent sends new Map([[1,2]]) in advanced mode",
+      "expected_behavior": "child can receive Map semantics"
+    },
+    {
+      "name": "built-in extra props",
+      "input": "// add enumerable custom prop to a built-in before send",
+      "expected_behavior": "custom properties on some built-ins are not guaranteed to survive advanced serialization"
+    }
+  ]
+}

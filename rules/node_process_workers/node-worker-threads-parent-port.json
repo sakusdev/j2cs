@@ -1,0 +1,38 @@
+{
+  "id": "node.worker-threads.parent-port",
+  "category": "node_process_workers",
+  "summary": "Expose parentPort as the MessagePort connected to the parent Worker object, or null outside a Worker.",
+  "source": {
+    "pattern": "parentPort",
+    "requirements": {
+      "binding": "node:worker_threads.parentPort"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_parent_port",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_parent_port($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inside_worker": "MessagePort",
+    "main_thread": "null",
+    "messaging": "parentPort.postMessage ↔ worker message event"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "main null",
+      "input": "const {parentPort,isMainThread}=require('node:worker_threads');console.log(isMainThread,parentPort===null);",
+      "expected_behavior": "prints true true on main thread"
+    },
+    {
+      "name": "worker port",
+      "input": "// inside Worker: parentPort.postMessage('x')",
+      "expected_behavior": "parent receives Worker 'message' event"
+    }
+  ]
+}

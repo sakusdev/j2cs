@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.fork-json-serialization",
+  "category": "node_process_workers",
+  "summary": "Use Node child-process IPC JSON serialization when fork/spawn IPC serialization mode is json.",
+  "source": {
+    "pattern": "fork($module,$args,{serialization:'json'})",
+    "requirements": {
+      "binding": "node:child_process.fork",
+      "serialization": "json"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_fork_json_serialization",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_fork_json_serialization($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "format": "Node JSON IPC serialization",
+    "bigint": "not supported like structured clone",
+    "object_types": "JSON-style limitations",
+    "ipc_ordering": "Node IPC"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object",
+      "input": "// child.send({x:1}) with serialization:'json'",
+      "expected_behavior": "child receives equivalent JSON-style object"
+    },
+    {
+      "name": "BigInt limitation",
+      "input": "// child.send({x:1n}) in json mode",
+      "expected_behavior": "must preserve Node JSON serialization failure/limitation rather than silently stringify"
+    }
+  ]
+}

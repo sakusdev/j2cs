@@ -1,0 +1,38 @@
+{
+  "id": "node.worker-threads.is-main-thread",
+  "category": "node_process_workers",
+  "summary": "Expose whether current code is executing on the main Node thread.",
+  "source": {
+    "pattern": "isMainThread",
+    "requirements": {
+      "binding": "node:worker_threads.isMainThread"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_worker_threads_is_main_thread",
+    "template": "NodeProcessWorkers.node_worker_threads_is_main_thread($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "Boolean",
+    "main": true,
+    "worker": false
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "main",
+      "input": "const {isMainThread}=require('node:worker_threads');console.log(isMainThread);",
+      "expected_behavior": "prints true in main thread"
+    },
+    {
+      "name": "worker",
+      "input": "// inside new Worker: isMainThread",
+      "expected_behavior": "is false"
+    }
+  ]
+}

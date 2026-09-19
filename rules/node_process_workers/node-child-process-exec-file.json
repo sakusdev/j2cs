@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.exec-file",
+  "category": "node_process_workers",
+  "summary": "Execute a file directly without a shell by default, buffering stdout/stderr for the callback.",
+  "source": {
+    "pattern": "execFile($file,$args?,$options?,$callback?)",
+    "requirements": {
+      "binding": "node:child_process.execFile"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_exec_file",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_exec_file($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "shell_default": false,
+    "argv": "direct",
+    "output": "buffered",
+    "platform": "Windows .bat/.cmd require shell handling"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "direct node",
+      "input": "const {execFile}=require('node:child_process');execFile(process.execPath,['-e','process.stdout.write(\"x\")'],(e,out)=>console.log(out));",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "shell difference",
+      "input": "// execFile('echo',['$HOME'])",
+      "expected_behavior": "argument is passed literally rather than shell-expanded by default"
+    }
+  ]
+}

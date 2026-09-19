@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.kill",
+  "category": "node_process_workers",
+  "summary": "Send a signal to a child with subprocess.kill(), preserving platform signal/error semantics and Boolean return.",
+  "source": {
+    "pattern": "$child.kill($signal?)",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_method": "kill"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_kill",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_kill($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default_signal": "SIGTERM",
+    "return": "Boolean indicating signal-send outcome per Node",
+    "platform": "signal support differs",
+    "does_not_guarantee_exit": true
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "kill return",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','setTimeout(()=>{},10000)']);console.log(typeof c.kill());",
+      "expected_behavior": "prints boolean"
+    },
+    {
+      "name": "not immediate exit guarantee",
+      "input": "// child.kill()",
+      "expected_behavior": "successful signal send does not itself prove process has exited"
+    }
+  ]
+}

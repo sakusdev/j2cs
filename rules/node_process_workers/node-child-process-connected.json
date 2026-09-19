@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.connected",
+  "category": "node_process_workers",
+  "summary": "Expose whether the ChildProcess IPC channel is currently connected.",
+  "source": {
+    "pattern": "$child.connected",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_property": "connected"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_child_process_connected",
+    "template": "NodeProcessWorkers.node_child_process_connected($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "Boolean",
+    "true": "IPC channel connected",
+    "false": "disconnected or no longer available"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "fork initial",
+      "input": "// const c=fork(...); console.log(c.connected)",
+      "expected_behavior": "typically true while IPC is established"
+    },
+    {
+      "name": "after disconnect",
+      "input": "// c.disconnect(); console.log(c.connected)",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

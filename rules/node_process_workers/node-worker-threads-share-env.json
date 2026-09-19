@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.share-env",
+  "category": "node_process_workers",
+  "summary": "Honor SHARE_ENV by sharing process.env state between parent and Worker rather than cloning an environment object.",
+  "source": {
+    "pattern": "new Worker($code,{env:SHARE_ENV})",
+    "requirements": {
+      "binding": "node:worker_threads.Worker",
+      "env": "SHARE_ENV"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_share_env",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_share_env($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "environment": "shared read/write process.env view",
+    "concurrency": "writes can be observed across threads",
+    "default_env": "otherwise worker gets copy/inherited semantics per Node"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "shared env",
+      "input": "// Worker(...,{env:SHARE_ENV}) writes process.env.X",
+      "expected_behavior": "parent can observe written environment variable"
+    },
+    {
+      "name": "not default",
+      "input": "// Worker without SHARE_ENV mutates process.env",
+      "expected_behavior": "must not assume identical shared-env semantics"
+    }
+  ]
+}

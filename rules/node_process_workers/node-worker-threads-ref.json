@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.ref",
+  "category": "node_process_workers",
+  "summary": "Reference a Worker handle so it keeps the Node event loop alive if otherwise idle.",
+  "source": {
+    "pattern": "$worker.ref()",
+    "requirements": {
+      "receiver": "Worker",
+      "builtin_method": "ref"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_ref",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_ref($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_loop_reference": true,
+    "idempotent": true,
+    "thread_execution": "unchanged"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "ref",
+      "input": "// worker.unref(); worker.ref()",
+      "expected_behavior": "restores event-loop liveness contribution"
+    },
+    {
+      "name": "not resume",
+      "input": "// worker.ref()",
+      "expected_behavior": "does not mean pause/resume worker execution"
+    }
+  ]
+}

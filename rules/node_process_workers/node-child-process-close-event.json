@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.close-event",
+  "category": "node_process_workers",
+  "summary": "Emit close after process termination and after stdio streams have closed; preserve its ordering relative to exit/error.",
+  "source": {
+    "pattern": "$child.on('close',($code,$signal)=>$listener)",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "event": "close"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_close_event",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_close_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "after": "exit or error and stdio closure",
+    "shared_stdio": "close waits for handles as Node defines",
+    "event_emitter": "reuse EVENTS_STREAMS"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "exit before close",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','']);const a=[];c.on('exit',()=>a.push('exit'));c.on('close',()=>console.log(a[0]));",
+      "expected_behavior": "prints exit"
+    },
+    {
+      "name": "not same event",
+      "input": "// listen to both exit and close",
+      "expected_behavior": "both can be observably distinct"
+    }
+  ]
+}

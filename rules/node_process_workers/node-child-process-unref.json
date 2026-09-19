@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.unref",
+  "category": "node_process_workers",
+  "summary": "Unreference the child process handle so it does not by itself keep the parent event loop alive.",
+  "source": {
+    "pattern": "$child.unref()",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_method": "unref"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_unref",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_unref($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_loop_reference": false,
+    "process_continues": "possible",
+    "ipc_channel": "can independently keep loop referenced"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "detached background pattern",
+      "input": "// spawn(cmd,{detached:true,stdio:'ignore'}).unref()",
+      "expected_behavior": "allows parent to exit independently when no other referenced handles remain"
+    },
+    {
+      "name": "not kill",
+      "input": "// child.unref()",
+      "expected_behavior": "does not terminate the child"
+    }
+  ]
+}

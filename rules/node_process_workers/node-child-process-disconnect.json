@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.disconnect",
+  "category": "node_process_workers",
+  "summary": "Close the parent side of an established child IPC channel and update connected state.",
+  "source": {
+    "pattern": "$child.disconnect()",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "ipc_channel_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_disconnect",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_disconnect($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ipc": "closed/disconnected",
+    "connected": false,
+    "event": "disconnect",
+    "process_lifecycle": "child process itself need not immediately exit"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "state",
+      "input": "// const c=fork(...); c.disconnect(); console.log(c.connected)",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "not kill",
+      "input": "// child.disconnect()",
+      "expected_behavior": "does not semantically equal child.kill()"
+    }
+  ]
+}

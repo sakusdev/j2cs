@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.spawn-sync",
+  "category": "node_process_workers",
+  "summary": "Run spawn synchronously, blocking the event loop until child completion/termination and returning result metadata.",
+  "source": {
+    "pattern": "spawnSync($command,$args?,$options?)",
+    "requirements": {
+      "binding": "node:child_process.spawnSync"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_sync",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_sync($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "blocking": true,
+    "return": "status/signal/stdout/stderr/error result object",
+    "timeout": "can terminate child",
+    "event_loop": "blocked"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "stdout",
+      "input": "const {spawnSync}=require('node:child_process');const r=spawnSync(process.execPath,['-e','process.stdout.write(\"ok\")'],{encoding:'utf8'});console.log(r.status,r.stdout);",
+      "expected_behavior": "prints 0 ok"
+    },
+    {
+      "name": "blocking",
+      "input": "// spawnSync(longCommand)",
+      "expected_behavior": "current JavaScript thread/event loop is blocked until completion"
+    }
+  ]
+}

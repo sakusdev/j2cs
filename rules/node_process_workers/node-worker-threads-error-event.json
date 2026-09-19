@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.error-event",
+  "category": "node_process_workers",
+  "summary": "Emit error for an uncaught worker exception and terminate that worker.",
+  "source": {
+    "pattern": "$worker.on('error',$listener)",
+    "requirements": {
+      "receiver": "Worker",
+      "event": "error"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_error_event",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_error_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "uncaught_exception": "emits error",
+    "termination": true,
+    "event_emitter": "reuse EVENTS_STREAMS"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "error",
+      "input": "const {Worker}=require('node:worker_threads');new Worker('throw new Error(\"x\")',{eval:true}).once('error',e=>console.log(e.message));",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "worker ends",
+      "input": "// uncaught worker exception",
+      "expected_behavior": "worker is terminated and later reaches exit lifecycle"
+    }
+  ]
+}

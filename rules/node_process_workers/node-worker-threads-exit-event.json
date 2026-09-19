@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.exit-event",
+  "category": "node_process_workers",
+  "summary": "Emit exit once the Worker has stopped; it is the final event from that Worker and follows prior worker messages.",
+  "source": {
+    "pattern": "$worker.on('exit',$listener)",
+    "requirements": {
+      "receiver": "Worker",
+      "event": "exit"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_exit_event",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_exit_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "final_event": true,
+    "messages_before_exit": true,
+    "exit_code": "process.exit code; termination has Node-defined nonzero code"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "message before exit",
+      "input": "const {Worker}=require('node:worker_threads');const w=new Worker(`const {parentPort}=require('node:worker_threads');parentPort.postMessage('m')`,{eval:true});const a=[];w.on('message',m=>a.push(m));w.on('exit',()=>console.log(a[0]));",
+      "expected_behavior": "prints m"
+    },
+    {
+      "name": "normal",
+      "input": "const {Worker}=require('node:worker_threads');new Worker('0',{eval:true}).on('exit',c=>console.log(c));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

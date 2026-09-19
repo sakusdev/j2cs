@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.send",
+  "category": "node_process_workers",
+  "summary": "Send an IPC message over an established ChildProcess channel with Node serialization/backpressure and optional callback.",
+  "source": {
+    "pattern": "$child.send($message,$sendHandle?,$options?,$callback?)",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "ipc_channel_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_send",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_send($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "configured json/advanced IPC mode",
+    "return": "Boolean backpressure signal",
+    "callback": "invoked after send attempt",
+    "sendHandle": "special server/socket handle passing on supported platforms"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "requires IPC",
+      "input": "// child from fork().send({x:1})",
+      "expected_behavior": "queues IPC message and returns Boolean"
+    },
+    {
+      "name": "backpressure",
+      "input": "// repeated child.send(...)",
+      "expected_behavior": "false can indicate backlog; it is not message-delivery confirmation"
+    }
+  ]
+}

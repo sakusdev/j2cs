@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.exit-event",
+  "category": "node_process_workers",
+  "summary": "Emit exit when the child process itself ends, with either exit code or signal information.",
+  "source": {
+    "pattern": "$child.on('exit',($code,$signal)=>$listener)",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "event": "exit"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_exit_event",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_exit_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timing": "process ended but stdio may still be open",
+    "code_signal": "one indicates termination result; null possible",
+    "ordering": "close occurs after exit/error once stdio closed"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "normal exit",
+      "input": "const {spawn}=require('node:child_process');spawn(process.execPath,['-e','process.exit(3)']).once('exit',(c,s)=>console.log(c,s===null));",
+      "expected_behavior": "prints 3 true"
+    },
+    {
+      "name": "stdio distinction",
+      "input": "// child exits while pipe data remains",
+      "expected_behavior": "exit must not be substituted for close/stream completion"
+    }
+  ]
+}

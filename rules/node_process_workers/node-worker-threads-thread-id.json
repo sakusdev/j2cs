@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.thread-id",
+  "category": "node_process_workers",
+  "summary": "Expose Node's integer threadId identity for a Worker/current worker thread.",
+  "source": {
+    "pattern": "threadId /* or worker.threadId */",
+    "requirements": {
+      "binding": "node:worker_threads.threadId or Worker.threadId"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_worker_threads_thread_id",
+    "template": "NodeProcessWorkers.node_worker_threads_thread_id($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "integer",
+    "scope": "Node worker thread identity",
+    "not_pid": true,
+    "lifecycle": "Worker property can change to -1 after termination in current Node profiles"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "main id",
+      "input": "const {threadId}=require('node:worker_threads');console.log(Number.isInteger(threadId));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "not PID",
+      "input": "const {threadId}=require('node:worker_threads');console.log(typeof threadId,typeof process.pid);",
+      "expected_behavior": "both numeric but represent different identities"
+    }
+  ]
+}
