@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.event.open",
+  "category": "web_realtime",
+  "summary": "open is dispatched as an Event when the connection becomes established.",
+  "source": {
+    "pattern": "$socket.onopen / addEventListener('open',...)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketEvents",
+    "template": "JsRuntime.WebSocketEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "event": "open",
+    "target": "socket",
+    "dispatch": "task/event-loop mediated"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.addEventListener('open',handler)",
+      "expected_behavior": "handler runs after establishment"
+    },
+    {
+      "name": "edge",
+      "input": "constructor call",
+      "expected_behavior": "does not synchronously fire open before returning"
+    }
+  ]
+}

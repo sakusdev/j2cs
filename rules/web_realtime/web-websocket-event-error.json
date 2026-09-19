@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.event.error",
+  "category": "web_realtime",
+  "summary": "error event reports connection/protocol failure without exposing arbitrary transport internals as a stable cross-browser shape.",
+  "source": {
+    "pattern": "$socket.onerror",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketEvents",
+    "template": "JsRuntime.WebSocketEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "event": "error",
+    "details": "limited browser surface",
+    "security": "network diagnostics may be intentionally opaque"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.addEventListener('error',handler)",
+      "expected_behavior": "failure dispatches error event"
+    },
+    {
+      "name": "edge",
+      "input": "TLS/network implementation detail",
+      "expected_behavior": "must not be fabricated into a Node-style errno contract"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.buffered-amount-after-close",
+  "category": "web_realtime",
+  "summary": "After closure, successful send calls do not reset bufferedAmount and can only increase it.",
+  "source": {
+    "pattern": "$socket.send($data) when CLOSED",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketState",
+    "template": "JsRuntime.WebSocketState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "send": "data is not transmitted",
+    "bufferedAmount": "increases by data byte length",
+    "reset": "does not reset to zero"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "closedSocket.send('x')",
+      "expected_behavior": "does not reopen connection"
+    },
+    {
+      "name": "edge",
+      "input": "closedSocket.bufferedAmount",
+      "expected_behavior": "retains/increases queued-count semantics"
+    }
+  ]
+}

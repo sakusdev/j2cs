@@ -1,0 +1,44 @@
+{
+  "id": "web.websocket.buffered-amount",
+  "category": "web_realtime",
+  "summary": "bufferedAmount counts queued application-data bytes not yet transmitted, excluding protocol/OS framing.",
+  "source": {
+    "pattern": "$socket.bufferedAmount",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketState",
+    "template": "JsRuntime.WebSocketState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "unit": "bytes",
+    "text": "UTF-8 encoded byte length",
+    "binary": "payload bytes",
+    "excludes": [
+      "WebSocket framing",
+      "OS/network hardware buffers"
+    ]
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.send('✓'); socket.bufferedAmount",
+      "expected_behavior": "increases by UTF-8 application bytes in current task"
+    },
+    {
+      "name": "edge",
+      "input": "socket bufferedAmount after network drains",
+      "expected_behavior": "can decrease only as event-loop/network progress is observed"
+    }
+  ]
+}

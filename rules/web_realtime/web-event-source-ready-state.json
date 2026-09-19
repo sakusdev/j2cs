@@ -1,0 +1,41 @@
+{
+  "id": "web.event-source.ready-state",
+  "category": "web_realtime",
+  "summary": "EventSource states are CONNECTING=0, OPEN=1, CLOSED=2 and start CONNECTING.",
+  "source": {
+    "pattern": "$source.readyState",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.EventSourceState",
+    "template": "JsRuntime.EventSourceState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "initial": 0,
+    "open": 1,
+    "closed": 2,
+    "reconnecting": "CONNECTING"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "new EventSource('/events').readyState",
+      "expected_behavior": "initially CONNECTING"
+    },
+    {
+      "name": "edge",
+      "input": "source.close(); source.readyState",
+      "expected_behavior": "CLOSED"
+    }
+  ]
+}

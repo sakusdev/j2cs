@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.send.blob",
+  "category": "web_realtime",
+  "summary": "Blob send uses binary payload bytes and increments bufferedAmount by Blob size.",
+  "source": {
+    "pattern": "$socket.send($blob)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "frame": "binary",
+    "bytes": "Blob raw data",
+    "amount": "Blob.size"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.send(new Blob(['abc']))",
+      "expected_behavior": "queues binary bytes"
+    },
+    {
+      "name": "edge",
+      "input": "empty Blob",
+      "expected_behavior": "queues zero payload bytes"
+    }
+  ]
+}

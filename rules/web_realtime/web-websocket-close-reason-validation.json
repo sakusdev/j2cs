@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.close.reason-validation",
+  "category": "web_realtime",
+  "summary": "close reason is USVString-encoded UTF-8 and may not exceed 123 bytes.",
+  "source": {
+    "pattern": "$socket.close($code,$reason)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "limit_bytes": 123,
+    "over_limit": "SyntaxError DOMException"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.close(1000,'bye')",
+      "expected_behavior": "starts close with reason"
+    },
+    {
+      "name": "edge",
+      "input": "socket.close(1000,'x'.repeat(124))",
+      "expected_behavior": "throws SyntaxError"
+    }
+  ]
+}

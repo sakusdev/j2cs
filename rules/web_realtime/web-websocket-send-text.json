@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.send.text",
+  "category": "web_realtime",
+  "summary": "String send uses a text frame and increments bufferedAmount by UTF-8 byte length.",
+  "source": {
+    "pattern": "$socket.send($string)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "frame": "text",
+    "encoding": "UTF-8",
+    "return": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.send('abc')",
+      "expected_behavior": "queues 3 application bytes"
+    },
+    {
+      "name": "edge",
+      "input": "socket.send('✓')",
+      "expected_behavior": "byte count follows UTF-8, not JS UTF-16 length"
+    }
+  ]
+}

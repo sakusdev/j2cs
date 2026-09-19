@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.protocol",
+  "category": "web_realtime",
+  "summary": "protocol is empty until/if the server selects an offered subprotocol.",
+  "source": {
+    "pattern": "$socket.protocol",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketState",
+    "template": "JsRuntime.WebSocketState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "readonly": true,
+    "default": "",
+    "selection": "server-selected offered protocol"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.protocol",
+      "expected_behavior": "returns selected protocol or empty string"
+    },
+    {
+      "name": "edge",
+      "input": "server selects unoffered protocol",
+      "expected_behavior": "connection establishment fails rather than inventing protocol"
+    }
+  ]
+}

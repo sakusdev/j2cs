@@ -1,0 +1,39 @@
+{
+  "id": "web.event-source.last-event-id-header",
+  "category": "web_realtime",
+  "summary": "Reconnect requests send Last-Event-ID when the stored last event ID string is non-empty.",
+  "source": {
+    "pattern": "EventSource reconnect request",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "header": "Last-Event-ID UTF-8",
+    "condition": "non-empty stored id"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "id: 7 then disconnect",
+      "expected_behavior": "reconnect includes Last-Event-ID: 7"
+    },
+    {
+      "name": "edge",
+      "input": "id field with empty value then disconnect",
+      "expected_behavior": "header omitted"
+    }
+  ]
+}

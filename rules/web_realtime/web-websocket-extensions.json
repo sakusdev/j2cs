@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.extensions",
+  "category": "web_realtime",
+  "summary": "extensions exposes negotiated WebSocket extensions as a string.",
+  "source": {
+    "pattern": "$socket.extensions",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketState",
+    "template": "JsRuntime.WebSocketState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "readonly": true,
+    "default": "",
+    "value": "server-negotiated extensions"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.extensions",
+      "expected_behavior": "returns negotiated extension string"
+    },
+    {
+      "name": "edge",
+      "input": "no extensions negotiated",
+      "expected_behavior": "returns empty string"
+    }
+  ]
+}

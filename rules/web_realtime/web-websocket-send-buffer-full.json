@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.send.buffer-full",
+  "category": "web_realtime",
+  "summary": "If required buffering cannot be accepted, the user agent flags the WebSocket as full and closes it.",
+  "source": {
+    "pattern": "$socket.send($data) when send buffer cannot accept data",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "failure": "close connection rather than arbitrary blocking",
+    "host_boundary": "buffer capacity/network policy"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.send(payload)",
+      "expected_behavior": "queues when capacity permits"
+    },
+    {
+      "name": "edge",
+      "input": "send requiring unavailable buffer capacity",
+      "expected_behavior": "connection is failed/closed per protocol algorithm"
+    }
+  ]
+}

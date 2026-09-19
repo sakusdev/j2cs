@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.send.array-buffer",
+  "category": "web_realtime",
+  "summary": "ArrayBuffer and ArrayBufferView send use the referenced binary bytes.",
+  "source": {
+    "pattern": "$socket.send($bufferSource)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "frame": "binary",
+    "ArrayBuffer": "full buffer bytes",
+    "view": "view-referenced bytes per WebIDL/spec algorithm"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.send(new Uint8Array([1,2,3]))",
+      "expected_behavior": "queues binary data"
+    },
+    {
+      "name": "edge",
+      "input": "socket.send(new ArrayBuffer(0))",
+      "expected_behavior": "valid zero-length binary message"
+    }
+  ]
+}

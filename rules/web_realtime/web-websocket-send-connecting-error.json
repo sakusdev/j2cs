@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.send.connecting-error",
+  "category": "web_realtime",
+  "summary": "send while CONNECTING throws InvalidStateError before queuing data.",
+  "source": {
+    "pattern": "$socket.send($data) when CONNECTING",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "error": "InvalidStateError DOMException",
+    "bufferedAmount": "not incremented by failed call"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "openSocket.send('x')",
+      "expected_behavior": "queues data"
+    },
+    {
+      "name": "edge",
+      "input": "connectingSocket.send('x')",
+      "expected_behavior": "throws InvalidStateError"
+    }
+  ]
+}

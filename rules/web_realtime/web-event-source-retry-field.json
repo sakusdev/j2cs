@@ -1,0 +1,39 @@
+{
+  "id": "web.event-source.retry-field",
+  "category": "web_realtime",
+  "summary": "retry containing only ASCII digits updates the reconnection time in milliseconds; other values are ignored.",
+  "source": {
+    "pattern": "SSE field retry:$value",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "valid": "ASCII digits interpreted base 10 milliseconds",
+    "invalid": "ignored"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "retry: 1500",
+      "expected_behavior": "sets reconnect time 1500ms"
+    },
+    {
+      "name": "edge",
+      "input": "retry: 1.5",
+      "expected_behavior": "ignored"
+    }
+  ]
+}

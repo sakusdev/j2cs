@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.close.code-validation",
+  "category": "web_realtime",
+  "summary": "close validates supplied close codes: 1000 or 3000-4999 are script-usable.",
+  "source": {
+    "pattern": "$socket.close($code,$reason?)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "valid_code": "1000 or 3000..4999",
+    "invalid": "InvalidAccessError DOMException"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.close(1000)",
+      "expected_behavior": "starts close handshake"
+    },
+    {
+      "name": "edge",
+      "input": "socket.close(2000)",
+      "expected_behavior": "throws InvalidAccessError"
+    }
+  ]
+}

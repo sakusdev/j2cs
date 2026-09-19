@@ -1,0 +1,40 @@
+{
+  "id": "web.event-source.last-event-id",
+  "category": "web_realtime",
+  "summary": "id fields update the persistent last event ID used in MessageEvent.lastEventId and future reconnections.",
+  "source": {
+    "pattern": "SSE field id:$id",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "persistence": "remains until changed/reset",
+    "dispatch": "MessageEvent.lastEventId",
+    "reconnect": "Last-Event-ID request header when non-empty"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "id: 42\\ndata: x\\n\\n",
+      "expected_behavior": "event lastEventId is 42"
+    },
+    {
+      "name": "edge",
+      "input": "next event without id",
+      "expected_behavior": "inherits prior last event ID"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.event-source.close",
+  "category": "web_realtime",
+  "summary": "close aborts outstanding fetch work, sets CLOSED, and disables future reconnect.",
+  "source": {
+    "pattern": "$source.close()",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "abort": "active fetch",
+    "state": "CLOSED",
+    "reconnect": false,
+    "return": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "source.close()",
+      "expected_behavior": "transitions CLOSED"
+    },
+    {
+      "name": "edge",
+      "input": "source.close(); network becomes available",
+      "expected_behavior": "does not reconnect"
+    }
+  ]
+}
