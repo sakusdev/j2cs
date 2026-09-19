@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.intersects-node",
+  "category": "dom_shadow_selection",
+  "summary": "Test whether Range intersects node with root-aware semantics.",
+  "source": {
+    "pattern": "$range.intersectsNode($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeIntersectsNode",
+    "template": "NativeDom.RangeIntersectsNode($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "different_root": "false",
+    "parentless_root_node": "special case",
+    "boundary_comparison": true
+  },
+  "caveats": [
+    "Intersection is based on boundary points, not rendered boxes."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* node selected by range */",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* node in another shadow/document root */",
+      "expected_behavior": "returns false"
+    }
+  ]
+}

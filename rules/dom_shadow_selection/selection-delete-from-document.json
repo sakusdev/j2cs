@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.delete-from-document",
+  "category": "dom_shadow_selection",
+  "summary": "Delete associated Range contents through Range.deleteContents semantics.",
+  "source": {
+    "pattern": "$selection.deleteFromDocument()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.DeleteFromDocument",
+    "template": "NativeDomSelection.DeleteFromDocument($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "no-op",
+    "operation": "range.deleteContents",
+    "ce_reactions": true
+  },
+  "caveats": [
+    "Must preserve Range deletion partial-node semantics."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* selected text */ s.deleteFromDocument()",
+      "expected_behavior": "selected content is removed"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* empty selection */",
+      "expected_behavior": "no-op"
+    }
+  ]
+}

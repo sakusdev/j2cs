@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.collapse",
+  "category": "dom_shadow_selection",
+  "summary": "Collapse Range to start or end boundary.",
+  "source": {
+    "pattern": "$range.collapse($toStart)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeCollapse",
+    "template": "NativeDom.RangeCollapse($range, $toStart)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "toStart_true": "end=start",
+    "false_or_omitted": "start=end",
+    "return": "undefined"
+  },
+  "caveats": [
+    "Omitted argument behaves false and collapses to end."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* noncollapsed r */ r.collapse(true)",
+      "expected_behavior": "end becomes start"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* noncollapsed r */ r.collapse()",
+      "expected_behavior": "start becomes end"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.select-all-children",
+  "category": "dom_shadow_selection",
+  "summary": "Select node contents and set anchor/focus endpoints around all children.",
+  "source": {
+    "pattern": "$selection.selectAllChildren($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.SelectAllChildren",
+    "template": "NativeDomSelection.SelectAllChildren($selection, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "anchor": "node,0",
+    "focus": "node,length",
+    "direction": "forward"
+  },
+  "caveats": [
+    "Node length differs for CharacterData vs parent nodes."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* element with 2 children */ s.selectAllChildren(el)",
+      "expected_behavior": "anchorOffset 0 and focusOffset 2"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* text node */",
+      "expected_behavior": "focusOffset uses UTF-16 data length"
+    }
+  ]
+}

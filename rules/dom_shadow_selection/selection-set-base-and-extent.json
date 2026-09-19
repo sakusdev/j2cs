@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.set-base-and-extent",
+  "category": "dom_shadow_selection",
+  "summary": "Set anchor/focus directly and normalize associated Range while retaining direction.",
+  "source": {
+    "pattern": "$selection.setBaseAndExtent($anchorNode, $anchorOffset, $focusNode, $focusOffset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.SetBaseAndExtent",
+    "template": "NativeDomSelection.SetBaseAndExtent($selection, $anchorNode, $anchorOffset, $focusNode, $focusOffset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "offset_validation": "IndexSizeError",
+    "range": "min/max boundary order",
+    "direction": "focus before anchor => backward"
+  },
+  "caveats": [
+    "Associated Range is normalized even for backward Selection."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* anchor before focus */",
+      "expected_behavior": "direction forward and range start=anchor"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* focus before anchor */",
+      "expected_behavior": "direction backward while range start=focus"
+    }
+  ]
+}

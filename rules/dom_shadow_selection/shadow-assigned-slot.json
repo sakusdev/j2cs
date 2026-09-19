@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.assigned-slot",
+  "category": "dom_shadow_selection",
+  "summary": "Return assigned slot for a slottable when observable.",
+  "source": {
+    "pattern": "$slottable.assignedSlot",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetAssignedSlot",
+    "template": "NativeDom.GetAssignedSlot($slottable)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "HTMLSlotElement|null",
+    "closed_tree_visibility": "subject to DOM rules"
+  },
+  "caveats": [
+    "Assignment follows host/shadow slotting, not nearest slot element in DOM ancestry."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* host with shadow <slot> and child */ child.assignedSlot",
+      "expected_behavior": "returns the slot when assigned"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* unmatched slot name */",
+      "expected_behavior": "returns null or default-slot assignment per name"
+    }
+  ]
+}

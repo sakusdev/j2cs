@@ -1,0 +1,42 @@
+{
+  "id": "dom.range.extract-contents",
+  "category": "dom_shadow_selection",
+  "summary": "Extract selected contents into DocumentFragment while mutating source Range tree.",
+  "source": {
+    "pattern": "$range.extractContents()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeExtractContents",
+    "template": "NativeDom.RangeExtractContents($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "DocumentFragment",
+    "fully_contained": "moved/cloned per algorithm",
+    "partial_ancestors": "cloned wrappers",
+    "source": "selected content removed"
+  },
+  "caveats": [
+    "Partially contained ancestors are structurally cloned into fragment."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* range selecting node */ const f=r.extractContents()",
+      "expected_behavior": "returns DocumentFragment and removes selected content"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* partial nested elements */",
+      "expected_behavior": "fragment preserves required cloned ancestor structure"
+    }
+  ]
+}

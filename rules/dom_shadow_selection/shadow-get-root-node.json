@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.get-root-node",
+  "category": "dom_shadow_selection",
+  "summary": "Return tree root or shadow-including root with composed option.",
+  "source": {
+    "pattern": "$node.getRootNode($options)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetRootNode",
+    "template": "NativeDom.GetRootNode($node, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "composed_false": "tree root, possibly ShadowRoot",
+    "composed_true": "shadow-including root, often Document"
+  },
+  "caveats": [
+    "composed:true crosses shadow-host boundaries; default does not."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* node inside shadow */ n.getRootNode()===shadow",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* node inside connected shadow */ n.getRootNode({composed:true})===document",
+      "expected_behavior": "true"
+    }
+  ]
+}

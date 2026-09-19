@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.range-count",
+  "category": "dom_shadow_selection",
+  "summary": "Expose 0/1 Selection range availability under document-tree constraints.",
+  "source": {
+    "pattern": "$selection.rangeCount",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.GetRangeCount",
+    "template": "NativeDomSelection.GetRangeCount($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty_or_endpoint_outside_document_tree": 0,
+    "otherwise": 1
+  },
+  "caveats": [
+    "Selection endpoints can exist in shadow trees; document-tree/composed constraints affect exposure."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=getSelection();s.removeAllRanges();console.log(s.rangeCount)",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* selection with associated range */",
+      "expected_behavior": "reports 1 when endpoints are valid for associated document"
+    }
+  ]
+}

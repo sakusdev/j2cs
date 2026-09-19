@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.set-start",
+  "category": "dom_shadow_selection",
+  "summary": "Set start boundary with offset/root/order validation and possible end collapse.",
+  "source": {
+    "pattern": "$range.setStart($node, $offset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSetStart",
+    "template": "NativeDom.RangeSetStart($range, $node, $offset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "offset_validation": "IndexSizeError",
+    "node_validation": "InvalidNodeTypeError for doctype",
+    "different_root_or_after_end": "end becomes new start"
+  },
+  "caveats": [
+    "Moving start past end collapses end to start rather than creating reversed Range."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=document.createRange();const t=document.createTextNode('abc');r.setStart(t,1);console.log(r.startOffset)",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* setStart after current end */",
+      "expected_behavior": "Range collapses to new start"
+    }
+  ]
+}

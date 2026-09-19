@@ -1,0 +1,42 @@
+{
+  "id": "dom.range.clone-contents",
+  "category": "dom_shadow_selection",
+  "summary": "Clone selected contents into DocumentFragment without mutating source.",
+  "source": {
+    "pattern": "$range.cloneContents()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeCloneContents",
+    "template": "NativeDom.RangeCloneContents($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "DocumentFragment",
+    "deep_clones": true,
+    "partial_character_data": "selected substring clone",
+    "source_unchanged": true
+  },
+  "caveats": [
+    "Event listeners/JS object identity are not copied by Node cloning."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* selected node */ const f=r.cloneContents()",
+      "expected_behavior": "source DOM remains unchanged"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* cloned Element */",
+      "expected_behavior": "returned nodes are distinct identities"
+    }
+  ]
+}

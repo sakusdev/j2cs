@@ -1,0 +1,41 @@
+{
+  "id": "dom.shadow.slot.assign",
+  "category": "dom_shadow_selection",
+  "summary": "Set manual slot assignment for manual ShadowRoot mode.",
+  "source": {
+    "pattern": "$slot.assign(...$nodes)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.AssignSlotManually",
+    "template": "NativeDom.AssignSlotManually($slot, $nodes)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode_requirement": "manual slot assignment",
+    "slottables": "explicit list",
+    "reassignment": true
+  },
+  "caveats": [
+    "Manual assignment does not mean DOM reparenting."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* manual ShadowRoot */ slot.assign(child)",
+      "expected_behavior": "child becomes manually assigned without changing light-DOM parent"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* named-mode root */",
+      "expected_behavior": "manual assignment semantics follow spec restrictions/behavior"
+    }
+  ]
+}

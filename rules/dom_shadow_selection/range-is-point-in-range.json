@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.is-point-in-range",
+  "category": "dom_shadow_selection",
+  "summary": "Test whether a boundary point lies within Range.",
+  "source": {
+    "pattern": "$range.isPointInRange($node, $offset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeIsPointInRange",
+    "template": "NativeDom.RangeIsPointInRange($range, $node, $offset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "different_root": "false",
+    "invalid_offset": "IndexSizeError",
+    "inclusive_boundaries": true
+  },
+  "caveats": [
+    "Different-root point returns false rather than being ordered across trees."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* point inside range */",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* node in different root */",
+      "expected_behavior": "returns false"
+    }
+  ]
+}

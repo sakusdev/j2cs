@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.set-start-after",
+  "category": "dom_shadow_selection",
+  "summary": "Set start immediately after node.",
+  "source": {
+    "pattern": "$range.setStartAfter($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSetStartAfter",
+    "template": "NativeDom.RangeSetStartAfter($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parent_required": true,
+    "boundary": "parent,index(node)+1"
+  },
+  "caveats": [
+    "Detached node has no valid boundary."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* parent with child */ r.setStartAfter(child)",
+      "expected_behavior": "start offset is child index + 1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* detached */",
+      "expected_behavior": "throws InvalidNodeTypeError"
+    }
+  ]
+}

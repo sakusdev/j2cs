@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.to-string",
+  "category": "dom_shadow_selection",
+  "summary": "Stringify associated Range selected text.",
+  "source": {
+    "pattern": "$selection.toString()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.ToString",
+    "template": "NativeDomSelection.ToString($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "empty string",
+    "text": "Range.toString semantics"
+  },
+  "caveats": [
+    "Selection stringification excludes markup."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* selection over text */ String(s)",
+      "expected_behavior": "returns selected text"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* selection over elements */",
+      "expected_behavior": "does not return HTML markup"
+    }
+  ]
+}

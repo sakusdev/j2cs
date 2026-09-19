@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.type-direction",
+  "category": "dom_shadow_selection",
+  "summary": "Expose Selection type and direction strings.",
+  "source": {
+    "pattern": "$selection.$property",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.GetTypeOrDirection",
+    "template": "NativeDomSelection.GetTypeOrDirection($selection, $property)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "None|Caret|Range",
+    "direction": "none|forward|backward"
+  },
+  "caveats": [
+    "Direction is independent of normalized Range start/end ordering."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=getSelection();s.removeAllRanges();console.log(s.type)",
+      "expected_behavior": "prints None"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* backward noncollapsed selection */",
+      "expected_behavior": "type is Range while direction is backward"
+    }
+  ]
+}

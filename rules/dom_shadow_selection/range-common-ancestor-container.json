@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.common-ancestor-container",
+  "category": "dom_shadow_selection",
+  "summary": "Return deepest common ancestor of start/end containers.",
+  "source": {
+    "pattern": "$range.commonAncestorContainer",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeCommonAncestor",
+    "template": "NativeDom.RangeCommonAncestor($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "existing Node",
+    "tree": "same root invariant"
+  },
+  "caveats": [
+    "This need not be an Element."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* range wholly in one Text node */",
+      "expected_behavior": "commonAncestorContainer can be that Text node"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* range across siblings */",
+      "expected_behavior": "returns their shared parent/ancestor"
+    }
+  ]
+}

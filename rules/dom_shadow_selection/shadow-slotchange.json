@@ -1,0 +1,41 @@
+{
+  "id": "dom.shadow.slotchange",
+  "category": "dom_shadow_selection",
+  "summary": "Preserve queued slotchange event semantics after assignment changes.",
+  "source": {
+    "pattern": "$slot slotchange event",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomSlotChange($slot)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "slotchange",
+    "bubbles": true,
+    "composed": false,
+    "queued": "signal slot list / mutation checkpoint behavior"
+  },
+  "caveats": [
+    "Do not dispatch synchronously at each low-level mutation."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* append slottable changing assignment */",
+      "expected_behavior": "slotchange is dispatched according to DOM signaling timing"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* multiple changes before delivery */",
+      "expected_behavior": "coalescing/queued signaling follows DOM algorithm"
+    }
+  ]
+}

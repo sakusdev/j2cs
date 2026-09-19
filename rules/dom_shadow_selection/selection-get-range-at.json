@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.get-range-at",
+  "category": "dom_shadow_selection",
+  "summary": "Return same associated Range object by reference.",
+  "source": {
+    "pattern": "$selection.getRangeAt($index)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.GetRangeAt",
+    "template": "NativeDomSelection.GetRangeAt($selection, $index)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "valid_index": "0 only",
+    "empty": "IndexSizeError",
+    "identity": "same Range object"
+  },
+  "caveats": [
+    "Must not return a clone; mutations to Range remain reflected in Selection."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* nonempty selection */ s.getRangeAt(0)===s.getRangeAt(0)",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mutate returned range */",
+      "expected_behavior": "selection changes because same Range is retained"
+    }
+  ]
+}

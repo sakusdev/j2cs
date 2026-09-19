@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.set-end",
+  "category": "dom_shadow_selection",
+  "summary": "Set end boundary with validation and possible start collapse.",
+  "source": {
+    "pattern": "$range.setEnd($node, $offset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSetEnd",
+    "template": "NativeDom.RangeSetEnd($range, $node, $offset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "offset_validation": "IndexSizeError",
+    "different_root_or_before_start": "start becomes new end"
+  },
+  "caveats": [
+    "Moving end before start collapses start to end."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=document.createRange();const t=document.createTextNode('abc');r.setEnd(t,2);console.log(r.endOffset)",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* setEnd before current start */",
+      "expected_behavior": "Range collapses to new end"
+    }
+  ]
+}

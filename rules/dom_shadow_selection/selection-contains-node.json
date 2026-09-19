@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.contains-node",
+  "category": "dom_shadow_selection",
+  "summary": "Test full or partial containment against associated Range.",
+  "source": {
+    "pattern": "$selection.containsNode($node, $allowPartial)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.ContainsNode",
+    "template": "NativeDomSelection.ContainsNode($selection, $node, $allowPartial)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": false,
+    "allowPartial_default": false,
+    "tree_boundary_logic": true
+  },
+  "caveats": [
+    "Containment uses DOM Range boundaries, not visual selection painting."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* fully selected child */",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* partially selected node, allowPartial=false/true */",
+      "expected_behavior": "false then true"
+    }
+  ]
+}

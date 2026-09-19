@@ -1,0 +1,41 @@
+{
+  "id": "dom.shadow.slot.name",
+  "category": "dom_shadow_selection",
+  "summary": "Reflect slot name and trigger reassignment effects.",
+  "source": {
+    "pattern": "$slot.name = $value",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetSlotName",
+    "template": "NativeDom.SetSlotName($slot, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reflection": "name content attribute",
+    "reassignment": "host slottables recalculated",
+    "slotchange_may_queue": true
+  },
+  "caveats": [
+    "Changing name can redistribute assigned nodes."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=document.createElement('slot');s.name='x';console.log(s.getAttribute('name'))",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* change slot name in shadow tree */",
+      "expected_behavior": "assigned-node sets may change and slotchange may be queued"
+    }
+  ]
+}

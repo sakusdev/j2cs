@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.remove-all-ranges",
+  "category": "dom_shadow_selection",
+  "summary": "Disassociate Selection range and clear anchor/focus.",
+  "source": {
+    "pattern": "$selection.removeAllRanges()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.RemoveAllRanges",
+    "template": "NativeDomSelection.RemoveAllRanges($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "rangeCount": 0,
+    "anchor_focus": null,
+    "selectionchange_may_schedule": true
+  },
+  "caveats": [
+    "empty() is alias but generic array clearing is unrelated."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=getSelection();s.removeAllRanges();console.log(s.rangeCount)",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* after clearing */",
+      "expected_behavior": "anchorNode and focusNode are null"
+    }
+  ]
+}

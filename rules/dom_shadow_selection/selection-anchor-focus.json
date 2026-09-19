@@ -1,0 +1,47 @@
+{
+  "id": "dom.selection.anchor-focus",
+  "category": "dom_shadow_selection",
+  "summary": "Expose anchor/focus nodes and offsets preserving selection direction.",
+  "source": {
+    "pattern": "$selection.$property",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.GetEndpointProperty",
+    "template": "NativeDomSelection.GetEndpointProperty($selection, $property)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "properties": [
+      "anchorNode",
+      "anchorOffset",
+      "focusNode",
+      "focusOffset"
+    ],
+    "empty_nodes": "null",
+    "empty_offsets": 0,
+    "direction_sensitive": true
+  },
+  "caveats": [
+    "Anchor is not always Range.start; backward selections swap anchor/focus roles."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* forward selection */",
+      "expected_behavior": "anchor=start and focus=end"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* backward selection */",
+      "expected_behavior": "anchor=end and focus=start"
+    }
+  ]
+}

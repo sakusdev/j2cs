@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.select-node",
+  "category": "dom_shadow_selection",
+  "summary": "Select node by boundaries before/after it.",
+  "source": {
+    "pattern": "$range.selectNode($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSelectNode",
+    "template": "NativeDom.RangeSelectNode($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "start": "before node",
+    "end": "after node",
+    "parent_required": true
+  },
+  "caveats": [
+    "Selecting Document/DocumentType constraints differ from selecting contents."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* child in parent */ r.selectNode(child)",
+      "expected_behavior": "range surrounds child in parent"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* detached node */",
+      "expected_behavior": "throws InvalidNodeTypeError"
+    }
+  ]
+}

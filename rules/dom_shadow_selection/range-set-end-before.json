@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.set-end-before",
+  "category": "dom_shadow_selection",
+  "summary": "Set end immediately before node.",
+  "source": {
+    "pattern": "$range.setEndBefore($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSetEndBefore",
+    "template": "NativeDom.RangeSetEndBefore($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parent_required": true,
+    "boundary": "parent,index(node)"
+  },
+  "caveats": [
+    "Detached node is invalid."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* parent with child */ r.setEndBefore(child)",
+      "expected_behavior": "end offset is child index"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* detached */",
+      "expected_behavior": "throws InvalidNodeTypeError"
+    }
+  ]
+}

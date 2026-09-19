@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.detach",
+  "category": "dom_shadow_selection",
+  "summary": "Preserve legacy Range.detach as a no-op.",
+  "source": {
+    "pattern": "$range.detach()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeDetachNoOp",
+    "template": "NativeDom.RangeDetachNoOp($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "range_remains_usable": true
+  },
+  "caveats": [
+    "Do not dispose underlying range state."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=document.createRange();r.detach();console.log(r.collapsed)",
+      "expected_behavior": "Range remains usable"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* call methods after detach */",
+      "expected_behavior": "methods still work"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.set-start-before",
+  "category": "dom_shadow_selection",
+  "summary": "Set start immediately before node in its parent.",
+  "source": {
+    "pattern": "$range.setStartBefore($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSetStartBefore",
+    "template": "NativeDom.RangeSetStartBefore($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parent_required": true,
+    "boundary": "parent,index(node)"
+  },
+  "caveats": [
+    "Detached node with null parent causes InvalidNodeTypeError."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* parent with child */ r.setStartBefore(child)",
+      "expected_behavior": "startContainer is parent and offset is child index"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* detached node */",
+      "expected_behavior": "throws InvalidNodeTypeError"
+    }
+  ]
+}

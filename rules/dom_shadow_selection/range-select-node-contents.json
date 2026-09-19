@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.select-node-contents",
+  "category": "dom_shadow_selection",
+  "summary": "Select entire contents of node.",
+  "source": {
+    "pattern": "$range.selectNodeContents($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSelectNodeContents",
+    "template": "NativeDom.RangeSelectNodeContents($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "start": "node,0",
+    "end": "node,length",
+    "doctype": "InvalidNodeTypeError"
+  },
+  "caveats": [
+    "For CharacterData length means UTF-16 code units; for Element it means child count."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const t=document.createTextNode('abc');const r=document.createRange();r.selectNodeContents(t);console.log(r.endOffset)",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* Element with two children */",
+      "expected_behavior": "endOffset is 2"
+    }
+  ]
+}

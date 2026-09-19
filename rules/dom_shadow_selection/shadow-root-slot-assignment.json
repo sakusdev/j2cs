@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.root.slot-assignment",
+  "category": "dom_shadow_selection",
+  "summary": "Expose named/manual slot-assignment mode.",
+  "source": {
+    "pattern": "$shadow.slotAssignment",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetShadowSlotAssignment",
+    "template": "NativeDom.GetShadowSlotAssignment($shadow)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "named|manual",
+    "creation_option": true
+  },
+  "caveats": [
+    "Manual slotting changes assigned-node calculation."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const h=document.createElement('div');const s=h.attachShadow({mode:'open'});console.log(s.slotAssignment)",
+      "expected_behavior": "prints named by default"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* slotAssignment:'manual' */",
+      "expected_behavior": "automatic slot-name assignment is not used"
+    }
+  ]
+}

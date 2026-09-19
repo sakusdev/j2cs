@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.clone-range",
+  "category": "dom_shadow_selection",
+  "summary": "Create independent Range object with same boundary points.",
+  "source": {
+    "pattern": "$range.cloneRange()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.CloneRange",
+    "template": "NativeDom.CloneRange($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "new Range identity",
+    "boundaries": "copied",
+    "future_direct_mutation": "independent"
+  },
+  "caveats": [
+    "Both ranges remain live to DOM mutation but changing one Range's endpoints does not change the other."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=document.createRange();const c=r.cloneRange();console.log(c!==r)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* c.setStart(...) */",
+      "expected_behavior": "does not change r's explicit boundary setting"
+    }
+  ]
+}

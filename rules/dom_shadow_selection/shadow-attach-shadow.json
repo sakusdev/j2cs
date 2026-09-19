@@ -1,0 +1,42 @@
+{
+  "id": "dom.shadow.attach-shadow",
+  "category": "dom_shadow_selection",
+  "summary": "Attach a ShadowRoot to an eligible host with mode and init semantics.",
+  "source": {
+    "pattern": "$element.attachShadow($init)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.AttachShadow",
+    "template": "NativeDom.AttachShadow($element, $init)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "host_validation": true,
+    "mode": "open|closed",
+    "duplicate_root": "NotSupportedError except declarative-root reuse case",
+    "custom_elements": "registry constraints"
+  },
+  "caveats": [
+    "Shadow host eligibility and existing roots are observable; do not attach to arbitrary nodes."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const h=document.createElement('div');const s=h.attachShadow({mode:'open'});console.log(s.host===h)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const h=document.createElement('div');h.attachShadow({mode:'open'});try{h.attachShadow({mode:'open'})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints NotSupportedError"
+    }
+  ]
+}

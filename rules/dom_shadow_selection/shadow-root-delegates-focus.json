@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.root.delegates-focus",
+  "category": "dom_shadow_selection",
+  "summary": "Expose delegatesFocus creation flag.",
+  "source": {
+    "pattern": "$shadow.delegatesFocus",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetShadowDelegatesFocus",
+    "template": "NativeDom.GetShadowDelegatesFocus($shadow)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "focus_behavior": "host focus can delegate into shadow tree"
+  },
+  "caveats": [
+    "Focus delegation affects host/shadow focus behavior and cannot be inferred from descendants."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const h=document.createElement('div');console.log(h.attachShadow({mode:'open',delegatesFocus:true}).delegatesFocus)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* delegatesFocus false */",
+      "expected_behavior": "host focus does not use delegation behavior"
+    }
+  ]
+}
