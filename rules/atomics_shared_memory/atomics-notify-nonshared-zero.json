@@ -1,0 +1,39 @@
+{
+  "id": "atomics.notify-nonshared-zero",
+  "category": "atomics_shared_memory",
+  "summary": "Atomics.notify validates a waitable integer typed array but returns +0 for ordinary ArrayBuffer backing instead of throwing for non-shared memory.",
+  "source": {
+    "pattern": "Atomics.notify($ta,$index,$count?)",
+    "requirements": {
+      "typed_array": "Int32Array|BigInt64Array",
+      "backing": "ArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.notify_nonshared_zero",
+    "template": "JsAtomics.notify_nonshared_zero($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": 0,
+    "waiter_list": "not consulted",
+    "contrast": "wait/waitAsync throw TypeError on same nonshared backing"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "Int32 ordinary",
+      "input": "console.log(Atomics.notify(new Int32Array(new ArrayBuffer(4)),0));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "BigInt64 ordinary",
+      "input": "console.log(Atomics.notify(new BigInt64Array(new ArrayBuffer(8)),0));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "atomics.compare-exchange-coercion-order",
+  "category": "atomics_shared_memory",
+  "summary": "Preserve compareExchange expected-value then replacement-value coercion order before revalidation and atomic access.",
+  "source": {
+    "pattern": "Atomics.compareExchange($ta,$index,$expected,$replacement)",
+    "requirements": {
+      "arguments_may_execute_user_code": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.compare_exchange_coercion_order",
+    "template": "JsRuntime.Atomics.compare_exchange_coercion_order($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "validate access; coerce expected; coerce replacement; revalidate; atomic compare/exchange",
+    "side_effects": "observable",
+    "abrupt_completion": "stops later steps"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "Number coercion order",
+      "input": "const log=[];const a=new Int32Array(new SharedArrayBuffer(4));Atomics.compareExchange(a,0,{valueOf(){log.push('e');return 0}},{valueOf(){log.push('r');return 1}});console.log(log.join(''));",
+      "expected_behavior": "prints er"
+    },
+    {
+      "name": "throw stops replacement",
+      "input": "const log=[];const a=new Int32Array(new SharedArrayBuffer(4));try{Atomics.compareExchange(a,0,{valueOf(){throw 1}},{valueOf(){log.push('r');return 1}})}catch{}console.log(log.length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

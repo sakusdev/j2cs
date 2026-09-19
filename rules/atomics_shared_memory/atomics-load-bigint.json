@@ -1,0 +1,38 @@
+{
+  "id": "atomics.load-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically load a BigInt element using sequentially-consistent memory ordering.",
+  "source": {
+    "pattern": "Atomics.load($ta,$index)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.load_bigint",
+    "template": "JsAtomics.load_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "current BigInt element",
+    "ordering": "seq-cst",
+    "no_tearing": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "load bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=7n;console.log(Atomics.load(a,0));",
+      "expected_behavior": "prints 7n"
+    },
+    {
+      "name": "ordinary backing",
+      "input": "const a=new BigInt64Array(new ArrayBuffer(8));a[0]=2n;console.log(Atomics.load(a,0));",
+      "expected_behavior": "prints 2n"
+    }
+  ]
+}

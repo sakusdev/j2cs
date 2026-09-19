@@ -1,0 +1,39 @@
+{
+  "id": "atomics.store-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically store a Number integer value with seq-cst ordering and return the coerced pre-element-conversion value.",
+  "source": {
+    "pattern": "Atomics.store($ta,$index,$value)",
+    "requirements": {
+      "content_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.store_number",
+    "template": "JsAtomics.store_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToIntegerOrInfinity",
+    "storage": "element-width NumericToRawBytes conversion",
+    "return": "coerced Number before width truncation",
+    "ordering": "seq-cst"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "store",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));console.log(Atomics.store(a,0,5),a[0]);",
+      "expected_behavior": "prints 5 5"
+    },
+    {
+      "name": "return differs from stored Uint8",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));console.log(Atomics.store(a,0,257),a[0]);",
+      "expected_behavior": "prints 257 1"
+    }
+  ]
+}

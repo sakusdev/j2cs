@@ -1,0 +1,39 @@
+{
+  "id": "atomics.wait-nonshared-throws",
+  "category": "atomics_shared_memory",
+  "summary": "Atomics.wait and waitAsync require a SharedArrayBuffer-backed waitable typed array; ordinary ArrayBuffer causes TypeError.",
+  "source": {
+    "pattern": "Atomics.$wait($ta,$index,$expected,$timeout?)",
+    "requirements": {
+      "operation": "wait|waitAsync",
+      "backing": "ArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.wait_nonshared_throws",
+    "template": "JsAtomics.wait_nonshared_throws($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "TypeError",
+    "before_wait_queue": true,
+    "ordinary_nonwait_atomics": "remain allowed"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "wait nonshared",
+      "input": "try{Atomics.wait(new Int32Array(new ArrayBuffer(4)),0,0,0)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "waitAsync nonshared",
+      "input": "try{Atomics.waitAsync(new Int32Array(new ArrayBuffer(4)),0,0,0)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

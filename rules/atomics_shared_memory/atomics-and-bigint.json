@@ -1,0 +1,38 @@
+{
+  "id": "atomics.and-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically bitwise-AND BigInt storage and return the old BigInt value.",
+  "source": {
+    "pattern": "Atomics.and($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.and_bigint",
+    "template": "JsAtomics.and_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToBigInt",
+    "return": "old BigInt element",
+    "update": "bytewise atomic AND"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "and bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=15n;console.log(Atomics.and(a,0,6n),a[0]);",
+      "expected_behavior": "prints 15n 6n"
+    },
+    {
+      "name": "type mismatch",
+      "input": "try{Atomics.and(new BigInt64Array(new SharedArrayBuffer(8)),0,1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

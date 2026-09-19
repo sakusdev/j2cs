@@ -1,0 +1,40 @@
+{
+  "id": "atomics.wait-bigint64",
+  "category": "atomics_shared_memory",
+  "summary": "Synchronously wait on a SharedArrayBuffer-backed BigInt64Array using ToBigInt64 expected-value semantics.",
+  "source": {
+    "pattern": "Atomics.wait($bigint64,$index,$expected,$timeout?)",
+    "requirements": {
+      "typed_array": "BigInt64Array",
+      "backing": "SharedArrayBuffer",
+      "agent_may_suspend": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.wait_bigint64",
+    "template": "JsRuntime.Atomics.wait_bigint64($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "expected": "ToBigInt64",
+    "result": "ok|not-equal|timed-out",
+    "waiter_list": "shared by agents for location"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "not equal bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=1n;console.log(Atomics.wait(a,0,0n,0));",
+      "expected_behavior": "prints not-equal"
+    },
+    {
+      "name": "Number expected rejected",
+      "input": "try{Atomics.wait(new BigInt64Array(new SharedArrayBuffer(8)),0,0,0)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

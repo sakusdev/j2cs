@@ -1,0 +1,39 @@
+{
+  "id": "atomics.compare-exchange-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically compare the current Number integer element and conditionally replace it, returning the old value in both cases.",
+  "source": {
+    "pattern": "Atomics.compareExchange($ta,$index,$expected,$replacement)",
+    "requirements": {
+      "content_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.compare_exchange_number",
+    "template": "JsAtomics.compare_exchange_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "expected_replacement": "ToIntegerOrInfinity then element conversion",
+    "comparison": "raw element bytes/value at element width",
+    "return": "old element",
+    "replacement": "only when equal"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "match",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=3;console.log(Atomics.compareExchange(a,0,3,9),a[0]);",
+      "expected_behavior": "prints 3 9"
+    },
+    {
+      "name": "mismatch",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=3;console.log(Atomics.compareExchange(a,0,2,9),a[0]);",
+      "expected_behavior": "prints 3 3"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "atomics.add-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically add a Number-converted operand and return the old integer element value.",
+  "source": {
+    "pattern": "Atomics.add($ta,$index,$value)",
+    "requirements": {
+      "content_type": "Number",
+      "integer_typed_array": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.add_number",
+    "template": "JsAtomics.add_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToIntegerOrInfinity then element-byte conversion",
+    "return": "old element value",
+    "update": "atomic addition with element-width wrapping",
+    "ordering": "seq-cst"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "old value",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=3;console.log(Atomics.add(a,0,2),a[0]);",
+      "expected_behavior": "prints 3 5"
+    },
+    {
+      "name": "narrow wrap",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));a[0]=255;console.log(Atomics.add(a,0,2),a[0]);",
+      "expected_behavior": "prints 255 1"
+    }
+  ]
+}

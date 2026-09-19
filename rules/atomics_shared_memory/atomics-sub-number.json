@@ -1,0 +1,40 @@
+{
+  "id": "atomics.sub-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically subtract a Number operand and return the old element value.",
+  "source": {
+    "pattern": "Atomics.sub($ta,$index,$value)",
+    "requirements": {
+      "content_type": "Number",
+      "integer_typed_array": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.sub_number",
+    "template": "JsAtomics.sub_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToIntegerOrInfinity",
+    "return": "old element",
+    "update": "atomic subtraction with element-width wrapping",
+    "ordering": "seq-cst"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "subtract",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=5;console.log(Atomics.sub(a,0,2),a[0]);",
+      "expected_behavior": "prints 5 3"
+    },
+    {
+      "name": "Uint8 wrap",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));a[0]=0;Atomics.sub(a,0,1);console.log(a[0]);",
+      "expected_behavior": "prints 255"
+    }
+  ]
+}

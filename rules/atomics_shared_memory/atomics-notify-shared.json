@@ -1,0 +1,40 @@
+{
+  "id": "atomics.notify-shared",
+  "category": "atomics_shared_memory",
+  "summary": "Notify up to count waiters at a shared Int32Array/BigInt64Array location and return the number removed/notified.",
+  "source": {
+    "pattern": "Atomics.notify($ta,$index,$count?)",
+    "requirements": {
+      "waitable_typed_array": true,
+      "backing": "SharedArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.notify_shared",
+    "template": "JsRuntime.Atomics.notify_shared($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "count_omitted": "+Infinity",
+    "count_conversion": "max(ToIntegerOrInfinity(count),0)",
+    "return": "number of waiters removed",
+    "waiter_list": "per shared block/index"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "no waiters",
+      "input": "console.log(Atomics.notify(new Int32Array(new SharedArrayBuffer(4)),0));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "negative count",
+      "input": "console.log(Atomics.notify(new Int32Array(new SharedArrayBuffer(4)),0,-1));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

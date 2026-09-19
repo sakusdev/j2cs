@@ -1,0 +1,40 @@
+{
+  "id": "atomics.seq-cst-memory-order",
+  "category": "atomics_shared_memory",
+  "summary": "Use ECMAScript sequentially-consistent atomic memory ordering for Atomics memory events.",
+  "source": {
+    "pattern": "[[AtomicsSeqCstAccess]]($operation)",
+    "requirements": {
+      "semantic_operation": "ECMAScript atomic memory event",
+      "shared_memory_possible": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.seq_cst_memory_order",
+    "template": "JsRuntime.Atomics.seq_cst_memory_order($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "memory_order": "seq-cst for Atomics load/store/RMW",
+    "no_tearing": true,
+    "agent_model": "ECMAScript memory model",
+    "not_plain_volatile": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "atomic guarantee",
+      "input": "// two agents coordinate via SharedArrayBuffer and Atomics.store/load",
+      "expected_behavior": "observations must satisfy ECMAScript atomic memory model"
+    },
+    {
+      "name": "not plain field",
+      "input": "// lowering to an unsynchronized ordinary C# array read/write",
+      "expected_behavior": "is insufficient when shared agents can race"
+    }
+  ]
+}

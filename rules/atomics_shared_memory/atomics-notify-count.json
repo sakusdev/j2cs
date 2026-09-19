@@ -1,0 +1,39 @@
+{
+  "id": "atomics.notify-count",
+  "category": "atomics_shared_memory",
+  "summary": "Coerce Atomics.notify count with ToIntegerOrInfinity and clamp negatives to zero.",
+  "source": {
+    "pattern": "Atomics.notify($ta,$index,$count)",
+    "requirements": {
+      "waitable_typed_array": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.notify_count",
+    "template": "JsAtomics.notify_count($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined": "+Infinity/all eligible waiters",
+    "negative": "0",
+    "fractional": "ToIntegerOrInfinity truncation",
+    "return": "actual notified count"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "negative",
+      "input": "console.log(Atomics.notify(new Int32Array(new SharedArrayBuffer(4)),0,-3));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "fractional no waiters",
+      "input": "console.log(Atomics.notify(new Int32Array(new SharedArrayBuffer(4)),0,1.9));",
+      "expected_behavior": "prints 0 with no waiters; effective count is 1"
+    }
+  ]
+}

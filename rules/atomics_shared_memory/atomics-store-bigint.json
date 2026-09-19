@@ -1,0 +1,39 @@
+{
+  "id": "atomics.store-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically store a BigInt value and return the coerced BigInt before element-width wrapping.",
+  "source": {
+    "pattern": "Atomics.store($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.store_bigint",
+    "template": "JsAtomics.store_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToBigInt",
+    "storage": "BigInt element-width conversion",
+    "return": "coerced BigInt",
+    "ordering": "seq-cst"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "store bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));console.log(Atomics.store(a,0,5n),a[0]);",
+      "expected_behavior": "prints 5n 5n"
+    },
+    {
+      "name": "Number rejected",
+      "input": "try{Atomics.store(new BigInt64Array(new SharedArrayBuffer(8)),0,5)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

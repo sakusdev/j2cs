@@ -1,0 +1,38 @@
+{
+  "id": "atomics.load-revalidation",
+  "category": "atomics_shared_memory",
+  "summary": "Atomics.load performs the specified revalidation step even though it has no value operand coercion.",
+  "source": {
+    "pattern": "Atomics.load($ta,$index)",
+    "requirements": {
+      "semantic_operation": "Atomics.load",
+      "resizable_or_growable_buffer_possible": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.load_revalidation",
+    "template": "JsAtomics.load_revalidation($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "validation": "ValidateAtomicAccessOnIntegerTypedArray then RevalidateAtomicAccess",
+    "memory_event": "only after valid current bounds"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "normal load",
+      "input": "console.log(Atomics.load(new Int32Array(new SharedArrayBuffer(4)),0));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "bounds failure",
+      "input": "try{Atomics.load(new Int32Array(new ArrayBuffer(4)),1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}
