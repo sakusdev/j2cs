@@ -1,0 +1,37 @@
+{
+  "id": "structured-clone.transfer-unreachable",
+  "category": "workers_messaging",
+  "summary": "Process valid transfer-list objects even if they are unreachable from the cloned value.",
+  "source": {
+    "pattern": "structuredClone($value,{transfer:[$unreachable]})",
+    "requirements": {
+      "transferable_may_be_unreachable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_transfer_unreachable",
+    "template": "JsWorkersMessaging.structured_clone_transfer_unreachable($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "transfer_side_effect": "still occurs",
+    "clone": "no invented reference"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "detach",
+      "input": "const b=new ArrayBuffer(4),c=structuredClone({x:1},{transfer:[b]});console.log(c.x,b.byteLength);",
+      "expected_behavior": "prints 1 0"
+    },
+    {
+      "name": "no property",
+      "input": "const b=new ArrayBuffer(1),c=structuredClone({}, {transfer:[b]});console.log(Object.keys(c).length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

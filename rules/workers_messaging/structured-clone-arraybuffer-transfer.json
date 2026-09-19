@@ -1,0 +1,39 @@
+{
+  "id": "structured-clone.arraybuffer-transfer",
+  "category": "workers_messaging",
+  "summary": "Transfer ArrayBuffer storage and detach the sender-side buffer using canonical BINARY semantics.",
+  "source": {
+    "pattern": "structuredClone($value,{transfer:[$buffer]})",
+    "requirements": {
+      "binding": "intrinsic structuredClone",
+      "transfer_item": "ArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_arraybuffer_transfer",
+    "template": "JsWorkersMessaging.structured_clone_arraybuffer_transfer($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source": "detached",
+    "recipient": "receives storage",
+    "binary_owner": "BINARY"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "detach",
+      "input": "const b=new ArrayBuffer(2),c=structuredClone(b,{transfer:[b]});console.log(b.byteLength,c.byteLength);",
+      "expected_behavior": "prints 0 2"
+    },
+    {
+      "name": "bytes",
+      "input": "const b=Uint8Array.from([4]).buffer,c=structuredClone(b,{transfer:[b]});console.log(new Uint8Array(c)[0]);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

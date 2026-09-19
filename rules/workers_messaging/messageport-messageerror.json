@@ -1,0 +1,39 @@
+{
+  "id": "messageport.messageerror",
+  "category": "workers_messaging",
+  "summary": "Fire messageerror for receiver-side structured-data deserialization failure, distinct from sender-side DataCloneError.",
+  "source": {
+    "pattern": "[[MessagePortDeserializeFailure]]($record)",
+    "requirements": {
+      "semantic_operation": "MessagePort deserialize failure"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_messageerror",
+    "template": "JsRuntime.WorkersMessaging.messageport_messageerror($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "messageerror",
+    "phase": "delivery task",
+    "source_serialization_error": "separate synchronous DataCloneError"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html",
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "handler surface",
+      "input": "const c=new MessageChannel();c.port2.onmessageerror=()=>{};console.log(c.port2.onmessageerror!==undefined);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "source failure",
+      "input": "try{structuredClone(()=>{})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError synchronously"
+    }
+  ]
+}

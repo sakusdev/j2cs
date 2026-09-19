@@ -1,0 +1,39 @@
+{
+  "id": "messageport.start",
+  "category": "workers_messaging",
+  "summary": "Enable the MessagePort message queue; repeated start calls are idempotent.",
+  "source": {
+    "pattern": "$port.start()",
+    "requirements": {
+      "receiver": "MessagePort",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_start",
+    "template": "JsRuntime.WorkersMessaging.messageport_start($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "queue": "enabled",
+    "idempotent": true,
+    "return": "undefined"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "return",
+      "input": "const c=new MessageChannel();console.log(c.port1.start()===undefined);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "repeat",
+      "input": "const c=new MessageChannel();c.port1.start();c.port1.start();console.log('ok');c.port1.close();c.port2.close();",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

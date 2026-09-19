@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.array-map-set",
+  "category": "workers_messaging",
+  "summary": "Clone Array, Map, and Set containers while preserving ordering and graph aliases.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($collection)",
+    "requirements": {
+      "static_type": "Array|Map|Set"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_array_map_set",
+    "template": "JsWorkersMessaging.structured_clone_array_map_set($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "order": "preserved",
+    "container_identity": "new",
+    "contained_values": "recursively cloned"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "map",
+      "input": "const k={};const m=new Map([[k,2]]),c=structuredClone(m),ck=[...c.keys()][0];console.log(ck!==k,c.get(ck));",
+      "expected_behavior": "prints true 2"
+    },
+    {
+      "name": "set",
+      "input": "console.log([...structuredClone(new Set([3,1,2]))].join(','));",
+      "expected_behavior": "prints 3,1,2"
+    }
+  ]
+}

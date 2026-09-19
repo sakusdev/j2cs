@@ -1,0 +1,38 @@
+{
+  "id": "messageport.channel-constructor",
+  "category": "workers_messaging",
+  "summary": "Construct MessageChannel with two distinct, mutually entangled MessagePort endpoints.",
+  "source": {
+    "pattern": "new MessageChannel()",
+    "requirements": {
+      "binding": "intrinsic MessageChannel"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_channel_constructor",
+    "template": "JsRuntime.WorkersMessaging.messageport_channel_constructor($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ports": "distinct",
+    "entangled": true,
+    "port_queues": "initially disabled until enabled"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "distinct",
+      "input": "const c=new MessageChannel();console.log(c.port1!==c.port2);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "port methods",
+      "input": "const c=new MessageChannel();console.log(typeof c.port1.postMessage);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

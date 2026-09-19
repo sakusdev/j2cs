@@ -1,0 +1,40 @@
+{
+  "id": "worker.messageerror-event",
+  "category": "workers_messaging",
+  "summary": "Expose messageerror on Worker for receiver-side deserialization failures, distinct from source-side DataCloneError.",
+  "source": {
+    "pattern": "$worker.onmessageerror = $handler",
+    "requirements": {
+      "receiver": "intrinsic Worker",
+      "event_handler_attribute": "onmessageerror"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_messageerror_event",
+    "template": "JsRuntime.WorkersMessaging.worker_messageerror_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "messageerror",
+    "phase": "target deserialization",
+    "source_failure": "synchronous DataCloneError"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "handler",
+      "input": "// browser: worker.onmessageerror=e=>console.log(e.type)",
+      "expected_behavior": "can observe messageerror"
+    },
+    {
+      "name": "source difference",
+      "input": "// browser: worker.postMessage(()=>{})",
+      "expected_behavior": "throws DataCloneError synchronously"
+    }
+  ]
+}

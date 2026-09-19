@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.arraybuffer-clone",
+  "category": "workers_messaging",
+  "summary": "Copy ArrayBuffer bytes when cloning without transfer, reusing BINARY backing-store semantics.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($buffer)",
+    "requirements": {
+      "static_type": "ArrayBuffer",
+      "not_in_transfer_list": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_arraybuffer_clone",
+    "template": "JsWorkersMessaging.structured_clone_arraybuffer_clone($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source_detached": false,
+    "backing_store": "distinct copy"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "copy",
+      "input": "const b=Uint8Array.from([1,2]).buffer,c=structuredClone(b);new Uint8Array(c)[0]=9;console.log(new Uint8Array(b)[0]);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "attached",
+      "input": "const b=new ArrayBuffer(4);structuredClone(b);console.log(b.byteLength);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

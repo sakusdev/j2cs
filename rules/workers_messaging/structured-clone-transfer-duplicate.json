@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.transfer-duplicate",
+  "category": "workers_messaging",
+  "summary": "Reject duplicate transferable identities with DataCloneError before successful transfer.",
+  "source": {
+    "pattern": "structuredClone($value,{transfer:$list})",
+    "requirements": {
+      "transfer_list_may_have_duplicates": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_transfer_duplicate",
+    "template": "JsWorkersMessaging.structured_clone_transfer_duplicate($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "duplicate": "DataCloneError",
+    "identity_based": true,
+    "partial_success": false
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "duplicate",
+      "input": "const b=new ArrayBuffer(1);try{structuredClone({}, {transfer:[b,b]})}catch(e){console.log(e.name,b.byteLength)}",
+      "expected_behavior": "prints DataCloneError and buffer remains attached"
+    },
+    {
+      "name": "distinct",
+      "input": "const a=new ArrayBuffer(1),b=new ArrayBuffer(1);structuredClone({}, {transfer:[a,b]});console.log(a.byteLength,b.byteLength);",
+      "expected_behavior": "prints 0 0"
+    }
+  ]
+}

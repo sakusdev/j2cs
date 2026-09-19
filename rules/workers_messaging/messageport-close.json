@@ -1,0 +1,39 @@
+{
+  "id": "messageport.close",
+  "category": "workers_messaging",
+  "summary": "Mark a MessagePort detached and disentangle it from its remote endpoint.",
+  "source": {
+    "pattern": "$port.close()",
+    "requirements": {
+      "receiver": "MessagePort",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_close",
+    "template": "JsRuntime.WorkersMessaging.messageport_close($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "detached": true,
+    "entanglement": "removed",
+    "return": "undefined"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "return",
+      "input": "const c=new MessageChannel();console.log(c.port1.close()===undefined);c.port2.close();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "repeat",
+      "input": "const c=new MessageChannel();c.port1.close();c.port1.close();console.log('ok');c.port2.close();",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.typedarray-view",
+  "category": "workers_messaging",
+  "summary": "Clone TypedArray/DataView metadata over the correspondingly cloned backing store.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($view)",
+    "requirements": {
+      "static_type": "TypedArray|DataView"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_typedarray_view",
+    "template": "JsWorkersMessaging.structured_clone_typedarray_view($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "kind": "preserved",
+    "offset_length": "preserved",
+    "shared_input_buffer_aliases": "preserved"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "typed array",
+      "input": "const a=new Uint16Array([1,2]),c=structuredClone(a);console.log(c instanceof Uint16Array,c[1]);",
+      "expected_behavior": "prints true 2"
+    },
+    {
+      "name": "shared cloned buffer",
+      "input": "const b=new ArrayBuffer(8),a=new Uint8Array(b),d=new DataView(b),c=structuredClone({a,d});console.log(c.a.buffer===c.d.buffer);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

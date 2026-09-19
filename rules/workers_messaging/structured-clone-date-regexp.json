@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.date-regexp",
+  "category": "workers_messaging",
+  "summary": "Clone Date and RegExp structured data without string coercion.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($value)",
+    "requirements": {
+      "static_type": "Date|RegExp"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_date_regexp",
+    "template": "JsWorkersMessaging.structured_clone_date_regexp($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "date": "time value",
+    "regexp": "source+flags",
+    "identity": "new"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "date",
+      "input": "const d=new Date(123),c=structuredClone(d);console.log(c!==d,c.getTime());",
+      "expected_behavior": "prints true 123"
+    },
+    {
+      "name": "regexp",
+      "input": "const c=structuredClone(/ab/gi);console.log(c.source,c.flags);",
+      "expected_behavior": "prints ab gi"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.uncloneable",
+  "category": "workers_messaging",
+  "summary": "Reject non-serializable functions, Symbol primitives, and other unsupported values with DataCloneError.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($value)",
+    "requirements": {
+      "semantic_operation": "StructuredSerialize",
+      "value_statically_uncloneable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_uncloneable",
+    "template": "JsWorkersMessaging.structured_clone_uncloneable($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "DataCloneError",
+    "clone_returned": false
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "function",
+      "input": "try{structuredClone(()=>{})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError"
+    },
+    {
+      "name": "symbol",
+      "input": "try{structuredClone(Symbol())}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "worker.constructor-classic",
+  "category": "workers_messaging",
+  "summary": "Create a dedicated classic Worker using host URL resolution/fetch, a separate worker global, and an implicit message channel.",
+  "source": {
+    "pattern": "new Worker($scriptURL,$options?)",
+    "requirements": {
+      "binding": "intrinsic Worker",
+      "worker_type": "classic",
+      "host_workers_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_constructor_classic",
+    "template": "JsRuntime.WorkersMessaging.worker_constructor_classic($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "url": "resolved relative to outside settings",
+    "invalid_url": "SyntaxError DOMException",
+    "script": "classic",
+    "host_fetch_security": "observable"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "host boundary",
+      "input": "// browser: new Worker('worker.js')",
+      "expected_behavior": "creates a dedicated worker or throws according to URL/fetch/security policy"
+    },
+    {
+      "name": "invalid URL",
+      "input": "// browser: new Worker('http://[invalid')",
+      "expected_behavior": "throws SyntaxError during URL parsing"
+    }
+  ]
+}

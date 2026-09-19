@@ -1,0 +1,40 @@
+{
+  "id": "messageport.delivery-task",
+  "category": "workers_messaging",
+  "summary": "Deserialize a queued port message in the target realm and fire MessageEvent asynchronously.",
+  "source": {
+    "pattern": "[[MessagePortDeliveryTask]]($record)",
+    "requirements": {
+      "semantic_operation": "MessagePort delivery task"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_delivery_task",
+    "template": "JsRuntime.WorkersMessaging.messageport_delivery_task($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "queue": "port message queue",
+    "event": "message",
+    "data": "deserialized clone",
+    "ports": "transferred ports",
+    "synchronous": false
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "task ordering",
+      "input": "const c=new MessageChannel();let x=0;c.port2.onmessage=()=>console.log(x);c.port1.postMessage(1);x=1;",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "data",
+      "input": "const c=new MessageChannel();c.port2.onmessage=e=>{console.log(e.data.x);c.port1.close();c.port2.close()};c.port1.postMessage({x:3});",
+      "expected_behavior": "eventually prints 3"
+    }
+  ]
+}

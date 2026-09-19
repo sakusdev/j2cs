@@ -1,0 +1,37 @@
+{
+  "id": "structured-clone.cycles",
+  "category": "workers_messaging",
+  "summary": "Preserve cycles and repeated-reference aliases via serialization memory.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($graph)",
+    "requirements": {
+      "semantic_operation": "StructuredSerialize"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_cycles",
+    "template": "JsWorkersMessaging.structured_clone_cycles($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "cycles": true,
+    "repeated_reference": "same cloned identity"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "cycle",
+      "input": "const x={};x.x=x;const y=structuredClone(x);console.log(y.x===y);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "alias",
+      "input": "const c={};const y=structuredClone({a:c,b:c});console.log(y.a===y.b);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

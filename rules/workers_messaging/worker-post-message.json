@@ -1,0 +1,41 @@
+{
+  "id": "worker.post-message",
+  "category": "workers_messaging",
+  "summary": "Delegate Worker.postMessage to its implicit outside MessagePort with synchronous structured serialization and asynchronous delivery.",
+  "source": {
+    "pattern": "$worker.postMessage($message,$options?)",
+    "requirements": {
+      "receiver": "intrinsic Worker",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_post_message",
+    "template": "JsRuntime.WorkersMessaging.worker_post_message($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "StructuredSerializeWithTransfer during call",
+    "delivery": "worker-side port task",
+    "return": "undefined",
+    "transfer": "canonical structured-clone semantics"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "data",
+      "input": "// browser: worker.postMessage({x:1})",
+      "expected_behavior": "worker later receives a cloned object"
+    },
+    {
+      "name": "bad clone",
+      "input": "// browser: worker.postMessage(()=>{})",
+      "expected_behavior": "throws DataCloneError synchronously"
+    }
+  ]
+}

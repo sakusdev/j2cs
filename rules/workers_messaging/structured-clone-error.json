@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.error",
+  "category": "workers_messaging",
+  "summary": "Clone supported Error objects without promising engine-specific stack strings.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($error)",
+    "requirements": {
+      "static_type": "Error"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.structured_clone_error",
+    "template": "JsRuntime.WorkersMessaging.structured_clone_error($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "message_name": "preserved per profile",
+    "stack": "implementation dependent",
+    "identity": "new"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "message",
+      "input": "const c=structuredClone(new Error('x'));console.log(c instanceof Error,c.message);",
+      "expected_behavior": "prints true x"
+    },
+    {
+      "name": "stack portable",
+      "input": "const c=structuredClone(new Error('x'));console.log(typeof c.stack);",
+      "expected_behavior": "exact stack text is not portable"
+    }
+  ]
+}
