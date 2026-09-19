@@ -28,7 +28,7 @@ python tools/coverage_gap.py \
 Issue creation is dry-run by default:
 
 ```bash
-python tools/create_gap_issues.py --top 10
+python tools/create_gap_issues.py --top 30
 ```
 
 With `GITHUB_TOKEN` and `GITHUB_REPOSITORY`, `--apply` creates READY
@@ -38,3 +38,15 @@ deduplicated.
 The `Coverage gaps` GitHub Actions workflow always produces a report artifact.
 Its manual `workflow_dispatch` can additionally create the highest-ranked
 READY issues.
+
+## Large waves and batch workers
+
+The default manual Coverage-gaps wave size is now **30** candidate Issues.
+
+For large waves, do not launch one chat per Issue. Use `prompts/batch-worker.md`.
+A batch worker processes up to **5 READY Issues sequentially**, producing one
+independent branch and PR per Issue. Multiple batch workers can run in parallel
+because each Issue still uses `work/issue-<N>` as its atomic claim lock.
+
+A 30-Issue wave therefore needs about six batch-worker launches rather than
+thirty single-Issue launches.
