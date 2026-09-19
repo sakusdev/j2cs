@@ -1,0 +1,45 @@
+{
+  "id": "electron.protocol.protocol-response-legacy",
+  "category": "electron_net_protocol",
+  "summary": "Preserve legacy ProtocolResponse status/header/data/path/url/session conversion rules when old APIs are encountered.",
+  "source": {
+    "pattern": "legacy ProtocolResponse $response",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolLegacyResponse($response)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "status_default": 200,
+    "charset_default": "utf-8",
+    "mime_default": "text/html",
+    "data": "Buffer|string|Node Readable",
+    "path": "file response",
+    "url": "URL response",
+    "session": "URL fetch session"
+  },
+  "caveats": [
+    "mimeType is ignored when content-type header already exists; body field meanings depend on legacy response kind."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* legacy {statusCode:201,data:'x'} */",
+      "expected_behavior": "legacy API converts according to ProtocolResponse contract"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mimeType plus content-type header */",
+      "expected_behavior": "explicit content-type header wins"
+    }
+  ]
+}

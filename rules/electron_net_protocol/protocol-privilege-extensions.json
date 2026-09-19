@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.privilege-extensions",
+  "category": "electron_net_protocol",
+  "summary": "Allow Chrome extensions on pages served by the custom protocol.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{allowExtensions:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterExtensionScheme",
+    "template": "ElectronCompat.Protocol.RegisterExtensionScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "allowExtensions": true,
+    "default": false
+  },
+  "caveats": [
+    "This is a distinct privilege and should not be implied by secure/standard."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* allowExtensions:true */",
+      "expected_behavior": "Electron permits extension integration for scheme"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* omitted */",
+      "expected_behavior": "extension use is not implicitly allowed"
+    }
+  ]
+}

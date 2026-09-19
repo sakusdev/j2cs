@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.request-error-close-order",
+  "category": "electron_net_protocol",
+  "summary": "Preserve Electron network failure and terminal close ordering.",
+  "source": {
+    "pattern": "$request error/close transaction events",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestTerminalEvents($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "network_failure": "error event",
+    "typical_order": "error then close",
+    "close": "last event across request/response transaction",
+    "no_response_on_request_error": "typically"
+  },
+  "caveats": [
+    "Do not map failure directly to a synchronous exception from net.request."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* unreachable endpoint */",
+      "expected_behavior": "network failure is reported asynchronously as error"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* close event */",
+      "expected_behavior": "close is terminal: no later request/response events"
+    }
+  ]
+}

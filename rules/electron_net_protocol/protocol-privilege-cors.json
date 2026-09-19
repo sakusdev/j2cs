@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.privilege-cors",
+  "category": "electron_net_protocol",
+  "summary": "Enable CORS handling for custom scheme.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{corsEnabled:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterCorsScheme",
+    "template": "ElectronCompat.Protocol.RegisterCorsScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "corsEnabled": true,
+    "cors_policy": "Chromium Fetch/CORS"
+  },
+  "caveats": [
+    "CORS-enabled does not mean cross-origin requests are universally allowed."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* corsEnabled:true */",
+      "expected_behavior": "Chromium applies CORS semantics for scheme"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* cross-origin response lacks permission */",
+      "expected_behavior": "can still be blocked by CORS policy"
+    }
+  ]
+}

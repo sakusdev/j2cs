@@ -1,0 +1,40 @@
+{
+  "id": "electron.protocol.privilege-fetch",
+  "category": "electron_net_protocol",
+  "summary": "Enable Fetch API support for custom scheme.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{supportFetchAPI:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterFetchScheme",
+    "template": "ElectronCompat.Protocol.RegisterFetchScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "supportFetchAPI": true
+  },
+  "caveats": [
+    "Having protocol.handle registered does not by itself imply renderer Fetch support."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* supportFetchAPI:true */",
+      "expected_behavior": "Fetch API can target scheme subject to policy"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* false/omitted */",
+      "expected_behavior": "must not assume fetch() support"
+    }
+  ]
+}

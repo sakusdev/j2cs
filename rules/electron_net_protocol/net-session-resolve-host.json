@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.session-resolve-host",
+  "category": "electron_net_protocol",
+  "summary": "Resolve host using a specific Electron Session's Chromium resolver state.",
+  "source": {
+    "pattern": "$session.resolveHost($host, $options)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSessionResolveHost($session, $host, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "session": "explicit receiver",
+    "return": "Promise<ResolvedHost>",
+    "options": "same resolver controls as net.resolveHost"
+  },
+  "caveats": [
+    "net.resolveHost resolves through default Session only."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* ses.resolveHost(host) */",
+      "expected_behavior": "uses selected Session's resolver state"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* different session proxy/cache/DNS state */",
+      "expected_behavior": "must not collapse to global/default Session"
+    }
+  ]
+}

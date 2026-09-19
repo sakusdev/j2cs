@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.default-session",
+  "category": "electron_net_protocol",
+  "summary": "Treat top-level electron.protocol as protocol manager for default Session.",
+  "source": {
+    "pattern": "electron.protocol",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.GetDefaultSessionProtocol",
+    "template": "ElectronCompat.Protocol.GetDefaultSessionProtocol()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "session": "default Session",
+    "availability": "after app ready for ordinary methods"
+  },
+  "caveats": [
+    "BrowserWindow with custom partition will not use default-session custom handler."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* protocol.handle('app',...) */",
+      "expected_behavior": "handler belongs to default Session"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* BrowserWindow partition:'persist:x' */",
+      "expected_behavior": "its requests do not automatically use default Session protocol handler"
+    }
+  ]
+}

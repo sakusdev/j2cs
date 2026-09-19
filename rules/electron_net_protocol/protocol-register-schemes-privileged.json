@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.register-schemes-privileged",
+  "category": "electron_net_protocol",
+  "summary": "Register custom scheme privilege metadata before app ready, once per application.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged($schemes)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolRegisterSchemesAsPrivileged($schemes)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timing": "before app ready only",
+    "call_count": "once",
+    "privileges": "host Chromium scheme registration"
+  },
+  "caveats": [
+    "Calling after ready or repeatedly is not equivalent to runtime handler registration."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* top-level before ready */ protocol.registerSchemesAsPrivileged([{scheme:'app',privileges:{standard:true}}])",
+      "expected_behavior": "scheme privilege metadata is registered for Chromium initialization"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* call after app ready */",
+      "expected_behavior": "violates Electron timing contract"
+    }
+  ]
+}

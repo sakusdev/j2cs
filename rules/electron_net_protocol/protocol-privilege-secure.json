@@ -1,0 +1,40 @@
+{
+  "id": "electron.protocol.privilege-secure",
+  "category": "electron_net_protocol",
+  "summary": "Mark custom scheme as secure for Chromium security classification.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{secure:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterSecureScheme",
+    "template": "ElectronCompat.Protocol.RegisterSecureScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "secure_context_classification": true
+  },
+  "caveats": [
+    "secure:true is security-origin state, not merely HTTPS-like spelling."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* secure custom scheme */",
+      "expected_behavior": "Chromium treats scheme as secure according to Electron privilege"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* secure omitted */",
+      "expected_behavior": "must not assume secure-context capabilities"
+    }
+  ]
+}

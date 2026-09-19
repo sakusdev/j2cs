@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.privilege-bypass-csp",
+  "category": "electron_net_protocol",
+  "summary": "Allow resources from custom scheme to bypass CSP where Electron grants the privilege.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{bypassCSP:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterBypassCspScheme",
+    "template": "ElectronCompat.Protocol.RegisterBypassCspScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "bypassCSP": true,
+    "security_sensitive": true
+  },
+  "caveats": [
+    "This materially weakens policy and must not be enabled implicitly."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* scheme registered with bypassCSP:true */",
+      "expected_behavior": "Electron grants documented CSP-bypass privilege"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* option omitted */",
+      "expected_behavior": "normal CSP enforcement remains applicable"
+    }
+  ]
+}

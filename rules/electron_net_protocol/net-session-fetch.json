@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.session-fetch",
+  "category": "electron_net_protocol",
+  "summary": "Issue Electron Fetch through a specific Session instead of default Session.",
+  "source": {
+    "pattern": "$session.fetch($input, $init)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSessionFetch($session, $input, $init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "session": "explicit receiver",
+    "cookies_cache_proxy_protocol": "receiver Session state",
+    "web_fetch_semantics_owner": "WEB_URL_FETCH"
+  },
+  "caveats": [
+    "net.fetch convenience always uses default Session; session.fetch is required for other partitions."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* ses.fetch(url) */",
+      "expected_behavior": "uses ses networking state"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* custom protocol registered only on ses.protocol */",
+      "expected_behavior": "request sees that session-scoped handler rather than default-session protocol state"
+    }
+  ]
+}

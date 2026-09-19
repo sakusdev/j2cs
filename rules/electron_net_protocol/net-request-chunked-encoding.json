@@ -1,0 +1,43 @@
+{
+  "id": "electron.net.request-chunked-encoding",
+  "category": "electron_net_protocol",
+  "summary": "Set ClientRequest chunked encoding only before first body write.",
+  "source": {
+    "pattern": "$request.chunkedEncoding = $value",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.SetChunkedEncoding",
+    "template": "ElectronCompat.Net.SetChunkedEncoding($request, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default": false,
+    "writable_before_first_write": true,
+    "after_first_write": "throws",
+    "memory": "stream chunks instead of internal buffering"
+  },
+  "caveats": [
+    "The property becomes immutable after request headers may have gone on wire."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* new request */ r.chunkedEncoding=true",
+      "expected_behavior": "enables chunked transfer mode"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* r.write('x'); r.chunkedEncoding=true */",
+      "expected_behavior": "throws"
+    }
+  ]
+}

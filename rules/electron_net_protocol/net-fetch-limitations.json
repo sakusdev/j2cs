@@ -1,0 +1,44 @@
+{
+  "id": "electron.net.fetch-limitations",
+  "category": "electron_net_protocol",
+  "summary": "Preserve Electron-specific net.fetch limitations over generic Fetch.",
+  "source": {
+    "pattern": "net.fetch($input, $init)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetFetch($input, $init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "unsupported_schemes": [
+      "data:",
+      "blob:"
+    ],
+    "integrity_option": "ignored",
+    "response_type_and_url": "documented incorrect in Electron"
+  },
+  "caveats": [
+    "Generic WEB_URL_FETCH rules alone do not capture these Electron deviations."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* net.fetch data: URL */",
+      "expected_behavior": "not supported by Electron net.fetch"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* integrity option */",
+      "expected_behavior": "Electron ignores integrity rather than enforcing Fetch integrity"
+    }
+  ]
+}

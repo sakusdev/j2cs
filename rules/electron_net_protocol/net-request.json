@@ -1,0 +1,46 @@
+{
+  "id": "electron.net.request",
+  "category": "electron_net_protocol",
+  "summary": "Create Chromium-network-stack ClientRequest with Electron session/proxy semantics.",
+  "source": {
+    "pattern": "net.request($options)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "ClientRequest immediately",
+    "network_stack": "Chromium",
+    "protocols": [
+      "http:",
+      "https:"
+    ],
+    "auto_end": false,
+    "session": "option/partition/default resolution"
+  },
+  "caveats": [
+    "Electron ClientRequest resembles Node http.ClientRequest but uses Chromium networking and must be ended explicitly."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* after ready */ const r=net.request('https://example.com')",
+      "expected_behavior": "returns ClientRequest before network completion"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* omit r.end() */",
+      "expected_behavior": "request is not implicitly finalized like net.fetch"
+    }
+  ]
+}

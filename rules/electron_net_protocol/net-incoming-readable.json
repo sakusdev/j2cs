@@ -1,0 +1,47 @@
+{
+  "id": "electron.net.incoming-readable",
+  "category": "electron_net_protocol",
+  "summary": "Reuse Node readable/EventEmitter semantics for Electron IncomingMessage body.",
+  "source": {
+    "pattern": "$response as IncomingMessage",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeStreams.AsReadable",
+    "template": "NodeStreams.AsReadable($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "interface": "Readable Stream + EventEmitter",
+    "data_chunks": "Buffer",
+    "events": [
+      "data",
+      "end",
+      "aborted",
+      "error"
+    ]
+  },
+  "caveats": [
+    "Header receipt does not eagerly materialize the body."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* response.on('data',chunk) */",
+      "expected_behavior": "chunks are Buffer values"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* server closes mid-body */",
+      "expected_behavior": "response error can occur before request close"
+    }
+  ]
+}

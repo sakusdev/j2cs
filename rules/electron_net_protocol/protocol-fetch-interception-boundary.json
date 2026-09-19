@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.fetch-interception-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Route Electron net.fetch through protocol.handle before built-in scheme handler unless bypassed.",
+  "source": {
+    "pattern": "net.fetch request to handled scheme or intercepted built-in scheme",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolFetchDispatch($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default": "custom handler eligible",
+    "bypass_option": "skip custom protocol handler",
+    "webRequest": "still participates"
+  },
+  "caveats": [
+    "This ordering is Electron host networking state and should not be duplicated inside WEB_URL_FETCH."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* protocol.handle('https',...); net.fetch(matchingUrl) */",
+      "expected_behavior": "custom handler can intercept"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* bypassCustomProtocolHandlers:true */",
+      "expected_behavior": "custom handler is skipped while webRequest can still run"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "electron.net.incoming-headers",
+  "category": "electron_net_protocol",
+  "summary": "Expose normalized Electron response headers with Node-like duplicate policy.",
+  "source": {
+    "pattern": "$response.headers",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.GetResponseHeaders",
+    "template": "ElectronCompat.Net.GetResponseHeaders($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "names": "lowercase",
+    "set_cookie": "array",
+    "cookie_duplicates": "joined '; '",
+    "other_duplicates": "joined ', '",
+    "selected_singletons": "duplicates discarded"
+  },
+  "caveats": [
+    "Header duplicate handling is header-name-specific."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* response.headers */",
+      "expected_behavior": "header names are lowercased"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* multiple set-cookie */",
+      "expected_behavior": "set-cookie remains an array instead of comma-joined string"
+    }
+  ]
+}

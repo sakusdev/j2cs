@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-follow-redirect",
+  "category": "electron_net_protocol",
+  "summary": "Continue pending manual redirect only during redirect event.",
+  "source": {
+    "pattern": "$request.followRedirect()",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestFollowRedirect($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "valid_context": "synchronous redirect event",
+    "outside_event": "invalid",
+    "manual_mode": "required to continue handled redirect"
+  },
+  "caveats": [
+    "Scheduling followRedirect later is too late."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* inside redirect listener: r.followRedirect() */",
+      "expected_behavior": "continues pending redirect"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* setTimeout(()=>r.followRedirect()) */",
+      "expected_behavior": "does not satisfy synchronous redirect continuation requirement"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.protocol.unhandle",
+  "category": "electron_net_protocol",
+  "summary": "Remove handler registered by protocol.handle for that Protocol/Session.",
+  "source": {
+    "pattern": "$protocol.unhandle($scheme)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolUnhandle($protocol, $scheme)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "effect": "remove modern handler",
+    "session_scoped": true
+  },
+  "caveats": [
+    "Unhandling default Session does not remove same scheme handler from another Session."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* handle then unhandle */",
+      "expected_behavior": "modern handler is removed for that Protocol instance"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* handler also exists on custom session */",
+      "expected_behavior": "custom session handler remains"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-get-header",
+  "category": "electron_net_protocol",
+  "summary": "Read a previously set extra ClientRequest header.",
+  "source": {
+    "pattern": "$request.getHeader($name)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.GetRequestHeader",
+    "template": "ElectronCompat.Net.GetRequestHeader($request, $name)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "string",
+    "scope": "extra headers set on request"
+  },
+  "caveats": [
+    "This is not a snapshot of every Chromium-generated outgoing header."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* r.setHeader('X-Test','v'); r.getHeader('X-Test') */",
+      "expected_behavior": "returns v"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* implicit browser-generated header */",
+      "expected_behavior": "must not assume getHeader exposes every final network header"
+    }
+  ]
+}

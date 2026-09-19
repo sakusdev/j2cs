@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-session-precedence",
+  "category": "electron_net_protocol",
+  "summary": "Honor explicit Session over partition when constructing ClientRequest.",
+  "source": {
+    "pattern": "net.request({session:$session, partition:$partition, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "session_option": "wins",
+    "partition_option": "ignored when session supplied",
+    "default_partition": "empty/default session"
+  },
+  "caveats": [
+    "Using both session and partition does not merge their cookie/proxy/cache state."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* net.request({url,session:ses,partition:'persist:x'}) */",
+      "expected_behavior": "uses ses"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* distinct partition state */",
+      "expected_behavior": "partition is ignored because explicit session supersedes it"
+    }
+  ]
+}

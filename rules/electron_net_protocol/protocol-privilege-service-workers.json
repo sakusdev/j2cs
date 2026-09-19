@@ -1,0 +1,40 @@
+{
+  "id": "electron.protocol.privilege-service-workers",
+  "category": "electron_net_protocol",
+  "summary": "Allow ServiceWorker registration for custom scheme.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{allowServiceWorkers:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterServiceWorkerScheme",
+    "template": "ElectronCompat.Protocol.RegisterServiceWorkerScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "allowServiceWorkers": true
+  },
+  "caveats": [
+    "Protocol.handle alone does not make a scheme ServiceWorker-capable."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* privilege enabled */",
+      "expected_behavior": "scheme is eligible for ServiceWorker use subject to other requirements"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* omitted */",
+      "expected_behavior": "do not assume ServiceWorker registration works"
+    }
+  ]
+}

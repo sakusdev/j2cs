@@ -1,0 +1,48 @@
+{
+  "id": "electron.net.request-priority",
+  "category": "electron_net_protocol",
+  "summary": "Preserve Chromium/Electron network request priority metadata.",
+  "source": {
+    "pattern": "net.request({priority:$priority, priorityIncremental:$inc, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "priority": [
+      "throttled",
+      "idle",
+      "lowest",
+      "low",
+      "medium",
+      "highest"
+    ],
+    "default": "idle",
+    "incremental_default": true
+  },
+  "caveats": [
+    "Do not map to thread priority."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* priority:'high' */",
+      "expected_behavior": "Chromium networking receives high request priority"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* priorityIncremental:false */",
+      "expected_behavior": "HTTP extensible-priority incremental flag is disabled"
+    }
+  ]
+}

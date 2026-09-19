@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.request-end",
+  "category": "electron_net_protocol",
+  "summary": "Finalize ClientRequest and prevent subsequent write/end operations.",
+  "source": {
+    "pattern": "$request.end($chunk, $encoding, $callback)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestEnd($request, $chunk, $encoding, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "same request",
+    "optional_final_chunk": true,
+    "finish_event": "just after end operation",
+    "subsequent_write_or_end": "not allowed"
+  },
+  "caveats": [
+    "Calling end is required for net.request and is a lifecycle transition."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* r.end() */",
+      "expected_behavior": "returns the ClientRequest and finalizes request body"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* r.end(); r.write('x') */",
+      "expected_behavior": "later write is not allowed"
+    }
+  ]
+}

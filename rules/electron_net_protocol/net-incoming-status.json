@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.incoming-status",
+  "category": "electron_net_protocol",
+  "summary": "Expose Electron IncomingMessage HTTP status code/message.",
+  "source": {
+    "pattern": "$response.statusCode / $response.statusMessage",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.GetResponseStatus",
+    "template": "ElectronCompat.Net.GetResponseStatus($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "statusCode": "Integer",
+    "statusMessage": "string",
+    "readonly": true
+  },
+  "caveats": [
+    "HTTP error status is a response, not necessarily a network error event."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* HTTP 404 response */",
+      "expected_behavior": "statusCode is 404"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* 500 */",
+      "expected_behavior": "still delivered as response status rather than request network failure"
+    }
+  ]
+}

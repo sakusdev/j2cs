@@ -1,0 +1,42 @@
+{
+  "id": "electron.protocol.scheme-name",
+  "category": "electron_net_protocol",
+  "summary": "Validate custom scheme name using RFC-style scheme grammar and canonical case-insensitive meaning.",
+  "source": {
+    "pattern": "protocol.handle($scheme, $handler)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.ValidateSchemeName",
+    "template": "ElectronCompat.Protocol.ValidateSchemeName($scheme)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "grammar": "starts with letter; then letters/digits/+.-",
+    "case_insensitive": true,
+    "canonical": "lowercase conceptually"
+  },
+  "caveats": [
+    "Do not accept arbitrary URI prefix strings containing colon/slashes."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* scheme 'my-app' */",
+      "expected_behavior": "is valid scheme name"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* scheme '1bad' */",
+      "expected_behavior": "fails scheme-name validity requirements"
+    }
+  ]
+}

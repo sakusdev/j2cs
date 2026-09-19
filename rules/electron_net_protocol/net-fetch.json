@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.fetch",
+  "category": "electron_net_protocol",
+  "summary": "Issue Fetch-compatible request through Chromium default Session/network stack.",
+  "source": {
+    "pattern": "net.fetch($input, $init)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetFetch($input, $init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<GlobalResponse>",
+    "network_stack": "Chromium",
+    "session": "default Session",
+    "web_fetch_semantics_owner": "WEB_URL_FETCH"
+  },
+  "caveats": [
+    "Electron net.fetch is not Node fetch/undici; proxy/session/custom-protocol integration differs."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* await net.fetch('https://example.com') */",
+      "expected_behavior": "uses Electron Chromium network stack and resolves GlobalResponse"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* application proxy/session configuration */",
+      "expected_behavior": "default Electron Session networking state applies"
+    }
+  ]
+}

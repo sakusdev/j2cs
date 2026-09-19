@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.incoming-http-version",
+  "category": "electron_net_protocol",
+  "summary": "Expose IncomingMessage protocol version fields.",
+  "source": {
+    "pattern": "$response.httpVersion / $response.httpVersionMajor / $response.httpVersionMinor",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.GetResponseHttpVersion",
+    "template": "ElectronCompat.Net.GetResponseHttpVersion($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "httpVersion": "string",
+    "major": "integer",
+    "minor": "integer"
+  },
+  "caveats": [
+    "Do not infer HTTP version from request URL scheme."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* response */",
+      "expected_behavior": "httpVersion describes negotiated/response protocol version"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* https URL */",
+      "expected_behavior": "scheme alone does not imply a specific HTTP version"
+    }
+  ]
+}

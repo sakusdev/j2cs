@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-partition",
+  "category": "electron_net_protocol",
+  "summary": "Bind ClientRequest to the Electron Session associated with partition.",
+  "source": {
+    "pattern": "net.request({partition:$partition, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequestForPartition($partition, $rest)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "persist_prefix": "persistent session",
+    "no_persist_prefix": "in-memory session",
+    "state": "cookies/cache/proxy/auth isolated by Session"
+  },
+  "caveats": [
+    "A partition is not merely a URL cache key; it selects Session state."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* partition:'persist:a' */",
+      "expected_behavior": "request uses that persistent Session"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* partition:'a' */",
+      "expected_behavior": "uses in-memory partition semantics rather than persistent state"
+    }
+  ]
+}

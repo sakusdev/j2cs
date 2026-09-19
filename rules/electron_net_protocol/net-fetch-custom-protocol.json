@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.fetch-custom-protocol",
+  "category": "electron_net_protocol",
+  "summary": "Route net.fetch through custom protocol and webRequest integration by default.",
+  "source": {
+    "pattern": "net.fetch($input, $init)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetFetch($input, $init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "custom_protocol_handlers": "enabled",
+    "file_scheme": "supported",
+    "webRequest": "triggered",
+    "utility_process": "custom protocols unsupported"
+  },
+  "caveats": [
+    "Main-process custom protocols are not available equivalently in utility process."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* protocol.handle('app',...); net.fetch('app://x') */",
+      "expected_behavior": "custom handler can service request when scheme privileges permit"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* utility process custom scheme */",
+      "expected_behavior": "custom protocol support is unavailable there"
+    }
+  ]
+}

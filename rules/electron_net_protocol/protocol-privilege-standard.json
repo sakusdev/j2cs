@@ -1,0 +1,42 @@
+{
+  "id": "electron.protocol.privilege-standard",
+  "category": "electron_net_protocol",
+  "summary": "Mark custom scheme as standard generic-URI scheme.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{standard:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterStandardScheme",
+    "template": "ElectronCompat.Protocol.RegisterStandardScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "relative_urls": "resolve correctly",
+    "filesystem_api": "allowed subject to security",
+    "web_storage": "standard-origin behavior enabled compared with non-standard"
+  },
+  "caveats": [
+    "Without standard:true, relative URL/origin/storage behavior differs materially."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* app://host/path with standard:true */",
+      "expected_behavior": "generic URI relative URL semantics apply"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* same scheme without standard */",
+      "expected_behavior": "must not assume HTTP-like relative/resource/origin behavior"
+    }
+  ]
+}

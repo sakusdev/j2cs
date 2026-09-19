@@ -1,0 +1,40 @@
+{
+  "id": "electron.protocol.storage-origin-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Respect Electron custom-scheme privilege impact on Chromium origin/storage APIs.",
+  "source": {
+    "pattern": "web storage on custom protocol",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolCustomSchemeOriginState($scheme, $privileges)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "non_standard_default": "web storage APIs disabled",
+    "standard": "enables standard-origin-style behavior subject to security"
+  },
+  "caveats": [
+    "Protocol handler existence does not imply localStorage/IndexedDB/cookie availability."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* standard custom scheme */",
+      "expected_behavior": "can participate in Chromium standard-scheme storage/origin model"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* non-standard scheme */",
+      "expected_behavior": "must not assume web storage APIs are enabled"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "electron.net.request-login-event",
+  "category": "electron_net_protocol",
+  "summary": "Handle proxy/server authentication challenge through Electron login callback.",
+  "source": {
+    "pattern": "$request 'login' event",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestLoginEvent($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "authInfo": [
+      "isProxy",
+      "scheme",
+      "host",
+      "port",
+      "realm"
+    ],
+    "callback": "username,password",
+    "empty_credentials": "cancel/auth failure"
+  },
+  "caveats": [
+    "credentials:'omit' suppresses login for 401; empty callback credentials cancel rather than mean anonymous retry."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* login listener calls cb('u','p') */",
+      "expected_behavior": "Electron retries challenge with supplied credentials"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* cb() */",
+      "expected_behavior": "request is cancelled/authentication failure surfaces"
+    }
+  ]
+}

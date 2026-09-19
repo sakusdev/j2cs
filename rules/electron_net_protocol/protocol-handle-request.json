@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.handle-request",
+  "category": "electron_net_protocol",
+  "summary": "Supply Fetch-compatible Request plus Electron initiatorOrigin metadata to protocol handler.",
+  "source": {
+    "pattern": "$protocol.handle($scheme, ($request) => $body)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolHandle($protocol, $scheme, $handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request": "GlobalRequest",
+    "initiatorOrigin": "trustworthy initiator origin for web-content request; absent for browser-started request",
+    "body": "ReadableStream-compatible Fetch body semantics"
+  },
+  "caveats": [
+    "For authorization decisions prefer initiatorOrigin over page-controlled referrer."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* handler inspects request.url/method/headers */",
+      "expected_behavior": "receives Fetch-compatible Request data"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* browser-started request */",
+      "expected_behavior": "initiatorOrigin may be absent"
+    }
+  ]
+}

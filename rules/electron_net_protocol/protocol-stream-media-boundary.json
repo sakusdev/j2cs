@@ -1,0 +1,44 @@
+{
+  "id": "electron.protocol.stream-media-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Honor stream privilege and Chromium media buffering expectations for custom protocols.",
+  "source": {
+    "pattern": "media resource from custom protocol",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolStreamMedia($request, $response)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "stream_privilege": "changes media response expectation",
+    "media": [
+      "video",
+      "audio"
+    ],
+    "range_streaming": "host renderer/network responsibility"
+  },
+  "caveats": [
+    "Returning bytes is not sufficient to claim seekable/streaming media semantics."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* custom protocol stream:true serving media */",
+      "expected_behavior": "Chromium treats response as streaming-capable according to privilege"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* stream omitted */",
+      "expected_behavior": "buffering/seek behavior can differ"
+    }
+  ]
+}

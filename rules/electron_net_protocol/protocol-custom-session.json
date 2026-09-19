@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.custom-session",
+  "category": "electron_net_protocol",
+  "summary": "Use Protocol object tied to a specific Electron Session/partition.",
+  "source": {
+    "pattern": "$session.protocol",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.GetSessionProtocol",
+    "template": "ElectronCompat.Protocol.GetSessionProtocol($session)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "session_identity": "receiver Session",
+    "handler_registry": "per Session"
+  },
+  "caveats": [
+    "Protocol registration is not process-global."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* session.fromPartition('persist:x').protocol.handle(...) */",
+      "expected_behavior": "handler applies to that session"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* default-session request */",
+      "expected_behavior": "does not automatically use custom-session handler"
+    }
+  ]
+}
