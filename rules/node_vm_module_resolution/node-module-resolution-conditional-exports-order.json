@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.conditional-exports-order",
+  "category": "node_vm_module_resolution",
+  "summary": "Match conditional exports in object key insertion order; earlier matching conditions take precedence.",
+  "source": {
+    "pattern": "[[PACKAGE_TARGET_RESOLVE]]($conditionalObject,$conditions)",
+    "requirements": {
+      "conditional_exports": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.conditional_exports_order",
+    "template": "JsRuntime.NodeModuleResolution.conditional_exports_order($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "object key order significant",
+    "first_matching_condition": "wins if resolution succeeds",
+    "nested_conditions": "recurse preserving order",
+    "default": "ordinary fallback condition"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "order matters",
+      "input": "// {'node':'./node.js','default':'./default.js'} under Node",
+      "expected_behavior": "node condition target selected"
+    },
+    {
+      "name": "default first hazard",
+      "input": "// {'default':'./d.js','node':'./n.js'}",
+      "expected_behavior": "default can shadow later node because earlier matching key wins"
+    }
+  ]
+}

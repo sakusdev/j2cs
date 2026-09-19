@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.run-in-new-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Create a new context, compile dynamic source, execute it, and return the last result.",
+  "source": {
+    "pattern": "vm.runInNewContext($code,$contextObject?,$options?)",
+    "requirements": {
+      "binding": "node:vm.runInNewContext",
+      "source_may_be_dynamic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.run_in_new_context",
+    "template": "JsRuntime.NodeVm.run_in_new_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "steps": "new context + compile + execute",
+    "return": "last result",
+    "global_state": "writes reflected through context object when contextified"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "result",
+      "input": "const vm=require('node:vm'),c={x:2};console.log(vm.runInNewContext('x*=3;x',c),c.x);",
+      "expected_behavior": "prints 6 6"
+    },
+    {
+      "name": "fresh builtins",
+      "input": "const vm=require('node:vm');console.log(vm.runInNewContext('Array')===Array);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

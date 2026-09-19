@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.create-require",
+  "category": "node_vm_module_resolution",
+  "summary": "Create a CommonJS require function whose resolution base is an absolute path or file URL, enabling CJS loading from ESM.",
+  "source": {
+    "pattern": "module.createRequire($filenameOrUrl)",
+    "requirements": {
+      "binding": "node:module.createRequire"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.create_require",
+    "template": "JsRuntime.NodeModuleResolution.create_require($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "require function",
+    "base": "supplied file location",
+    "loader": "CommonJS require machinery",
+    "esm_interop": "inherits current Node require(ESM) boundaries"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "builtin",
+      "input": "// ESM: const r=createRequire(import.meta.url); console.log(typeof r('node:fs').readFile)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "relative base",
+      "input": "// createRequire('/tmp/a/main.js').resolve('./x')",
+      "expected_behavior": "resolves relative to supplied require base"
+    }
+  ]
+}

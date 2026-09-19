@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.dynamic-import",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve and asynchronously load dynamic import() through Node's ESM loader from both ESM and CommonJS contexts.",
+  "source": {
+    "pattern": "import($specifier,$options?)",
+    "requirements": {
+      "host": "Node.js",
+      "specifier_may_be_dynamic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.dynamic_import",
+    "template": "JsRuntime.NodeModuleResolution.dynamic_import($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<module namespace>",
+    "resolution": "Node ESM resolution",
+    "supports_cjs_and_esm_callers": true,
+    "evaluation": "reuse MODULES semantics"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "builtin",
+      "input": "import('node:fs').then(m=>console.log(typeof m.readFile));",
+      "expected_behavior": "prints function asynchronously"
+    },
+    {
+      "name": "missing",
+      "input": "import('./definitely-missing.mjs').catch(e=>console.log(e.code));",
+      "expected_behavior": "rejects with Node module resolution error"
+    }
+  ]
+}

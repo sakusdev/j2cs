@@ -1,0 +1,38 @@
+{
+  "id": "node.vm.filename-diagnostics",
+  "category": "node_vm_module_resolution",
+  "summary": "Preserve vm filename/lineOffset/columnOffset as diagnostic/source-location metadata without treating filename as an automatic module resolver base unless the API specifies it.",
+  "source": {
+    "pattern": "new vm.Script($code,{filename:$filename,lineOffset:$line,columnOffset:$column})",
+    "requirements": {
+      "binding": "node:vm.Script"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeVm.filename_diagnostics",
+    "template": "NodeVm.filename_diagnostics($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "stack_traces": "use filename/offset metadata",
+    "execution": "unchanged",
+    "dynamic_import_default_loader": "filename can become resolution base in that explicit mode"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "filename stack",
+      "input": "const vm=require('node:vm');try{new vm.Script('throw new Error(\"x\")',{filename:'foo.js'}).runInThisContext()}catch(e){console.log(e.stack.includes('foo.js'))}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "not filesystem load",
+      "input": "const vm=require('node:vm');console.log(new vm.Script('1',{filename:'missing.js'}).runInThisContext());",
+      "expected_behavior": "prints 1 without reading missing.js"
+    }
+  ]
+}

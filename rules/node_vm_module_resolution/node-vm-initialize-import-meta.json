@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.initialize-import-meta",
+  "category": "node_vm_module_resolution",
+  "summary": "Run SourceTextModule initializeImportMeta callback to populate that module's import.meta object without granting implicit host metadata.",
+  "source": {
+    "pattern": "new vm.SourceTextModule($code,{initializeImportMeta:$callback})",
+    "requirements": {
+      "binding": "node:vm.SourceTextModule",
+      "initializeImportMeta_callback": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.initialize_import_meta",
+    "template": "JsRuntime.NodeVm.initialize_import_meta($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callback": "receives meta object and module",
+    "host_defaults": "caller is responsible for properties it exposes",
+    "object_values": "can cross context if assigned from outside"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "custom meta",
+      "input": "// initializeImportMeta(meta){meta.url='x:'}; module uses import.meta.url",
+      "expected_behavior": "module observes x:"
+    },
+    {
+      "name": "security boundary",
+      "input": "// assign host object onto meta from main context",
+      "expected_behavior": "can expose outside-context objects; runtime must not pretend isolation is automatic"
+    }
+  ]
+}

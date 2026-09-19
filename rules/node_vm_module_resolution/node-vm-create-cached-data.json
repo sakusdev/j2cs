@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.create-cached-data",
+  "category": "node_vm_module_resolution",
+  "summary": "Produce V8 code-cache bytes for a Script without executing the script.",
+  "source": {
+    "pattern": "$script.createCachedData()",
+    "requirements": {
+      "receiver": "vm.Script",
+      "builtin_method": "createCachedData"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.create_cached_data",
+    "template": "JsRuntime.NodeVm.create_cached_data($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Buffer",
+    "execution": false,
+    "format": "V8/version dependent",
+    "semantic_content": "cache only"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "does not execute",
+      "input": "const vm=require('node:vm');globalThis.__vmx=0;const s=new vm.Script('__vmx=1');const b=s.createCachedData();console.log(__vmx,Buffer.isBuffer(b));",
+      "expected_behavior": "prints 0 true"
+    },
+    {
+      "name": "opaque bytes",
+      "input": "// persist createCachedData() across incompatible V8 versions",
+      "expected_behavior": "acceptance is not guaranteed"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.dynamic-import-main-loader",
+  "category": "node_vm_module_resolution",
+  "summary": "Use vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER for supported vm compilation APIs, resolving relative to filename or cwd as documented.",
+  "source": {
+    "pattern": "vm.$compile($code,{importModuleDynamically:vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER,$options})",
+    "requirements": {
+      "binding": "node:vm",
+      "default_loader_constant": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.dynamic_import_main_loader",
+    "template": "JsRuntime.NodeVm.dynamic_import_main_loader($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "loader": "main-context default ESM loader",
+    "base": "filename absolute path/URL when supplied; otherwise documented cwd fallback",
+    "cache": "Node module cache rules",
+    "SourceTextModule": "constant not supported there"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "builtin import",
+      "input": "// Script('import(\"node:fs\")',{importModuleDynamically:USE_MAIN_CONTEXT_DEFAULT_LOADER})",
+      "expected_behavior": "uses main-context default loader and resolves node:fs"
+    },
+    {
+      "name": "relative base",
+      "input": "// Script('import(\"./x.mjs\")',{filename:'/a/ref.js',importModuleDynamically:USE_MAIN_CONTEXT_DEFAULT_LOADER})",
+      "expected_behavior": "resolves relative import using documented filename base"
+    }
+  ]
+}

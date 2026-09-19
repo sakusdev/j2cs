@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.package-exports-main",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve a package main entry through package.json exports when present, with exports taking precedence over main.",
+  "source": {
+    "pattern": "[[PACKAGE_EXPORTS_RESOLVE]]($packageURL,'.',$exports,$conditions)",
+    "requirements": {
+      "host": "Node.js",
+      "package_exports_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_exports_main",
+    "template": "JsRuntime.NodeModuleResolution.package_exports_main($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precedence": "exports over main",
+    "main_export": "string/array/condition object or '.' entry",
+    "failure": "package path not exported/error as algorithm specifies"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "exports precedence",
+      "input": "// package has main:'old.js', exports:'./new.js'",
+      "expected_behavior": "import/require through supported Node resolves the exports target"
+    },
+    {
+      "name": "invalid target",
+      "input": "// exports target violates package-target rules",
+      "expected_behavior": "resolution throws Node package configuration/target error"
+    }
+  ]
+}

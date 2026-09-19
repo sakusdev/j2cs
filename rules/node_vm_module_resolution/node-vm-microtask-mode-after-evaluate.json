@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.microtask-mode-after-evaluate",
+  "category": "node_vm_module_resolution",
+  "summary": "Drain context-created Promise/async microtasks immediately after evaluation when context microtaskMode is afterEvaluate.",
+  "source": {
+    "pattern": "vm.runInNewContext($code,$context,{microtaskMode:'afterEvaluate'})",
+    "requirements": {
+      "binding": "node:vm",
+      "microtaskMode": "afterEvaluate"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.microtask_mode_after_evaluate",
+    "template": "JsRuntime.NodeVm.microtask_mode_after_evaluate($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "microtasks": "context queue drained after evaluation",
+    "timeout_scope": "includes drained microtasks where documented",
+    "ordering": "can differ from default/shared queue"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "microtask drain",
+      "input": "const vm=require('node:vm'),c={x:0};vm.runInNewContext('Promise.resolve().then(()=>x=1)',c,{microtaskMode:'afterEvaluate'});console.log(c.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "not ordinary Task",
+      "input": "// Promise microtasks created inside context",
+      "expected_behavior": "must preserve vm microtask queue semantics rather than schedule arbitrary managed Tasks"
+    }
+  ]
+}

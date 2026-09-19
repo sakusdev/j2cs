@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.import-meta-filename",
+  "category": "node_vm_module_resolution",
+  "summary": "Expose import.meta.filename as the resolved absolute filesystem filename for local file: modules only.",
+  "source": {
+    "pattern": "import.meta.filename",
+    "requirements": {
+      "module_kind": "ESM",
+      "node_version_supports_property": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.import_meta_filename",
+    "template": "JsRuntime.NodeModuleResolution.import_meta_filename($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "type": "String when present",
+    "only_file_protocol": true,
+    "symlinks": "resolved as Node documents",
+    "derivation": "fileURLToPath(import.meta.url)"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "local module",
+      "input": "// ESM local file: typeof import.meta.filename",
+      "expected_behavior": "prints string on supported Node"
+    },
+    {
+      "name": "non-file URL",
+      "input": "// non-file module",
+      "expected_behavior": "property is not guaranteed/present"
+    }
+  ]
+}

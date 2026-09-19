@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.package-target-relative",
+  "category": "node_vm_module_resolution",
+  "summary": "Require package exports targets that resolve within the package to use './' relative targets and enforce invalid-target/path-segment checks.",
+  "source": {
+    "pattern": "[[PACKAGE_TARGET_RESOLVE]]($packageURL,$target,$subpath,$isImports,$conditions)",
+    "requirements": {
+      "package_target_resolution": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_target_relative",
+    "template": "JsRuntime.NodeModuleResolution.package_target_relative($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "exports_local_target": "must start with ./",
+    "escape_package": "rejected",
+    "invalid_segments": "node_modules and other forbidden target segments rejected per algorithm",
+    "imports": "may allow external package target"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "valid target",
+      "input": "// exports:'./dist/index.js'",
+      "expected_behavior": "resolves within package"
+    },
+    {
+      "name": "invalid export target",
+      "input": "// exports:'../outside.js'",
+      "expected_behavior": "throws invalid package target error"
+    }
+  ]
+}

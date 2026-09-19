@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.loader-load-hook",
+  "category": "node_vm_module_resolution",
+  "summary": "Preserve Node custom loader load-hook chaining and returned format/source semantics.",
+  "source": {
+    "pattern": "[[NodeLoaderLoadHook]]($url,$context,$nextLoad)",
+    "requirements": {
+      "custom_module_hooks_active": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.loader_load_hook",
+    "template": "JsRuntime.NodeModuleResolution.loader_load_hook($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "format/source plus hook metadata",
+    "chain": "nextLoad",
+    "source": "can synthesize/transform module bytes/text",
+    "cache_loader_boundary": "host/runtime concern"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "transform",
+      "input": "// load hook returns source for virtual URL",
+      "expected_behavior": "Node evaluates supplied source in returned format"
+    },
+    {
+      "name": "delegate",
+      "input": "// nextLoad(url,context)",
+      "expected_behavior": "uses subsequent/default loader"
+    }
+  ]
+}

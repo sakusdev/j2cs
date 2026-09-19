@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.script-run-in-this-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Execute a compiled Script in the current global context but outside the caller's lexical scope.",
+  "source": {
+    "pattern": "$script.runInThisContext($options?)",
+    "requirements": {
+      "receiver": "vm.Script"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.script_run_in_this_context",
+    "template": "JsRuntime.NodeVm.script_run_in_this_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "global": "current global",
+    "caller_lexical_scope": "not captured",
+    "return": "last result",
+    "contextification": "none"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "global expression",
+      "input": "const vm=require('node:vm');console.log(new vm.Script('1+2').runInThisContext());",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "no local capture",
+      "input": "const vm=require('node:vm');const secret=7;console.log(new vm.Script('typeof secret').runInThisContext());",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

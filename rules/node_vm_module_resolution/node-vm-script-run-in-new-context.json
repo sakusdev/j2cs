@@ -1,0 +1,38 @@
+{
+  "id": "node.vm.script-run-in-new-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Create/contextify a new context for a Script run, execute there, and return the result.",
+  "source": {
+    "pattern": "$script.runInNewContext($contextObject?,$options?)",
+    "requirements": {
+      "receiver": "vm.Script"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.script_run_in_new_context",
+    "template": "JsRuntime.NodeVm.script_run_in_new_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "context": "new realm/context per call unless DONT_CONTEXTIFY path used",
+    "context_object": "properties exposed as globals",
+    "return": "last result"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "new global",
+      "input": "const vm=require('node:vm'),c={x:2},s=new vm.Script('x*=4;x');console.log(s.runInNewContext(c),c.x);",
+      "expected_behavior": "prints 8 8"
+    },
+    {
+      "name": "builtins isolated",
+      "input": "const vm=require('node:vm'),c={};new vm.Script('this.A=Array').runInNewContext(c);console.log(c.A===Array);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

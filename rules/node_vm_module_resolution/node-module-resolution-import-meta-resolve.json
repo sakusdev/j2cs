@@ -1,0 +1,43 @@
+{
+  "id": "node.module-resolution.import-meta-resolve",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve a specifier relative to the current module using Node's full module resolution and package-exports constraints, returning a URL string synchronously.",
+  "source": {
+    "pattern": "import.meta.resolve($specifier)",
+    "requirements": {
+      "module_kind": "ESM",
+      "host": "Node.js"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.import_meta_resolve",
+    "template": "JsRuntime.NodeModuleResolution.import_meta_resolve($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "String synchronously",
+    "base": "current import.meta.url",
+    "features": "Node ESM/package resolution",
+    "filesystem": "may perform synchronous FS operations",
+    "custom_loader": "not available there"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "builtin",
+      "input": "// ESM: console.log(import.meta.resolve('node:fs'))",
+      "expected_behavior": "prints node:fs"
+    },
+    {
+      "name": "relative",
+      "input": "// file:///app/main.mjs resolving './dep.js'",
+      "expected_behavior": "returns absolute file: URL even if target file existence is not required in current Node behavior"
+    }
+  ]
+}

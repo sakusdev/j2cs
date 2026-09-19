@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.package-exports-encapsulation",
+  "category": "node_vm_module_resolution",
+  "summary": "Apply exports encapsulation to bare package subpaths while recognizing that absolute filesystem paths can bypass package-name encapsulation.",
+  "source": {
+    "pattern": "[[PackageExportsEncapsulation]]($specifier)",
+    "requirements": {
+      "package_exports_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_exports_encapsulation",
+    "template": "JsRuntime.NodeModuleResolution.package_exports_encapsulation($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "bare_subpath": "restricted to exports",
+    "absolute_path": "not strong encapsulation and may load file through another path",
+    "package_json": "not automatically public"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "package json hidden",
+      "input": "// package exports only '.'; require('pkg/package.json')",
+      "expected_behavior": "throws ERR_PACKAGE_PATH_NOT_EXPORTED"
+    },
+    {
+      "name": "absolute caveat",
+      "input": "// require('/absolute/node_modules/pkg/internal.js')",
+      "expected_behavior": "exports is not a filesystem access-control boundary"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.package-exports-pattern",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve exports subpath patterns by literal '*' string replacement, including nested subpaths.",
+  "source": {
+    "pattern": "[[PACKAGE_IMPORTS_EXPORTS_RESOLVE]]($match,$exportsMap,$packageURL,false,$conditions)",
+    "requirements": {
+      "exports_pattern": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_exports_pattern",
+    "template": "JsRuntime.NodeModuleResolution.package_exports_pattern($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "star": "string replacement for matched subpath",
+    "specificity": "Node best-match ordering",
+    "target": "must satisfy package target rules"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "pattern",
+      "input": "// exports {'./features/*.js':'./src/features/*.js'}; import 'pkg/features/x.js'",
+      "expected_behavior": "maps to ./src/features/x.js"
+    },
+    {
+      "name": "nested star",
+      "input": "// matched star contains nested path segments",
+      "expected_behavior": "replacement preserves nested subpath text"
+    }
+  ]
+}

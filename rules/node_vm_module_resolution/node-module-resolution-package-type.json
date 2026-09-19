@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.package-type",
+  "category": "node_vm_module_resolution",
+  "summary": "Use nearest package.json type plus extensions/syntax detection boundaries to classify .js files as module or commonjs according to Node rules.",
+  "source": {
+    "pattern": "[[DetermineModuleFormat]]($url,$packageScope)",
+    "requirements": {
+      "file_extension": ".js or extension-sensitive",
+      "host": "Node.js"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_type",
+    "template": "JsRuntime.NodeModuleResolution.package_type($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "type_module": "package type module makes .js ESM",
+    "type_commonjs": "package type commonjs makes .js CJS",
+    "mjs_cjs": "extensions override package type",
+    "syntax_detection": "version/config dependent for ambiguous inputs"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "type module",
+      "input": "// package.json {'type':'module'} and index.js uses import",
+      "expected_behavior": "treated as ESM"
+    },
+    {
+      "name": "type commonjs",
+      "input": "// package.json {'type':'commonjs'} and index.js uses module.exports",
+      "expected_behavior": "treated as CommonJS"
+    }
+  ]
+}

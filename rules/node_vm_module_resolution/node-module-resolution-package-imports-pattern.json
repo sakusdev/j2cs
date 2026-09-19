@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.package-imports-pattern",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve imports subpath patterns using Node's pattern matching/replacement rules.",
+  "source": {
+    "pattern": "import '#internal/$subpath'",
+    "requirements": {
+      "package_imports_pattern": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_imports_pattern",
+    "template": "JsRuntime.NodeModuleResolution.package_imports_pattern($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "star": "string replacement",
+    "conditions": "can wrap pattern target",
+    "scope": "current package"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "pattern",
+      "input": "// imports {'#internal/*.js':'./src/*.js'}; import '#internal/x.js'",
+      "expected_behavior": "maps to ./src/x.js"
+    },
+    {
+      "name": "nested",
+      "input": "// star matches nested/a.js",
+      "expected_behavior": "replacement can include nested path text"
+    }
+  ]
+}

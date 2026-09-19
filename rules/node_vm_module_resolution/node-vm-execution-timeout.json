@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.execution-timeout",
+  "category": "node_vm_module_resolution",
+  "summary": "Enforce vm execution timeout in milliseconds and terminate the executing script with Node's timeout error.",
+  "source": {
+    "pattern": "vm.$run($code,$context?,{timeout:$ms})",
+    "requirements": {
+      "binding": "node:vm run/Script run method",
+      "timeout_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.execution_timeout",
+    "template": "JsRuntime.NodeVm.execution_timeout($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timeout": "strictly positive integer milliseconds",
+    "termination": "V8 execution interrupted",
+    "error": "ERR_SCRIPT_EXECUTION_TIMEOUT-style Error",
+    "not_task_timeout": true
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "infinite loop",
+      "input": "const vm=require('node:vm');try{vm.runInNewContext('while(true){}',{}, {timeout:10})}catch(e){console.log(e.code)}",
+      "expected_behavior": "prints ERR_SCRIPT_EXECUTION_TIMEOUT"
+    },
+    {
+      "name": "invalid zero",
+      "input": "const vm=require('node:vm');try{vm.runInNewContext('1',{}, {timeout:0})}catch(e){console.log(e.code||e.name)}",
+      "expected_behavior": "throws for invalid timeout"
+    }
+  ]
+}

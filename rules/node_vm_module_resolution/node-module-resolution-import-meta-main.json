@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.import-meta-main",
+  "category": "node_vm_module_resolution",
+  "summary": "Expose import.meta.main as whether the ES module is the process entry point on Node versions that provide it.",
+  "source": {
+    "pattern": "import.meta.main",
+    "requirements": {
+      "module_kind": "ESM",
+      "node_version_supports_property": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.import_meta_main",
+    "template": "JsRuntime.NodeModuleResolution.import_meta_main($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "type": "Boolean",
+    "entry_module": true,
+    "imported_dependency": false,
+    "version_boundary": "early-development Node API"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "entry",
+      "input": "// execute module directly and print import.meta.main",
+      "expected_behavior": "prints true on supporting Node"
+    },
+    {
+      "name": "imported",
+      "input": "// import same module from another entry",
+      "expected_behavior": "prints/observes false"
+    }
+  ]
+}

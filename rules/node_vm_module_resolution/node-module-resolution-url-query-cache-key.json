@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.url-query-cache-key",
+  "category": "node_vm_module_resolution",
+  "summary": "Treat distinct ESM URL query/fragment variants as distinct module cache identities when the resolved URLs differ.",
+  "source": {
+    "pattern": "import './mod.mjs?$query'",
+    "requirements": {
+      "module_kind": "ESM",
+      "specifier_resolves_url_with_query_or_fragment": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.url_query_cache_key",
+    "template": "JsRuntime.NodeModuleResolution.url_query_cache_key($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cache_key": "resolved URL",
+    "different_query": "can load/evaluate same file path as distinct module identities",
+    "file_io": "underlying path may be same"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "query identity",
+      "input": "// import './x.mjs?a=1' and './x.mjs?a=2'",
+      "expected_behavior": "can produce distinct module instances/evaluations"
+    },
+    {
+      "name": "same URL",
+      "input": "// import same exact resolved URL twice",
+      "expected_behavior": "reuses module cache/evaluate-once semantics"
+    }
+  ]
+}

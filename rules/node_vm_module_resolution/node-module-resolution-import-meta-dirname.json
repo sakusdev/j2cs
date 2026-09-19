@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.import-meta-dirname",
+  "category": "node_vm_module_resolution",
+  "summary": "Expose import.meta.dirname as dirname(import.meta.filename) for local file: modules.",
+  "source": {
+    "pattern": "import.meta.dirname",
+    "requirements": {
+      "module_kind": "ESM",
+      "node_version_supports_property": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.import_meta_dirname",
+    "template": "JsRuntime.NodeModuleResolution.import_meta_dirname($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "type": "String when present",
+    "only_file_protocol": true,
+    "relationship": "path.dirname(import.meta.filename)"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "local",
+      "input": "// ESM local file: typeof import.meta.dirname",
+      "expected_behavior": "prints string on supported Node"
+    },
+    {
+      "name": "non-file",
+      "input": "// non-file module",
+      "expected_behavior": "property is not guaranteed/present"
+    }
+  ]
+}

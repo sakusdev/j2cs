@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.break-on-sigint",
+  "category": "node_vm_module_resolution",
+  "summary": "Temporarily make SIGINT terminate vm execution when breakOnSigint is enabled, without permanently replacing process SIGINT handlers.",
+  "source": {
+    "pattern": "vm.$run($code,$context?,{breakOnSigint:true})",
+    "requirements": {
+      "binding": "node:vm run/Script run method",
+      "breakOnSigint": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.break_on_sigint",
+    "template": "JsRuntime.NodeVm.break_on_sigint($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "during_execution": "SIGINT terminates script and throws",
+    "existing_handlers": "disabled during execution then restored",
+    "platform_signal_boundary": true
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "semantic boundary",
+      "input": "// run long vm code with breakOnSigint:true then deliver SIGINT",
+      "expected_behavior": "execution is interrupted with an Error"
+    },
+    {
+      "name": "handler restoration",
+      "input": "// existing process.on('SIGINT') handler before run",
+      "expected_behavior": "handler remains usable after vm execution scope ends"
+    }
+  ]
+}

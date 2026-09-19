@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.source-text-module-namespace",
+  "category": "node_vm_module_resolution",
+  "summary": "Expose the vm module namespace exotic object while preserving canonical ESM namespace semantics.",
+  "source": {
+    "pattern": "$module.namespace",
+    "requirements": {
+      "receiver": "vm.SourceTextModule|vm.Module",
+      "module_linked_enough_for_namespace": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.source_text_module_namespace",
+    "template": "JsRuntime.NodeVm.source_text_module_namespace($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "namespace": "reuse MODULES namespace exotic object semantics",
+    "live_bindings": true,
+    "identity": "module namespace identity stable"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "namespace export",
+      "input": "// after link/evaluate: module.namespace.x",
+      "expected_behavior": "reads module export"
+    },
+    {
+      "name": "not plain dictionary",
+      "input": "// assignment to namespace export",
+      "expected_behavior": "must preserve ESM namespace exotic immutability/live binding rules"
+    }
+  ]
+}

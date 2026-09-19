@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.node-default-custom-conditions",
+  "category": "node_vm_module_resolution",
+  "summary": "Include Node/default and CLI/user-defined conditions when resolving package exports/imports, preserving configured condition sets.",
+  "source": {
+    "pattern": "[[PackageConditions]]($context)",
+    "requirements": {
+      "host": "Node.js"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.node_default_custom_conditions",
+    "template": "JsRuntime.NodeModuleResolution.node_default_custom_conditions($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "node_condition": "active in Node",
+    "default_condition": "generic fallback",
+    "custom_conditions": "--conditions values participate",
+    "node_addons": "flag-sensitive"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "node condition",
+      "input": "// exports {node:'./n.js',default:'./d.js'}",
+      "expected_behavior": "Node selects n.js"
+    },
+    {
+      "name": "custom condition",
+      "input": "// node --conditions=development with development branch",
+      "expected_behavior": "development mapping can be selected"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.loader-resolve-hook",
+  "category": "node_vm_module_resolution",
+  "summary": "Preserve Node custom loader resolve-hook chaining, conditions, parentURL, import attributes, and shortCircuit semantics.",
+  "source": {
+    "pattern": "[[NodeLoaderResolveHook]]($specifier,$context,$nextResolve)",
+    "requirements": {
+      "custom_module_hooks_active": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.loader_resolve_hook",
+    "template": "JsRuntime.NodeModuleResolution.loader_resolve_hook($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "context": "conditions/importAttributes/parentURL",
+    "chain": "nextResolve",
+    "result": "url plus optional format/importAttributes",
+    "shortCircuit": "explicit hook-chain termination",
+    "version_boundary": "hook API evolves"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "rewrite",
+      "input": "// resolve hook maps 'virtual:x' to a URL",
+      "expected_behavior": "subsequent load uses returned URL"
+    },
+    {
+      "name": "chain",
+      "input": "// hook delegates nextResolve(specifier,context)",
+      "expected_behavior": "default or subsequent resolver semantics preserved"
+    }
+  ]
+}
