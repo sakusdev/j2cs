@@ -47,6 +47,8 @@ Search open issues in `sakusdev/j2cs` for a workstream task that is not already 
 
 Prefer issues whose body explicitly contains `WORKSTREAM:` and `STATUS: READY`.
 
+For an Issue containing `AUTO_GENERATED: coverage-gap-v1`, also inspect the corresponding entry in `coverage/catalog.json`. Respect its match prefixes/categories and `required_id_prefixes` so the analyzer can recognize the completed coverage. Do not create filler rules merely to satisfy a numeric target.
+
 Do not take meta/reviewer/infrastructure issues unless the issue explicitly asks for rule generation.
 
 If the user gave a specific issue number, use that issue instead of selecting one yourself.
