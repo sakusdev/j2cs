@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.item.get-as-string",
+  "category": "dom_clipboard_drag",
+  "summary": "Schedule a callback with string item data only when the drag store mode permits payload access.",
+  "source": {
+    "pattern": "$item.getAsString($callback)",
+    "requirements": {
+      "receiver_is_data_transfer_item": true,
+      "callback_call_semantics_reused": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemGetAsString",
+    "template": "NativeDom.DataTransferItemGetAsString($item, $callback)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "non_string_or_disabled_or_protected": "no data callback result as specified by store availability",
+    "string_readable": "queue callback task with stored string",
+    "callback": "uses canonical JS call behavior",
+    "timing": "not a synchronous return of the string"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "string callback",
+      "input": "// browser: item.getAsString(s=>console.log(s))",
+      "expected_behavior": "callback receives string data asynchronously according to DnD task semantics"
+    },
+    {
+      "name": "file item",
+      "input": "// browser semantic: fileItem.getAsString(cb)",
+      "expected_behavior": "does not treat File bytes as a text item"
+    }
+  ]
+}

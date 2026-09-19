@@ -1,0 +1,39 @@
+{
+  "id": "web.clipboard.read-permission",
+  "category": "dom_clipboard_drag",
+  "summary": "Keep clipboard-read authorization and transient/user-agent paste activation as a host runtime boundary.",
+  "source": {
+    "pattern": "[[CheckClipboardReadPermission]]()",
+    "requirements": {
+      "semantic_operation": "clipboard read permission"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CheckClipboardReadPermission",
+    "template": "JsRuntime.CheckClipboardReadPermission($global)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "transient_activation": "consult relevant global",
+    "system_paste_action": "may authorize",
+    "otherwise": "false under current Clipboard WD algorithm",
+    "host_policy": true
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "no activation",
+      "input": "// browser without accepted paste activation",
+      "expected_behavior": "clipboard read check can deny access"
+    },
+    {
+      "name": "paste activation",
+      "input": "// user-agent/OS Paste action with transient activation",
+      "expected_behavior": "can satisfy the read gate"
+    }
+  ]
+}

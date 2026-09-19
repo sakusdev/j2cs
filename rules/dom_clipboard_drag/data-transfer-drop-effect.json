@@ -1,0 +1,44 @@
+{
+  "id": "dom.data-transfer.drop-effect",
+  "category": "dom_clipboard_drag",
+  "summary": "Get/set dropEffect using the fixed allowed token set; invalid assigned values are ignored.",
+  "source": {
+    "pattern": "$dt.dropEffect = $value",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetDropEffect",
+    "template": "NativeDom.SetDropEffect($dt, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "allowed": [
+      "none",
+      "copy",
+      "link",
+      "move"
+    ],
+    "invalid": "leave current value unchanged",
+    "event_processing": "UA may initialize/change feedback according to DnD algorithm"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "valid",
+      "input": "// browser: d=new DataTransfer(); d.dropEffect='copy'; d.dropEffect",
+      "expected_behavior": "returns copy"
+    },
+    {
+      "name": "invalid ignored",
+      "input": "// browser: d=new DataTransfer(); d.dropEffect='copy'; d.dropEffect='bad'; d.dropEffect",
+      "expected_behavior": "returns copy"
+    }
+  ]
+}

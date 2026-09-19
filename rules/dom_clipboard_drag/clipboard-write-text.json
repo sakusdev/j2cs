@@ -1,0 +1,42 @@
+{
+  "id": "web.clipboard.write-text",
+  "category": "dom_clipboard_drag",
+  "summary": "Write DOMString text through Web Clipboard permission and asynchronous host clipboard semantics.",
+  "source": {
+    "pattern": "navigator.clipboard.writeText($data)",
+    "requirements": {
+      "secure_context": true,
+      "builtin_not_overridden": true,
+      "receiver_is_web_clipboard": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardWriteText",
+    "template": "JsRuntime.WebClipboardWriteText($clipboard, $data)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "argument": "WebIDL DOMString",
+    "return": "Promise<undefined>",
+    "permission": "check clipboard write permission/user activation policy",
+    "encoding": "UTF-8 text/plain;charset=utf-8 representation",
+    "denied": "reject NotAllowedError"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "promise completion",
+      "input": "// browser: navigator.clipboard.writeText('x').then(()=>console.log('ok'))",
+      "expected_behavior": "settles asynchronously after host clipboard write"
+    },
+    {
+      "name": "denied write",
+      "input": "// browser when clipboard write is disallowed",
+      "expected_behavior": "Promise rejects with NotAllowedError"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "web.clipboard.item.constructor-known",
+  "category": "dom_clipboard_drag",
+  "summary": "Construct a ClipboardItem from statically known MIME-to-Blob/string representations and options.",
+  "source": {
+    "pattern": "new ClipboardItem($representations, $options)",
+    "requirements": {
+      "builtin_constructor_not_overridden": true,
+      "representation_keys_statically_known": true,
+      "representation_values_are_supported_blob_string_or_promise_contracts": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboardItem.Create",
+    "template": "WebClipboardItem.Create($representations, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "representations": "ordered MIME/custom-format map",
+    "values": "converted to promises of Blob-compatible data",
+    "presentation_style": "unspecified/inline/attachment option",
+    "duplicate_normalized_type": "rejected per WebIDL/map construction"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "known text representation",
+      "input": "// browser: new ClipboardItem({'text/plain': new Blob(['x'],{type:'text/plain'})})",
+      "expected_behavior": "creates item exposing text/plain in types"
+    },
+    {
+      "name": "style option",
+      "input": "// browser: new ClipboardItem({'text/plain': blob},{presentationStyle:'inline'})",
+      "expected_behavior": "presentationStyle is inline"
+    }
+  ],
+  "caveats": [
+    "Blob/File byte semantics belong to WEB_ENCODING_FILE_BLOB; this rule references that ownership rather than redefining it."
+  ]
+}

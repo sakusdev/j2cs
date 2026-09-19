@@ -1,0 +1,43 @@
+{
+  "id": "dom.data-transfer.item-list.add-file",
+  "category": "dom_clipboard_drag",
+  "summary": "Append a File item to a read/write DataTransferItemList without text-type uniqueness restriction.",
+  "source": {
+    "pattern": "$items.add($file)",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true,
+      "data_is_file": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemListAddFile",
+    "template": "NativeDom.DataTransferItemListAddFile($items, $file)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode_non_read_write": "return null",
+    "kind": "file",
+    "type": "file.type normalized as specified",
+    "success": "append and return DataTransferItem"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "file kind",
+      "input": "// browser semantic: items.add(file).kind",
+      "expected_behavior": "returns file"
+    },
+    {
+      "name": "multiple files",
+      "input": "// semantic: add two File objects of same MIME type",
+      "expected_behavior": "both file entries may coexist"
+    }
+  ],
+  "caveats": [
+    "File creation/content semantics are reused from WEB_ENCODING_FILE_BLOB."
+  ]
+}

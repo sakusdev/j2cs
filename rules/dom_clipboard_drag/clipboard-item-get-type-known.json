@@ -1,0 +1,41 @@
+{
+  "id": "web.clipboard.item.get-type-known",
+  "category": "dom_clipboard_drag",
+  "summary": "Resolve a script-created ClipboardItem's known representation to a Promise<Blob>.",
+  "source": {
+    "pattern": "$item.getType($type)",
+    "requirements": {
+      "receiver_is_script_created_clipboard_item": true,
+      "type_lookup_lowerable": true,
+      "no_host_clipboard_lazy_read": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboardItem.GetType",
+    "template": "WebClipboardItem.GetType($item, $type)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Blob>",
+    "missing": "reject NotFoundError",
+    "representation": "await stored representation resolver",
+    "type": "DOMString exact representation key semantics"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "known type",
+      "input": "// browser: await item.getType('text/plain')",
+      "expected_behavior": "resolves the matching Blob representation"
+    },
+    {
+      "name": "missing type",
+      "input": "// browser: item.getType('image/png') when absent",
+      "expected_behavior": "Promise rejects NotFoundError"
+    }
+  ]
+}

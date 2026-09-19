@@ -1,0 +1,42 @@
+{
+  "id": "web.clipboard.read-unsanitized",
+  "category": "dom_clipboard_drag",
+  "summary": "Retain runtime validation and privacy policy for Clipboard.read({unsanitized:[...]}) requests.",
+  "source": {
+    "pattern": "navigator.clipboard.read({unsanitized:$types})",
+    "requirements": {
+      "secure_context": true,
+      "builtin_not_overridden": true,
+      "receiver_is_web_clipboard": true,
+      "unsanitized_option_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardReadUnsanitized",
+    "template": "JsRuntime.WebClipboardReadUnsanitized($clipboard, $types)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "validation": "requested formats must be supported optional unsanitized types",
+    "permission": "read gate remains required",
+    "privacy": "host may expose only permitted unsanitized formats",
+    "error": "NotAllowedError for disallowed requested format"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "option boundary",
+      "input": "// browser: navigator.clipboard.read({unsanitized:['text/html']})",
+      "expected_behavior": "uses unsanitized-format validation before host clipboard read"
+    },
+    {
+      "name": "unsupported unsanitized",
+      "input": "// browser: read with disallowed unsanitized format",
+      "expected_behavior": "rejects with NotAllowedError"
+    }
+  ]
+}

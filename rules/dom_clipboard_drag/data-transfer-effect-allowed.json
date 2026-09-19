@@ -1,0 +1,49 @@
+{
+  "id": "dom.data-transfer.effect-allowed",
+  "category": "dom_clipboard_drag",
+  "summary": "Mutate effectAllowed only in read/write mode and only for valid effect tokens.",
+  "source": {
+    "pattern": "$dt.effectAllowed = $value",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetEffectAllowed",
+    "template": "NativeDom.SetEffectAllowed($dt, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode": "setter effective only read/write",
+    "allowed": [
+      "none",
+      "copy",
+      "copyLink",
+      "copyMove",
+      "link",
+      "linkMove",
+      "move",
+      "all",
+      "uninitialized"
+    ],
+    "invalid": "ignored"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "valid detached",
+      "input": "// browser: d=new DataTransfer(); d.effectAllowed='copyMove'; d.effectAllowed",
+      "expected_behavior": "returns copyMove"
+    },
+    {
+      "name": "invalid ignored",
+      "input": "// browser: assign invalid effectAllowed",
+      "expected_behavior": "previous value remains unchanged"
+    }
+  ]
+}

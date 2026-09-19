@@ -1,0 +1,41 @@
+{
+  "id": "web.clipboard.write",
+  "category": "dom_clipboard_drag",
+  "summary": "Write ClipboardItem representations to the system clipboard with permission and representation conversion semantics.",
+  "source": {
+    "pattern": "navigator.clipboard.write($items)",
+    "requirements": {
+      "secure_context": true,
+      "builtin_not_overridden": true,
+      "receiver_is_web_clipboard": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardWrite",
+    "template": "JsRuntime.WebClipboardWrite($clipboard, $items)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<undefined>",
+    "permission": "write gate",
+    "representations": "resolve ClipboardItem data promises and map MIME/custom formats to platform formats",
+    "atomicity": "host clipboard write operation semantics"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "multi-format",
+      "input": "// browser: await navigator.clipboard.write([new ClipboardItem({'text/plain': blob})])",
+      "expected_behavior": "writes through Web Clipboard representation conversion"
+    },
+    {
+      "name": "representation reject",
+      "input": "// browser: ClipboardItem representation promise rejects during write",
+      "expected_behavior": "write Promise rejects; do not silently stringify the rejection"
+    }
+  ]
+}

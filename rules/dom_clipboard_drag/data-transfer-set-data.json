@@ -1,0 +1,41 @@
+{
+  "id": "dom.data-transfer.set-data",
+  "category": "dom_clipboard_drag",
+  "summary": "Set or replace text data only in read/write mode while preserving existing item position on replacement.",
+  "source": {
+    "pattern": "$dt.setData($format, $data)",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferSetData",
+    "template": "NativeDom.DataTransferSetData($dt, $format, $data)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode": "mutation only in read/write",
+    "type": "normalized ASCII lowercase/legacy aliases",
+    "existing_type": "replace data in place",
+    "new_type": "append item",
+    "return": "undefined"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "add",
+      "input": "// browser: d=new DataTransfer(); d.setData('text/plain','a'); d.getData('text/plain')",
+      "expected_behavior": "returns a"
+    },
+    {
+      "name": "replace keeps type slot",
+      "input": "// semantic: setData same normalized type twice",
+      "expected_behavior": "one text item remains for that type and its data is replaced"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.constructor",
+  "category": "dom_clipboard_drag",
+  "summary": "Construct a detached DataTransfer with an empty read/write drag data store.",
+  "source": {
+    "pattern": "new DataTransfer()",
+    "requirements": {
+      "builtin_constructor_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.CreateDataTransfer",
+    "template": "NativeDom.CreateDataTransfer()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode": "read/write",
+    "items": "empty",
+    "drop_effect": "none",
+    "effect_allowed": "none",
+    "associated_event": "none"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "empty",
+      "input": "// browser: const d=new DataTransfer(); d.items.length",
+      "expected_behavior": "returns 0"
+    },
+    {
+      "name": "initial effects",
+      "input": "// browser: new DataTransfer().dropEffect/effectAllowed",
+      "expected_behavior": "both initialize to none"
+    }
+  ]
+}

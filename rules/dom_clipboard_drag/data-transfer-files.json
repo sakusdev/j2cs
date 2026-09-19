@@ -1,0 +1,42 @@
+{
+  "id": "dom.data-transfer.files",
+  "category": "dom_clipboard_drag",
+  "summary": "Expose the DataTransfer FileList subject to drag-store mode data visibility.",
+  "source": {
+    "pattern": "$dt.files",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferFiles",
+    "template": "NativeDom.DataTransferFiles($dt)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "FileList",
+    "file_items": "File objects from visible file-kind entries",
+    "protected_mode": "underlying data is unavailable so files can appear empty per drag lifecycle contract"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "file list",
+      "input": "// browser semantic: dt.files",
+      "expected_behavior": "returns a FileList rather than an ordinary JS Array"
+    },
+    {
+      "name": "mode-sensitive",
+      "input": "// dragover protected-mode event dataTransfer.files",
+      "expected_behavior": "file payload access is restricted by drag data store mode"
+    }
+  ],
+  "caveats": [
+    "File object semantics are owned by WEB_ENCODING_FILE_BLOB, potentially via a pending PR."
+  ]
+}

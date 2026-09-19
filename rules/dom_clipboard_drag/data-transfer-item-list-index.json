@@ -1,0 +1,39 @@
+{
+  "id": "dom.data-transfer.item-list.index",
+  "category": "dom_clipboard_drag",
+  "summary": "Return a stable DataTransferItem wrapper for a supported index of the live item list.",
+  "source": {
+    "pattern": "$items[$index]",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true,
+      "index_is_array_index": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemAt",
+    "template": "NativeDom.DataTransferItemAt($items, $index)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "same_object_per_entry": "same DataTransferItem wrapper returned for a particular store entry while associated",
+    "out_of_range": "undefined via indexed-property semantics",
+    "disabled": "no supported indices"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "same wrapper",
+      "input": "// browser: const d=new DataTransfer(); d.items.add('x','text/plain'); d.items[0]===d.items[0]",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "out of range",
+      "input": "// browser: new DataTransfer().items[0]",
+      "expected_behavior": "is undefined"
+    }
+  ]
+}

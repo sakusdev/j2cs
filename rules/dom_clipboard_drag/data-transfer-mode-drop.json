@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.mode.drop",
+  "category": "dom_clipboard_drag",
+  "summary": "Expose drop-event DataTransfer in read-only mode: payload is readable but new data cannot be added.",
+  "source": {
+    "pattern": "drop event $event.dataTransfer",
+    "requirements": {
+      "event_type": "drop",
+      "host_drag_operation": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DragDataStoreForDrop",
+    "template": "JsRuntime.DragDataStoreForDrop($event)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mode": "read-only",
+    "payload": "readable",
+    "mutation": "data store mutation APIs ineffective/not permitted as specified",
+    "files": "readable"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "read drop",
+      "input": "// browser drop handler: e.dataTransfer.getData('text/plain')",
+      "expected_behavior": "payload can be read"
+    },
+    {
+      "name": "cannot add",
+      "input": "// browser drop handler: e.dataTransfer.items.add('x','text/plain')",
+      "expected_behavior": "does not add because store is not read/write"
+    }
+  ]
+}

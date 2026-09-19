@@ -1,0 +1,40 @@
+{
+  "id": "web.clipboard.item.constructor-dynamic",
+  "category": "dom_clipboard_drag",
+  "summary": "Use runtime WebIDL/property/promise semantics for dynamically shaped ClipboardItem representation records.",
+  "source": {
+    "pattern": "new ClipboardItem($representations, $options)",
+    "requirements": {
+      "builtin_constructor_not_overridden": true,
+      "representation_record_or_values_may_have_dynamic_getters_promises_or_proxies": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardItemCreate",
+    "template": "JsRuntime.WebClipboardItemCreate($representations, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "property_enumeration": "WebIDL record conversion observable",
+    "promise_resolution": "representation values may settle later",
+    "validation": "MIME/web custom format validation",
+    "exceptions": "propagate"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "getter side effect",
+      "input": "// browser semantic: representation record getter executes during conversion",
+      "expected_behavior": "getter/property conversion ordering is observable"
+    },
+    {
+      "name": "rejected data promise",
+      "input": "// browser semantic: ClipboardItem contains rejecting representation promise",
+      "expected_behavior": "later getType/write observes rejection"
+    }
+  ]
+}

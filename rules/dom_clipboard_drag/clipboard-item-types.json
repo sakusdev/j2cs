@@ -1,0 +1,38 @@
+{
+  "id": "web.clipboard.item.types",
+  "category": "dom_clipboard_drag",
+  "summary": "Expose a ClipboardItem's representation type strings as an immutable sequence.",
+  "source": {
+    "pattern": "$item.types",
+    "requirements": {
+      "receiver_is_clipboard_item": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboardItem.Types",
+    "template": "WebClipboardItem.Types($item)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "FrozenArray<DOMString>",
+    "contents": "available representation MIME/custom-format keys",
+    "mutation": "caller cannot mutate item representation set through returned array"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "contains type",
+      "input": "// browser: item.types.includes('text/plain')",
+      "expected_behavior": "true when representation exists"
+    },
+    {
+      "name": "frozen view",
+      "input": "// browser semantic: item.types",
+      "expected_behavior": "returned type list is not a mutable backing list"
+    }
+  ]
+}

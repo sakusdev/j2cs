@@ -1,0 +1,39 @@
+{
+  "id": "dom.data-transfer.mode.dragstart",
+  "category": "dom_clipboard_drag",
+  "summary": "Associate dragstart DataTransfer with read/write mode so scripts can populate the drag data store.",
+  "source": {
+    "pattern": "dragstart event $event.dataTransfer",
+    "requirements": {
+      "event_type": "dragstart",
+      "host_drag_operation": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DragDataStoreForDragStart",
+    "template": "JsRuntime.DragDataStoreForDragStart($event)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mode": "read/write",
+    "mutations": "setData/items.add/remove/clear and effectAllowed writes permitted",
+    "event_lifetime": "host drag processing owns transition out of mode"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "write during dragstart",
+      "input": "// browser dragstart handler: e.dataTransfer.setData('text/plain','x')",
+      "expected_behavior": "mutation is permitted"
+    },
+    {
+      "name": "lifetime",
+      "input": "// after dragstart dispatch",
+      "expected_behavior": "host transitions drag data store mode according to drag processing algorithm"
+    }
+  ]
+}

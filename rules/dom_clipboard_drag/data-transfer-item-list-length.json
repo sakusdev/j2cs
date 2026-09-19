@@ -1,0 +1,38 @@
+{
+  "id": "dom.data-transfer.item-list.length",
+  "category": "dom_clipboard_drag",
+  "summary": "Return current item count, or zero for a disabled item-list view.",
+  "source": {
+    "pattern": "$items.length",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemListLength",
+    "template": "NativeDom.DataTransferItemListLength($items)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "live": true,
+    "disabled_mode": 0,
+    "otherwise": "drag data store item-list length"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "live",
+      "input": "// browser: d=new DataTransfer(); let l=d.items; d.items.add('x','text/plain'); l.length",
+      "expected_behavior": "returns 1"
+    },
+    {
+      "name": "disabled",
+      "input": "// semantic disabled DataTransferItemList",
+      "expected_behavior": "length returns 0"
+    }
+  ]
+}

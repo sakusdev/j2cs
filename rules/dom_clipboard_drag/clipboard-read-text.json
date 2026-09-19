@@ -1,0 +1,42 @@
+{
+  "id": "web.clipboard.read-text",
+  "category": "dom_clipboard_drag",
+  "summary": "Read text from the system clipboard through the asynchronous permission/task-source contract.",
+  "source": {
+    "pattern": "navigator.clipboard.readText()",
+    "requirements": {
+      "secure_context": true,
+      "builtin_not_overridden": true,
+      "receiver_is_web_clipboard": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardReadText",
+    "template": "JsRuntime.WebClipboardReadText($clipboard)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<String>",
+    "permission": "check clipboard read permission",
+    "denied": "reject NotAllowedError",
+    "scheduling": "permission/clipboard global tasks; not synchronous",
+    "text": "platform clipboard text/plain conversion"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "returns promise",
+      "input": "// browser: const p=navigator.clipboard.readText();",
+      "expected_behavior": "returns a Promise; clipboard access is not synchronous"
+    },
+    {
+      "name": "denied read",
+      "input": "// browser without required clipboard-read authorization: navigator.clipboard.readText()",
+      "expected_behavior": "Promise rejects with NotAllowedError"
+    }
+  ]
+}
