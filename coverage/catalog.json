@@ -449,6 +449,985 @@
       ]
     },
     {
+      "id": "WEB_STREAMS",
+      "title": "WHATWG Streams",
+      "priority": 108,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "web_streams"
+        ],
+        "id_prefixes": [
+          "web.stream.",
+          "web.readable-stream.",
+          "web.writable-stream.",
+          "web.transform-stream."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.readable-stream.",
+        "web.writable-stream.",
+        "web.transform-stream."
+      ],
+      "scope": [
+        "ReadableStream/WritableStream/TransformStream construction and state",
+        "readers/writers, locking and release",
+        "enqueue/close/error/cancel/abort",
+        "backpressure and desiredSize",
+        "pipeTo/pipeThrough/tee and async iteration"
+      ],
+      "ownership_notes": [
+        "Reuse ASYNC and ITERATORS_GENERATORS.",
+        "Do not substitute Node streams; Web Streams have distinct locking/backpressure semantics."
+      ]
+    },
+    {
+      "id": "WEB_ABORT_SIGNALS",
+      "title": "AbortController and AbortSignal",
+      "priority": 106,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "web_abort"
+        ],
+        "id_prefixes": [
+          "web.abort-controller.",
+          "web.abort-signal."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.abort-controller.",
+        "web.abort-signal."
+      ],
+      "scope": [
+        "AbortController construction/abort",
+        "AbortSignal aborted/reason/throwIfAborted",
+        "AbortSignal.abort/timeout/any",
+        "event dispatch and one-shot semantics",
+        "integration contracts used by fetch/streams/timers"
+      ],
+      "ownership_notes": [
+        "Reuse DOM EventTarget semantics.",
+        "Fetch-specific abort behavior remains owned by WEB_URL_FETCH."
+      ]
+    },
+    {
+      "id": "WEB_ENCODING_FILE_BLOB",
+      "title": "Encoding, Blob, File, and FormData",
+      "priority": 104,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "web_encoding_file"
+        ],
+        "id_prefixes": [
+          "web.text-encoder.",
+          "web.text-decoder.",
+          "web.blob.",
+          "web.file.",
+          "web.form-data."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.text-encoder.",
+        "web.text-decoder.",
+        "web.blob.",
+        "web.file."
+      ],
+      "scope": [
+        "TextEncoder/TextDecoder",
+        "Blob construction/slice/text/arrayBuffer/stream",
+        "File metadata and inheritance from Blob",
+        "FormData append/set/get/delete/iteration",
+        "UTF-8 replacement/fatal/BOM boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse BINARY and WEB_STREAMS.",
+        "Do not duplicate Response/Request body consumption rules."
+      ]
+    },
+    {
+      "id": "WEB_WEBSOCKET_EVENTSOURCE",
+      "title": "WebSocket and EventSource",
+      "priority": 102,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "web_realtime"
+        ],
+        "id_prefixes": [
+          "web.websocket.",
+          "web.event-source."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.websocket.",
+        "web.event-source."
+      ],
+      "scope": [
+        "WebSocket construction/readyState/send/close",
+        "binaryType and bufferedAmount",
+        "open/message/error/close events",
+        "EventSource construction/reconnect/last-event-id",
+        "network/runtime boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse DOM event semantics and BINARY.",
+        "Protocol/network implementation stays runtime when host behavior is observable."
+      ]
+    },
+    {
+      "id": "WEB_CRYPTO",
+      "title": "Web Crypto API",
+      "priority": 101,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "web_crypto"
+        ],
+        "id_prefixes": [
+          "web.crypto.",
+          "web.subtle-crypto.",
+          "web.crypto-key."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.crypto.",
+        "web.subtle-crypto."
+      ],
+      "scope": [
+        "crypto.getRandomValues/randomUUID",
+        "SubtleCrypto digest/encrypt/decrypt/sign/verify",
+        "key generation/import/export/derive/wrap/unwrap",
+        "CryptoKey metadata/extractability/usages",
+        "Promise/error and algorithm-normalization semantics"
+      ],
+      "ownership_notes": [
+        "Reuse ASYNC and BINARY.",
+        "Do not alias Node crypto APIs; Web Crypto algorithm/result contracts differ."
+      ]
+    },
+    {
+      "id": "WEB_PERFORMANCE",
+      "title": "Performance and timing APIs",
+      "priority": 99,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "web_performance"
+        ],
+        "id_prefixes": [
+          "web.performance.",
+          "web.performance-observer."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.performance.",
+        "web.performance-observer."
+      ],
+      "scope": [
+        "performance.now/timeOrigin",
+        "mark/measure/clear/getEntries",
+        "PerformanceEntry families",
+        "PerformanceObserver observe/takeRecords/disconnect",
+        "monotonic-clock and buffering semantics"
+      ],
+      "ownership_notes": [
+        "Keep host clock precision/privacy policy explicit.",
+        "Reuse callback/event scheduling rather than inventing synchronous observer delivery."
+      ]
+    },
+    {
+      "id": "WEB_INDEXEDDB",
+      "title": "IndexedDB",
+      "priority": 98,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "web_indexeddb"
+        ],
+        "id_prefixes": [
+          "web.indexeddb.",
+          "web.idb."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.indexeddb.",
+        "web.idb.transaction.",
+        "web.idb.request."
+      ],
+      "scope": [
+        "indexedDB.open/deleteDatabase",
+        "IDBRequest success/error lifecycle",
+        "transactions and auto-commit/abort",
+        "object stores/indexes/cursors",
+        "structured clone, key ordering and versionchange"
+      ],
+      "ownership_notes": [
+        "Reuse WORKERS_MESSAGING structured clone once available.",
+        "Do not map transactions to ordinary Dictionary/database calls without event-loop semantics."
+      ]
+    },
+    {
+      "id": "WEB_CACHE_SERVICE_WORKER",
+      "title": "Cache API and Service Workers",
+      "priority": 94,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "web_service_worker"
+        ],
+        "id_prefixes": [
+          "web.cache.",
+          "web.caches.",
+          "web.service-worker."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.cache.",
+        "web.service-worker."
+      ],
+      "scope": [
+        "CacheStorage open/match/delete/keys",
+        "Cache match/put/add/addAll/delete/keys",
+        "ServiceWorkerContainer register/ready/controller",
+        "worker registration/update/unregister",
+        "lifecycle/runtime boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse WEB_URL_FETCH Request/Response semantics.",
+        "Service worker execution/lifecycle is host runtime, not an ordinary thread."
+      ]
+    },
+    {
+      "id": "DOM_SHADOW_SELECTION_RANGE",
+      "title": "Shadow DOM, Range, and Selection",
+      "priority": 97,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "dom_shadow_selection"
+        ],
+        "id_prefixes": [
+          "dom.shadow.",
+          "dom.range.",
+          "dom.selection."
+        ]
+      },
+      "required_id_prefixes": [
+        "dom.shadow.",
+        "dom.range.",
+        "dom.selection."
+      ],
+      "scope": [
+        "attachShadow/shadowRoot/slot basics",
+        "Range boundary points and mutation",
+        "Selection ranges/anchor/focus",
+        "DocumentFragment/clone/extract/surround boundaries",
+        "retargeting/composed-tree constraints"
+      ],
+      "ownership_notes": [
+        "Reuse DOM_RENDERER node identity/mutation/event rules.",
+        "Do not claim layout/painting compatibility here."
+      ]
+    },
+    {
+      "id": "DOM_GEOMETRY_SCROLL",
+      "title": "DOM geometry, scrolling, and viewport",
+      "priority": 95,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "dom_geometry"
+        ],
+        "id_prefixes": [
+          "dom.geometry.",
+          "dom.scroll.",
+          "dom.viewport."
+        ]
+      },
+      "required_id_prefixes": [
+        "dom.geometry.",
+        "dom.scroll."
+      ],
+      "scope": [
+        "DOMRect/DOMPoint representative APIs",
+        "getBoundingClientRect/getClientRects",
+        "offset/client/scroll metrics",
+        "scroll/scrollTo/scrollBy/scrollIntoView",
+        "visual viewport and layout-dependent runtime boundaries"
+      ],
+      "ownership_notes": [
+        "CSS/layout-dependent results should fall back to native-renderer/runtime contracts.",
+        "Reuse CSS_LAYOUT_RENDERER when geometry requires layout."
+      ]
+    },
+    {
+      "id": "DOM_MEDIA",
+      "title": "HTML media element semantics",
+      "priority": 82,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "dom_media"
+        ],
+        "id_prefixes": [
+          "dom.media.",
+          "dom.audio.",
+          "dom.video."
+        ]
+      },
+      "required_id_prefixes": [
+        "dom.media."
+      ],
+      "scope": [
+        "HTMLMediaElement play/pause/load",
+        "currentTime/duration/volume/muted/playbackRate",
+        "readyState/networkState",
+        "media event ordering",
+        "play() Promise and autoplay/runtime boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse ASYNC and DOM event semantics.",
+        "Decoding/device output remains a host media runtime."
+      ]
+    },
+    {
+      "id": "DOM_DRAG_CLIPBOARD",
+      "title": "Web Clipboard and drag-and-drop",
+      "priority": 83,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "dom_clipboard_drag"
+        ],
+        "id_prefixes": [
+          "web.clipboard.",
+          "dom.drag.",
+          "dom.data-transfer."
+        ]
+      },
+      "required_id_prefixes": [
+        "web.clipboard.",
+        "dom.data-transfer."
+      ],
+      "scope": [
+        "navigator.clipboard read/write/readText/writeText",
+        "ClipboardItem basics",
+        "DataTransfer/DataTransferItemList",
+        "drag event data-store modes",
+        "permission/user-activation runtime boundaries"
+      ],
+      "ownership_notes": [
+        "Do not reuse Electron clipboard as if it were the Web Clipboard API.",
+        "Reuse DOM events and BINARY/Blob semantics."
+      ]
+    },
+    {
+      "id": "NODE_NET_TLS_DNS",
+      "title": "Node net, tls, and dns",
+      "priority": 105,
+      "minimum_rules": 50,
+      "match": {
+        "categories": [
+          "node_net_tls_dns"
+        ],
+        "id_prefixes": [
+          "node.net.",
+          "node.tls.",
+          "node.dns."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.net.",
+        "node.tls.",
+        "node.dns."
+      ],
+      "scope": [
+        "net.Socket/Server connect/listen/write/end/destroy",
+        "TCP connection/event ordering/backpressure",
+        "tls.connect/createServer/TLSSocket basics",
+        "dns lookup/resolve/reverse promises+callback forms",
+        "address/error/platform/runtime behavior"
+      ],
+      "ownership_notes": [
+        "Reuse EVENTS_STREAMS and ASYNC.",
+        "HTTP ownership remains NODE_HTTP_CRYPTO."
+      ]
+    },
+    {
+      "id": "NODE_ZLIB_COMPRESSION",
+      "title": "Node zlib and compression",
+      "priority": 92,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "node_zlib"
+        ],
+        "id_prefixes": [
+          "node.zlib."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.zlib."
+      ],
+      "scope": [
+        "gzip/gunzip/deflate/inflate sync+callback APIs",
+        "Brotli representative APIs",
+        "zlib stream constructors",
+        "flush/reset/params boundaries",
+        "Buffer and error semantics"
+      ],
+      "ownership_notes": [
+        "Reuse BINARY and EVENTS_STREAMS.",
+        "Compression implementation may use platform libraries only when byte/output semantics are compatible."
+      ]
+    },
+    {
+      "id": "NODE_FS_WATCH_STREAMS",
+      "title": "Node fs watchers and file streams",
+      "priority": 96,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "node_fs_advanced"
+        ],
+        "id_prefixes": [
+          "node.fs.watch.",
+          "node.fs.read-stream.",
+          "node.fs.write-stream.",
+          "node.fs.opendir."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.fs.watch.",
+        "node.fs.read-stream.",
+        "node.fs.write-stream."
+      ],
+      "scope": [
+        "fs.watch/fs.watchFile/unwatchFile",
+        "FSWatcher lifecycle/platform caveats",
+        "createReadStream/createWriteStream",
+        "file-stream open/ready/close/error ordering",
+        "opendir/Dir async iteration"
+      ],
+      "ownership_notes": [
+        "Reuse NODE_FS core path/error semantics and EVENTS_STREAMS.",
+        "Platform-dependent watcher behavior must be explicit."
+      ]
+    },
+    {
+      "id": "NODE_PROCESS_SIGNALS_STDIO",
+      "title": "Node process signals and stdio",
+      "priority": 93,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "node_process_io"
+        ],
+        "id_prefixes": [
+          "node.process.signal.",
+          "node.process.stdio.",
+          "node.process.lifecycle."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.process.signal.",
+        "node.process.stdio."
+      ],
+      "scope": [
+        "process stdin/stdout/stderr identities",
+        "TTY vs pipe behavior boundaries",
+        "signal events/kill",
+        "beforeExit/exit/disconnect",
+        "uncaughtException/unhandledRejection host hooks where not owned elsewhere"
+      ],
+      "ownership_notes": [
+        "Reuse NODE_CORE process basics and EVENTS_STREAMS.",
+        "Promise rejection semantics remain ASYNC; this owns Node process hooks."
+      ]
+    },
+    {
+      "id": "NODE_CONSOLE_DIAGNOSTICS",
+      "title": "Node console, diagnostics, and tracing",
+      "priority": 78,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "node_diagnostics"
+        ],
+        "id_prefixes": [
+          "node.console.",
+          "node.diagnostics-channel.",
+          "node.trace."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.console."
+      ],
+      "scope": [
+        "console.log/error/warn/dir/time/timeEnd/count/assert",
+        "formatting/inspection integration",
+        "Console construction/output streams",
+        "diagnostics_channel representative APIs",
+        "host logging/ordering boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse NODE_CORE util.format/inspect rules.",
+        "Do not freeze terminal-specific styling or diagnostic text as portable semantics."
+      ]
+    },
+    {
+      "id": "NODE_VM_MODULE_RESOLUTION",
+      "title": "Node vm and advanced module resolution",
+      "priority": 91,
+      "minimum_rules": 45,
+      "match": {
+        "categories": [
+          "node_vm_modules"
+        ],
+        "id_prefixes": [
+          "node.vm.",
+          "node.module-resolution.",
+          "node.import-meta.",
+          "node.dynamic-import."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.vm.",
+        "node.module-resolution."
+      ],
+      "scope": [
+        "vm.Script/Context/runIn* basics",
+        "dynamic import() boundary",
+        "import.meta.url/resolve",
+        "package exports/imports condition resolution",
+        "module.createRequire and loader/version boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse MODULES ESM/CommonJS binding/evaluation semantics.",
+        "Dynamic code execution should remain runtime when source is not statically known."
+      ]
+    },
+    {
+      "id": "NODE_TEXT_UTILS",
+      "title": "Node querystring, string_decoder, and text utilities",
+      "priority": 76,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "node_text_utils"
+        ],
+        "id_prefixes": [
+          "node.querystring.",
+          "node.string-decoder.",
+          "node.punycode."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.querystring.",
+        "node.string-decoder."
+      ],
+      "scope": [
+        "querystring parse/stringify/escape/unescape",
+        "StringDecoder incremental multibyte decoding",
+        "legacy punycode compatibility boundaries",
+        "Buffer/string encoding edge cases"
+      ],
+      "ownership_notes": [
+        "Reuse STRING and BINARY.",
+        "WHATWG URLSearchParams stays owned by WEB_URL_FETCH."
+      ]
+    },
+    {
+      "id": "NODE_TEST_ASSERT",
+      "title": "Node assert and test semantics",
+      "priority": 70,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "node_test_assert"
+        ],
+        "id_prefixes": [
+          "node.assert.",
+          "node.test."
+        ]
+      },
+      "required_id_prefixes": [
+        "node.assert.",
+        "node.test."
+      ],
+      "scope": [
+        "assert/strict/deep equality/throws/rejects",
+        "AssertionError shape and portability",
+        "node:test test/subtest/hooks basics",
+        "async completion/timeouts/concurrency boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse OBJECT/VALUES equality semantics and ASYNC.",
+        "Exact diagnostic message formatting may be host/version-sensitive."
+      ]
+    },
+    {
+      "id": "ELECTRON_SESSION_WEBREQUEST",
+      "title": "Electron session, cookies, and webRequest",
+      "priority": 103,
+      "minimum_rules": 50,
+      "match": {
+        "id_prefixes": [
+          "electron.session.",
+          "electron.cookies.",
+          "electron.webrequest."
+        ]
+      },
+      "required_id_prefixes": [
+        "electron.session.",
+        "electron.cookies.",
+        "electron.webrequest."
+      ],
+      "scope": [
+        "session.fromPartition/defaultSession",
+        "cookies get/set/remove/flushStore",
+        "webRequest onBefore*/onHeaders*/onCompleted",
+        "proxy/cache/storage data APIs representative surfaces",
+        "partition/persistence and callback ordering"
+      ],
+      "ownership_notes": [
+        "Reuse ElectronCompat and WEB_URL_FETCH concepts without conflating browser APIs.",
+        "Network interception is host/runtime-sensitive."
+      ]
+    },
+    {
+      "id": "ELECTRON_NET_PROTOCOL",
+      "title": "Electron net and protocol APIs",
+      "priority": 100,
+      "minimum_rules": 45,
+      "match": {
+        "id_prefixes": [
+          "electron.net.",
+          "electron.protocol."
+        ]
+      },
+      "required_id_prefixes": [
+        "electron.net.",
+        "electron.protocol."
+      ],
+      "scope": [
+        "net.request/fetch/isOnline/resolveHost representative APIs",
+        "ClientRequest/IncomingMessage Electron semantics",
+        "protocol.handle/unhandle/isProtocolHandled",
+        "custom scheme registration and response conversion",
+        "session/partition boundaries"
+      ],
+      "ownership_notes": [
+        "Reuse WEB_URL_FETCH and NODE_HTTP_CRYPTO only where semantics actually align.",
+        "Electron protocol handlers are host integration surfaces."
+      ]
+    },
+    {
+      "id": "ELECTRON_PRELOAD_CONTEXT",
+      "title": "Electron preload, contextBridge, and renderer isolation",
+      "priority": 102,
+      "minimum_rules": 40,
+      "match": {
+        "id_prefixes": [
+          "electron.contextbridge.",
+          "electron.preload.",
+          "electron.webframe."
+        ]
+      },
+      "required_id_prefixes": [
+        "electron.contextbridge.",
+        "electron.preload."
+      ],
+      "scope": [
+        "contextBridge.exposeInMainWorld/exposeInIsolatedWorld",
+        "function/object proxying/freezing semantics",
+        "ipcRenderer exposure restrictions",
+        "preload world/context isolation",
+        "webFrame representative renderer controls"
+      ],
+      "ownership_notes": [
+        "Reuse ELECTRON IPC and FUNCTIONS/OBJECT semantics.",
+        "Do not model isolated worlds as ordinary shared C# object references."
+      ]
+    },
+    {
+      "id": "ELECTRON_WEBCONTENTS_ADVANCED",
+      "title": "Electron WebContents advanced APIs",
+      "priority": 99,
+      "minimum_rules": 50,
+      "match": {
+        "id_prefixes": [
+          "electron.webcontents.advanced.",
+          "electron.webcontents.navigation.",
+          "electron.webcontents.capture."
+        ]
+      },
+      "required_id_prefixes": [
+        "electron.webcontents.advanced.",
+        "electron.webcontents.navigation."
+      ],
+      "scope": [
+        "navigation/loadURL/loadFile/reload/stop/goBack/goForward",
+        "executeJavaScript boundary refinement",
+        "capturePage/print/printToPDF/devtools representative APIs",
+        "window-open/navigation events",
+        "zoom/audio/background-throttling controls"
+      ],
+      "ownership_notes": [
+        "Do not duplicate existing basic WebContents/IPC rules.",
+        "Dynamic page JavaScript remains runtime/unsupported where semantics cannot be preserved."
+      ]
+    },
+    {
+      "id": "ELECTRON_UPDATER_DESKTOP",
+      "title": "Electron autoUpdater, dock, and desktop integration",
+      "priority": 81,
+      "minimum_rules": 35,
+      "match": {
+        "id_prefixes": [
+          "electron.autoupdater.",
+          "electron.dock.",
+          "electron.badge.",
+          "electron.jump-list."
+        ]
+      },
+      "required_id_prefixes": [
+        "electron.autoupdater.",
+        "electron.dock."
+      ],
+      "scope": [
+        "autoUpdater check/download/quitAndInstall events",
+        "macOS dock APIs",
+        "badge count and recent documents",
+        "JumpList/task representative Windows integration",
+        "platform-specific availability/error behavior"
+      ],
+      "ownership_notes": [
+        "Reuse ElectronCompat host abstraction.",
+        "Keep platform gates explicit rather than synthesizing unavailable APIs."
+      ]
+    },
+    {
+      "id": "JS_GLOBAL_BUILTINS",
+      "title": "ECMAScript global functions and globalThis",
+      "priority": 89,
+      "minimum_rules": 35,
+      "match": {
+        "categories": [
+          "js_globals"
+        ],
+        "id_prefixes": [
+          "global.",
+          "globalthis.",
+          "uri."
+        ]
+      },
+      "required_id_prefixes": [
+        "global.",
+        "uri."
+      ],
+      "scope": [
+        "globalThis identity/property semantics",
+        "global isFinite/isNaN/parseInt/parseFloat",
+        "encodeURI/decodeURI/encodeURIComponent/decodeURIComponent",
+        "eval classification boundary without duplicating FUNCTIONS",
+        "URI malformed-sequence errors"
+      ],
+      "ownership_notes": [
+        "Reuse COERCION and MATH_NUMBER parsing helpers.",
+        "Direct/indirect eval semantics remain runtime/unsupported and should not be approximated."
+      ]
+    },
+    {
+      "id": "ARRAY_ADVANCED",
+      "title": "Advanced Array APIs",
+      "priority": 87,
+      "minimum_rules": 35,
+      "match": {
+        "id_prefixes": [
+          "array.prototype.flat",
+          "array.prototype.flatmap",
+          "array.from",
+          "array.fromasync",
+          "array.prototype.entries",
+          "array.prototype.keys",
+          "array.prototype.values"
+        ]
+      },
+      "required_id_prefixes": [
+        "array.prototype.flat",
+        "array.from"
+      ],
+      "scope": [
+        "flat/flatMap depth and species",
+        "Array.from/fromAsync",
+        "Array iterator keys/values/entries",
+        "generic array-like/iterable construction",
+        "callback, holes and IteratorClose interactions"
+      ],
+      "ownership_notes": [
+        "Reuse ARRAY core, ITERATORS_GENERATORS, ASYNC, and FUNCTIONS.",
+        "Do not duplicate existing map/filter/reduce or core mutation methods."
+      ]
+    },
+    {
+      "id": "COLLECTION_SET_METHODS",
+      "title": "Modern Set composition methods",
+      "priority": 84,
+      "minimum_rules": 25,
+      "match": {
+        "id_prefixes": [
+          "set.prototype.union",
+          "set.prototype.intersection",
+          "set.prototype.difference",
+          "set.prototype.symmetric-difference",
+          "set.prototype.is-subset",
+          "set.prototype.is-superset",
+          "set.prototype.is-disjoint"
+        ]
+      },
+      "required_id_prefixes": [
+        "set.prototype.union",
+        "set.prototype.intersection",
+        "set.prototype.difference"
+      ],
+      "scope": [
+        "Set union/intersection/difference/symmetricDifference",
+        "isSubsetOf/isSupersetOf/isDisjointFrom",
+        "set-like argument protocol",
+        "ordering and SameValueZero interactions"
+      ],
+      "ownership_notes": [
+        "Reuse MAP_SET equality/storage semantics.",
+        "Avoid reimplementing generic iterator/call behavior."
+      ]
+    },
+    {
+      "id": "ATOMICS_SHARED_MEMORY",
+      "title": "Atomics and shared-memory synchronization",
+      "priority": 90,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "atomics_shared"
+        ],
+        "id_prefixes": [
+          "atomics.",
+          "shared-memory."
+        ]
+      },
+      "required_id_prefixes": [
+        "atomics."
+      ],
+      "scope": [
+        "Atomics load/store/exchange/compareExchange",
+        "add/sub/and/or/xor",
+        "wait/waitAsync/notify",
+        "isLockFree",
+        "SharedArrayBuffer typed-array restrictions and memory-order semantics"
+      ],
+      "ownership_notes": [
+        "Reuse BINARY SharedArrayBuffer/TypedArray rules.",
+        "Threading primitives must preserve JS atomicity/wait semantics rather than merely map syntax."
+      ]
+    },
+    {
+      "id": "WEAKREF_FINALIZATION",
+      "title": "WeakRef and FinalizationRegistry",
+      "priority": 79,
+      "minimum_rules": 25,
+      "match": {
+        "categories": [
+          "weakref_finalization"
+        ],
+        "id_prefixes": [
+          "weakref.",
+          "finalization-registry."
+        ]
+      },
+      "required_id_prefixes": [
+        "weakref.",
+        "finalization-registry."
+      ],
+      "scope": [
+        "WeakRef constructor/deref",
+        "FinalizationRegistry register/unregister",
+        "cleanup callback scheduling boundaries",
+        "target/token restrictions",
+        "GC nondeterminism and observability limits"
+      ],
+      "ownership_notes": [
+        "Reuse MAP_SET weak-reference concepts.",
+        "Never promise deterministic finalization timing."
+      ]
+    },
+    {
+      "id": "TYPESCRIPT_RUNTIME_LOWERINGS",
+      "title": "TypeScript runtime-emitting constructs",
+      "priority": 86,
+      "minimum_rules": 40,
+      "match": {
+        "categories": [
+          "typescript_runtime"
+        ],
+        "id_prefixes": [
+          "typescript.enum.",
+          "typescript.namespace.",
+          "typescript.parameter-property.",
+          "typescript.import-equals."
+        ]
+      },
+      "required_id_prefixes": [
+        "typescript.enum.",
+        "typescript.namespace."
+      ],
+      "scope": [
+        "numeric/string enums and reverse mappings",
+        "namespaces and declaration merging runtime output",
+        "parameter properties",
+        "import equals/export assignment",
+        "TS-specific class field emit/profile boundaries"
+      ],
+      "ownership_notes": [
+        "Model observable JavaScript emitted by TypeScript, not type-checker-only behavior.",
+        "Reuse JS FUNCTIONS/CLASSES/MODULES after lowering."
+      ]
+    },
+    {
+      "id": "TYPESCRIPT_ERASURE_SYNTAX",
+      "title": "TypeScript type-erasure and assertion syntax",
+      "priority": 75,
+      "minimum_rules": 30,
+      "match": {
+        "categories": [
+          "typescript_erasure"
+        ],
+        "id_prefixes": [
+          "typescript.type-only.",
+          "typescript.assertion.",
+          "typescript.satisfies.",
+          "typescript.non-null."
+        ]
+      },
+      "required_id_prefixes": [
+        "typescript.type-only.",
+        "typescript.assertion."
+      ],
+      "scope": [
+        "interfaces/type aliases/type-only imports/exports erase",
+        "as/type assertions and non-null assertion erase",
+        "satisfies operator compile-time-only semantics",
+        "const assertions and emitted-runtime neutrality",
+        "decorator syntax explicitly excluded unless profile-defined"
+      ],
+      "ownership_notes": [
+        "These rules describe no-runtime-effect constructs and parser/type-analysis preconditions.",
+        "Do not duplicate runtime JS semantics after erasure."
+      ]
+    },
+    {
       "id": "ARRAY_CORE",
       "title": "Array core",
       "priority": 40,
