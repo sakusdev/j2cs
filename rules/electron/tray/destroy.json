@@ -1,0 +1,44 @@
+{
+  "id": "electron.tray.destroy",
+  "category": "electron.tray",
+  "summary": "Destroy a Tray host resource without silently recreating it.",
+  "source": {
+    "pattern": "$tray.destroy()",
+    "requirements": {
+      "receiver": "Electron Tray",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$tray.Destroy()",
+    "helper": "ElectronCompat.Tray.Destroy"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_receiver": true,
+    "destroyed_state": true
+  },
+  "caveats": [
+    "Destroyed Tray wrappers must remain destroyed."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tray.destroy();",
+      "expected_csharp": "tray.Destroy();",
+      "expected_behavior": "destroys the native tray item immediately"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tray.destroy(); console.log(tray.isDestroyed());",
+      "expected_behavior": "prints true and later calls must not implicitly create a replacement"
+    }
+  ]
+}

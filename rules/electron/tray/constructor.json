@@ -1,0 +1,47 @@
+{
+  "id": "electron.tray.constructor",
+  "category": "electron.tray",
+  "summary": "Create a native Tray while preserving host lifetime and platform-specific image/GUID behavior.",
+  "source": {
+    "pattern": "new Tray($image, $guid?)",
+    "requirements": {
+      "module_binding": "electron.Tray",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Tray.Create($image, $guid)",
+    "helper": "ElectronCompat.Tray.Create"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Tray host wrapper",
+    "allocates_native_resource": true,
+    "event_source": true
+  },
+  "caveats": [
+    "Tray is an EventEmitter; generic listener mechanics belong to EVENTS_STREAMS.",
+    "Linux activation semantics and macOS/Windows GUID persistence are host-specific.",
+    "NativeImage/string handling must reuse Electron-compatible image semantics."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const tray=new Tray(icon);",
+      "expected_csharp": "var tray = ElectronCompat.Tray.Create(icon, null);",
+      "expected_behavior": "creates one live tray item associated with the image"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const tray=new Tray(icon,guid);",
+      "expected_behavior": "GUID validation and persistence follow Electron platform rules rather than acting as an arbitrary key"
+    }
+  ]
+}

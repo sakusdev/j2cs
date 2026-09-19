@@ -1,0 +1,45 @@
+{
+  "id": "electron.screen.getprimarydisplay",
+  "category": "electron.screen",
+  "summary": "Return the host primary Display with Electron display metadata.",
+  "source": {
+    "pattern": "screen.getPrimaryDisplay()",
+    "requirements": {
+      "module_binding": "electron.screen",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Screen.GetPrimaryDisplay()",
+    "helper": "ElectronCompat.Screen.GetPrimaryDisplay"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Display",
+    "bounds_units": "DIP",
+    "identity": "host display wrapper"
+  },
+  "caveats": [
+    "Display scaleFactor/rotation/color/device metadata must remain host-derived."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/screen"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const d=screen.getPrimaryDisplay();",
+      "expected_csharp": "var d = ElectronCompat.Screen.GetPrimaryDisplay();",
+      "expected_behavior": "returns the primary Display wrapper"
+    },
+    {
+      "name": "edge semantics",
+      "input": "console.log(screen.getPrimaryDisplay().scaleFactor);",
+      "expected_behavior": "does not assume scaleFactor is 1"
+    }
+  ]
+}

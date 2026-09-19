@@ -1,0 +1,43 @@
+{
+  "id": "electron.notification.close",
+  "category": "electron.notification",
+  "summary": "Close an Electron Notification while preserving host notification-center behavior.",
+  "source": {
+    "pattern": "$notification.close()",
+    "requirements": {
+      "receiver": "Electron Notification",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$notification.Close()",
+    "helper": "ElectronCompat.Notification.Close"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "host_side_effect": true
+  },
+  "caveats": [
+    "The close event is not guaranteed for every host close path."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/notification"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "n.show(); n.close();",
+      "expected_csharp": "n.Close();",
+      "expected_behavior": "requests the delivered notification to close"
+    },
+    {
+      "name": "edge semantics",
+      "input": "n.close();",
+      "expected_behavior": "closing a non-visible/persisted notification follows host behavior without inventing a guaranteed event"
+    }
+  ]
+}

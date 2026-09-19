@@ -1,0 +1,41 @@
+{
+  "id": "electron.tray.isdestroyed",
+  "category": "electron.tray",
+  "summary": "Read whether a Tray has been destroyed.",
+  "source": {
+    "pattern": "$tray.isDestroyed()",
+    "requirements": {
+      "receiver": "Electron Tray",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$tray.IsDestroyed()",
+    "helper": "ElectronCompat.Tray.IsDestroyed"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const dead=tray.isDestroyed();",
+      "expected_csharp": "var dead = tray.IsDestroyed();",
+      "expected_behavior": "returns false for a live Tray"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tray.destroy(); console.log(tray.isDestroyed());",
+      "expected_behavior": "returns true after destruction"
+    }
+  ]
+}

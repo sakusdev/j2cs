@@ -1,0 +1,41 @@
+{
+  "id": "electron.tray.settooltip",
+  "category": "electron.tray",
+  "summary": "Set or clear Tray hover text.",
+  "source": {
+    "pattern": "$tray.setToolTip($text)",
+    "requirements": {
+      "receiver": "Electron Tray",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$tray.SetToolTip($text)",
+    "helper": "ElectronCompat.Tray.SetToolTip"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_host_state": true
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/tray"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tray.setToolTip('Ready');",
+      "expected_csharp": "tray.SetToolTip(\"Ready\");",
+      "expected_behavior": "sets host tooltip text"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tray.setToolTip('');",
+      "expected_behavior": "removes the tooltip"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.notification.show",
+  "category": "electron.notification",
+  "summary": "Show or re-show an Electron Notification through the OS notification service.",
+  "source": {
+    "pattern": "$notification.show()",
+    "requirements": {
+      "receiver": "Electron Notification",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "$notification.Show()",
+    "helper": "ElectronCompat.Notification.Show"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "host_side_effect": true,
+    "repeat_show": "reposts/replaces previous presentation"
+  },
+  "caveats": [
+    "Signing/permission failures can emit failed rather than show visible UI.",
+    "Generic EventEmitter mechanics belong to EVENTS_STREAMS."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/notification"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "n.show();",
+      "expected_csharp": "n.Show();",
+      "expected_behavior": "requests immediate display and host events"
+    },
+    {
+      "name": "edge semantics",
+      "input": "n.show(); n.show();",
+      "expected_behavior": "the second call reposts according to Electron instead of being silently ignored"
+    }
+  ]
+}

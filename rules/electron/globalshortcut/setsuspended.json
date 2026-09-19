@@ -1,0 +1,45 @@
+{
+  "id": "electron.globalshortcut.setsuspended",
+  "category": "electron.globalshortcut",
+  "summary": "Suspend or resume globalShortcut handling while retaining existing registrations.",
+  "source": {
+    "pattern": "globalShortcut.setSuspended($suspended)",
+    "requirements": {
+      "module_binding": "electron.globalShortcut",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.GlobalShortcut.SetSuspended($suspended)",
+    "helper": "ElectronCompat.GlobalShortcut.SetSuspended"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "mutates_module_state": true,
+    "new_registrations_while_suspended": "fail"
+  },
+  "caveats": [
+    "Available in Electron 42+; version gating must be respected."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/global-shortcut"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "globalShortcut.setSuspended(true);",
+      "expected_csharp": "ElectronCompat.GlobalShortcut.SetSuspended(true);",
+      "expected_behavior": "stops handling without discarding registrations"
+    },
+    {
+      "name": "edge semantics",
+      "input": "globalShortcut.setSuspended(true); globalShortcut.register('F3',cb);",
+      "expected_behavior": "new registration fails while handling is suspended"
+    }
+  ]
+}

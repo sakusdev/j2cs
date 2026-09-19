@@ -1,0 +1,46 @@
+{
+  "id": "electron.globalshortcut.register",
+  "category": "electron.globalshortcut",
+  "summary": "Register one OS-global accelerator while preserving silent registration failure.",
+  "source": {
+    "pattern": "globalShortcut.register($accelerator, $callback)",
+    "requirements": {
+      "module_binding": "electron.globalShortcut",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.GlobalShortcut.Register($accelerator, $callback)",
+    "helper": "ElectronCompat.GlobalShortcut.Register"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "requires_ready": true,
+    "callback": "invoked on successful global activation"
+  },
+  "caveats": [
+    "OS conflicts return false without throwing.",
+    "Wayland portal consent/identity behavior remains host-controlled."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/global-shortcut"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const ok=globalShortcut.register('CommandOrControl+X',cb);",
+      "expected_csharp": "var ok = ElectronCompat.GlobalShortcut.Register(accel, cb);",
+      "expected_behavior": "returns true only when this app registered the shortcut"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const ok=globalShortcut.register(taken,cb);",
+      "expected_behavior": "returns false without throwing when the OS refuses registration"
+    }
+  ]
+}

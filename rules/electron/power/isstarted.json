@@ -1,0 +1,42 @@
+{
+  "id": "electron.power.powersave.isstarted",
+  "category": "electron.power",
+  "summary": "Check whether a power-save blocker token is active.",
+  "source": {
+    "pattern": "powerSaveBlocker.isStarted($id)",
+    "requirements": {
+      "module_binding": "electron.powerSaveBlocker",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.PowerSaveBlocker.IsStarted($id)",
+    "helper": "ElectronCompat.PowerSaveBlocker.IsStarted"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "side_effects": false
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/power-save-blocker"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const ok=powerSaveBlocker.isStarted(id);",
+      "expected_csharp": "var ok = ElectronCompat.PowerSaveBlocker.IsStarted(id);",
+      "expected_behavior": "returns true for an active token"
+    },
+    {
+      "name": "edge semantics",
+      "input": "powerSaveBlocker.stop(id); console.log(powerSaveBlocker.isStarted(id));",
+      "expected_behavior": "returns false after stop"
+    }
+  ]
+}

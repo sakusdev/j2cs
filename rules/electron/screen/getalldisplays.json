@@ -1,0 +1,45 @@
+{
+  "id": "electron.screen.getalldisplays",
+  "category": "electron.screen",
+  "summary": "Return all currently available Electron Display objects.",
+  "source": {
+    "pattern": "screen.getAllDisplays()",
+    "requirements": {
+      "module_binding": "electron.screen",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Screen.GetAllDisplays()",
+    "helper": "ElectronCompat.Screen.GetAllDisplays"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Display[]",
+    "snapshot": "currently available displays",
+    "host_state": true
+  },
+  "caveats": [
+    "Headless/remote environments can expose synthetic or virtual displays."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/screen"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const ds=screen.getAllDisplays();",
+      "expected_csharp": "var ds = ElectronCompat.Screen.GetAllDisplays();",
+      "expected_behavior": "returns wrappers for current displays"
+    },
+    {
+      "name": "edge semantics",
+      "input": "/* headless host */ screen.getAllDisplays();",
+      "expected_behavior": "preserves synthetic/virtual display metadata instead of assuming one physical monitor"
+    }
+  ]
+}

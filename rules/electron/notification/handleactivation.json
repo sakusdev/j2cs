@@ -1,0 +1,45 @@
+{
+  "id": "electron.notification.handleactivation",
+  "category": "electron.notification",
+  "summary": "Route Windows notification activations across cold-start and object-lifetime boundaries.",
+  "source": {
+    "pattern": "Notification.handleActivation($callback)",
+    "requirements": {
+      "module_binding": "electron.Notification",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true,
+      "platform": "win32"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNotificationHandleActivation($callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "undefined",
+    "persistent_activation_router": true,
+    "callback_timing": "queued earlier activation may invoke immediately; later activations invoke on arrival"
+  },
+  "caveats": [
+    "Activations can arrive when the original Notification object no longer exists, requiring process-level runtime state."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/notification"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "Notification.handleActivation(cb);",
+      "expected_csharp": "JsRuntime.ElectronNotificationHandleActivation(cb);",
+      "expected_behavior": "registers the process-level activation handler"
+    },
+    {
+      "name": "edge semantics",
+      "input": "/* activation occurred before registration */ Notification.handleActivation(cb);",
+      "expected_behavior": "the queued activation invokes the callback immediately"
+    }
+  ]
+}

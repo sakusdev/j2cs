@@ -1,0 +1,42 @@
+{
+  "id": "electron.menu.constructor",
+  "category": "electron.menu",
+  "summary": "Create an empty native Menu wrapper.",
+  "source": {
+    "pattern": "new Menu()",
+    "requirements": {
+      "module_binding": "electron.Menu",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Menu.Create()",
+    "helper": "ElectronCompat.Menu.Create"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "Menu host wrapper",
+    "initial_items": 0,
+    "event_source": true
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const m=new Menu();",
+      "expected_csharp": "var m = ElectronCompat.Menu.Create();",
+      "expected_behavior": "creates an empty Menu"
+    },
+    {
+      "name": "edge semantics",
+      "input": "const a=new Menu(), b=new Menu();",
+      "expected_behavior": "creates distinct menu identities"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.notification.issupported",
+  "category": "electron.notification",
+  "summary": "Check whether main-process desktop notifications are supported on the current host.",
+  "source": {
+    "pattern": "Notification.isSupported()",
+    "requirements": {
+      "module_binding": "electron.Notification",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.Notification.IsSupported()",
+    "helper": "ElectronCompat.Notification.IsSupported"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "host_capability": true,
+    "side_effects": false
+  },
+  "caveats": [
+    "Support depends on OS/session configuration."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/notification"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const ok=Notification.isSupported();",
+      "expected_csharp": "var ok = ElectronCompat.Notification.IsSupported();",
+      "expected_behavior": "returns current host capability"
+    },
+    {
+      "name": "edge semantics",
+      "input": "/* unsupported desktop */ Notification.isSupported();",
+      "expected_behavior": "returns false rather than pretending a backend exists"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.menuitem.constructor",
+  "category": "electron.menuitem",
+  "summary": "Construct a MenuItem with Electron role/type/click/submenu semantics.",
+  "source": {
+    "pattern": "new MenuItem($options)",
+    "requirements": {
+      "module_binding": "electron.MenuItem",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronMenuItemCreate($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "returns": "MenuItem",
+    "role_precedence": "role ignores click option",
+    "callbacks": "retain JS closure identity",
+    "host_roles": true
+  },
+  "caveats": [
+    "Electron built-in classes cannot be subclassed.",
+    "Role defaults, radio grouping, nested submenus and arbitrary option objects require general JS/native semantics."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/menu-item"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const i=new MenuItem({label:'Run',click:cb});",
+      "expected_csharp": "var i = JsRuntime.ElectronMenuItemCreate(options);",
+      "expected_behavior": "retains the click callback"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new MenuItem({role:'quit',click:cb});",
+      "expected_behavior": "role action takes precedence and click is ignored"
+    }
+  ]
+}

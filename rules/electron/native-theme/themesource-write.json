@@ -1,0 +1,50 @@
+{
+  "id": "electron.native-theme.themesource-write",
+  "category": "electron.native-theme",
+  "summary": "Set nativeTheme.themeSource while preserving global UI effects and assignment value.",
+  "source": {
+    "pattern": "nativeTheme.themeSource = $value",
+    "requirements": {
+      "module_binding": "electron.nativeTheme",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.NativeTheme.SetThemeSource($value)",
+    "helper": "ElectronCompat.NativeTheme.SetThemeSource"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "assigned value",
+    "valid_values": [
+      "system",
+      "light",
+      "dark"
+    ],
+    "mutates_global_ui_state": true,
+    "events": "updated is emitted for theme changes per Electron"
+  },
+  "caveats": [
+    "Generic assignment evaluation remains owned by OPERATORS; the helper must yield the assigned value when used as an expression.",
+    "Changing themeSource affects Electron-rendered/native UI and prefers-color-scheme."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/native-theme"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const v=(nativeTheme.themeSource='dark');",
+      "expected_csharp": "var v = ElectronCompat.NativeTheme.SetThemeSource(\"dark\");",
+      "expected_behavior": "sets dark mode and yields the assigned string"
+    },
+    {
+      "name": "edge semantics",
+      "input": "nativeTheme.themeSource='system';",
+      "expected_behavior": "removes the override and returns to OS/Chromium default"
+    }
+  ]
+}

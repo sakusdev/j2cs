@@ -1,0 +1,44 @@
+{
+  "id": "electron.native-theme.shouldusedarkcolors",
+  "category": "electron.native-theme",
+  "summary": "Read Electron/Chromium effective dark-mode state.",
+  "source": {
+    "pattern": "nativeTheme.shouldUseDarkColors",
+    "requirements": {
+      "module_binding": "electron.nativeTheme",
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.NativeTheme.ShouldUseDarkColors",
+    "helper": "ElectronCompat.NativeTheme.ShouldUseDarkColors"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "boolean",
+    "effective_state": "includes themeSource override and Chromium/OS choice",
+    "side_effects": false
+  },
+  "caveats": [
+    "Not equivalent to a single raw OS preference because themeSource can override it."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/native-theme"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const dark=nativeTheme.shouldUseDarkColors;",
+      "expected_csharp": "var dark = ElectronCompat.NativeTheme.ShouldUseDarkColors;",
+      "expected_behavior": "returns effective dark-mode state"
+    },
+    {
+      "name": "edge semantics",
+      "input": "nativeTheme.themeSource='dark'; console.log(nativeTheme.shouldUseDarkColors);",
+      "expected_behavior": "returns true after the dark override"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "electron.power.getsystemidlestate",
+  "category": "electron.power",
+  "summary": "Query Electron's host-defined idle state using a threshold in seconds.",
+  "source": {
+    "pattern": "powerMonitor.getSystemIdleState($idleThreshold)",
+    "requirements": {
+      "module_binding": "electron.powerMonitor",
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "ElectronCompat.PowerMonitor.GetSystemIdleState($idleThreshold)",
+    "helper": "ElectronCompat.PowerMonitor.GetSystemIdleState"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "returns": "active|idle|locked|unknown",
+    "units": "seconds",
+    "host_state": true
+  },
+  "caveats": [
+    "locked is only available on supported systems; unknown remains representable."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/power-monitor"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "const s=powerMonitor.getSystemIdleState(60);",
+      "expected_csharp": "var s = ElectronCompat.PowerMonitor.GetSystemIdleState(60);",
+      "expected_behavior": "returns an Electron idle-state string"
+    },
+    {
+      "name": "edge semantics",
+      "input": "powerMonitor.getSystemIdleState(0);",
+      "expected_behavior": "threshold/result handling stays with the Electron-compatible host"
+    }
+  ]
+}
