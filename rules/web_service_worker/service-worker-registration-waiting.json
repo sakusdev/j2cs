@@ -1,0 +1,39 @@
+{
+  "id": "web.service-worker.registration.waiting",
+  "category": "web_service_worker",
+  "summary": "Expose the waiting worker slot of a registration.",
+  "source": {
+    "pattern": "$registration.waiting",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerWaiting",
+    "template": "JsRuntime.ServiceWorkerWaiting($registration)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "ServiceWorker|null",
+    "lifecycle": "installed worker may wait until activation conditions",
+    "live": true
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "waiting update",
+      "input": "// updated worker installed while old worker controls clients",
+      "expected_behavior": "waiting can reference the new worker"
+    },
+    {
+      "name": "none",
+      "input": "// no waiting worker",
+      "expected_behavior": "returns null"
+    }
+  ]
+}

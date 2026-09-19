@@ -1,0 +1,42 @@
+{
+  "id": "web.cache.add",
+  "category": "web_service_worker",
+  "summary": "Fetch one GET/http(s) Request and atomically insert the validated response into the Cache.",
+  "source": {
+    "pattern": "$cache.add($request)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCacheAdd",
+    "template": "JsRuntime.WebCacheAdd($cache, $request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request": "construct Request; http(s) GET required",
+    "network": "Fetch runtime",
+    "response_validation": "reject non-ok/error/Vary:* per Cache add algorithms as applicable",
+    "return": "Promise<undefined>",
+    "store": "batch put after successful fetch"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "network add",
+      "input": "// browser/service worker: await cache.add('/asset.js')",
+      "expected_behavior": "fetches and stores response if valid"
+    },
+    {
+      "name": "invalid method",
+      "input": "// semantic: cache.add(new Request(url,{method:'POST'}))",
+      "expected_behavior": "Promise rejects TypeError before caching"
+    }
+  ]
+}

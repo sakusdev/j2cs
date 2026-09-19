@@ -1,0 +1,39 @@
+{
+  "id": "web.service-worker.registration.scope",
+  "category": "web_service_worker",
+  "summary": "Return the serialized scope URL associated with a registration.",
+  "source": {
+    "pattern": "$registration.scope",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebServiceWorker.RegistrationScope",
+    "template": "WebServiceWorker.RegistrationScope($registration)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "serialized absolute URL",
+    "stable": "registration scope URL",
+    "fragment": "scope mapping excludes fragments"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "scope",
+      "input": "// registration created with /app/ scope; registration.scope",
+      "expected_behavior": "returns absolute scope URL ending /app/"
+    },
+    {
+      "name": "readonly",
+      "input": "// semantic registration.scope",
+      "expected_behavior": "does not mutate registration mapping"
+    }
+  ]
+}

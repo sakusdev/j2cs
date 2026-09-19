@@ -1,0 +1,41 @@
+{
+  "id": "web.caches.has",
+  "category": "web_service_worker",
+  "summary": "Test named-cache existence asynchronously without creating it.",
+  "source": {
+    "pattern": "caches.has($name)",
+    "requirements": {
+      "receiver_is_intrinsic_cache_storage": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachesHas",
+    "template": "JsRuntime.WebCachesHas($caches, $name)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Boolean>",
+    "missing": false,
+    "no_creation": true,
+    "storage_key_scoped": true
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "missing",
+      "input": "// fresh storage key: await caches.has('none')",
+      "expected_behavior": "resolves false"
+    },
+    {
+      "name": "after open",
+      "input": "// await caches.open('x'); await caches.has('x')",
+      "expected_behavior": "resolves true"
+    }
+  ]
+}

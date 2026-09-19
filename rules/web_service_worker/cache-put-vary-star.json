@@ -1,0 +1,40 @@
+{
+  "id": "web.cache.put-vary-star",
+  "category": "web_service_worker",
+  "summary": "Reject a Response whose Vary header contains '*' when storing with Cache.put.",
+  "source": {
+    "pattern": "$cache.put($request, $response)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "response_headers_statically_analyzable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.ValidatePutResponse",
+    "template": "WebCache.ValidatePutResponse($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "vary_star": "TypeError/rejection; response cannot be stored by put",
+    "header_parsing": "Fetch Headers semantics"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "vary star",
+      "input": "// semantic: cache.put(req,new Response('x',{headers:{Vary:'*'}}))",
+      "expected_behavior": "rejects"
+    },
+    {
+      "name": "ordinary vary",
+      "input": "// semantic response Vary: Accept",
+      "expected_behavior": "can be stored if other preconditions hold"
+    }
+  ]
+}

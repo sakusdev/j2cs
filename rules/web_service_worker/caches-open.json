@@ -1,0 +1,42 @@
+{
+  "id": "web.caches.open",
+  "category": "web_service_worker",
+  "summary": "Open or create a named Cache asynchronously within the current storage key.",
+  "source": {
+    "pattern": "caches.open($name)",
+    "requirements": {
+      "receiver_is_intrinsic_cache_storage": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachesOpen",
+    "template": "JsRuntime.WebCachesOpen($caches, $name)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "name": "DOMString",
+    "return": "Promise<Cache>",
+    "existing": "returns object representing same underlying request-response list",
+    "missing": "create named cache",
+    "persistence": "host storage"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "open",
+      "input": "// service worker/browser: const c=await caches.open('v1')",
+      "expected_behavior": "resolves to a Cache associated with name v1"
+    },
+    {
+      "name": "same underlying cache",
+      "input": "// semantic: await caches.open('v1') twice",
+      "expected_behavior": "both Cache objects can observe the same underlying cache contents"
+    }
+  ]
+}

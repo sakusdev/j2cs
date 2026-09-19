@@ -1,0 +1,39 @@
+{
+  "id": "web.caches.access",
+  "category": "web_service_worker",
+  "summary": "Access the origin/storage-key scoped CacheStorage host object.",
+  "source": {
+    "pattern": "caches",
+    "requirements": {
+      "global_exposes_cache_storage": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCacheStorage.Get",
+    "template": "WebCacheStorage.Get($global)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "scope": "associated global's storage key/origin cache-name map",
+    "identity": "host CacheStorage object",
+    "sharing": "multiple globals with same storage key can observe same underlying named caches"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "host object",
+      "input": "// browser/worker: typeof caches.open === 'function'",
+      "expected_behavior": "CacheStorage is exposed in supporting secure contexts"
+    },
+    {
+      "name": "storage scoped",
+      "input": "// semantic: caches",
+      "expected_behavior": "does not expose caches from unrelated storage keys/origins"
+    }
+  ]
+}

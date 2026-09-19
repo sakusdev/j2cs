@@ -1,0 +1,39 @@
+{
+  "id": "web.service-worker.registration.installing",
+  "category": "web_service_worker",
+  "summary": "Expose the installing worker slot of a ServiceWorkerRegistration as a live nullable state view.",
+  "source": {
+    "pattern": "$registration.installing",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerRegistrationState",
+    "template": "JsRuntime.ServiceWorkerInstalling($registration)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "ServiceWorker|null",
+    "live": "changes during update/install lifecycle",
+    "identity": "realm wrapper for internal installing worker"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "during install",
+      "input": "// registration during install",
+      "expected_behavior": "may return installing ServiceWorker"
+    },
+    {
+      "name": "no install",
+      "input": "// stable active registration",
+      "expected_behavior": "can return null"
+    }
+  ]
+}

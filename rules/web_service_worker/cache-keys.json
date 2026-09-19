@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.keys",
+  "category": "web_service_worker",
+  "summary": "Return cloned Requests for cache entries in request-response-list order.",
+  "source": {
+    "pattern": "$cache.keys()",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.Keys",
+    "template": "WebCache.Keys($cache, undefined, {})"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<FrozenArray<Request>>",
+    "order": "cache entry order",
+    "clones": "new Request wrappers preserving stored request metadata",
+    "bodies": "cache keys are requests used for matching; response bodies not consumed"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "all keys",
+      "input": "// cache with /a,/b then await cache.keys()",
+      "expected_behavior": "resolves Request objects in cache order"
+    },
+    {
+      "name": "independent wrappers",
+      "input": "// semantic: cache.keys()",
+      "expected_behavior": "does not expose mutable internal request records directly"
+    }
+  ]
+}

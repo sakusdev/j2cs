@@ -1,0 +1,39 @@
+{
+  "id": "web.caches.storage-key-boundary",
+  "category": "web_service_worker",
+  "summary": "Keep CacheStorage partitioning/storage-key policy as a host runtime boundary.",
+  "source": {
+    "pattern": "[[CacheStorageMap]]($global)",
+    "requirements": {
+      "semantic_operation": "obtain cache storage for global",
+      "storage_partitioning_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCacheStorageForGlobal",
+    "template": "JsRuntime.WebCacheStorageForGlobal($global)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "partition": "storage key, origin, browser privacy policy",
+    "security": "cross-key caches not visible",
+    "persistence": "host controlled"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "same key sharing",
+      "input": "// semantic: two same-storage-key globals",
+      "expected_behavior": "may share underlying named cache map"
+    },
+    {
+      "name": "cross key isolation",
+      "input": "// semantic: different storage keys",
+      "expected_behavior": "must not expose each other's cache entries"
+    }
+  ]
+}

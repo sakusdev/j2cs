@@ -1,0 +1,48 @@
+{
+  "id": "web.service-worker.register-options",
+  "category": "web_service_worker",
+  "summary": "Keep worker type and updateViaCache options in the scheduled service-worker registration job.",
+  "source": {
+    "pattern": "navigator.serviceWorker.register($scriptURL,{type:$type,updateViaCache:$mode})",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "registration_options_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerRegister",
+    "template": "JsRuntime.ServiceWorkerRegister($container, $scriptURL, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "type": [
+      "classic",
+      "module"
+    ],
+    "update_via_cache": [
+      "imports",
+      "all",
+      "none"
+    ],
+    "observable": "registration.updateViaCache and script fetch behavior"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "module",
+      "input": "// register('/sw.js',{type:'module'})",
+      "expected_behavior": "worker job uses module worker semantics"
+    },
+    {
+      "name": "cache mode",
+      "input": "// register('/sw.js',{updateViaCache:'none'})",
+      "expected_behavior": "registration records none and update fetch cache behavior follows it"
+    }
+  ]
+}

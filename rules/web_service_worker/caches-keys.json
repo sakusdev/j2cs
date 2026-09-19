@@ -1,0 +1,41 @@
+{
+  "id": "web.caches.keys",
+  "category": "web_service_worker",
+  "summary": "Enumerate cache names in creation/insertion order as an asynchronous snapshot sequence.",
+  "source": {
+    "pattern": "caches.keys()",
+    "requirements": {
+      "receiver_is_intrinsic_cache_storage": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachesKeys",
+    "template": "JsRuntime.WebCachesKeys($caches)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<sequence<DOMString>>",
+    "order": "underlying name-to-cache map order",
+    "snapshot": "new sequence",
+    "scope": "current storage key"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "names",
+      "input": "// open a then b; await caches.keys()",
+      "expected_behavior": "resolves a sequence containing names in cache-map order"
+    },
+    {
+      "name": "no cache objects",
+      "input": "// semantic: await caches.keys()",
+      "expected_behavior": "returns names, not Cache instances"
+    }
+  ]
+}

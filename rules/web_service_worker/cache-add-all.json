@@ -1,0 +1,42 @@
+{
+  "id": "web.cache.add-all",
+  "category": "web_service_worker",
+  "summary": "Fetch a sequence of requests and commit them through Cache batch semantics only after all input/fetch validation succeeds.",
+  "source": {
+    "pattern": "$cache.addAll($requests)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCacheAddAll",
+    "template": "JsRuntime.WebCacheAddAll($cache, $requests)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inputs": "RequestInfo sequence; each becomes Request",
+    "requirements": "http(s) GET",
+    "fetches": "host Fetch semantics",
+    "return": "Promise<undefined>",
+    "commit": "batch operation"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "multiple",
+      "input": "// service worker: await cache.addAll(['/a','/b'])",
+      "expected_behavior": "fetches/validates both and stores batch"
+    },
+    {
+      "name": "bad input",
+      "input": "// addAll including POST/non-http request",
+      "expected_behavior": "rejects TypeError"
+    }
+  ]
+}

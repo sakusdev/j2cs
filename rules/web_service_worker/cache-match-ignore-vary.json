@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.match-ignore-vary",
+  "category": "web_service_worker",
+  "summary": "Model ignoreVary option independently of URL/method matching.",
+  "source": {
+    "pattern": "$cache.match($request, {ignoreVary:true,...$options})",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "ignore_vary": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.Match",
+    "template": "WebCache.Match($cache, $request, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "vary_headers": "skip Vary request-header comparison",
+    "url_method": "remain applicable",
+    "vary_star": "query behavior follows spec matching rules/options"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "vary ignored",
+      "input": "// cached response varies on Accept-Language; match with ignoreVary:true",
+      "expected_behavior": "header mismatch does not block the cache match"
+    },
+    {
+      "name": "url still required",
+      "input": "// different URL with ignoreVary:true",
+      "expected_behavior": "does not match solely because Vary is ignored"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.put-body-unusable",
+  "category": "web_service_worker",
+  "summary": "Reject Cache.put when the Response body is disturbed or locked/unusable.",
+  "source": {
+    "pattern": "$cache.put($request, $response)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "response_is_intrinsic_response": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.ValidatePutResponse",
+    "template": "WebCache.ValidatePutResponse($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "body": "must be usable according to Fetch body semantics",
+    "disturbed_or_locked": "reject TypeError",
+    "clone": "storage keeps independent body data"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "used response",
+      "input": "// const r=new Response('x'); await r.text(); await cache.put('/a',r)",
+      "expected_behavior": "rejects TypeError"
+    },
+    {
+      "name": "fresh response",
+      "input": "// fresh Response body",
+      "expected_behavior": "may be stored and later consumed independently"
+    }
+  ]
+}

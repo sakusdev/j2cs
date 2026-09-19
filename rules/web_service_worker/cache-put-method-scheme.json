@@ -1,0 +1,44 @@
+{
+  "id": "web.cache.put-method-scheme-validation",
+  "category": "web_service_worker",
+  "summary": "Reject Cache.put requests whose method is not GET or whose URL scheme is not HTTP(S).",
+  "source": {
+    "pattern": "$cache.put($request, $response)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "request_method_or_scheme_statically_known": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.ValidatePutRequest",
+    "template": "WebCache.ValidatePutRequest($request)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "valid_method": "GET",
+    "valid_schemes": [
+      "http",
+      "https"
+    ],
+    "invalid": "Promise rejection TypeError before storage mutation"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "post rejected",
+      "input": "// semantic: cache.put(new Request(url,{method:'POST'}),res)",
+      "expected_behavior": "rejects TypeError"
+    },
+    {
+      "name": "data URL rejected",
+      "input": "// semantic: cache.put('data:text/plain,x',res)",
+      "expected_behavior": "rejects TypeError"
+    }
+  ]
+}

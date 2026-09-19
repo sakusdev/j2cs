@@ -1,0 +1,39 @@
+{
+  "id": "web.service-worker.registration.active",
+  "category": "web_service_worker",
+  "summary": "Expose the registration's active ServiceWorker slot, which is distinct from per-client controller.",
+  "source": {
+    "pattern": "$registration.active",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerActive",
+    "template": "JsRuntime.ServiceWorkerActive($registration)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "ServiceWorker|null",
+    "registration_state": "active worker can exist even for a client it does not currently control",
+    "live": true
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "active",
+      "input": "// activated registration",
+      "expected_behavior": "returns active ServiceWorker"
+    },
+    {
+      "name": "not yet active",
+      "input": "// early installation",
+      "expected_behavior": "can return null"
+    }
+  ]
+}

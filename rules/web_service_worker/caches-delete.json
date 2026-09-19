@@ -1,0 +1,41 @@
+{
+  "id": "web.caches.delete",
+  "category": "web_service_worker",
+  "summary": "Delete a named cache mapping and resolve whether a cache existed.",
+  "source": {
+    "pattern": "caches.delete($name)",
+    "requirements": {
+      "receiver_is_intrinsic_cache_storage": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachesDelete",
+    "template": "JsRuntime.WebCachesDelete($caches, $name)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Boolean>",
+    "true": "mapping existed and is removed",
+    "false": "no matching cache name",
+    "existing_cache_objects": "may still represent their request-response list according to host object lifetime"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "delete existing",
+      "input": "// open x then await caches.delete('x')",
+      "expected_behavior": "resolves true"
+    },
+    {
+      "name": "delete absent",
+      "input": "// await caches.delete('missing')",
+      "expected_behavior": "resolves false"
+    }
+  ]
+}

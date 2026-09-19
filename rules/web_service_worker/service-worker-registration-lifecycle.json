@@ -1,0 +1,47 @@
+{
+  "id": "web.service-worker.lifecycle-boundary",
+  "category": "web_service_worker",
+  "summary": "Keep install/waiting/activate/redundant transitions and event lifetime as browser service-worker runtime semantics.",
+  "source": {
+    "pattern": "[[ServiceWorkerLifecycle]]($registration)",
+    "requirements": {
+      "semantic_operation": "service worker lifecycle",
+      "host_execution_context_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerLifecycle",
+    "template": "JsRuntime.ServiceWorkerLifecycle($registration)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "states": [
+      "parsed",
+      "installing",
+      "installed",
+      "activating",
+      "activated",
+      "redundant"
+    ],
+    "events": "install/activate and extendable lifetime promises",
+    "termination": "worker execution may be stopped/restarted by UA",
+    "not_thread": "not equivalent to a permanently running CLR thread"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "install to activate",
+      "input": "// semantic registration lifecycle",
+      "expected_behavior": "activation occurs only after service-worker lifecycle conditions and extend-lifetime work"
+    },
+    {
+      "name": "termination",
+      "input": "// idle service worker",
+      "expected_behavior": "UA may terminate execution without unregistering the registration"
+    }
+  ]
+}
