@@ -1,0 +1,43 @@
+{
+  "id": "dom.geometry.domrect.derived-edges",
+  "category": "dom_geometry",
+  "summary": "Derive top/right/bottom/left from x/y/width/height according to DOMRect sign rules.",
+  "source": {
+    "pattern": "$rect.top/right/bottom/left",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.RectEdges($rect)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.RectEdges"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "right": "max(x, x+width)",
+    "left": "min(x, x+width)",
+    "bottom": "max(y, y+height)",
+    "top": "min(y, y+height)"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "positive size",
+      "input": "const r=new DOMRect(10,20,30,40);console.log(r.left,r.top,r.right,r.bottom);",
+      "expected_behavior": "prints 10 20 40 60"
+    },
+    {
+      "name": "negative size",
+      "input": "const r=new DOMRect(10,20,-3,-4);console.log(r.left,r.top,r.right,r.bottom);",
+      "expected_behavior": "prints 7 16 10 20"
+    }
+  ]
+}

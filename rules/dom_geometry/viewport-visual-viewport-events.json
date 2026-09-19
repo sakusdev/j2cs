@@ -1,0 +1,42 @@
+{
+  "id": "dom.viewport.visual-viewport-events",
+  "category": "dom_geometry",
+  "summary": "Dispatch VisualViewport resize/scroll events through DOM EventTarget when its geometry changes.",
+  "source": {
+    "pattern": "visualViewport.addEventListener(\"resize\"|\"scroll\", $listener)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.VisualViewportEvents()",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_target": "DOM EventTarget semantics reused",
+    "resize": "visual viewport size/scale changes",
+    "scroll": "visual viewport offset changes",
+    "timing": "renderer/event-loop scheduled"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "listener API",
+      "input": "visualViewport.addEventListener('resize',()=>{});",
+      "expected_behavior": "registers DOM event listener"
+    },
+    {
+      "name": "not synchronous setter",
+      "input": "/* pinch zoom or viewport pan */",
+      "expected_behavior": "event timing follows renderer/event-loop, not direct property mutation"
+    }
+  ]
+}

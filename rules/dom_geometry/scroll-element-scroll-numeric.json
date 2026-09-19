@@ -1,0 +1,43 @@
+{
+  "id": "dom.scroll.element.scroll-numeric",
+  "category": "dom_geometry",
+  "summary": "Scroll element to absolute x/y using numeric overload.",
+  "source": {
+    "pattern": "$element.scroll($x,$y)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.ScrollTo($element,$x,$y,\"auto\")",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coordinates": "absolute scroll position",
+    "return_value": "Promise<undefined> in current CSSOM View draft profiles or undefined in legacy browser profiles; profile must be explicit",
+    "layout": "scrolling box required"
+  },
+  "caveats": [
+    "Return type has evolved in CSSOM View drafts; compiler profile/browser target must be explicit."
+  ],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "absolute",
+      "input": "el.scroll(10,20);",
+      "expected_behavior": "requests absolute scroll position 10,20"
+    },
+    {
+      "name": "not relative",
+      "input": "el.scroll(5,5);el.scroll(5,5);",
+      "expected_behavior": "second call targets same absolute position, unlike scrollBy"
+    }
+  ]
+}

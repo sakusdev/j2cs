@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-into-view-options",
+  "category": "dom_geometry",
+  "summary": "Apply ScrollIntoViewOptions block/inline/behavior/container semantics.",
+  "source": {
+    "pattern": "$element.scrollIntoView($options)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.ScrollIntoView($element,$options)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "defaults": "behavior auto, block start, inline nearest, container all/current profile",
+    "layout": "requires target bounding box and scroll ancestor geometry",
+    "container": "nearest option limits affected scroll containers when supported"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "center",
+      "input": "el.scrollIntoView({block:'center',inline:'nearest'});",
+      "expected_behavior": "positions according to logical alignment"
+    },
+    {
+      "name": "nearest container",
+      "input": "el.scrollIntoView({container:'nearest'});",
+      "expected_behavior": "current profiles restrict scrolling to nearest container"
+    }
+  ]
+}

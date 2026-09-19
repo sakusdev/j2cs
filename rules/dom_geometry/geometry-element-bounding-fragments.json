@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.bounding-fragments",
+  "category": "dom_geometry",
+  "summary": "Handle multi-fragment elements by unioning non-zero client rects.",
+  "source": {
+    "pattern": "$element.getBoundingClientRect() for fragmented element",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetBoundingClientRect($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "fragments": "uses getClientRects",
+    "zero_rects": "zero-width/height rects excluded from union unless all are zero",
+    "all_zero": "first rect used when every rect is zero-sized"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "fragment union",
+      "input": "/* multiline inline element */ el.getBoundingClientRect();",
+      "expected_behavior": "bounds all relevant fragments"
+    },
+    {
+      "name": "client rect relation",
+      "input": "/* compare getClientRects with bounding */",
+      "expected_behavior": "bounding rect encloses non-zero fragments"
+    }
+  ]
+}

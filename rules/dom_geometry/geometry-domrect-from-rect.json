@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.domrect.from-rect",
+  "category": "dom_geometry",
+  "summary": "Create a fresh DOMRect from a DOMRectInit dictionary.",
+  "source": {
+    "pattern": "DOMRect.fromRect($init?)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.RectFromInit($init)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.RectFromInit"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "dictionary": "missing members default 0",
+    "return_value": "fresh DOMRect",
+    "copy": "numeric values copied, not object identity"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "partial init",
+      "input": "const r=DOMRect.fromRect({x:2,width:5});console.log(r.x,r.y,r.width,r.height);",
+      "expected_behavior": "prints 2 0 5 0"
+    },
+    {
+      "name": "fresh",
+      "input": "const a=new DOMRect(1,2,3,4),b=DOMRect.fromRect(a);console.log(a!==b,b.x);",
+      "expected_behavior": "prints true 1"
+    }
+  ]
+}

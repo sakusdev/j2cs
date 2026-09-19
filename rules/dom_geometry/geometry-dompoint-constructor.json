@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.dompoint.constructor",
+  "category": "dom_geometry",
+  "summary": "Construct a mutable DOMPoint with x/y/z defaults 0 and w default 1.",
+  "source": {
+    "pattern": "new DOMPoint($x?,$y?,$z?,$w?)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.CreatePoint($x,$y,$z,$w)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.CreatePoint"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "defaults": "x/y/z=0,w=1",
+    "identity": "fresh object",
+    "values": "double"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "defaults",
+      "input": "const p=new DOMPoint();console.log(p.x,p.y,p.z,p.w);",
+      "expected_behavior": "prints 0 0 0 1"
+    },
+    {
+      "name": "explicit",
+      "input": "const p=new DOMPoint(1,2,3,4);console.log(p.x,p.y,p.z,p.w);",
+      "expected_behavior": "prints 1 2 3 4"
+    }
+  ]
+}

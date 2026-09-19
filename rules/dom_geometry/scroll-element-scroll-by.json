@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-by",
+  "category": "dom_geometry",
+  "summary": "Apply relative delta to current scroll position.",
+  "source": {
+    "pattern": "$element.scrollBy($arg1,$arg2?)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.ScrollBy($element,$arg1,$arg2)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "relative": "adds supplied delta to current scroll position",
+    "overloads": "numeric or ScrollToOptions",
+    "behavior": "options behavior honored"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "relative",
+      "input": "el.scrollTo(0,0);el.scrollBy(0,10);",
+      "expected_behavior": "vertical target is current + 10"
+    },
+    {
+      "name": "repeat accumulates",
+      "input": "el.scrollBy(0,5);el.scrollBy(0,5);",
+      "expected_behavior": "requests cumulative relative movement where scrollable"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.offset-height",
+  "category": "dom_geometry",
+  "summary": "Return unscaled axis-aligned height of element border boxes per CSSOM View.",
+  "source": {
+    "pattern": "$element.offsetHeight",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetOffsetHeight($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "integer": "long result",
+    "box": "border-box related",
+    "hidden": "zero without CSS box"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "integer",
+      "input": "console.log(Number.isInteger(el.offsetHeight));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "display none",
+      "input": "el.style.display='none';console.log(el.offsetHeight);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

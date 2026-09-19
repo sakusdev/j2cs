@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.offset-left",
+  "category": "dom_geometry",
+  "summary": "Measure offsetLeft using CSSOM View offset-parent coordinate rules.",
+  "source": {
+    "pattern": "$element.offsetLeft",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetOffsetLeft($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "units": "CSS pixels",
+    "layout": "renderer-derived",
+    "coordinate_space": "offset-parent related"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(typeof el.offsetLeft);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "scroll distinction",
+      "input": "/* compare after viewport scroll */",
+      "expected_behavior": "offsetLeft is not simply viewport client-left"
+    }
+  ]
+}

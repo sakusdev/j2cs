@@ -1,0 +1,40 @@
+{
+  "id": "dom.geometry.element.bounding-not-live",
+  "category": "dom_geometry",
+  "summary": "Keep returned geometry snapshots non-live after later layout changes.",
+  "source": {
+    "pattern": "const r=$element.getBoundingClientRect(); /* mutate layout */",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetBoundingClientRect($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "snapshot": "r values do not update automatically",
+    "remeasure": "new call required after layout changes"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "snapshot",
+      "input": "const r=el.getBoundingClientRect();el.style.width='200px';console.log(r.width);",
+      "expected_behavior": "stored r retains old measurement"
+    },
+    {
+      "name": "remeasure",
+      "input": "const a=el.getBoundingClientRect();el.style.width='200px';const b=el.getBoundingClientRect();",
+      "expected_behavior": "b may differ after layout"
+    }
+  ]
+}

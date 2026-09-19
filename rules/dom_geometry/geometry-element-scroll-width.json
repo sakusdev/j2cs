@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.scroll-width",
+  "category": "dom_geometry",
+  "summary": "Return width required to contain scrollable overflow/content.",
+  "source": {
+    "pattern": "$element.scrollWidth",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetScrollWidth($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "integer": "CSS pixel integer",
+    "minimum": "at least clientWidth under ordinary non-negative geometry",
+    "layout": "overflow/pseudo-content can contribute"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(typeof el.scrollWidth);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "overflow",
+      "input": "/* element with overflowing child */",
+      "expected_behavior": "scrollWidth can exceed clientWidth"
+    }
+  ]
+}

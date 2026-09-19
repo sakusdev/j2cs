@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.domrect.constructor",
+  "category": "dom_geometry",
+  "summary": "Construct a mutable DOMRect value with Web IDL double conversion and defaults.",
+  "source": {
+    "pattern": "new DOMRect($x?,$y?,$width?,$height?)",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.CreateRect($x,$y,$width,$height)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.CreateRect"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "defaults": "x/y/width/height default 0",
+    "values": "double values retained",
+    "identity": "fresh object"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "defaults",
+      "input": "const r=new DOMRect(); console.log(r.x,r.y,r.width,r.height);",
+      "expected_behavior": "prints 0 0 0 0 in a DOM environment"
+    },
+    {
+      "name": "explicit",
+      "input": "const r=new DOMRect(1,2,3,4); console.log(r.x,r.y,r.width,r.height);",
+      "expected_behavior": "prints 1 2 3 4"
+    }
+  ]
+}

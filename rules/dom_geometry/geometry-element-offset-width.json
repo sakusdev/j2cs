@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.offset-width",
+  "category": "dom_geometry",
+  "summary": "Return unscaled axis-aligned width of element border boxes per CSSOM View.",
+  "source": {
+    "pattern": "$element.offsetWidth",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetOffsetWidth($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "integer": "CSSOM View long/integer result",
+    "box": "border-box related including layout fragments rules",
+    "hidden": "zero when no associated CSS box"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "integer",
+      "input": "console.log(Number.isInteger(el.offsetWidth));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "display none",
+      "input": "el.style.display='none';console.log(el.offsetWidth);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

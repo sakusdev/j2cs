@@ -1,0 +1,41 @@
+{
+  "id": "dom.viewport.inner-size",
+  "category": "dom_geometry",
+  "summary": "Expose Window innerWidth/innerHeight from layout viewport including scrollbar rules.",
+  "source": {
+    "pattern": "window.innerWidth / window.innerHeight",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetInnerViewportSize()",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "units": "CSS pixels",
+    "viewport": "layout viewport dimensions",
+    "scrollbars": "CSSOM View rules can include scrollbar space"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "numbers",
+      "input": "console.log(typeof innerWidth,typeof innerHeight);",
+      "expected_behavior": "prints number number"
+    },
+    {
+      "name": "runtime",
+      "input": "const w=innerWidth;window.addEventListener('resize',()=>{});",
+      "expected_behavior": "value can change with viewport resize"
+    }
+  ]
+}

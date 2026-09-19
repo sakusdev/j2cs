@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.dompoint.mutable-coordinates",
+  "category": "dom_geometry",
+  "summary": "Preserve writable DOMPoint coordinate properties.",
+  "source": {
+    "pattern": "$point.x = $value",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "DomGeometry.SetPointCoordinate($point,$axis,$value)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation.",
+    "helper": "DomGeometry.SetPointCoordinate"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutation": "x/y/z/w mutable on DOMPoint",
+    "readonly_variant": "DOMPointReadOnly mutation is a different interface contract"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "mutate x",
+      "input": "const p=new DOMPoint();p.x=5;console.log(p.x);",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "w mutable",
+      "input": "const p=new DOMPoint();p.w=2;console.log(p.w);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

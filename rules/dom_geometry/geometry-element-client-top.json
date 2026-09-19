@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.client-top",
+  "category": "dom_geometry",
+  "summary": "Return clientTop derived from border/layout geometry.",
+  "source": {
+    "pattern": "$element.clientTop",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetClientTop($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "integer": "CSS pixel integer",
+    "meaning": "top border/scrollbar-related client edge per CSSOM View",
+    "layout": "renderer-owned"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(typeof el.clientTop);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "not style string",
+      "input": "console.log(Number.isFinite(el.clientTop));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

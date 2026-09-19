@@ -1,0 +1,42 @@
+{
+  "id": "dom.viewport.visual-viewport-metrics",
+  "category": "dom_geometry",
+  "summary": "Expose VisualViewport offset/page/size/scale from current visual viewport state.",
+  "source": {
+    "pattern": "visualViewport.offsetLeft/offsetTop/pageLeft/pageTop/width/height/scale",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetVisualViewportMetrics()",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "offset": "relative to layout viewport",
+    "page": "relative to initial containing block/document page",
+    "size": "visual viewport CSS-pixel dimensions",
+    "scale": "pinch-zoom scale factor"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "types",
+      "input": "const v=visualViewport;console.log(typeof v.offsetLeft,typeof v.pageLeft,typeof v.width,typeof v.scale);",
+      "expected_behavior": "number number number number"
+    },
+    {
+      "name": "scale positive",
+      "input": "console.log(visualViewport.scale>0);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

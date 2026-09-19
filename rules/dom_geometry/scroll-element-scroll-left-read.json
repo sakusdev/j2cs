@@ -1,0 +1,41 @@
+{
+  "id": "dom.scroll.element.scroll-left-read",
+  "category": "dom_geometry",
+  "summary": "Read horizontal scroll offset including directionality-specific coordinate behavior.",
+  "source": {
+    "pattern": "$element.scrollLeft",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetScrollLeft($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "double CSS pixel offset",
+    "direction": "RTL/writing mode affects coordinate semantics",
+    "root": "viewport special cases"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(typeof el.scrollLeft);",
+      "expected_behavior": "prints number"
+    },
+    {
+      "name": "not assumed nonnegative",
+      "input": "/* RTL scroll container */",
+      "expected_behavior": "implementation must preserve CSSOM View direction-specific value behavior"
+    }
+  ]
+}

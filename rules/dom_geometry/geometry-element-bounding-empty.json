@@ -1,0 +1,40 @@
+{
+  "id": "dom.geometry.element.bounding-empty",
+  "category": "dom_geometry",
+  "summary": "Return zero DOMRect when element has no client rects.",
+  "source": {
+    "pattern": "$element.getBoundingClientRect() with no boxes",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetBoundingClientRect($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "empty": "x=y=width=height=0",
+    "return_value": "DOMRect"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "detached/no-box",
+      "input": "const e=document.createElement('div');const r=e.getBoundingClientRect();console.log(r.width,r.height);",
+      "expected_behavior": "zero dimensions when no CSS box is generated"
+    },
+    {
+      "name": "rect object",
+      "input": "const e=document.createElement('div');console.log(e.getBoundingClientRect() instanceof DOMRect);",
+      "expected_behavior": "true in conforming browsers"
+    }
+  ]
+}

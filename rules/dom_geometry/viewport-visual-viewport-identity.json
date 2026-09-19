@@ -1,0 +1,41 @@
+{
+  "id": "dom.viewport.visual-viewport-identity",
+  "category": "dom_geometry",
+  "summary": "Expose the window VisualViewport object as a stable EventTarget when supported.",
+  "source": {
+    "pattern": "window.visualViewport",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetVisualViewport()",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "VisualViewport object or profile-defined absence on unsupported hosts",
+    "identity": "stable viewport interface object for a Window",
+    "event_target": "reuse DOM EventTarget semantics"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "shape",
+      "input": "if(visualViewport)console.log(typeof visualViewport.width,typeof visualViewport.addEventListener);",
+      "expected_behavior": "number function when supported"
+    },
+    {
+      "name": "identity",
+      "input": "console.log(window.visualViewport===window.visualViewport);",
+      "expected_behavior": "true when supported"
+    }
+  ]
+}

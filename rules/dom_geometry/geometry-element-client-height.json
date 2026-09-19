@@ -1,0 +1,41 @@
+{
+  "id": "dom.geometry.element.client-height",
+  "category": "dom_geometry",
+  "summary": "Return inner padding-box viewport height excluding borders/scrollbars per CSSOM View.",
+  "source": {
+    "pattern": "$element.clientHeight",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetClientHeight($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "integer": "CSS pixel integer",
+    "box": "client box semantics",
+    "root_special_case": "viewport rules for root/body"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "integer",
+      "input": "console.log(Number.isInteger(el.clientHeight));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "offset distinction",
+      "input": "/* bordered box */ console.log(el.clientHeight<=el.offsetHeight);",
+      "expected_behavior": "typically true"
+    }
+  ]
+}

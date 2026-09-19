@@ -1,0 +1,42 @@
+{
+  "id": "dom.geometry.element.get-bounding-client-rect",
+  "category": "dom_geometry",
+  "summary": "Return smallest bounding rect covering relevant client rect fragments.",
+  "source": {
+    "pattern": "$element.getBoundingClientRect()",
+    "requirements": {
+      "dom_environment": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NativeDomGeometry.GetBoundingClientRect($element)",
+    "notes": "Layout-derived values delegate to the renderer/layout runtime; this rule owns the DOM/CSSOM View API contract, not CSS layout computation."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "source": "derived from getClientRects result",
+    "union": "smallest rectangle including non-zero relevant fragments",
+    "return_value": "new non-live DOMRect",
+    "units": "CSS pixels"
+  },
+  "caveats": [],
+  "references": [
+    "CSSOM View Module Level 1",
+    "Geometry Interfaces Module Level 1"
+  ],
+  "tests": [
+    {
+      "name": "rect shape",
+      "input": "const r=el.getBoundingClientRect();console.log(typeof r.x,typeof r.width);",
+      "expected_behavior": "number number"
+    },
+    {
+      "name": "new object",
+      "input": "console.log(el.getBoundingClientRect()!==el.getBoundingClientRect());",
+      "expected_behavior": "typically true; returned DOMRect is new/non-live"
+    }
+  ]
+}
