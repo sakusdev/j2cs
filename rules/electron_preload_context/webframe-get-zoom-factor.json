@@ -1,0 +1,40 @@
+{
+  "id": "electron.webframe.get-zoom-factor",
+  "category": "electron_preload_context",
+  "summary": "Read current frame zoom factor.",
+  "source": {
+    "pattern": "webFrame.getZoomFactor()",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebFrame.GetZoomFactor",
+    "template": "ElectronCompat.WebFrame.GetZoomFactor()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "number",
+    "state": "current Chromium zoom factor"
+  },
+  "caveats": [
+    "Zoom can be affected by same-origin Chromium policy."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* after setZoomFactor(2) */ webFrame.getZoomFactor()",
+      "expected_behavior": "returns 2"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* same-origin related frame/window state */",
+      "expected_behavior": "Chromium zoom policy can propagate according to Electron behavior"
+    }
+  ]
+}

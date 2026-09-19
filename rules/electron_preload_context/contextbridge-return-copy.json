@@ -1,0 +1,40 @@
+{
+  "id": "electron.contextbridge.return-copy",
+  "category": "electron_preload_context",
+  "summary": "Copy/proxy supported return value back across context bridge.",
+  "source": {
+    "pattern": "$bridgedFunction(...$args) returning $value",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeReturn($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordinary_values": "copied/frozen",
+    "functions": "proxied",
+    "unsupported_types": "Electron bridge restrictions"
+  },
+  "caveats": [
+    "Returning source-realm object must not leak direct reference."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* bridged f returns {x:1} */",
+      "expected_behavior": "destination receives copied/frozen value"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* source later mutates original */",
+      "expected_behavior": "previous copied destination value does not become shared mutable reference"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.contextbridge.unsupported-symbol",
+  "category": "electron_preload_context",
+  "summary": "Preserve Electron restriction that Symbols cannot be copied across contexts.",
+  "source": {
+    "pattern": "contextBridge transfer containing Symbol",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeUnsupportedValue($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "symbol_support": false,
+    "dropped_or_rejected": "per bridge position/type rules"
+  },
+  "caveats": [
+    "Do not stringify Symbols as a compatibility shortcut."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* bridge object with Symbol value/key */",
+      "expected_behavior": "Symbol is not transferred as an equivalent Symbol"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* expect shared Symbol.for identity */",
+      "expected_behavior": "not a valid bridge assumption"
+    }
+  ]
+}

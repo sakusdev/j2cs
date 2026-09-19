@@ -1,0 +1,39 @@
+{
+  "id": "electron.preload.bridge-required-for-window-api",
+  "category": "electron_preload_context",
+  "summary": "Require explicit contextBridge-style exposure for page-visible API under isolation.",
+  "source": {
+    "pattern": "preload exposes API to page under contextIsolation",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadExposeViaBridge($apiKey, $api)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "direct_window_assignment": "isolated world only",
+    "bridge": "cross-world exposure"
+  },
+  "caveats": [
+    "Direct preload window assignment is not page-main-world exposure."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* preload: window.api={} */",
+      "expected_behavior": "page main world does not automatically see api"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* contextBridge.exposeInMainWorld */",
+      "expected_behavior": "page receives bridged API"
+    }
+  ]
+}

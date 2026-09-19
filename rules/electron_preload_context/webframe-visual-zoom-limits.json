@@ -1,0 +1,41 @@
+{
+  "id": "electron.webframe.visual-zoom-limits",
+  "category": "electron_preload_context",
+  "summary": "Set pinch-to-zoom limits.",
+  "source": {
+    "pattern": "webFrame.setVisualZoomLevelLimits($min, $max)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebFrame.SetVisualZoomLevelLimits",
+    "template": "ElectronCompat.WebFrame.SetVisualZoomLevelLimits($min, $max)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "affects": "visual/pinch zoom",
+    "default_visual_zoom": "disabled",
+    "return": "undefined"
+  },
+  "caveats": [
+    "This does not control menu keyboard zoom roles."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* setVisualZoomLevelLimits(1,3) */",
+      "expected_behavior": "enables/limits visual pinch zoom range"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* Cmd/Ctrl zoom shortcuts */",
+      "expected_behavior": "controlled separately by application Menu roles"
+    }
+  ]
+}

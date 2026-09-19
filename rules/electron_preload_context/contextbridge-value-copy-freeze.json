@@ -1,0 +1,40 @@
+{
+  "id": "electron.contextbridge.value-copy-freeze",
+  "category": "electron_preload_context",
+  "summary": "Copy and freeze supported non-Function values across bridge.",
+  "source": {
+    "pattern": "contextBridge exposure containing $value",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeCopyAndFreeze($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "strings_numbers_booleans": "copied",
+    "arrays_objects": "recursively copied/frozen",
+    "source_identity": "not shared"
+  },
+  "caveats": [
+    "Object identity and mutability do not cross worlds for ordinary values."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose {o:{x:1}} */",
+      "expected_behavior": "destination sees equivalent object data"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* destination writes o.x */",
+      "expected_behavior": "does not mutate source and frozen semantics apply"
+    }
+  ]
+}

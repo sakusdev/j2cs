@@ -1,0 +1,39 @@
+{
+  "id": "electron.webframe.remove-inserted-css",
+  "category": "electron_preload_context",
+  "summary": "Remove CSS previously injected by insertCSS key.",
+  "source": {
+    "pattern": "webFrame.removeInsertedCSS($key)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameRemoveCss($frame, $key)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "key": "host-issued stylesheet identity",
+    "return": "undefined"
+  },
+  "caveats": [
+    "Do not remove arbitrary equivalent CSS text; key identity is authoritative."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* key from insertCSS then removeInsertedCSS(key) */",
+      "expected_behavior": "that injected stylesheet is removed"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* unrelated key */",
+      "expected_behavior": "must follow Electron host key behavior"
+    }
+  ]
+}

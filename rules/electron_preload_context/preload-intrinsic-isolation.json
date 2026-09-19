@@ -1,0 +1,40 @@
+{
+  "id": "electron.preload.intrinsic-isolation",
+  "category": "electron_preload_context",
+  "summary": "Keep preload realm intrinsics isolated from page realm monkey patches.",
+  "source": {
+    "pattern": "page modifies built-in prototypes with contextIsolation:true",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadIsolateIntrinsics($frame)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "Array_prototype": "separate",
+    "JSON": "separate realm object",
+    "Object_prototype": "separate"
+  },
+  "caveats": [
+    "Ordinary shared C# static types would erase this realm boundary."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* page changes Array.prototype.push */",
+      "expected_behavior": "preload realm Array.prototype.push remains isolated"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* page changes JSON.parse */",
+      "expected_behavior": "preload JSON.parse remains its realm implementation"
+    }
+  ]
+}

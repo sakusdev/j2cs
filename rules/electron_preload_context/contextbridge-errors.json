@@ -1,0 +1,40 @@
+{
+  "id": "electron.contextbridge.errors",
+  "category": "electron_preload_context",
+  "summary": "Propagate bridged function failure using Electron-supported copied error behavior.",
+  "source": {
+    "pattern": "$bridgedFunction throws $error",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeThrow($error)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "throw": "destination call fails",
+    "error_data": "bridge-supported copy",
+    "realm_identity": "not original Error identity"
+  },
+  "caveats": [
+    "Do not preserve source Error object identity across realms."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* bridged function throws Error('x') */",
+      "expected_behavior": "destination observes failure with error information"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* compare error prototype/identity to source */",
+      "expected_behavior": "must not rely on source-realm object identity"
+    }
+  ]
+}

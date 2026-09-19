@@ -1,0 +1,41 @@
+{
+  "id": "electron.contextbridge.function-proxy",
+  "category": "electron_preload_context",
+  "summary": "Proxy exposed function so source implementation executes in isolated context.",
+  "source": {
+    "pattern": "contextBridge exposure containing $function",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeProxyFunction($function)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity": "proxy identity in destination",
+    "source_execution_world": "preload/isolated source world",
+    "arguments": "copied",
+    "return": "copied/proxied supported type"
+  },
+  "caveats": [
+    "Destination must not receive original Function object or its privileged realm."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose {f:()=>1} */",
+      "expected_behavior": "destination can call f and receive 1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* compare source f with destination proxy */",
+      "expected_behavior": "they are not the same JS Function object"
+    }
+  ]
+}

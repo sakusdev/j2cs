@@ -1,0 +1,40 @@
+{
+  "id": "electron.webframe.insert-text",
+  "category": "electron_preload_context",
+  "summary": "Insert text into currently focused editable element using Chromium editing semantics.",
+  "source": {
+    "pattern": "webFrame.insertText($text)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameInsertText($frame, $text)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "focus_dependent": true,
+    "editing_commands": true,
+    "return": "undefined"
+  },
+  "caveats": [
+    "Not equivalent to setting activeElement.value; selection/contenteditable behavior matters."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* focused input then insertText('x') */",
+      "expected_behavior": "text inserted at current editing selection"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* contenteditable selection */",
+      "expected_behavior": "uses Chromium editing/selection semantics"
+    }
+  ]
+}

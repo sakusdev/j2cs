@@ -1,0 +1,41 @@
+{
+  "id": "electron.contextbridge.nested-api",
+  "category": "electron_preload_context",
+  "summary": "Recursively validate/copy/proxy nested API object graph.",
+  "source": {
+    "pattern": "contextBridge exposure of nested supported API object",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeExposeSupportedTree($api)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "keys": "strings",
+    "nested_objects": "recursive",
+    "functions": "proxied",
+    "values": "copied/frozen"
+  },
+  "caveats": [
+    "One unsupported nested value can invalidate/drop behavior according to bridge support rather than silently sharing."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose {a:{b:()=>1}} */",
+      "expected_behavior": "destination can invoke nested proxied function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* nested custom prototype/Symbol */",
+      "expected_behavior": "bridge restrictions remain recursive"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.preload.runs-before-page",
+  "category": "electron_preload_context",
+  "summary": "Execute preload before ordinary renderer page scripts for its frame lifecycle.",
+  "source": {
+    "pattern": "preload script lifecycle",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadRunBeforePage($frame, $script)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "preload injection before page renderer code",
+    "dom_access": "available according to document lifecycle"
+  },
+  "caveats": [
+    "Do not schedule preload after application renderer initialization."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* preload installs bridge before page script */",
+      "expected_behavior": "page script can observe exposed bridge API at startup"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* delayed preload emulation */",
+      "expected_behavior": "would change observable initialization order"
+    }
+  ]
+}

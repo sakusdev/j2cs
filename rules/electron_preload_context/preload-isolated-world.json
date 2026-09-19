@@ -1,0 +1,41 @@
+{
+  "id": "electron.preload.isolated-world",
+  "category": "electron_preload_context",
+  "summary": "Run preload in Electron isolated world separate from page main world.",
+  "source": {
+    "pattern": "BrowserWindow webPreferences.preload with contextIsolation:true",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadCreateIsolatedWorld($frame)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "contextIsolation_default_since_12": true,
+    "preload_world": "isolated",
+    "page_world": "main",
+    "globals": "distinct JS wrappers/prototypes"
+  },
+  "caveats": [
+    "Do not model preload and page as same global object graph."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* preload sets window.secret directly */",
+      "expected_behavior": "page main world does not automatically see direct isolated-world property"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* contextBridge exposes api */",
+      "expected_behavior": "explicit bridged property becomes visible in destination world"
+    }
+  ]
+}

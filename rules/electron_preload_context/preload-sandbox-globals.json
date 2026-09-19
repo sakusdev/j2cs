@@ -1,0 +1,45 @@
+{
+  "id": "electron.preload.sandbox-globals",
+  "category": "electron_preload_context",
+  "summary": "Provide documented sandboxed preload globals without full Node global surface.",
+  "source": {
+    "pattern": "sandboxed preload global access",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadGlobals($frame)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "documented": [
+      "Buffer",
+      "process",
+      "clearImmediate",
+      "setImmediate"
+    ],
+    "process": "limited/polyfilled",
+    "full_node_globals": false
+  },
+  "caveats": [
+    "Presence of Buffer/process does not imply unrestricted Node runtime."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* sandboxed preload typeof Buffer */",
+      "expected_behavior": "documented polyfilled global is available"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* use process as unrestricted main Node process */",
+      "expected_behavior": "not a safe semantic assumption"
+    }
+  ]
+}

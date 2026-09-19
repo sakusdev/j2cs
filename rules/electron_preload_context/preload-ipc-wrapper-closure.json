@@ -1,0 +1,40 @@
+{
+  "id": "electron.preload.ipc-wrapper-closure",
+  "category": "electron_preload_context",
+  "summary": "Keep ipcRenderer privilege in preload closure while exposing narrow proxied function.",
+  "source": {
+    "pattern": "preload bridged function closes over ipcRenderer",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadIpcClosure($function)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ipcRenderer": "remains isolated",
+    "renderer_receives": "proxy function only",
+    "closure": "source realm retained for source function execution"
+  },
+  "caveats": [
+    "Do not serialize away the source closure for ordinary exposed functions (unlike executeInMainWorld)."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose {ping:()=>ipcRenderer.invoke('ping')} */",
+      "expected_behavior": "page can call proxy without receiving ipcRenderer object"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* page reads ipcRenderer from proxy */",
+      "expected_behavior": "privileged module object is not exposed"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "electron.preload.world-id-999",
+  "category": "electron_preload_context",
+  "summary": "Recognize Electron's contextIsolation world ID 999 while reserving custom worlds.",
+  "source": {
+    "pattern": "Electron contextIsolation preload world id",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Preload.ContextIsolationWorldId",
+    "template": "ElectronCompat.Preload.ContextIsolationWorldId()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "electron_preload_world": 999,
+    "main_world": 0,
+    "recommended_custom": "1000+"
+  },
+  "caveats": [
+    "World ID is host context identity, not an application object key."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* Electron isolated execution targeting 999 */",
+      "expected_behavior": "targets contextIsolation preload world"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* custom isolated world */",
+      "expected_behavior": "use a distinct ID such as 1000+ rather than sharing preload world accidentally"
+    }
+  ]
+}

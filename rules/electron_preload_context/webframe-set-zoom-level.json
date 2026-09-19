@@ -1,0 +1,41 @@
+{
+  "id": "electron.webframe.set-zoom-level",
+  "category": "electron_preload_context",
+  "summary": "Set Chromium zoom level with logarithmic 20% increments and default limits.",
+  "source": {
+    "pattern": "webFrame.setZoomLevel($level)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebFrame.SetZoomLevel",
+    "template": "ElectronCompat.WebFrame.SetZoomLevel($level)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "level_0": "original size",
+    "increment": "~20% per level",
+    "same_origin_policy": true
+  },
+  "caveats": [
+    "Zoom level is not identical to factor and is subject to Chromium limits/policy."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* setZoomLevel(0) */",
+      "expected_behavior": "represents original-size level"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* compare factor mapping */",
+      "expected_behavior": "must use Chromium zoom-level mapping, not factor=level"
+    }
+  ]
+}

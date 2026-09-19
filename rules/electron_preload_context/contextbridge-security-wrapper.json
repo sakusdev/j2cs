@@ -1,0 +1,41 @@
+{
+  "id": "electron.contextbridge.security-wrapper",
+  "category": "electron_preload_context",
+  "summary": "Represent explicit narrow wrapper contract around privileged IPC instead of raw module exposure.",
+  "source": {
+    "pattern": "preload safe IPC wrapper exposed via contextBridge",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.ContextBridge.ValidateSafeWrapper",
+    "template": "ElectronCompat.ContextBridge.ValidateSafeWrapper($api)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "channels": "statically restricted/validated",
+    "arguments": "filtered as application contract",
+    "bridge": "function proxy"
+  },
+  "caveats": [
+    "contextIsolation alone does not make arbitrary ipcRenderer.send exposure safe."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose {loadPreferences:()=>ipcRenderer.invoke('load-prefs')} */",
+      "expected_behavior": "renderer can invoke only intended capability"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* expose send:ipcRenderer.send */",
+      "expected_behavior": "is security-sensitive and not treated as equivalent safe wrapper"
+    }
+  ]
+}

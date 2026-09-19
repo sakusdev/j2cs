@@ -1,0 +1,40 @@
+{
+  "id": "electron.contextbridge.arguments-copy",
+  "category": "electron_preload_context",
+  "summary": "Copy supported arguments from destination world to source bridged function.",
+  "source": {
+    "pattern": "$bridgedFunction(...$args)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeInvoke($proxy, $args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "supported bridge type table",
+    "functions": "supported proxy semantics where allowed",
+    "symbols": "unsupported/dropped"
+  },
+  "caveats": [
+    "Custom prototypes and Symbols cannot be assumed to survive bridge transfer."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* bridged f({x:1}) */",
+      "expected_behavior": "source receives copied supported object data"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* argument with Symbol/custom prototype */",
+      "expected_behavior": "unsupported bridge semantics apply rather than shared identity"
+    }
+  ]
+}
