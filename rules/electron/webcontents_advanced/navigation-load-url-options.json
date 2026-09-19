@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.load-url-options",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve loadURL referrer, userAgent, extraHeaders, postData, and data-URL base options.",
+  "source": {
+    "pattern": "$contents.loadURL($url,$options)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsLoadUrl($contents,$url,$options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "options": "httpReferrer/userAgent/extraHeaders/postData/baseURLForDataURL are request/navigation inputs",
+    "headers": "extraHeaders newline-separated per Electron contract",
+    "identity": "options are read for this navigation, not retained as arbitrary JS object state"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "headers",
+      "input": "await wc.loadURL('https://example.com',{extraHeaders:'X-Test: 1\\n'})",
+      "expected_behavior": "navigation request includes supplied header according to Electron"
+    },
+    {
+      "name": "data base",
+      "input": "await wc.loadURL('data:text/html,<img src=\"x.png\">',{baseURLForDataURL:'https://example.com/'})",
+      "expected_behavior": "relative resources use supplied base URL for the data URL"
+    }
+  ]
+}

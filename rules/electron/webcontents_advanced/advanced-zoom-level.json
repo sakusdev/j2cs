@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.zoom-level",
+  "category": "electron_webcontents_advanced",
+  "summary": "Set/get logarithmic zoom level with Chromium 1.2^level relation.",
+  "source": {
+    "pattern": "$contents.setZoomLevel($level) / $contents.getZoomLevel()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetGetZoomLevel($contents,$level)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "level": "0 original size; scale approximately 1.2^level",
+    "limits": "default Chromium/Electron zoom constraints apply",
+    "return_get": "number"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "zero",
+      "input": "wc.setZoomLevel(0);console.log(wc.getZoomLevel())",
+      "expected_behavior": "current level is 0"
+    },
+    {
+      "name": "factor relation",
+      "input": "wc.setZoomLevel(1)",
+      "expected_behavior": "page zoom is about 20% larger under default mode"
+    }
+  ]
+}

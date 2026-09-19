@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.did-create-window",
+  "category": "electron_webcontents_advanced",
+  "summary": "Emit did-create-window only after successful renderer-requested window creation.",
+  "source": {
+    "pattern": "$contents.on('did-create-window',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidCreateWindow($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "successful creation after window.open-style request",
+    "excluded": "not emitted when setWindowOpenHandler cancels",
+    "details": "creation details including URL/frame/disposition/referrer/post data as available"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "success",
+      "input": "wc.on('did-create-window',(child,details)=>console.log(details.url))",
+      "expected_behavior": "fires after allowed child creation"
+    },
+    {
+      "name": "deny suppresses",
+      "input": "wc.setWindowOpenHandler(()=>({action:'deny'}));wc.on('did-create-window',()=>console.log('x'))",
+      "expected_behavior": "denied request does not emit did-create-window"
+    }
+  ]
+}

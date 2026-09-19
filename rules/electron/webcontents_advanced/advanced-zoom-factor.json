@@ -1,0 +1,41 @@
+{
+  "id": "electron.webcontents.advanced.zoom-factor",
+  "category": "electron_webcontents_advanced",
+  "summary": "Set/get positive zoom factor using Electron WebContents zoom state.",
+  "source": {
+    "pattern": "$contents.setZoomFactor($factor) / $contents.getZoomFactor()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetGetZoomFactor($contents,$factor)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "factor": "zoom percent divided by 100; must be > 0",
+    "default": "1.0",
+    "return_get": "number",
+    "effect": "changes page zoom according to current zoom mode"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "factor",
+      "input": "wc.setZoomFactor(1.5);console.log(wc.getZoomFactor())",
+      "expected_behavior": "returns current factor near 1.5 according to Electron"
+    },
+    {
+      "name": "positive requirement",
+      "input": "try{wc.setZoomFactor(0)}catch(e){console.log(Boolean(e))}",
+      "expected_behavior": "invalid non-positive factor is rejected"
+    }
+  ]
+}

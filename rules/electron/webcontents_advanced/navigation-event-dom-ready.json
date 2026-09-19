@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.event-dom-ready",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe top-level document DOM readiness through Electron.",
+  "source": {
+    "pattern": "$contents.on('dom-ready',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDomReady($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "document in top-level frame loaded enough for DOM-ready lifecycle",
+    "renderer": "host/renderer lifecycle event"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "event",
+      "input": "wc.once('dom-ready',()=>console.log('dom'))",
+      "expected_behavior": "fires for top-level document lifecycle"
+    },
+    {
+      "name": "not full load alias",
+      "input": "wc.on('dom-ready',()=>{});wc.on('did-finish-load',()=>{})",
+      "expected_behavior": "distinct lifecycle events"
+    }
+  ]
+}

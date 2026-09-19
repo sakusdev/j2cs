@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.event-did-start-loading",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe aggregate loading start corresponding to tab-spinner loading state.",
+  "source": {
+    "pattern": "$contents.on('did-start-loading',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidStartLoading($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "loading state begins",
+    "scope": "webContents aggregate loading indicator semantics"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "event",
+      "input": "wc.on('did-start-loading',()=>console.log('start'))",
+      "expected_behavior": "fires when loading begins"
+    },
+    {
+      "name": "query relation",
+      "input": "wc.on('did-start-loading',()=>console.log(wc.isLoading()))",
+      "expected_behavior": "isLoading reflects active loading state"
+    }
+  ]
+}

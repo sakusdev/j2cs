@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.print-to-pdf",
+  "category": "electron_webcontents_advanced",
+  "summary": "Render current page to PDF and resolve with a Node Buffer.",
+  "source": {
+    "pattern": "$contents.printToPDF($options)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.PrintToPdf($contents,$options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<Buffer>",
+    "rendering": "Chromium print/PDF renderer semantics",
+    "options": "orientation/header-footer/background/scale/page size/margins/ranges and related Electron options"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "buffer",
+      "input": "const data=await wc.printToPDF({});console.log(Buffer.isBuffer(data))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "async failure",
+      "input": "try{await wc.printToPDF(badOptions)}catch(e){console.log(Boolean(e))}",
+      "expected_behavior": "invalid/render failures reject according to Electron"
+    }
+  ]
+}

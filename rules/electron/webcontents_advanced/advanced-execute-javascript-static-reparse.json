@@ -1,0 +1,44 @@
+{
+  "id": "electron.webcontents.advanced.execute-javascript-static-reparse",
+  "category": "electron_webcontents_advanced",
+  "summary": "Permit a narrow compile-time-constant executeJavaScript path only after reparsing/analyzing the source as JavaScript AST.",
+  "source": {
+    "pattern": "$contents.executeJavaScript($constantCode,$userGesture?)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true,
+      "code": "compile-time constant",
+      "constant_script_reparsed_to_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.ExecuteAnalyzedRendererScript($contents,$compiledScript,$userGesture)",
+    "helper": "ElectronCompat.ExecuteAnalyzedRendererScript"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "source is compile-time constant and frontend reparses/validates it; generic dynamic strings use existing electron.webcontents.executejavascript unsupported rule",
+    "return_value": "Promise<any> matching renderer result/rejection",
+    "realm": "renderer page context",
+    "user_gesture": "boolean affects gesture-gated APIs"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "constant reparse",
+      "input": "await wc.executeJavaScript('1 + 2')",
+      "expected_behavior": "eligible only if compiler reparses script into AST and preserves renderer realm; never text-rewritten into C#"
+    },
+    {
+      "name": "dynamic excluded",
+      "input": "await wc.executeJavaScript(codeFromNetwork)",
+      "expected_behavior": "falls to existing unsupported dynamic-code rule"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-did-start-navigation",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe start of any frame navigation including same-document navigation details.",
+  "source": {
+    "pattern": "$contents.on('did-start-navigation',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidStartNavigation($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "any frame starts navigating",
+    "details": "url,isSameDocument,isMainFrame,frame,initiator",
+    "cancellable": "no cancellation contract"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "main frame",
+      "input": "wc.on('did-start-navigation',(e,d)=>console.log(d.isMainFrame))",
+      "expected_behavior": "true for main-frame navigation"
+    },
+    {
+      "name": "same document flag",
+      "input": "wc.on('did-start-navigation',(e,d)=>console.log(d.isSameDocument))",
+      "expected_behavior": "true for qualifying same-document navigation"
+    }
+  ]
+}

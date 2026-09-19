@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.stop",
+  "category": "electron_webcontents_advanced",
+  "summary": "Stop a pending navigation/load without pretending already-committed state is rolled back.",
+  "source": {
+    "pattern": "$contents.stop()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsStop($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "effect": "stops pending navigation/resource loading",
+    "state": "does not undo arbitrary renderer side effects already committed"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "stop loading",
+      "input": "wc.loadURL(url); wc.stop();",
+      "expected_behavior": "requests Chromium to stop pending load"
+    },
+    {
+      "name": "return",
+      "input": "console.log(wc.stop())",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

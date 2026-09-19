@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.audio-muted",
+  "category": "electron_webcontents_advanced",
+  "summary": "Set/get page audio mute state.",
+  "source": {
+    "pattern": "$contents.setAudioMuted($muted) / $contents.isAudioMuted()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetGetAudioMuted($contents,$muted)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "muted": "boolean page audio output policy",
+    "return_get": "boolean",
+    "audibility": "muted state is distinct from whether media is currently producing audio"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "mute",
+      "input": "wc.setAudioMuted(true);console.log(wc.isAudioMuted())",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "unmute",
+      "input": "wc.setAudioMuted(false);console.log(wc.isAudioMuted())",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

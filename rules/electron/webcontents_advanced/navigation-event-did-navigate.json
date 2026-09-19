@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-did-navigate",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe completed main-frame document navigation with response metadata.",
+  "source": {
+    "pattern": "$contents.on('did-navigate',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidNavigate($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "main-frame navigation done",
+    "excludes": "in-page navigation",
+    "args": "url,httpResponseCode,httpStatusText; non-HTTP uses sentinel metadata"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "main only",
+      "input": "wc.on('did-navigate',(e,url,code)=>console.log(url,code))",
+      "expected_behavior": "fires for completed main-frame document navigation"
+    },
+    {
+      "name": "hash excluded",
+      "input": "/* change location.hash */",
+      "expected_behavior": "did-navigate-in-page rather than did-navigate"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "electron.webcontents.navigation.load-file-options",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve loadFile query/search/hash URL formatting options.",
+  "source": {
+    "pattern": "$contents.loadFile($filePath,$options)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsLoadFile($contents,$filePath,$options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "query": "record serialized through URL formatting",
+    "search": "search string option",
+    "hash": "fragment option",
+    "completion": "same Promise<void> load lifecycle as loadFile"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "hash",
+      "input": "await wc.loadFile('index.html',{hash:'section'})",
+      "expected_behavior": "loaded file URL includes requested fragment"
+    },
+    {
+      "name": "query",
+      "input": "await wc.loadFile('index.html',{query:{a:'1'}})",
+      "expected_behavior": "query is reflected in formatted file URL"
+    }
+  ]
+}

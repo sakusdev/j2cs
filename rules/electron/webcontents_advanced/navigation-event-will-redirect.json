@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-will-redirect",
+  "category": "electron_webcontents_advanced",
+  "summary": "Expose cancellable server redirect before it is followed.",
+  "source": {
+    "pattern": "$contents.on('will-redirect',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnWillRedirect($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "server-side redirect during navigation",
+    "cancel": "preventDefault prevents redirect",
+    "details": "navigation/frame details"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "cancel redirect",
+      "input": "wc.on('will-redirect',e=>e.preventDefault())",
+      "expected_behavior": "prevents following matching redirect"
+    },
+    {
+      "name": "server redirect",
+      "input": "/* navigate to HTTP 302 endpoint */",
+      "expected_behavior": "will-redirect occurs before redirect commit"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.history-clear",
+  "category": "electron_webcontents_advanced",
+  "summary": "Clear stored navigation history according to Electron navigationHistory semantics.",
+  "source": {
+    "pattern": "$contents.navigationHistory.clear()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryClear($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "effect": "clears navigation history while retaining current page state as defined by Electron",
+    "queries": "back/forward availability changes"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "clear",
+      "input": "wc.navigationHistory.clear();console.log(wc.navigationHistory.canGoBack())",
+      "expected_behavior": "back history is unavailable afterward"
+    },
+    {
+      "name": "current page remains",
+      "input": "const u=wc.getURL();wc.navigationHistory.clear();console.log(wc.getURL()===u)",
+      "expected_behavior": "current loaded page remains"
+    }
+  ]
+}

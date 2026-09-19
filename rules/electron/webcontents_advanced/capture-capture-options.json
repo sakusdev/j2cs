@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.capture.capture-options",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve capturePage stayHidden/stayAwake visibility and power behavior.",
+  "source": {
+    "pattern": "$contents.capturePage($rect?,$opts)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.CapturePage($contents,$rect,$opts)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "stayHidden": "keeps hidden page hidden instead of making it considered visible",
+    "stayAwake": "keeps system awake during capture",
+    "capturer_count": "default capture contributes to page being considered visible while capturer count nonzero"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "stay hidden",
+      "input": "await wc.capturePage(undefined,{stayHidden:true})",
+      "expected_behavior": "capture does not force hidden page into visible state for capture policy"
+    },
+    {
+      "name": "stay awake",
+      "input": "await wc.capturePage(undefined,{stayAwake:true})",
+      "expected_behavior": "host power policy keeps system awake for capture"
+    }
+  ]
+}

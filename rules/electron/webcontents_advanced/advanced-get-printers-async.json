@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.advanced.get-printers-async",
+  "category": "electron_webcontents_advanced",
+  "summary": "Enumerate system printers asynchronously.",
+  "source": {
+    "pattern": "$contents.getPrintersAsync()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.GetPrintersAsync($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<PrinterInfo[]>",
+    "host": "printer list/device metadata from OS print subsystem"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "promise",
+      "input": "const p=wc.getPrintersAsync();console.log(typeof p.then)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "array",
+      "input": "const ps=await wc.getPrintersAsync();console.log(Array.isArray(ps))",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

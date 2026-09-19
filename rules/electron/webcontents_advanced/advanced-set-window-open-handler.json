@@ -1,0 +1,41 @@
+{
+  "id": "electron.webcontents.advanced.set-window-open-handler",
+  "category": "electron_webcontents_advanced",
+  "summary": "Run the single WebContents window-open policy handler before creating renderer-requested windows.",
+  "source": {
+    "pattern": "$contents.setWindowOpenHandler($handler)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetWindowOpenHandler($contents,$handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "window.open,target=_blank,modified clicks/forms as documented",
+    "handler": "receives resolved url/frameName/features/disposition/referrer/postBody and related details",
+    "result": "allow or deny plus optional override/createWindow semantics",
+    "timing": "before WebContents/window creation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "deny",
+      "input": "wc.setWindowOpenHandler(()=>({action:'deny'}))",
+      "expected_behavior": "renderer window-open request is canceled"
+    },
+    {
+      "name": "allow",
+      "input": "wc.setWindowOpenHandler(()=>({action:'allow'}))",
+      "expected_behavior": "request may create a window/WebContents"
+    }
+  ]
+}

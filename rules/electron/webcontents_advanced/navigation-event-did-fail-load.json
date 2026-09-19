@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-did-fail-load",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe failed load with Chromium/Electron error metadata.",
+  "source": {
+    "pattern": "$contents.on('did-fail-load',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidFailLoad($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "load failure",
+    "metadata": "errorCode,errorDescription,validatedURL,isMainFrame/frame ids per Electron version",
+    "promise": "loadURL/loadFile rejection correlates with failure"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "failure",
+      "input": "wc.on('did-fail-load',(e,code,desc,url)=>console.log(code,url))",
+      "expected_behavior": "fires with failure metadata"
+    },
+    {
+      "name": "promise rejects",
+      "input": "try{await wc.loadURL(badUrl)}catch(e){console.log('rejected')}",
+      "expected_behavior": "prints rejected on failed load"
+    }
+  ]
+}

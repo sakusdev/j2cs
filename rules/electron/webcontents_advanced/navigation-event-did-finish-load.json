@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.event-did-finish-load",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe successful top-level page load completion used by loadURL/loadFile promises.",
+  "source": {
+    "pattern": "$contents.on('did-finish-load',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidFinishLoad($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "page finished loading",
+    "promise": "successful loadURL/loadFile promise resolves in relation to this lifecycle"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "event",
+      "input": "wc.once('did-finish-load',()=>console.log('done'))",
+      "expected_behavior": "prints done after successful page load"
+    },
+    {
+      "name": "promise relation",
+      "input": "await wc.loadURL(url);console.log('resolved')",
+      "expected_behavior": "resolution follows successful finish-load"
+    }
+  ]
+}

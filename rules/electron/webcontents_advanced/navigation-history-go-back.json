@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.history-go-back",
+  "category": "electron_webcontents_advanced",
+  "summary": "Navigate to the previous history entry using current navigationHistory API.",
+  "source": {
+    "pattern": "$contents.navigationHistory.goBack()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryGoBack($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "void/host navigation action per Electron API",
+    "precondition": "meaningful only if canGoBack",
+    "navigation": "programmatic history traversal"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "go back",
+      "input": "if(wc.navigationHistory.canGoBack()) wc.navigationHistory.goBack()",
+      "expected_behavior": "requests previous history entry"
+    },
+    {
+      "name": "programmatic boundary",
+      "input": "wc.navigationHistory.goBack()",
+      "expected_behavior": "is a programmatic navigation and not a user/page will-navigate request"
+    }
+  ]
+}

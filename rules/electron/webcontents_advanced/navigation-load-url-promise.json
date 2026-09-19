@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.load-url-promise",
+  "category": "electron_webcontents_advanced",
+  "summary": "Keep loadURL completion/rejection tied to navigation events, including Electron's attached noop rejection handler behavior.",
+  "source": {
+    "pattern": "$contents.loadURL($url,$options?)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsLoadUrl($contents,$url,$options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "resolve": "when page has finished loading (did-finish-load)",
+    "reject": "when page fails to load (did-fail-load)",
+    "unhandled": "Electron attaches a noop rejection handler to avoid unhandled-rejection noise from an ignored returned promise"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "await completion",
+      "input": "await wc.loadURL('https://example.com')",
+      "expected_behavior": "await resumes after successful finish-load"
+    },
+    {
+      "name": "failure",
+      "input": "try{await wc.loadURL('bad://unhandled-host')}catch(e){console.log(Boolean(e))}",
+      "expected_behavior": "promise rejects on navigation failure"
+    }
+  ]
+}

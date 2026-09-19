@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.load-file",
+  "category": "electron_webcontents_advanced",
+  "summary": "Load an application-relative HTML file through Electron file navigation.",
+  "source": {
+    "pattern": "$contents.loadFile($filePath)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsLoadFile($contents,$filePath,null)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<void>",
+    "path": "filePath is relative to application root under Electron contract",
+    "navigation": "loads file URL in renderer"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "relative file",
+      "input": "await win.webContents.loadFile('src/index.html')",
+      "expected_behavior": "loads application-root-relative HTML file"
+    },
+    {
+      "name": "failure",
+      "input": "try{await wc.loadFile('missing.html')}catch(e){console.log(Boolean(e))}",
+      "expected_behavior": "rejects on failed file load"
+    }
+  ]
+}

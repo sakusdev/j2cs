@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.background-throttling-window-wide",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve Electron behavior where disabling background throttling on one WebContents affects all WebContents in the host BrowserWindow.",
+  "source": {
+    "pattern": "$contents.setBackgroundThrottling(false)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.DisableWindowBackgroundThrottling($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "since": "documented since Electron 28 behavior",
+    "scope": "all WebContents in hosting BrowserWindow are affected when false",
+    "reenable": "host policy must account for multiple contents/requesters"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "cross contents",
+      "input": "a.setBackgroundThrottling(false); /* a and b hosted in same BrowserWindow */",
+      "expected_behavior": "window-level background behavior can affect b too"
+    },
+    {
+      "name": "not local flag",
+      "input": "wc.backgroundThrottling=false",
+      "expected_behavior": "must not be represented solely as per-object C# boolean"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.is-loading",
+  "category": "electron_webcontents_advanced",
+  "summary": "Report whether any resources in the web page are still loading.",
+  "source": {
+    "pattern": "$contents.isLoading()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsIsLoading($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "scope": "web page resource loading, not only main frame"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "boolean",
+      "input": "console.log(typeof wc.isLoading())",
+      "expected_behavior": "prints boolean"
+    },
+    {
+      "name": "subframe distinction",
+      "input": "console.log(wc.isLoading(),wc.isLoadingMainFrame())",
+      "expected_behavior": "values may differ when only subresources/subframes are loading"
+    }
+  ]
+}

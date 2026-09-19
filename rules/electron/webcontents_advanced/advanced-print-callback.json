@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.print-callback",
+  "category": "electron_webcontents_advanced",
+  "summary": "Print through system printing and deliver success/failure via callback.",
+  "source": {
+    "pattern": "$contents.print($options?,$callback?)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.Print($contents,$options,$callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "host": "system printer/print subsystem",
+    "callback": "reports success boolean and failure reason according to Electron API",
+    "dialog": "silent=false may show platform print UI"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "callback",
+      "input": "wc.print({},(success,reason)=>console.log(typeof success,typeof reason))",
+      "expected_behavior": "callback reports print outcome"
+    },
+    {
+      "name": "host dependent",
+      "input": "wc.print()",
+      "expected_behavior": "printer availability/UI are OS runtime concerns"
+    }
+  ]
+}

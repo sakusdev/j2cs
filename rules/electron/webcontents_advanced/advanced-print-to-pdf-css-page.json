@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.print-to-pdf-css-page",
+  "category": "electron_webcontents_advanced",
+  "summary": "Honor Chromium printing precedence such as @page CSS overriding landscape option where documented.",
+  "source": {
+    "pattern": "$contents.printToPDF({landscape:$landscape,...})",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.PrintToPdf($contents,$options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "css_page": "page CSS can override option-level orientation behavior",
+    "units": "custom paper Size dimensions are inches per Electron option contract",
+    "renderer": "page layout belongs Chromium print renderer"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "css precedence",
+      "input": "/* page has @page rule */ await wc.printToPDF({landscape:true})",
+      "expected_behavior": "landscape option may be ignored because @page CSS controls orientation"
+    },
+    {
+      "name": "page size",
+      "input": "await wc.printToPDF({pageSize:'A4'})",
+      "expected_behavior": "uses Electron/Chromium A4 print sizing"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.history-can-go-forward",
+  "category": "electron_webcontents_advanced",
+  "summary": "Query navigationHistory for an available forward entry.",
+  "source": {
+    "pattern": "$contents.navigationHistory.canGoForward()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryCanGoForward($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "history": "current entry relative to forward stack"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "initial",
+      "input": "console.log(wc.navigationHistory.canGoForward())",
+      "expected_behavior": "normally false"
+    },
+    {
+      "name": "after back",
+      "input": "wc.navigationHistory.goBack(); /* after commit */ console.log(wc.navigationHistory.canGoForward())",
+      "expected_behavior": "can become true"
+    }
+  ]
+}

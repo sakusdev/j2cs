@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.history-can-go-offset",
+  "category": "electron_webcontents_advanced",
+  "summary": "Test whether an offset from current history entry is reachable.",
+  "source": {
+    "pattern": "$contents.navigationHistory.canGoToOffset($offset)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryCanGoToOffset($contents,$offset)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "offset": "integer relative to current entry",
+    "return_value": "boolean"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "zero",
+      "input": "console.log(wc.navigationHistory.canGoToOffset(0))",
+      "expected_behavior": "reports whether offset 0 is accepted by current Electron history API"
+    },
+    {
+      "name": "far offset",
+      "input": "console.log(wc.navigationHistory.canGoToOffset(999999))",
+      "expected_behavior": "false for unreachable offset"
+    }
+  ]
+}

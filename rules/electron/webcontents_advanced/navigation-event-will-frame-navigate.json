@@ -1,0 +1,41 @@
+{
+  "id": "electron.webcontents.navigation.event-will-frame-navigate",
+  "category": "electron_webcontents_advanced",
+  "summary": "Expose cancellable attempted navigation for main frame or subframes.",
+  "source": {
+    "pattern": "$contents.on('will-frame-navigate',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnWillFrameNavigate($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "user/page attempted document navigation in any frame",
+    "details": "url,isSameDocument false,isMainFrame,frame,initiator",
+    "cancel": "preventDefault stops navigation",
+    "excludes": "programmatic and same-document history/hash navigation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "subframe",
+      "input": "wc.on('will-frame-navigate',(e,d)=>console.log(d.isMainFrame))",
+      "expected_behavior": "can observe false for iframe navigation"
+    },
+    {
+      "name": "cancel",
+      "input": "wc.on('will-frame-navigate',e=>e.preventDefault())",
+      "expected_behavior": "attempted matching frame navigation is canceled"
+    }
+  ]
+}

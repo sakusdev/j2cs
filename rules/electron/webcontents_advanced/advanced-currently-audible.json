@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.currently-audible",
+  "category": "electron_webcontents_advanced",
+  "summary": "Report whether audio is currently playing, independently of mute control.",
+  "source": {
+    "pattern": "$contents.isCurrentlyAudible()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.IsCurrentlyAudible($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "state": "Chromium media/audibility state",
+    "difference": "not equivalent to !isAudioMuted()"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "boolean",
+      "input": "console.log(typeof wc.isCurrentlyAudible())",
+      "expected_behavior": "prints boolean"
+    },
+    {
+      "name": "not inverse mute",
+      "input": "console.log(wc.isCurrentlyAudible()===!wc.isAudioMuted())",
+      "expected_behavior": "not guaranteed"
+    }
+  ]
+}

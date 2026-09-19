@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.devtools-open",
+  "category": "electron_webcontents_advanced",
+  "summary": "Open DevTools for the WebContents with Electron mode/activation options.",
+  "source": {
+    "pattern": "$contents.openDevTools($options?)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OpenDevTools($contents,$options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "effect": "creates/shows DevTools WebContents as supported",
+    "options": "mode/activate and version-specific options preserved",
+    "return_value": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "open",
+      "input": "wc.openDevTools()",
+      "expected_behavior": "opens DevTools for contents"
+    },
+    {
+      "name": "mode",
+      "input": "wc.openDevTools({mode:'detach'})",
+      "expected_behavior": "requests detached DevTools mode"
+    }
+  ]
+}
