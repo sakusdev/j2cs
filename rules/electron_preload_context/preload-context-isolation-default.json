@@ -1,0 +1,40 @@
+{
+  "id": "electron.preload.context-isolation-default",
+  "category": "electron_preload_context",
+  "summary": "Record modern Electron default contextIsolation=true.",
+  "source": {
+    "pattern": "BrowserWindow webPreferences.contextIsolation omitted",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Preload.DefaultContextIsolation",
+    "template": "ElectronCompat.Preload.DefaultContextIsolation()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default_since_electron_12": true,
+    "value": true
+  },
+  "caveats": [
+    "Version/profile requirements must be explicit for legacy Electron."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* modern BrowserWindow without contextIsolation option */",
+      "expected_behavior": "context isolation is enabled by default"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* legacy compatibility profile */",
+      "expected_behavior": "must not silently apply modern default without version requirement"
+    }
+  ]
+}

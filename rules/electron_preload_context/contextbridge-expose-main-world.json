@@ -1,0 +1,42 @@
+{
+  "id": "electron.contextbridge.expose-main-world",
+  "category": "electron_preload_context",
+  "summary": "Expose supported API into main world under window key using Electron bridge semantics.",
+  "source": {
+    "pattern": "contextBridge.exposeInMainWorld($apiKey, $api)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeExposeMainWorld($apiKey, $api)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target_world": 0,
+    "key": "string",
+    "functions": "proxied",
+    "other_supported_values": "copied and frozen",
+    "isolation_preserved": true
+  },
+  "caveats": [
+    "Do not share the preload object by reference."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* preload */ contextBridge.exposeInMainWorld('api',{x:1})",
+      "expected_behavior": "main world receives window.api.x === 1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mutate exposed non-function object in main world */",
+      "expected_behavior": "copied/frozen bridge value does not mutate preload source object"
+    }
+  ]
+}

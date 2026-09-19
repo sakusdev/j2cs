@@ -1,0 +1,42 @@
+{
+  "id": "electron.contextbridge.expose-isolated-world",
+  "category": "electron_preload_context",
+  "summary": "Expose API into a specified isolated world.",
+  "source": {
+    "pattern": "contextBridge.exposeInIsolatedWorld($worldId, $apiKey, $api)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeExposeIsolatedWorld($worldId, $apiKey, $api)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "world_id": "integer",
+    "world_0": "main world",
+    "world_999": "Electron contextIsolation preload world",
+    "recommended_custom": "1000+",
+    "copy_proxy_rules": "same as bridge"
+  },
+  "caveats": [
+    "World IDs identify separate JS contexts, not ordinary namespaces."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose to world 1004 */",
+      "expected_behavior": "API appears on window in world 1004"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* inspect from main world */",
+      "expected_behavior": "API is not automatically visible in other worlds"
+    }
+  ]
+}

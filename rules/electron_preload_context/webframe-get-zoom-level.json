@@ -1,0 +1,40 @@
+{
+  "id": "electron.webframe.get-zoom-level",
+  "category": "electron_preload_context",
+  "summary": "Read current Chromium zoom level.",
+  "source": {
+    "pattern": "webFrame.getZoomLevel()",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebFrame.GetZoomLevel",
+    "template": "ElectronCompat.WebFrame.GetZoomLevel()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "number",
+    "state": "frame/domain zoom"
+  },
+  "caveats": [
+    "Do not derive by naive linear factor conversion."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* getZoomLevel */",
+      "expected_behavior": "returns current numeric zoom level"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* after policy propagation */",
+      "expected_behavior": "reflects actual Chromium zoom state"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.preload.node-integration-boundary",
+  "category": "electron_preload_context",
+  "summary": "Preserve interaction between Node integration, isolation, and sandbox security profile.",
+  "source": {
+    "pattern": "preload/renderer with nodeIntegration/contextIsolation options",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadSecurityProfile($webPreferences)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "nodeIntegration": "controls page Node exposure",
+    "contextIsolation": "separates realms",
+    "sandbox": "additional restriction"
+  },
+  "caveats": [
+    "These flags are distinct; enabling one/disabling another is not interchangeable."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* nodeIntegration:false, contextIsolation:true */",
+      "expected_behavior": "page lacks Node globals while preload uses isolated allowed environment"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* contextIsolation:false */",
+      "expected_behavior": "preload/page globals can share context with materially different semantics"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.contextbridge.blob-transfer",
+  "category": "electron_preload_context",
+  "summary": "Transfer supported Blob values according to contextBridge supported-type rules.",
+  "source": {
+    "pattern": "contextBridge function argument/return Blob",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeCopyBlob($blob)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "supported_complex_type": "Blob",
+    "identity": "copied/bridged, not shared JS wrapper"
+  },
+  "caveats": [
+    "Blob wrapper identity and realm prototype are not shared."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* bridged function receives Blob */",
+      "expected_behavior": "Blob data is supported across bridge"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* compare wrapper identity across worlds */",
+      "expected_behavior": "must not rely on identical JS object"
+    }
+  ]
+}

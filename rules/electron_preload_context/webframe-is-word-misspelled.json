@@ -1,0 +1,39 @@
+{
+  "id": "electron.webframe.is-word-misspelled",
+  "category": "electron_preload_context",
+  "summary": "Query current frame spellchecker for a word.",
+  "source": {
+    "pattern": "webFrame.isWordMisspelled($word)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameIsWordMisspelled($frame, $word)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "dictionary_provider_state": true
+  },
+  "caveats": [
+    "Result depends on current language/dictionary/provider."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* isWordMisspelled(word) */",
+      "expected_behavior": "returns current spellchecker decision"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* provider/language changes */",
+      "expected_behavior": "result can change without source string changing"
+    }
+  ]
+}

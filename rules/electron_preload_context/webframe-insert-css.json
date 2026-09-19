@@ -1,0 +1,40 @@
+{
+  "id": "electron.webframe.insert-css",
+  "category": "electron_preload_context",
+  "summary": "Inject CSS into current page and return removal key.",
+  "source": {
+    "pattern": "webFrame.insertCSS($css, $options)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameInsertCss($frame, $css, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "unique key string",
+    "cssOrigin": "author default or user",
+    "document_style_state": true
+  },
+  "caveats": [
+    "CSS cascade/rendering belongs to host renderer and key identity must be retained."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* const key=webFrame.insertCSS('body{}') */",
+      "expected_behavior": "returns a string key"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* cssOrigin:'user' */",
+      "expected_behavior": "uses user cascade origin rather than author"
+    }
+  ]
+}

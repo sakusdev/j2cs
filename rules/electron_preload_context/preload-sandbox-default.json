@@ -1,0 +1,40 @@
+{
+  "id": "electron.preload.sandbox-default",
+  "category": "electron_preload_context",
+  "summary": "Model modern Electron sandboxed preload restrictions.",
+  "source": {
+    "pattern": "sandboxed Electron preload environment",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadSandbox($frame)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "electron_20_plus": "sandboxed preload default in standard configuration",
+    "full_node_environment": false,
+    "polyfilled_require": true
+  },
+  "caveats": [
+    "Do not assume unrestricted Node require/process in sandboxed preload."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* sandboxed preload */",
+      "expected_behavior": "only documented Electron/limited Node modules/globals are available"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* require arbitrary native Node module */",
+      "expected_behavior": "must not be assumed available"
+    }
+  ]
+}

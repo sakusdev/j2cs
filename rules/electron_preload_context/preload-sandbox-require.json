@@ -1,0 +1,44 @@
+{
+  "id": "electron.preload.sandbox-require",
+  "category": "electron_preload_context",
+  "summary": "Restrict sandboxed preload require to documented subset/polyfill.",
+  "source": {
+    "pattern": "require($module) in sandboxed preload",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSandboxedPreloadRequire($module)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "allowed_node_modules": [
+      "events",
+      "timers",
+      "url"
+    ],
+    "electron": "renderer process modules",
+    "arbitrary_node_modules": "not generally available"
+  },
+  "caveats": [
+    "Do not compile arbitrary require as if nodeIntegration/full Node were enabled."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* require('events') */",
+      "expected_behavior": "supported in sandboxed preload polyfill"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* require('node:fs') in sandboxed preload */",
+      "expected_behavior": "must not be assumed available"
+    }
+  ]
+}

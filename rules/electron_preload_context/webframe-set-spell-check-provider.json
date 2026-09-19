@@ -1,0 +1,40 @@
+{
+  "id": "electron.webframe.set-spell-check-provider",
+  "category": "electron_preload_context",
+  "summary": "Install renderer spell-check provider with callback timing contract.",
+  "source": {
+    "pattern": "webFrame.setSpellCheckProvider($language, $provider)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameSetSpellCheckProvider($frame, $language, $provider)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "provider_callbacks": "host invokes provider",
+    "language": "BCP47-ish host setting",
+    "async_provider_behavior": true
+  },
+  "caveats": [
+    "Provider callback execution/timing is renderer-host behavior."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* set provider */",
+      "expected_behavior": "Chromium consults provider for spell checking"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* async provider */",
+      "expected_behavior": "callback result is integrated with host spellcheck lifecycle"
+    }
+  ]
+}

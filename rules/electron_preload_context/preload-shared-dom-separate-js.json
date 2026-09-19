@@ -1,0 +1,40 @@
+{
+  "id": "electron.preload.shared-dom-separate-js",
+  "category": "electron_preload_context",
+  "summary": "Allow both worlds to interact with same underlying DOM while retaining separate JS contexts.",
+  "source": {
+    "pattern": "preload DOM access under contextIsolation",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronPreloadDomRealmBridge($frame)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "underlying_dom": "shared frame document",
+    "wrappers_realms": "isolated",
+    "expando_globals": "not shared automatically"
+  },
+  "caveats": [
+    "Shared DOM does not imply shared Object/Array prototypes or arbitrary JS globals."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* preload modifies document attribute */",
+      "expected_behavior": "page can observe DOM mutation"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* page patches Array.prototype */",
+      "expected_behavior": "preload isolated Array prototype is not thereby patched"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "electron.webframe.execute-javascript",
+  "category": "electron_preload_context",
+  "summary": "Evaluate dynamic code in page world and return Promise/callback result.",
+  "source": {
+    "pattern": "webFrame.executeJavaScript($code, $userGesture, $callback)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameExecuteJavaScript($frame, $code, $userGesture, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "dynamic_code": true,
+    "world": "page",
+    "userGesture": "can enable gesture-gated APIs",
+    "return": "Promise<any>",
+    "callback": "legacy-compatible completion"
+  },
+  "caveats": [
+    "Dynamic page code cannot be safely precompiled as static C#."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* executeJavaScript('1+1') */",
+      "expected_behavior": "Promise resolves to 2"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* code throws/rejects */",
+      "expected_behavior": "Promise rejects according to Electron executeJavaScript contract"
+    }
+  ]
+}

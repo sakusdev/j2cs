@@ -1,0 +1,42 @@
+{
+  "id": "electron.webframe.execute-isolated-world",
+  "category": "electron_preload_context",
+  "summary": "Evaluate WebSource scripts in specified isolated world.",
+  "source": {
+    "pattern": "webFrame.executeJavaScriptInIsolatedWorld($worldId, $scripts, $userGesture, $callback)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameExecuteIsolatedWorld($frame, $worldId, $scripts, $userGesture, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "world_range": "1..536870911",
+    "world_0": "main",
+    "world_999": "contextIsolation world",
+    "return": "Promise<any>",
+    "failure_note": "script failure may yield undefined rather than rejection per Electron docs"
+  },
+  "caveats": [
+    "Failure behavior differs from executeJavaScript and world identity is observable."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* execute in custom world */",
+      "expected_behavior": "runs with isolated global context"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* script execution failure */",
+      "expected_behavior": "preserve Electron's documented undefined/non-rejection behavior where applicable"
+    }
+  ]
+}

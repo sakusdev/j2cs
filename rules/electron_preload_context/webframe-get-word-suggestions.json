@@ -1,0 +1,39 @@
+{
+  "id": "electron.webframe.get-word-suggestions",
+  "category": "electron_preload_context",
+  "summary": "Return current spellchecker suggestions.",
+  "source": {
+    "pattern": "webFrame.getWordSuggestions($word)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameWordSuggestions($frame, $word)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "string[]",
+    "ordering": "host dictionary/provider order"
+  },
+  "caveats": [
+    "Suggestion contents/order are platform/provider dependent."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* getWordSuggestions */",
+      "expected_behavior": "returns array of suggestion strings"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* different OS dictionary */",
+      "expected_behavior": "exact suggestions are not portable"
+    }
+  ]
+}

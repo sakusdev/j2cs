@@ -1,0 +1,46 @@
+{
+  "id": "electron.webframe.frame-relations",
+  "category": "electron_preload_context",
+  "summary": "Expose WebFrame top/parent/firstChild/nextSibling/opener relations.",
+  "source": {
+    "pattern": "webFrame.$relation",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebFrameRelation($frame, $relation)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "relations": [
+      "top",
+      "parent",
+      "firstChild",
+      "nextSibling",
+      "opener"
+    ],
+    "return": "WebFrame|null",
+    "frame_tree_identity": true
+  },
+  "caveats": [
+    "Frame relationships are Chromium frame-tree state, not DOM Node parent/child relationships."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* webFrame.top */",
+      "expected_behavior": "returns top WebFrame for frame tree"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* firstChild/nextSibling with frame removal */",
+      "expected_behavior": "relations track live frame-tree lifecycle"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "electron.contextbridge.execute-main-world",
+  "category": "electron_preload_context",
+  "summary": "Serialize function, copy args, execute in main world, and copy result back.",
+  "source": {
+    "pattern": "contextBridge.executeInMainWorld($executionScript)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeExecuteMainWorld($executionScript)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "experimental": true,
+    "function": "serialized",
+    "bound_context": "lost",
+    "args": "bridge copied",
+    "result": "bridge copied"
+  },
+  "caveats": [
+    "Closures/bound parameters/execution context of source function are not retained."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* executeInMainWorld({func:(x)=>x+1,args:[1]}) */",
+      "expected_behavior": "returns copied value 2"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* func closes over preload variable */",
+      "expected_behavior": "serialized function cannot rely on original closure"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "electron.webframe.routing-id",
+  "category": "electron_preload_context",
+  "summary": "Expose Chromium frame routing ID.",
+  "source": {
+    "pattern": "webFrame.routingId",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebFrame.GetRoutingId",
+    "template": "ElectronCompat.WebFrame.GetRoutingId()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "integer",
+    "host_identity": true,
+    "lifetime": "frame-scoped"
+  },
+  "caveats": [
+    "Routing ID is host process/frame identity and should not be synthesized from DOM indices."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* webFrame.routingId */",
+      "expected_behavior": "returns integer routing identifier"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* navigation/frame replacement */",
+      "expected_behavior": "identity/lifetime follows Chromium frame semantics"
+    }
+  ]
+}

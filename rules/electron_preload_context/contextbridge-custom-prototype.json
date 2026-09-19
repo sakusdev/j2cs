@@ -1,0 +1,39 @@
+{
+  "id": "electron.contextbridge.custom-prototype",
+  "category": "electron_preload_context",
+  "summary": "Prevent custom prototype identity from crossing isolated contexts.",
+  "source": {
+    "pattern": "contextBridge transfer containing custom-prototype object",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeCopySupported($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "prototype": "not preserved as arbitrary custom prototype",
+    "data": "only supported transferable/copyable surface"
+  },
+  "caveats": [
+    "Class instances cannot be modeled as same object/class across worlds."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose instance of custom class */",
+      "expected_behavior": "only supported bridge representation can cross"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* destination instanceof source custom class */",
+      "expected_behavior": "must not be assumed true"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.contextbridge.array-copy-freeze",
+  "category": "electron_preload_context",
+  "summary": "Copy arrays recursively and freeze bridge-side value.",
+  "source": {
+    "pattern": "contextBridge exposure containing $array",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeCopyAndFreeze($array)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "preserved",
+    "nested_values": "bridge rules recursively",
+    "functions": "proxied"
+  },
+  "caveats": [
+    "Array prototype/identity from preload realm is not shared."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* expose [1,2] */",
+      "expected_behavior": "destination receives array-equivalent sequence"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mutate destination array */",
+      "expected_behavior": "frozen bridge value prevents ordinary mutation"
+    }
+  ]
+}

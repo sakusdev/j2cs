@@ -1,0 +1,41 @@
+{
+  "id": "electron.webframe.set-zoom-factor",
+  "category": "electron_preload_context",
+  "summary": "Set current frame zoom factor with >0 validation.",
+  "source": {
+    "pattern": "webFrame.setZoomFactor($factor)",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebFrame.SetZoomFactor",
+    "template": "ElectronCompat.WebFrame.SetZoomFactor($factor)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "factor": "double > 0",
+    "return": "undefined",
+    "chromium_zoom_state": true
+  },
+  "caveats": [
+    "Zero/negative factors are invalid and zoom is Chromium frame/domain state."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* webFrame.setZoomFactor(2) */",
+      "expected_behavior": "current frame zoom factor becomes 2"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* factor <=0 */",
+      "expected_behavior": "must preserve Electron validation/error behavior"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.contextbridge.ipc-renderer-restriction",
+  "category": "electron_preload_context",
+  "summary": "Enforce Electron >=29 restriction against sending full ipcRenderer module over contextBridge.",
+  "source": {
+    "pattern": "contextBridge exposure of ipcRenderer",
+    "requirements": {
+      "electron_renderer_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronContextBridgeRestrictIpcRenderer($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "electron_29_plus": "ipcRenderer cannot be sent over bridge",
+    "destination": "empty/restricted representation",
+    "security": "wrapper methods should filter channels/args"
+  },
+  "caveats": [
+    "Do not expose raw ipcRenderer as a general privileged object."
+  ],
+  "references": [
+    "Electron latest contextBridge/context isolation/webFrame documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* exposeInMainWorld('ipc', ipcRenderer) */",
+      "expected_behavior": "full ipcRenderer is not transferred in Electron >=29"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* expose safe wrapper ()=>ipcRenderer.send('fixed') */",
+      "expected_behavior": "function wrapper can be proxied while retaining explicit policy"
+    }
+  ]
+}
