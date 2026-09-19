@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.visual-zoom-limits",
+  "category": "electron_webcontents_advanced",
+  "summary": "Set pinch-to-zoom level limits asynchronously.",
+  "source": {
+    "pattern": "$contents.setVisualZoomLevelLimits($min,$max)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetVisualZoomLimits($contents,$min,$max)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<void>",
+    "default_policy": "visual zoom disabled by default in Electron",
+    "effect": "limits can re-enable/configure pinch zoom"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "promise",
+      "input": "const p=wc.setVisualZoomLevelLimits(1,3);console.log(typeof p.then)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "await",
+      "input": "await wc.setVisualZoomLevelLimits(1,3)",
+      "expected_behavior": "resolves after limits are applied"
+    }
+  ]
+}

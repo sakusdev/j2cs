@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.reload",
+  "category": "electron_webcontents_advanced",
+  "summary": "Reload the current page using ordinary cache policy.",
+  "source": {
+    "pattern": "$contents.reload()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsReload($contents,false)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "navigation": "reloads current page",
+    "cache": "normal cache behavior"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "reload",
+      "input": "wc.reload()",
+      "expected_behavior": "requests current page reload"
+    },
+    {
+      "name": "not new URL argument",
+      "input": "console.log(wc.reload())",
+      "expected_behavior": "returns undefined"
+    }
+  ]
+}

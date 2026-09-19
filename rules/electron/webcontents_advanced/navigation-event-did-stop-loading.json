@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.event-did-stop-loading",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe aggregate loading stop corresponding to tab-spinner end.",
+  "source": {
+    "pattern": "$contents.on('did-stop-loading',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidStopLoading($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "aggregate loading stops",
+    "scope": "not identical to one network request completion"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "event",
+      "input": "wc.on('did-stop-loading',()=>console.log('stop'))",
+      "expected_behavior": "fires when spinner/loading state stops"
+    },
+    {
+      "name": "lifecycle",
+      "input": "wc.on('did-start-loading',()=>{});wc.on('did-stop-loading',()=>{})",
+      "expected_behavior": "events bracket aggregate loading activity"
+    }
+  ]
+}

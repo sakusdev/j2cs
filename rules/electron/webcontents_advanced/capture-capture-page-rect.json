@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.capture.capture-page-rect",
+  "category": "electron_webcontents_advanced",
+  "summary": "Capture only the requested page rectangle.",
+  "source": {
+    "pattern": "$contents.capturePage($rect)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.CapturePage($contents,$rect,null)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "rect": "Electron Rectangle capture area",
+    "return_value": "Promise<NativeImage>",
+    "coordinates": "interpreted by Electron page capture implementation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "rect",
+      "input": "const img=await wc.capturePage({x:0,y:0,width:10,height:10})",
+      "expected_behavior": "captures requested page area"
+    },
+    {
+      "name": "not DOM crop helper",
+      "input": "await wc.capturePage(rect)",
+      "expected_behavior": "capture is compositor/WebContents operation, not post-hoc generic bitmap crop assumption"
+    }
+  ]
+}

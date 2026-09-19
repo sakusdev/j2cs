@@ -1,0 +1,41 @@
+{
+  "id": "electron.webcontents.navigation.load-url",
+  "category": "electron_webcontents_advanced",
+  "summary": "Load a protocol-qualified URL in the WebContents through Chromium navigation.",
+  "source": {
+    "pattern": "$contents.loadURL($url)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsLoadUrl($contents,$url,null)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<void>",
+    "url": "must contain protocol prefix",
+    "navigation": "starts a programmatic main-frame navigation",
+    "completion": "promise resolves after did-finish-load and rejects on load failure"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "https load",
+      "input": "await win.webContents.loadURL('https://example.com/')",
+      "expected_behavior": "navigates renderer and resolves after page finishes loading"
+    },
+    {
+      "name": "programmatic navigation event boundary",
+      "input": "win.webContents.on('will-navigate',()=>console.log('will')); await win.webContents.loadURL('https://example.com/')",
+      "expected_behavior": "will-navigate is not emitted solely for the programmatic loadURL call"
+    }
+  ]
+}

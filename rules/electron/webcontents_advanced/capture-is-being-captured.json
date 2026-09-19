@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.capture.is-being-captured",
+  "category": "electron_webcontents_advanced",
+  "summary": "Report whether the WebContents capturer count is non-zero.",
+  "source": {
+    "pattern": "$contents.isBeingCaptured()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.IsBeingCaptured($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "meaning": "true when capturer count > 0",
+    "lifecycle": "can change during capture consumers"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "boolean",
+      "input": "console.log(typeof wc.isBeingCaptured())",
+      "expected_behavior": "prints boolean"
+    },
+    {
+      "name": "not permanent",
+      "input": "await wc.capturePage();console.log(typeof wc.isBeingCaptured())",
+      "expected_behavior": "capture status is runtime state rather than sticky flag"
+    }
+  ]
+}

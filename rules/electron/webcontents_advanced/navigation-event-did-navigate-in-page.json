@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-did-navigate-in-page",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe same-document navigation without page reload.",
+  "source": {
+    "pattern": "$contents.on('did-navigate-in-page',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidNavigateInPage($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "hash/history same-page navigation",
+    "reload": false,
+    "args": "url,isMainFrame,frame ids"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "hash",
+      "input": "wc.on('did-navigate-in-page',()=>console.log('in')); /* page changes hash */",
+      "expected_behavior": "prints in"
+    },
+    {
+      "name": "document event distinction",
+      "input": "/* same-document */",
+      "expected_behavior": "does not require did-navigate"
+    }
+  ]
+}

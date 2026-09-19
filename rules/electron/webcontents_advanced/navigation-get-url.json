@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.get-url",
+  "category": "electron_webcontents_advanced",
+  "summary": "Read the currently committed page URL as a string.",
+  "source": {
+    "pattern": "$contents.getURL()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsGetUrl($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "string",
+    "state": "current page URL",
+    "timing": "value changes as navigations commit"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "after load",
+      "input": "await wc.loadURL('https://example.com/'); console.log(wc.getURL())",
+      "expected_behavior": "returns current committed URL"
+    },
+    {
+      "name": "string",
+      "input": "console.log(typeof wc.getURL())",
+      "expected_behavior": "prints string"
+    }
+  ]
+}

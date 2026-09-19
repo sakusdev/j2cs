@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-did-frame-navigate",
+  "category": "electron_webcontents_advanced",
+  "summary": "Observe completed document navigation in any frame.",
+  "source": {
+    "pattern": "$contents.on('did-frame-navigate',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDidFrameNavigate($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "any frame document navigation done",
+    "args": "url,response metadata,isMainFrame,frame process/routing ids",
+    "excludes": "in-page navigation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "subframe",
+      "input": "wc.on('did-frame-navigate',(e,u,c,s,isMain)=>console.log(isMain))",
+      "expected_behavior": "can observe false for iframe navigation"
+    },
+    {
+      "name": "main included",
+      "input": "wc.on('did-frame-navigate',()=>console.log('f'))",
+      "expected_behavior": "also fires for main-frame document navigation"
+    }
+  ]
+}

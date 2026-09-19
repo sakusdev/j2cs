@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.history-go-index",
+  "category": "electron_webcontents_advanced",
+  "summary": "Navigate to an absolute index in navigation history.",
+  "source": {
+    "pattern": "$contents.navigationHistory.goToIndex($index)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryGoToIndex($contents,$index)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "index": "absolute history index",
+    "effect": "programmatic history navigation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "absolute",
+      "input": "wc.navigationHistory.goToIndex(0)",
+      "expected_behavior": "requests entry at absolute history index 0 when valid"
+    },
+    {
+      "name": "different from offset",
+      "input": "/* current index > 0 */ wc.navigationHistory.goToIndex(0)",
+      "expected_behavior": "targets absolute zero, not current+0"
+    }
+  ]
+}

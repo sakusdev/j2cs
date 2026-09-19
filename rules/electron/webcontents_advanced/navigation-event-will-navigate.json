@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.event-will-navigate",
+  "category": "electron_webcontents_advanced",
+  "summary": "Expose cancellable user/page-initiated main-frame navigation through will-navigate.",
+  "source": {
+    "pattern": "$contents.on('will-navigate',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnWillNavigate($contents,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "user/page main-frame navigation such as location change/link",
+    "excludes": "programmatic loadURL/back and in-page navigation",
+    "cancel": "event.preventDefault prevents navigation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "cancel",
+      "input": "wc.on('will-navigate',e=>e.preventDefault())",
+      "expected_behavior": "matching user/page main-frame navigation is prevented"
+    },
+    {
+      "name": "loadURL excluded",
+      "input": "wc.on('will-navigate',()=>console.log('x'));wc.loadURL(url)",
+      "expected_behavior": "loadURL alone does not emit will-navigate"
+    }
+  ]
+}

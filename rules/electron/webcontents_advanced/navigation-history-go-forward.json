@@ -1,0 +1,39 @@
+{
+  "id": "electron.webcontents.navigation.history-go-forward",
+  "category": "electron_webcontents_advanced",
+  "summary": "Navigate to the next history entry using navigationHistory.",
+  "source": {
+    "pattern": "$contents.navigationHistory.goForward()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryGoForward($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "navigation": "programmatic forward traversal",
+    "precondition": "meaningful if canGoForward"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "forward",
+      "input": "if(wc.navigationHistory.canGoForward()) wc.navigationHistory.goForward()",
+      "expected_behavior": "requests next history entry"
+    },
+    {
+      "name": "history identity",
+      "input": "/* back then forward */",
+      "expected_behavior": "restores history entry rather than constructing an unrelated new URL load"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.zoom-origin-sharing",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve default same-origin zoom sharing across WebContents instead of treating zoom as always instance-local.",
+  "source": {
+    "pattern": "$contents.setZoomLevel($level) with default zoom mode",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetOriginZoomLevel($contents,$level)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default_mode": "Chromium zoom is same-origin shared by default",
+    "cross_contents": "other WebContents at same origin may observe zoom level",
+    "isolation": "use isolated mode for per-WebContents behavior"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "same-origin boundary",
+      "input": "a.setZoomLevel(1); /* b on same origin */",
+      "expected_behavior": "default mode may propagate zoom to b"
+    },
+    {
+      "name": "not CLR view property",
+      "input": "wc.setZoomLevel(1)",
+      "expected_behavior": "cannot be modeled as a private numeric field only"
+    }
+  ]
+}

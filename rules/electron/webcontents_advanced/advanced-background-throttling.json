@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.background-throttling",
+  "category": "electron_webcontents_advanced",
+  "summary": "Set/get whether animations and timers are throttled while page is backgrounded.",
+  "source": {
+    "pattern": "$contents.setBackgroundThrottling($allowed) / $contents.getBackgroundThrottling()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetGetBackgroundThrottling($contents,$allowed)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "allowed": "boolean",
+    "effects": "animations/timers and Page Visibility behavior",
+    "host": "Chromium scheduler policy"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "toggle",
+      "input": "wc.setBackgroundThrottling(false);console.log(wc.getBackgroundThrottling())",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "scheduler boundary",
+      "input": "wc.setBackgroundThrottling(false)",
+      "expected_behavior": "does not mean generic .NET timers alone; Chromium/page visibility scheduling changes"
+    }
+  ]
+}

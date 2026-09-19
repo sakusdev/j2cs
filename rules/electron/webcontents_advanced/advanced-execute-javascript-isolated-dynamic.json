@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.execute-javascript-isolated-dynamic",
+  "category": "electron_webcontents_advanced",
+  "summary": "Reject AOT lowering of arbitrary runtime source passed to executeJavaScriptInIsolatedWorld.",
+  "source": {
+    "pattern": "$contents.executeJavaScriptInIsolatedWorld($worldId,$scripts,$userGesture?)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "unsupported",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls."
+  },
+  "strategy": "unsupported",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<any>",
+    "dynamic_code": "WebSource code strings are parsed/executed at runtime",
+    "realm": "specified isolated world",
+    "ordering": "scripts execute in supplied order"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "dynamic source",
+      "input": "await wc.executeJavaScriptInIsolatedWorld(999,[{code:codeFromNetwork}])",
+      "expected_behavior": "unsupported for Chromium/V8-free static translation"
+    },
+    {
+      "name": "world identity matters",
+      "input": "await wc.executeJavaScriptInIsolatedWorld(999,[{code:'globalThis.x=1'}])",
+      "expected_behavior": "must not collapse isolated-world global object into page world"
+    }
+  ]
+}

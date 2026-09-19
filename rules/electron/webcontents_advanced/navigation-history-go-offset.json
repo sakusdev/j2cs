@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.history-go-offset",
+  "category": "electron_webcontents_advanced",
+  "summary": "Navigate by an integer offset in current navigation history.",
+  "source": {
+    "pattern": "$contents.navigationHistory.goToOffset($offset)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.NavigationHistoryGoToOffset($contents,$offset)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "offset": "relative history index",
+    "effect": "programmatic navigation to reachable history entry",
+    "bounds": "host API enforces history bounds"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "back one",
+      "input": "if(wc.navigationHistory.canGoToOffset(-1)) wc.navigationHistory.goToOffset(-1)",
+      "expected_behavior": "requests previous entry"
+    },
+    {
+      "name": "not URL delta",
+      "input": "wc.navigationHistory.goToOffset(1)",
+      "expected_behavior": "offset is history-relative, not string/URL arithmetic"
+    }
+  ]
+}

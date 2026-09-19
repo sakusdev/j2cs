@@ -1,0 +1,43 @@
+{
+  "id": "electron.webcontents.advanced.execute-javascript-isolated-static",
+  "category": "electron_webcontents_advanced",
+  "summary": "Allow analyzed isolated-world scripts only when every WebSource code body is statically reparsed and isolated-world semantics are provided.",
+  "source": {
+    "pattern": "$contents.executeJavaScriptInIsolatedWorld($worldId,$constantScripts,$userGesture?)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true,
+      "scripts": "all compile-time constant and reparsed"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.ExecuteAnalyzedIsolatedWorldScripts($contents,$worldId,$compiledScripts,$userGesture)",
+    "helper": "ElectronCompat.ExecuteAnalyzedIsolatedWorldScripts"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "all code statically known/reparsed",
+    "world": "separate isolated execution context and global state",
+    "ordering": "scripts execute in array order",
+    "return_value": "Promise<any> per Electron API"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "static isolated",
+      "input": "await wc.executeJavaScriptInIsolatedWorld(999,[{code:'1+2'}])",
+      "expected_behavior": "eligible only with isolated-world compatibility realm"
+    },
+    {
+      "name": "multiple order",
+      "input": "await wc.executeJavaScriptInIsolatedWorld(999,[{code:'globalThis.x=1'},{code:'x+1'}])",
+      "expected_behavior": "preserves script order and shared isolated-world state"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.devtools-close",
+  "category": "electron_webcontents_advanced",
+  "summary": "Close DevTools associated with the WebContents.",
+  "source": {
+    "pattern": "$contents.closeDevTools()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.CloseDevTools($contents)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "effect": "closes associated DevTools if open",
+    "return_value": "undefined",
+    "event": "devtools-closed lifecycle may fire"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "close",
+      "input": "wc.openDevTools();wc.closeDevTools()",
+      "expected_behavior": "requests DevTools closure"
+    },
+    {
+      "name": "return",
+      "input": "console.log(wc.closeDevTools())",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

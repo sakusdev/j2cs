@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.window-open-invalid-deny",
+  "category": "electron_webcontents_advanced",
+  "summary": "Treat invalid setWindowOpenHandler return values as deny with console error.",
+  "source": {
+    "pattern": "$windowOpenHandler($details) returns invalid result",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.ValidateWindowOpenResponse($result)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "invalid": "null/undefined/unrecognized/missing action is not allow",
+    "effect": "same practical result as {action:'deny'} plus console error",
+    "security": "fail closed"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "undefined",
+      "input": "wc.setWindowOpenHandler(()=>undefined)",
+      "expected_behavior": "window creation denied and Electron reports invalid response"
+    },
+    {
+      "name": "unknown action",
+      "input": "wc.setWindowOpenHandler(()=>({action:'maybe'}))",
+      "expected_behavior": "denied"
+    }
+  ]
+}

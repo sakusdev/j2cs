@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.capture.capture-page",
+  "category": "electron_webcontents_advanced",
+  "summary": "Capture the visible page into a NativeImage asynchronously.",
+  "source": {
+    "pattern": "$contents.capturePage()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.CapturePage($contents,null,null)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise<NativeImage>",
+    "area": "whole visible page when rect omitted",
+    "rendering": "snapshot comes from Chromium compositor/render surface"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "native image",
+      "input": "const img=await wc.capturePage();console.log(typeof img.toPNG)",
+      "expected_behavior": "resolves to Electron NativeImage"
+    },
+    {
+      "name": "async",
+      "input": "const p=wc.capturePage();console.log(typeof p.then)",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.navigation.reload-ignoring-cache",
+  "category": "electron_webcontents_advanced",
+  "summary": "Reload the current page while bypassing normal cache use.",
+  "source": {
+    "pattern": "$contents.reloadIgnoringCache()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.WebContentsReload($contents,true)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "navigation": "reload current page",
+    "cache": "ignore cache for reload"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "reload no cache",
+      "input": "wc.reloadIgnoringCache()",
+      "expected_behavior": "requests cache-bypassing reload"
+    },
+    {
+      "name": "distinct policy",
+      "input": "wc.reload(); wc.reloadIgnoringCache()",
+      "expected_behavior": "second reload has different cache policy"
+    }
+  ]
+}

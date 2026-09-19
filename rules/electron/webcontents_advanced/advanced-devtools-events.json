@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.devtools-events",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve devtools-opened/devtools-closed/devtools-focused lifecycle events.",
+  "source": {
+    "pattern": "$contents.on('devtools-opened'|'devtools-closed'|'devtools-focused',$listener)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.OnDevToolsLifecycle($contents,$event,$listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_emitter": "reuse EventEmitter ordering",
+    "host": "events tied to actual DevTools lifecycle/focus",
+    "timing": "not assumed synchronous with method invocation"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "opened",
+      "input": "wc.once('devtools-opened',()=>console.log('open'));wc.openDevTools()",
+      "expected_behavior": "prints open when DevTools has opened"
+    },
+    {
+      "name": "closed",
+      "input": "wc.once('devtools-closed',()=>console.log('closed'));wc.closeDevTools()",
+      "expected_behavior": "prints closed when closure completes"
+    }
+  ]
+}

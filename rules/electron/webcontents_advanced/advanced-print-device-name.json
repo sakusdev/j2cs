@@ -1,0 +1,40 @@
+{
+  "id": "electron.webcontents.advanced.print-device-name",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve silent/deviceName semantics using system-defined printer names rather than friendly display labels.",
+  "source": {
+    "pattern": "$contents.print({silent:true,deviceName:$name},$callback)",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.Print($contents,$options,$callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "silent": "no print settings dialog",
+    "deviceName": "must identify system printer device name",
+    "failure": "invalid/unavailable printer reported through print outcome"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "silent",
+      "input": "wc.print({silent:true},cb)",
+      "expected_behavior": "uses default printer without interactive settings when available"
+    },
+    {
+      "name": "device identifier",
+      "input": "wc.print({silent:true,deviceName:'system_device_name'},cb)",
+      "expected_behavior": "uses system-defined device identifier, not arbitrary friendly-name equivalence"
+    }
+  ]
+}

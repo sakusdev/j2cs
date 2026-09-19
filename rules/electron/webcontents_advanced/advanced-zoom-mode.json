@@ -1,0 +1,42 @@
+{
+  "id": "electron.webcontents.advanced.zoom-mode",
+  "category": "electron_webcontents_advanced",
+  "summary": "Preserve default/isolated/manual/disabled zoom modes and persistence rules.",
+  "source": {
+    "pattern": "$contents.setZoomMode($mode) / $contents.getZoomMode()",
+    "requirements": {
+      "receiver": "Electron WebContents",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Preserve Electron WebContents/Chromium renderer semantics through the ElectronCompat host boundary; do not replace navigation, rendering, printing, or DevTools with ordinary .NET calls.",
+    "template": "ElectronCompat.SetGetZoomMode($contents,$mode)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "modes": "default|isolated|manual|disabled",
+    "isolated": "automatic per-WebContents zoom",
+    "manual": "zoom-changed events occur but page not automatically zoomed",
+    "disabled": "resets/ignores zoom changes",
+    "persistence": "isolated/manual persist across navigations per Electron docs"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-contents"
+  ],
+  "tests": [
+    {
+      "name": "isolated",
+      "input": "wc.setZoomMode('isolated');console.log(wc.getZoomMode())",
+      "expected_behavior": "prints isolated on supported Electron versions"
+    },
+    {
+      "name": "disabled",
+      "input": "wc.setZoomMode('disabled')",
+      "expected_behavior": "automatic/content zooming disabled and default level restored per Electron"
+    }
+  ]
+}
