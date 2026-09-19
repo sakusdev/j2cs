@@ -1,0 +1,43 @@
+{
+  "id": "math.log1p",
+  "category": "math_number",
+  "summary": "Compute implementation-approximated ln(1+x) with small-x accuracy.",
+  "source": {
+    "pattern": "Math.log1p($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Log1p",
+    "template": "JsMath.Log1p($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "negative_zero": "preserved",
+    "minus_one": "-Infinity",
+    "less_than_minus_one": "NaN",
+    "positive_infinity": "Infinity"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.log1p(-0),-0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "minus one",
+      "input": "console.log(Math.log1p(-1));",
+      "expected_behavior": "prints -Infinity"
+    }
+  ]
+}

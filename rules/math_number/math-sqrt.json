@@ -1,0 +1,42 @@
+{
+  "id": "math.sqrt",
+  "category": "math_number",
+  "summary": "Compute principal square root with signed-zero and negative-domain behavior.",
+  "source": {
+    "pattern": "Math.sqrt($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Sqrt",
+    "template": "JsMath.Sqrt($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "negative_zero": "preserved",
+    "negative_nonzero": "NaN",
+    "positive_infinity": "Infinity"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(Math.sqrt(9));",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.sqrt(-0),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "math.min",
+  "category": "math_number",
+  "summary": "Return the least coerced Number with ECMAScript NaN and signed-zero ordering.",
+  "source": {
+    "pattern": "Math.min(...$args)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "all_argument_to_number_lowerings": "reuse COERCION left-to-right"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Min",
+    "template": "JsMath.Min($args)",
+    "notes": "All arguments are ToNumber-coerced before selection; -0 wins a zero tie."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "+Infinity",
+    "nan": "NaN",
+    "signed_zero": "prefer -0",
+    "conversion": "all arguments ToNumber first"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "empty",
+      "input": "console.log(Math.min());",
+      "expected_behavior": "prints Infinity"
+    },
+    {
+      "name": "zero tie",
+      "input": "console.log(Object.is(Math.min(+0,-0),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

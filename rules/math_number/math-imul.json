@@ -1,0 +1,42 @@
+{
+  "id": "math.imul",
+  "category": "math_number",
+  "summary": "Multiply low 32 bits with ECMAScript signed 32-bit result semantics.",
+  "source": {
+    "pattern": "Math.imul($x, $y)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_uint32_lowering": "reuse COERCION for x then y"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Imul",
+    "template": "JsMath.Imul($x, $y)",
+    "notes": "Reuse canonical ToUint32 for both operands, multiply modulo 2^32, then interpret as signed int32 Number."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion_order": "x then y",
+    "conversion": "ToUint32",
+    "multiplication": "modulo 2^32",
+    "result": "signed int32 represented as Number"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(Math.imul(2,4));",
+      "expected_behavior": "prints 8"
+    },
+    {
+      "name": "signed wrap",
+      "input": "console.log(Math.imul(0xffffffff,5));",
+      "expected_behavior": "prints -5"
+    }
+  ]
+}

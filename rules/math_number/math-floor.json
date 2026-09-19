@@ -1,0 +1,42 @@
+{
+  "id": "math.floor",
+  "category": "math_number",
+  "summary": "Compute the greatest integral Number not greater than x, preserving -0.",
+  "source": {
+    "pattern": "Math.floor($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Floor",
+    "template": "JsMath.Floor($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "fraction": "round toward -Infinity",
+    "negative_zero": "preserved",
+    "nan_infinity": "preserved"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(Math.floor(-0.1));",
+      "expected_behavior": "prints -1"
+    },
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.floor(-0),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

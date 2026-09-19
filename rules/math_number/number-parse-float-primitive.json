@@ -1,0 +1,46 @@
+{
+  "id": "number.parse-float.primitive",
+  "category": "math_number",
+  "summary": "Parse a primitive using ECMAScript parseFloat longest-prefix grammar.",
+  "source": {
+    "pattern": "Number.parseFloat($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": "%parseFloat%",
+      "argument_is_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ParseFloatPrimitive",
+    "template": "JsNumber.ParseFloatPrimitive($value)",
+    "notes": "Delegate primitive conversion to canonical JsCoercion.ToStringPrimitive, then apply ECMAScript parseFloat grammar."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "to_string": "canonical primitive ToString",
+    "leading_whitespace": "trimmed",
+    "grammar": "longest valid decimal or Infinity prefix",
+    "invalid_prefix": "NaN"
+  },
+  "caveats": [
+    "Symbol throws during ToString; BigInt primitive stringification is allowed but parsing can lose precision."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html",
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "longest prefix",
+      "input": "console.log(Number.parseFloat('  -1.25xyz'));",
+      "expected_behavior": "prints -1.25"
+    },
+    {
+      "name": "hex not parsed as hexadecimal",
+      "input": "console.log(Number.parseFloat('0x10'));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

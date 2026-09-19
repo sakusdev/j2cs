@@ -1,0 +1,42 @@
+{
+  "id": "number.prototype.to-locale-string",
+  "category": "math_number",
+  "summary": "Retain runtime/Intl behavior for locale-sensitive Number formatting.",
+  "source": {
+    "pattern": "$number.toLocaleString($locales, $options)",
+    "requirements": {
+      "method_resolution_intrinsic": "%Number.prototype.toLocaleString%",
+      "receiver_proven_number_or_number_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NumberToLocaleString",
+    "template": "JsRuntime.NumberToLocaleString($number, $locales, $options)",
+    "notes": "Locale negotiation, Intl.NumberFormat options, option getters, host locale data, and exceptions are observable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ThisNumberValue",
+    "locale_sensitive": true,
+    "option_property_access": "observable",
+    "host_locale_data": "required"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html",
+    "https://tc39.es/ecma402/"
+  ],
+  "tests": [
+    {
+      "name": "returns string",
+      "input": "console.log(typeof (1234.5).toLocaleString());",
+      "expected_behavior": "prints string"
+    },
+    {
+      "name": "missing currency option",
+      "input": "try{(1).toLocaleString('en',{style:'currency'})}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws because currency is required for currency style"
+    }
+  ]
+}

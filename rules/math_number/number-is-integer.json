@@ -1,0 +1,44 @@
+{
+  "id": "number.is-integer",
+  "category": "math_number",
+  "summary": "Implement Number.isInteger using integral IEEE-754 Number semantics without coercion.",
+  "source": {
+    "pattern": "Number.isInteger($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.IsInteger",
+    "template": "JsNumber.IsInteger($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "none",
+    "non_number": false,
+    "nan_infinity": false,
+    "positive_and_negative_zero": true,
+    "integral_binary64": true
+  },
+  "caveats": [
+    "The test is over the already-rounded binary64 value, not the source decimal spelling."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "integer number",
+      "input": "console.log(Number.isInteger(12));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "negative zero and string",
+      "input": "console.log(Number.isInteger(-0), Number.isInteger('12'));",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

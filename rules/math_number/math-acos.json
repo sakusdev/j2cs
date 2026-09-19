@@ -1,0 +1,43 @@
+{
+  "id": "math.acos",
+  "category": "math_number",
+  "summary": "Compute implementation-approximated arccosine with ECMAScript domain behavior.",
+  "source": {
+    "pattern": "Math.acos($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Acos",
+    "template": "JsMath.Acos($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "domain": "[-1,1]",
+    "outside_domain": "NaN",
+    "one": "+0",
+    "units": "radians"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "one",
+      "input": "console.log(Object.is(Math.acos(1),0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "outside domain",
+      "input": "console.log(Number.isNaN(Math.acos(2)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

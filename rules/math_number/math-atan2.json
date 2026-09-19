@@ -1,0 +1,42 @@
+{
+  "id": "math.atan2",
+  "category": "math_number",
+  "summary": "Compute ECMAScript Math.atan2 with signed-zero and infinity quadrants.",
+  "source": {
+    "pattern": "Math.atan2($y, $x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION for y then x"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Atan2",
+    "template": "JsMath.Atan2($y, $x)",
+    "notes": "Coerce y then x through canonical ToNumber and preserve all signed-zero quadrant cases."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion_order": "y then x",
+    "signed_zero": "observable in result",
+    "infinities": "explicit ECMAScript quadrant cases",
+    "units": "radians"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.atan2(-0,1),-0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "positive zero over negative zero",
+      "input": "console.log(Math.atan2(+0,-0)===Math.PI);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

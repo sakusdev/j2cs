@@ -1,0 +1,41 @@
+{
+  "id": "math.pow",
+  "category": "math_number",
+  "summary": "Apply ECMAScript Number exponentiation semantics after ToNumber conversion.",
+  "source": {
+    "pattern": "Math.pow($base, $exponent)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION for base then exponent"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Pow",
+    "template": "JsMath.Pow($base, $exponent)",
+    "notes": "Reuse canonical ToNumber then Number::exponentiate; do not assume platform Math.Pow edge cases are identical."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion_order": "base then exponent",
+    "exponent_zero": "returns 1 even for NaN base",
+    "signed_zero_and_infinity": "ECMAScript exponentiation cases"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(Math.pow(2,3));",
+      "expected_behavior": "prints 8"
+    },
+    {
+      "name": "NaN exponent zero",
+      "input": "console.log(Math.pow(NaN,0));",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

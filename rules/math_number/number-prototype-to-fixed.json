@@ -1,0 +1,41 @@
+{
+  "id": "number.prototype.to-fixed",
+  "category": "math_number",
+  "summary": "Format a Number with ECMAScript fixed-point rounding and 0..100 fraction digits.",
+  "source": {
+    "pattern": "$number.toFixed($fractionDigits)",
+    "requirements": {
+      "method_resolution_intrinsic": "%Number.prototype.toFixed%",
+      "receiver_proven_number_or_number_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ToFixed",
+    "template": "JsNumber.ToFixed($number, $fractionDigits)",
+    "notes": "Preserve the 1e21 cutoff and ECMAScript decimal rounding; do not use culture-sensitive CLR formatting."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ThisNumberValue",
+    "fraction_digits": "default 0; ToIntegerOrInfinity; range 0..100",
+    "large_magnitude": "at abs(x) >= 1e21 use ordinary Number string form",
+    "negative_zero": "formats without minus sign"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "binary rounding",
+      "input": "console.log((1.005).toFixed(2));",
+      "expected_behavior": "prints 1.00"
+    },
+    {
+      "name": "negative zero spelling",
+      "input": "console.log((-0).toFixed(2));",
+      "expected_behavior": "prints 0.00"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "number.prototype.to-precision",
+  "category": "math_number",
+  "summary": "Format a Number to requested significant-digit precision using ECMAScript rules.",
+  "source": {
+    "pattern": "$number.toPrecision($precision)",
+    "requirements": {
+      "method_resolution_intrinsic": "%Number.prototype.toPrecision%",
+      "receiver_proven_number_or_number_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ToPrecision",
+    "template": "JsNumber.ToPrecision($number, $precision)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ThisNumberValue",
+    "precision": "undefined uses ordinary Number string; otherwise ToIntegerOrInfinity 1..100",
+    "notation_choice": "fixed or exponential per ECMAScript thresholds",
+    "rounding": "significant decimal digits"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "significant digits",
+      "input": "console.log((123.456).toPrecision(4));",
+      "expected_behavior": "prints 123.5"
+    },
+    {
+      "name": "zero precision rejected",
+      "input": "try{(1).toPrecision(0)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

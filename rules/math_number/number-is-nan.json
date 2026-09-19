@@ -1,0 +1,42 @@
+{
+  "id": "number.is-nan",
+  "category": "math_number",
+  "summary": "Implement Number.isNaN as a type-sensitive NaN test with no coercion.",
+  "source": {
+    "pattern": "Number.isNaN($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.IsNaN",
+    "template": "JsNumber.IsNaN($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "none",
+    "only_number_nan": true,
+    "non_number": false
+  },
+  "caveats": [
+    "Global isNaN has different coercive semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "NaN recognized",
+      "input": "console.log(Number.isNaN(NaN));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "string not coerced",
+      "input": "console.log(Number.isNaN('NaN'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

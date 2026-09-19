@@ -1,0 +1,40 @@
+{
+  "id": "number.is-safe-integer",
+  "category": "math_number",
+  "summary": "Recognize integral Numbers whose magnitude is at most 2^53-1.",
+  "source": {
+    "pattern": "Number.isSafeInteger($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "method_resolution_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.IsSafeInteger",
+    "template": "JsNumber.IsSafeInteger($value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "none",
+    "max_magnitude": 9007199254740991,
+    "requires_integral_number": true,
+    "negative_zero": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "largest safe integer",
+      "input": "console.log(Number.isSafeInteger(9007199254740991));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "2^53 unsafe",
+      "input": "console.log(Number.isSafeInteger(9007199254740992));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

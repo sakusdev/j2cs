@@ -1,0 +1,39 @@
+{
+  "id": "number.prototype.value-of",
+  "category": "math_number",
+  "summary": "Extract the Number primitive from a Number primitive/object and reject incompatible receivers.",
+  "source": {
+    "pattern": "$receiver.valueOf()",
+    "requirements": {
+      "method_resolution_intrinsic": "%Number.prototype.valueOf%",
+      "call_semantics_preserved": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ValueOf",
+    "template": "JsNumber.ValueOf($receiver)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "Number primitive or object with [[NumberData]]",
+    "return_value": "primitive Number",
+    "invalid_receiver": "TypeError"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "unboxes Number object",
+      "input": "console.log(new Number(3).valueOf());",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "incompatible receiver",
+      "input": "try{Number.prototype.valueOf.call('3')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

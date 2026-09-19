@@ -1,0 +1,41 @@
+{
+  "id": "number.constant.max-value",
+  "category": "math_number",
+  "summary": "Lower intrinsic Number.MAX_VALUE to the corresponding binary64 constant.",
+  "source": {
+    "pattern": "Number.MAX_VALUE",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "intrinsic_constant_property": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "double.MaxValue"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "value": "largest finite positive binary64 Number",
+    "property_read": "safe only when Number binding resolves to intrinsic constructor"
+  },
+  "caveats": [
+    "Apply only to the intrinsic Number constructor binding."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "constant value",
+      "input": "console.log(Number.isFinite(Number.MAX_VALUE));",
+      "expected_csharp": "var x = double.MaxValue;",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "binding requirement",
+      "input": "const N={}; N.MAX_VALUE=123; console.log(N.MAX_VALUE);",
+      "expected_behavior": "prints 123; this rule does not apply to a non-intrinsic receiver"
+    }
+  ]
+}

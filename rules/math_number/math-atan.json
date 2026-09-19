@@ -1,0 +1,43 @@
+{
+  "id": "math.atan",
+  "category": "math_number",
+  "summary": "Compute implementation-approximated arctangent preserving signed zero.",
+  "source": {
+    "pattern": "Math.atan($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Atan",
+    "template": "JsMath.Atan($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "negative_zero": "preserved",
+    "positive_infinity": "approximately pi/2",
+    "negative_infinity": "approximately -pi/2",
+    "units": "radians"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "negative zero",
+      "input": "console.log(Object.is(Math.atan(-0),-0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "infinity",
+      "input": "console.log(Math.atan(Infinity)>1.5);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "math.trunc",
+  "category": "math_number",
+  "summary": "Remove the fractional part toward zero while preserving signed zero and infinities.",
+  "source": {
+    "pattern": "Math.trunc($x)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Math%",
+      "method_resolution_intrinsic": true,
+      "to_number_lowering": "reuse COERCION"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsMath.Trunc",
+    "template": "JsMath.Trunc($x)",
+    "notes": "Compose with canonical COERCION ToNumber before the numeric kernel; if ToNumber requires runtime, the whole expression inherits that dependency."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument_conversion": "ECMAScript ToNumber via canonical COERCION rules",
+    "direction": "toward zero",
+    "negative_fraction_between_minus1_and_zero": "-0",
+    "nan_infinity": "preserved"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "positive",
+      "input": "console.log(Math.trunc(1.9));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "negative zero result",
+      "input": "console.log(Object.is(Math.trunc(-0.9),-0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

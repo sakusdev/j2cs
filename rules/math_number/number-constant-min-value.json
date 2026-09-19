@@ -1,0 +1,41 @@
+{
+  "id": "number.constant.min-value",
+  "category": "math_number",
+  "summary": "Lower intrinsic Number.MIN_VALUE to the corresponding binary64 constant.",
+  "source": {
+    "pattern": "Number.MIN_VALUE",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Number%",
+      "intrinsic_constant_property": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "double.Epsilon"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "value": "smallest positive subnormal binary64 Number",
+    "property_read": "safe only when Number binding resolves to intrinsic constructor"
+  },
+  "caveats": [
+    "Apply only to the intrinsic Number constructor binding."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "constant value",
+      "input": "console.log(Number.MIN_VALUE > 0, Number.MIN_VALUE/2);",
+      "expected_csharp": "var x = double.Epsilon;",
+      "expected_behavior": "prints true 0"
+    },
+    {
+      "name": "binding requirement",
+      "input": "const N={}; N.MIN_VALUE=123; console.log(N.MIN_VALUE);",
+      "expected_behavior": "prints 123; this rule does not apply to a non-intrinsic receiver"
+    }
+  ]
+}

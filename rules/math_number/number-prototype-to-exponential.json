@@ -1,0 +1,41 @@
+{
+  "id": "number.prototype.to-exponential",
+  "category": "math_number",
+  "summary": "Format a Number using ECMAScript exponential notation and its 0..100 fraction-digit range.",
+  "source": {
+    "pattern": "$number.toExponential($fractionDigits)",
+    "requirements": {
+      "method_resolution_intrinsic": "%Number.prototype.toExponential%",
+      "receiver_proven_number_or_number_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ToExponential",
+    "template": "JsNumber.ToExponential($number, $fractionDigits)",
+    "notes": "Implement ThisNumberValue, omitted-vs-provided fractionDigits, decimal rounding, and exponent spelling."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ThisNumberValue",
+    "fraction_digits": "omitted selects shortest distinguishing exponential form; otherwise ToIntegerOrInfinity 0..100",
+    "non_finite": "Number string form",
+    "rounding": "ECMAScript decimal algorithm"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ],
+  "tests": [
+    {
+      "name": "explicit digits",
+      "input": "console.log((77.1234).toExponential(2));",
+      "expected_behavior": "prints 7.71e+1"
+    },
+    {
+      "name": "range checked",
+      "input": "try{(1).toExponential(101)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}
