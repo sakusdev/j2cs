@@ -1,0 +1,41 @@
+{
+  "id": "node.net.is-ip",
+  "category": "node_net_tls_dns",
+  "summary": "Classify strict Node IP literal as IPv4, IPv6, or invalid.",
+  "source": {
+    "pattern": "net.isIP($input)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.IsIP",
+    "template": "NodeNet.IsIP($input)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "4|6|0",
+    "dns": false,
+    "strict_text": true
+  },
+  "caveats": [
+    "Permissive legacy parsers can accept forms Node rejects."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(net.isIP('127.0.0.1'))",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const net=require('node:net');console.log(net.isIP('127.000.0.1'))",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

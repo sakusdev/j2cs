@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.resolve4",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve DNS A records with optional TTL result shape.",
+  "source": {
+    "pattern": "dns.resolve4($hostname, $options, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolve4($hostname, $options, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "A",
+    "default": "IPv4 strings",
+    "ttl_true": "{address,ttl}[]"
+  },
+  "caveats": [
+    "TTL option changes observable result shape."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').resolve4)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* resolve4(host,{ttl:true}) */",
+      "expected_behavior": "returns address/ttl objects"
+    }
+  ]
+}

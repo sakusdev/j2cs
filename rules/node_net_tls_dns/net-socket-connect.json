@@ -1,0 +1,44 @@
+{
+  "id": "node.net.socket.connect",
+  "category": "node_net_tls_dns",
+  "summary": "Initiate asynchronous TCP/IPC Socket connection.",
+  "source": {
+    "pattern": "$socket.connect($options, $listener)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeNetSocketConnect($socket, $options, $listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Socket",
+    "connecting": "true until complete",
+    "events": [
+      "connect",
+      "error"
+    ],
+    "tcp_or_ipc": true
+  },
+  "caveats": [
+    "Reconnection and connecting-state transitions must match Node."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.connect({port:9})===s);s.on('error',()=>{})",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* connect in progress */",
+      "expected_behavior": "socket.connecting remains true until success/failure"
+    }
+  ]
+}

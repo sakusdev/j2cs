@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.socket.get-peer-certificate",
+  "category": "node_net_tls_dns",
+  "summary": "Return peer certificate metadata and optional detailed chain.",
+  "source": {
+    "pattern": "$socket.getPeerCertificate($detailed)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.GetPeerCertificate",
+    "template": "NodeTls.GetPeerCertificate($socket, $detailed)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "certificate object/empty object",
+    "detailed": "issuer chain",
+    "provider_fields": true
+  },
+  "caveats": [
+    "Certificate field formatting is Node/OpenSSL-specific."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().getPeerCertificate)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* detailed=true */",
+      "expected_behavior": "may include issuerCertificate chain"
+    }
+  ]
+}

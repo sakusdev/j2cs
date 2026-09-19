@@ -1,0 +1,39 @@
+{
+  "id": "node.dns.lookup-all",
+  "category": "node_net_tls_dns",
+  "summary": "Return all OS resolver address/family entries.",
+  "source": {
+    "pattern": "dns.lookup($hostname, {all:true, ...$options}, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsLookupAll($hostname, $options, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_via_callback": "{address,family}[]",
+    "ordering": "Node/OS/order option"
+  },
+  "caveats": [
+    "Do not collapse multiple addresses."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "require('node:dns').lookup('localhost',{all:true},(e,a)=>console.log(Array.isArray(a)))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* multiple results */",
+      "expected_behavior": "preserves Node-defined result order and family fields"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.resolve-txt",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve TXT records preserving per-record string chunks.",
+  "source": {
+    "pattern": "dns.resolveTxt($hostname, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolveTxt($hostname, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "TXT",
+    "return": "string[][]",
+    "chunk_boundaries": true
+  },
+  "caveats": [
+    "Joining TXT chunks changes Node result shape."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').resolveTxt)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* successful TXT */",
+      "expected_behavior": "returns nested string arrays"
+    }
+  ]
+}

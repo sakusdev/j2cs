@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.lookup-service",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve numeric address/port through OS name/service facilities.",
+  "source": {
+    "pattern": "dns.lookupService($address, $port, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsLookupService($address, $port, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "resolver": "OS getnameinfo-like",
+    "callback": "hostname,service",
+    "numeric_input": true
+  },
+  "caveats": [
+    "Service and host names vary by OS databases."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').lookupService)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* loopback, port 80 */",
+      "expected_behavior": "uses OS host/service resolution, not dns.reverse"
+    }
+  ]
+}

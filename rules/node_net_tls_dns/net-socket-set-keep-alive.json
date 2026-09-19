@@ -1,0 +1,42 @@
+{
+  "id": "node.net.socket.set-keep-alive",
+  "category": "node_net_tls_dns",
+  "summary": "Configure OS TCP keepalive.",
+  "source": {
+    "pattern": "$socket.setKeepAlive($enable, $initialDelay)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.SetKeepAlive",
+    "template": "NodeNet.SetKeepAlive($socket, $enable, $initialDelay)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Socket",
+    "default_enable": false,
+    "initial_delay_ms": true,
+    "platform_specific": true
+  },
+  "caveats": [
+    "Keepalive is OS TCP state, not a JS timer."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.setKeepAlive(true,1000)===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* setKeepAlive */",
+      "expected_behavior": "uses host TCP keepalive semantics"
+    }
+  ]
+}

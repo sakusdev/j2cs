@@ -1,0 +1,40 @@
+{
+  "id": "node.tls.socket.get-certificate",
+  "category": "node_net_tls_dns",
+  "summary": "Return local certificate metadata when configured.",
+  "source": {
+    "pattern": "$socket.getCertificate()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.GetCertificate",
+    "template": "NodeTls.GetCertificate($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "certificate object/empty object",
+    "local_identity": true
+  },
+  "caveats": [
+    "A local certificate may be absent."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().getCertificate)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* socket without local certificate */",
+      "expected_behavior": "returns Node empty/absent certificate shape rather than fabricated data"
+    }
+  ]
+}

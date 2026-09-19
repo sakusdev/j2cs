@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.promises.lookup",
+  "category": "node_net_tls_dns",
+  "summary": "Promise form of OS name lookup.",
+  "source": {
+    "pattern": "dns.promises.lookup($hostname, $options)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsPromisesLookup($hostname, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise",
+    "resolver": "OS facilities",
+    "shape": "{address,family} or array"
+  },
+  "caveats": [
+    "Reuse ASYNC Promise semantics and keep lookup/resolve distinction."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const d=require('node:dns').promises;console.log(d.lookup('127.0.0.1') instanceof Promise)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "require('node:dns').promises.lookup('127.0.0.1').then(x=>console.log(x.family))",
+      "expected_behavior": "eventually prints 4"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.net.socket.address",
+  "category": "node_net_tls_dns",
+  "summary": "Return local Socket endpoint in Node address shape.",
+  "source": {
+    "pattern": "$socket.address()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.SocketAddress",
+    "template": "NodeNet.SocketAddress($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "tcp": "{address,family,port}",
+    "state_dependent": true
+  },
+  "caveats": [
+    "Unbound state must not produce fabricated data."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(typeof new net.Socket().address)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* connected socket.address() */",
+      "expected_behavior": "returns local address/family/port"
+    }
+  ]
+}

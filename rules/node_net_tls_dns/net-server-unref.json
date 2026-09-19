@@ -1,0 +1,41 @@
+{
+  "id": "node.net.server.unref",
+  "category": "node_net_tls_dns",
+  "summary": "Unref Server so it alone does not keep the process alive.",
+  "source": {
+    "pattern": "$server.unref()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.UnrefServer",
+    "template": "NodeNet.UnrefServer($server)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Server",
+    "idempotent": true,
+    "process_liveness": true
+  },
+  "caveats": [
+    "This is Node event-loop liveness state."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=net.createServer();console.log(s.unref()===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const net=require('node:net');const s=net.createServer();console.log(s.unref().unref()===s)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

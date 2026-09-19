@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.resolver.cancel",
+  "category": "node_net_tls_dns",
+  "summary": "Cancel outstanding Resolver queries with cancellation errors.",
+  "source": {
+    "pattern": "$resolver.cancel()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolverCancel($resolver)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "pending": "cancelled",
+    "error_code": "ECANCELLED"
+  },
+  "caveats": [
+    "This is resolver-query cancellation, not generic Promise cancellation."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const d=require('node:dns');console.log(new d.Resolver().cancel())",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* cancel pending resolve */",
+      "expected_behavior": "pending operation completes with Node cancellation error"
+    }
+  ]
+}

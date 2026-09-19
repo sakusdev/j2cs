@@ -1,0 +1,41 @@
+{
+  "id": "node.net.create-server",
+  "category": "node_net_tls_dns",
+  "summary": "Create TCP/IPC Server with Node EventEmitter and accepted Socket semantics.",
+  "source": {
+    "pattern": "net.createServer($options, $listener)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeNetCreateServer($options, $listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Server immediately",
+    "connection_listener": true,
+    "accepted_socket": "net.Socket Duplex",
+    "allowHalfOpen": "observable"
+  },
+  "caveats": [
+    "OS/event-loop lifecycle is not a TcpListener syntax substitution."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const f=()=>{};const s=net.createServer(f);console.log(s.listenerCount('connection'))",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* accepted connection */",
+      "expected_behavior": "connection listener receives a net.Socket Duplex"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.net.server.get-connections",
+  "category": "node_net_tls_dns",
+  "summary": "Asynchronously report Server connection count including shared handle behavior.",
+  "source": {
+    "pattern": "$server.getConnections($callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeNetGetConnections($server, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "callback": "(error,count)",
+    "cluster_aware": true
+  },
+  "caveats": [
+    "A local collection count is not equivalent with shared handles."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=net.createServer().listen(0,()=>s.getConnections((e,n)=>{console.log(!e,typeof n);s.close()}))",
+      "expected_behavior": "prints true number"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* clustered/shared server handle */",
+      "expected_behavior": "count follows Node shared-handle semantics"
+    }
+  ]
+}

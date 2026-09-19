@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.socket.get-cipher",
+  "category": "node_net_tls_dns",
+  "summary": "Return negotiated cipher metadata.",
+  "source": {
+    "pattern": "$socket.getCipher()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.GetCipher",
+    "template": "NodeTls.GetCipher($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "cipher metadata object",
+    "handshake_dependent": true,
+    "provider_names": true
+  },
+  "caveats": [
+    "Cipher names/inventory vary with OpenSSL/provider."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().getCipher)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* after secureConnect */",
+      "expected_behavior": "returns actual negotiated cipher metadata"
+    }
+  ]
+}

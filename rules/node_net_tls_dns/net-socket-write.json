@@ -1,0 +1,42 @@
+{
+  "id": "node.net.socket.write",
+  "category": "node_net_tls_dns",
+  "summary": "Write via Writable ordering and backpressure semantics.",
+  "source": {
+    "pattern": "$socket.write($data, $encoding, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeStreams.Write",
+    "template": "NodeStreams.Write($socket, $data, $encoding, $callback)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean backpressure",
+    "ordering": "stream order",
+    "encoding": "string or bytes",
+    "callback": "completion/error"
+  },
+  "caveats": [
+    "Independent network sends are not equivalent to Node Writable buffering."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(typeof new net.Socket().write)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* connected socket.write(data) */",
+      "expected_behavior": "returns boolean backpressure signal, not byte count"
+    }
+  ]
+}

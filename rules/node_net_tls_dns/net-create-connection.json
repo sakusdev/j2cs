@@ -1,0 +1,41 @@
+{
+  "id": "node.net.create-connection",
+  "category": "node_net_tls_dns",
+  "summary": "Create Socket, initiate connection, and return before completion.",
+  "source": {
+    "pattern": "net.createConnection($options, $listener)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeNetCreateConnection($options, $listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "net.Socket immediately",
+    "success": "connect event",
+    "failure": "error event",
+    "lookup": "dns.lookup/custom lookup"
+  },
+  "caveats": [
+    "Do not await connection before returning the Socket."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=net.createConnection({port:9});console.log(s instanceof net.Socket);s.on('error',()=>{})",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const net=require('node:net');console.log(net.connect===net.createConnection)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

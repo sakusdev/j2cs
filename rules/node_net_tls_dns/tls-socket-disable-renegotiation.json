@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.socket.disable-renegotiation",
+  "category": "node_net_tls_dns",
+  "summary": "Disable future TLS renegotiation attempts.",
+  "source": {
+    "pattern": "$socket.disableRenegotiation()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.DisableRenegotiation",
+    "template": "NodeTls.DisableRenegotiation($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "future_attempts": "blocked/error",
+    "one_way": true
+  },
+  "caveats": [
+    "There is no inverse API to re-enable on the same socket."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().disableRenegotiation)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* disable then renegotiate */",
+      "expected_behavior": "future renegotiation is rejected/errored"
+    }
+  ]
+}

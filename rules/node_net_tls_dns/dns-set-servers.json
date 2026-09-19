@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.set-servers",
+  "category": "node_net_tls_dns",
+  "summary": "Replace configured DNS resolver servers.",
+  "source": {
+    "pattern": "dns.setServers($servers)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsSetServers($servers)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "input": "server strings",
+    "affects": "resolve* family",
+    "lookup": "not OS lookup"
+  },
+  "caveats": [
+    "Changing DNS servers is runtime resolver state."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').setServers)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* setServers */",
+      "expected_behavior": "does not redefine dns.lookup OS resolver source"
+    }
+  ]
+}

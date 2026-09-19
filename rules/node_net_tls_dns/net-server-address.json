@@ -1,0 +1,42 @@
+{
+  "id": "node.net.server.address",
+  "category": "node_net_tls_dns",
+  "summary": "Return null outside listening lifetime or Node TCP/IPC bound address while active.",
+  "source": {
+    "pattern": "$server.address()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.ServerAddress",
+    "template": "NodeNet.ServerAddress($server)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "before_listen": "null",
+    "tcp": "{address,family,port}",
+    "ipc": "path string",
+    "after_close": "null"
+  },
+  "caveats": [
+    "Do not fabricate endpoint data before bind completes."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(net.createServer().address()===null)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* TCP server after listening */",
+      "expected_behavior": "returns object with address/family/port"
+    }
+  ]
+}

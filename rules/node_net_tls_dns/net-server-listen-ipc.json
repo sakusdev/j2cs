@@ -1,0 +1,40 @@
+{
+  "id": "node.net.server.listen-ipc",
+  "category": "node_net_tls_dns",
+  "summary": "Listen on Unix-domain socket or Windows named pipe.",
+  "source": {
+    "pattern": "$server.listen($path, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeNetServerListenIpc($server, $path, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "platform": "Unix domain socket or Windows named pipe",
+    "path_limit": "platform-specific",
+    "return": "same Server"
+  },
+  "caveats": [
+    "Do not assume Unix filesystem socket behavior on Windows."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(typeof net.createServer().listen)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* server.listen(path) */",
+      "expected_behavior": "uses platform-specific IPC endpoint semantics"
+    }
+  ]
+}

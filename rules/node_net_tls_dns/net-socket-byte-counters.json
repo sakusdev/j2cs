@@ -1,0 +1,44 @@
+{
+  "id": "node.net.socket.byte-counters",
+  "category": "node_net_tls_dns",
+  "summary": "Expose cumulative bytesRead/bytesWritten.",
+  "source": {
+    "pattern": "$socket.$counter",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.GetSocketByteCounter",
+    "template": "NodeNet.GetSocketByteCounter($socket, $counter)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "properties": [
+      "bytesRead",
+      "bytesWritten"
+    ],
+    "units": "bytes",
+    "cumulative": true
+  },
+  "caveats": [
+    "bytesWritten is encoded bytes, not JS string length."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.bytesRead,s.bytesWritten)",
+      "expected_behavior": "prints 0 0"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* write('€') */",
+      "expected_behavior": "counter reflects UTF-8 byte count rather than one JS character"
+    }
+  ]
+}

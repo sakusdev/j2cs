@@ -1,0 +1,40 @@
+{
+  "id": "node.tls.socket.get-protocol",
+  "category": "node_net_tls_dns",
+  "summary": "Return actual negotiated TLS protocol version.",
+  "source": {
+    "pattern": "$socket.getProtocol()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.GetProtocol",
+    "template": "NodeTls.GetProtocol($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "protocol string or state-dependent null",
+    "handshake_dependent": true
+  },
+  "caveats": [
+    "Configured min/max versions do not determine the negotiated result alone."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().getProtocol)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* after secureConnect */",
+      "expected_behavior": "returns negotiated protocol such as TLSv1.2/TLSv1.3"
+    }
+  ]
+}

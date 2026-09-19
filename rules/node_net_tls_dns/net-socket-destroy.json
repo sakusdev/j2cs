@@ -1,0 +1,41 @@
+{
+  "id": "node.net.socket.destroy",
+  "category": "node_net_tls_dns",
+  "summary": "Abruptly destroy socket I/O with stream destruction events.",
+  "source": {
+    "pattern": "$socket.destroy($error)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeNetSocketDestroy($socket, $error)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Socket",
+    "io": "stopped",
+    "error_argument": "error event",
+    "close_event": true
+  },
+  "caveats": [
+    "Destroy is observably different from graceful end."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.destroy()===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const net=require('node:net');const s=new net.Socket();s.destroy();console.log(s.destroyed)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

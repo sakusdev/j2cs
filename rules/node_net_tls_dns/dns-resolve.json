@@ -1,0 +1,41 @@
+{
+  "id": "node.dns.resolve",
+  "category": "node_net_tls_dns",
+  "summary": "Query configured DNS resolver for record type.",
+  "source": {
+    "pattern": "dns.resolve($hostname, $rrtype, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolve($hostname, $rrtype, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "DNS",
+    "default_rrtype": "A",
+    "record_type_specific": true,
+    "errors": "Node DNS codes"
+  },
+  "caveats": [
+    "Do not implement via OS getaddrinfo."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').resolve)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* dns.resolve(host, cb) */",
+      "expected_behavior": "queries A records through DNS resolver"
+    }
+  ]
+}
