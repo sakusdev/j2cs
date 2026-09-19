@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.cleanup.unregister-prevents-cell",
+  "category": "weakref_finalization",
+  "summary": "A successfully unregistered cell is removed and cannot later contribute its heldValue to cleanup.",
+  "source": {
+    "pattern": "$registry.register($target,$held,$token); $registry.unregister($token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_unregister_prevents_cell($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "unregister_true": "matching cells removed immediately",
+    "future_cleanup": "removed cells are absent from cleanup candidates"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "remove cell",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={},t={}; f.register(x,1,t); console.log(f.unregister(t),f.unregister(t))",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "all same-token cells removed",
+      "input": "const f=new FinalizationRegistry(()=>{}),t={},a={},b={}; f.register(a,1,t); f.register(b,2,t); console.log(f.unregister(t))",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

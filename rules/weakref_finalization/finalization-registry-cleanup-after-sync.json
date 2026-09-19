@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.cleanup.after-sync",
+  "category": "weakref_finalization",
+  "summary": "A cleanup callback, if scheduled, runs only after the current synchronous ECMAScript execution has completed.",
+  "source": {
+    "pattern": "HostEnqueueFinalizationRegistryCleanupJob($registry)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_after_sync($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scheduling": "future host job",
+    "not_inline": "cleanup is not invoked synchronously by register or by target becoming unreachable"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "register not synchronous cleanup",
+      "input": "let called=false; const f=new FinalizationRegistry(()=>called=true),x={}; f.register(x,1); console.log(called)",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "callback not called by unregister",
+      "input": "let called=false; const f=new FinalizationRegistry(()=>called=true),x={},t={}; f.register(x,1,t); f.unregister(t); console.log(called)",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

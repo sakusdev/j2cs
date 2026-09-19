@@ -1,0 +1,38 @@
+{
+  "id": "weakref.deref.brand-check",
+  "category": "weakref_finalization",
+  "summary": "WeakRef.prototype.deref requires the [[WeakRefTarget]] internal slot.",
+  "source": {
+    "pattern": "WeakRef.prototype.deref.call($receiver)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_deref_brand_check($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordinary_object": "TypeError",
+    "proxy": "does not acquire internal slot from target"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object rejected",
+      "input": "try{WeakRef.prototype.deref.call({})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "proxy around WeakRef rejected",
+      "input": "const x={}; const p=new Proxy(new WeakRef(x),{}); try{WeakRef.prototype.deref.call(p)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

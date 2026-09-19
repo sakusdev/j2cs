@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.register.token-eligibility",
+  "category": "weakref_finalization",
+  "summary": "A supplied unregisterToken must itself be weakly holdable.",
+  "source": {
+    "pattern": "$registry.register($target,$held,$token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_register_token_eligibility($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "undefined": "means no token",
+    "eligible": "objects and non-registered Symbols",
+    "ineligible_nonundefined": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "object token",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={},t={}; console.log(f.register(x,1,t))",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "number token rejected",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; try{f.register(x,1,2)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

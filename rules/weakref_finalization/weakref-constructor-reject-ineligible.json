@@ -1,0 +1,46 @@
+{
+  "id": "weakref.constructor.reject-ineligible",
+  "category": "weakref_finalization",
+  "summary": "WeakRef rejects values that CanBeHeldWeakly reports false.",
+  "source": {
+    "pattern": "new WeakRef($target)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_constructor_reject_ineligible($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "rejected": [
+      "undefined",
+      "null",
+      "boolean",
+      "number",
+      "bigint",
+      "string",
+      "registered Symbol"
+    ],
+    "error": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "number rejected",
+      "input": "try{new WeakRef(1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "null rejected",
+      "input": "try{new WeakRef(null)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

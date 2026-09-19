@@ -1,0 +1,41 @@
+{
+  "id": "finalization-registry.cleanup.nondeterministic",
+  "category": "weakref_finalization",
+  "summary": "Finalization cleanup is optional and has no guaranteed timing.",
+  "source": {
+    "pattern": "garbage collection affecting $registry",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_nondeterministic($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "collection": "implementation may never collect a target",
+    "cleanup": "may be delayed indefinitely or never run",
+    "tests": "must not require callback occurrence within a deadline"
+  },
+  "caveats": [
+    "Do not translate this to deterministic Dispose/finalizer timing."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "no timing assertion",
+      "input": "const f=new FinalizationRegistry(()=>console.log('cleanup')); let x={}; f.register(x,1); x=null; console.log('sync')",
+      "expected_behavior": "prints sync; cleanup presence/timing is intentionally unspecified"
+    },
+    {
+      "name": "live target prevents eligibility",
+      "input": "const f=new FinalizationRegistry(()=>{}); const x={}; f.register(x,1); console.log(typeof x)",
+      "expected_behavior": "prints object"
+    }
+  ]
+}

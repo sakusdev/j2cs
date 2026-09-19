@@ -1,0 +1,39 @@
+{
+  "id": "weakref.constructor.symbol-target",
+  "category": "weakref_finalization",
+  "summary": "WeakRef accepts non-registered Symbols under current ECMAScript CanBeHeldWeakly semantics.",
+  "source": {
+    "pattern": "new WeakRef($symbol)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_constructor_symbol_target($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "eligible_symbol": "Symbol with Symbol.keyFor(symbol) === undefined",
+    "registered_symbol": "not eligible"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "unique symbol",
+      "input": "const s=Symbol('x'); try{const r=new WeakRef(s); console.log(r.deref()===s)}catch(e){console.log('unsupported-runtime')}",
+      "expected_behavior": "ECMAScript 2026 requires true; older runtimes may not yet implement symbol weak references",
+      "notes": "Spec-current test; Node 22 may lag this feature."
+    },
+    {
+      "name": "registered symbol rejected",
+      "input": "try{new WeakRef(Symbol.for('x'))}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

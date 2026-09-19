@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.cleanup.error-reporting",
+  "category": "weakref_finalization",
+  "summary": "An abrupt cleanup callback completion is reported through host-defined error handling rather than synchronously thrown from register/unregister.",
+  "source": {
+    "pattern": "cleanup callback throws $value",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_error_reporting($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cleanup_operation": "abrupt completion stops that CleanupFinalizationRegistry invocation",
+    "host": "HostEnqueueFinalizationRegistryCleanupJob reports the error by host-defined steps",
+    "originating_api": "register/unregister already returned earlier"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "register remains synchronous normal",
+      "input": "const f=new FinalizationRegistry(()=>{throw 1}); const x={}; console.log(f.register(x,1))",
+      "expected_behavior": "prints undefined; any future cleanup error is host-reported"
+    },
+    {
+      "name": "unregister avoids that cell cleanup",
+      "input": "const f=new FinalizationRegistry(()=>{throw 1}),x={},t={}; f.register(x,1,t); console.log(f.unregister(t))",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

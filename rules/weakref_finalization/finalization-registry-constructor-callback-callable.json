@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.constructor.callback-callable",
+  "category": "weakref_finalization",
+  "summary": "The cleanup callback must be callable.",
+  "source": {
+    "pattern": "new FinalizationRegistry($callback)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_constructor_callback_callable($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "non_callable": "TypeError",
+    "callback": "stored as host job callback"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "number rejected",
+      "input": "try{new FinalizationRegistry(1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "function accepted",
+      "input": "console.log(new FinalizationRegistry(()=>{}) instanceof FinalizationRegistry)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

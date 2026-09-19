@@ -1,0 +1,41 @@
+{
+  "id": "finalization-registry.cleanup.callback-shape",
+  "category": "weakref_finalization",
+  "summary": "Cleanup invokes the stored callback with undefined this and one heldValue argument.",
+  "source": {
+    "pattern": "cleanup job for $registry",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_callback_shape($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "this_value": "undefined",
+    "arguments": [
+      "heldValue"
+    ],
+    "callback": "HostCallJobCallback"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "held value callback contract",
+      "input": "const f=new FinalizationRegistry(function(v){ 'use strict'; console.log(this===undefined,v); }); const x={}; f.register(x,7); console.log('registered')",
+      "expected_behavior": "registration succeeds; if cleanup later occurs callback receives undefined this and 7"
+    },
+    {
+      "name": "held object identity contract",
+      "input": "const h={}; const f=new FinalizationRegistry(v=>console.log(v===h)); const x={}; f.register(x,h); console.log('registered')",
+      "expected_behavior": "if cleanup occurs it receives the exact held object"
+    }
+  ]
+}

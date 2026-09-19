@@ -1,0 +1,37 @@
+{
+  "id": "finalization-registry.unregister.brand-check",
+  "category": "weakref_finalization",
+  "summary": "unregister requires a genuine FinalizationRegistry receiver.",
+  "source": {
+    "pattern": "FinalizationRegistry.prototype.unregister.call($receiver,$token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_unregister_brand_check($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "missing_slots": "TypeError before token processing"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object",
+      "input": "try{FinalizationRegistry.prototype.unregister.call({}, {})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "prototype object",
+      "input": "try{FinalizationRegistry.prototype.unregister.call(FinalizationRegistry.prototype,{})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

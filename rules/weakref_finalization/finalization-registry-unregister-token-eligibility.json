@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.unregister.token-eligibility",
+  "category": "weakref_finalization",
+  "summary": "unregister requires a weakly-holdable token.",
+  "source": {
+    "pattern": "$registry.unregister($token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_unregister_token_eligibility($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ineligible": "TypeError",
+    "eligible": "objects or non-registered Symbols"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "primitive rejected",
+      "input": "const f=new FinalizationRegistry(()=>{}); try{f.unregister('x')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "object miss",
+      "input": "const f=new FinalizationRegistry(()=>{}); console.log(f.unregister({}))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.unregister.miss-false",
+  "category": "weakref_finalization",
+  "summary": "unregister returns false when no registration uses the token.",
+  "source": {
+    "pattern": "$registry.unregister($token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_unregister_miss_false($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "miss": "false",
+    "no_exception": "for eligible token even if absent"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "fresh registry miss",
+      "input": "const f=new FinalizationRegistry(()=>{}); console.log(f.unregister({}))",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "already removed miss",
+      "input": "const f=new FinalizationRegistry(()=>{}),t={},x={}; f.register(x,1,t); f.unregister(t); console.log(f.unregister(t))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

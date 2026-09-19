@@ -1,0 +1,41 @@
+{
+  "id": "finalization-registry.cleanup.no-forced-gc-observability",
+  "category": "weakref_finalization",
+  "summary": "Programs cannot infer a conforming deadline or mandatory GC cycle from WeakRef/FinalizationRegistry semantics.",
+  "source": {
+    "pattern": "observable behavior conditioned on target collection by deadline",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_no_forced_gc_observability($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "portable_contract": "no collection deadline",
+    "optimization": "liveness may depend on implementation reachability analysis",
+    "translation": "must preserve nondeterminism rather than force CLR GC"
+  },
+  "caveats": [
+    "Tests that call host-specific gc() are host tests, not ECMAScript semantic guarantees."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "portable test avoids gc",
+      "input": "let x={}; const r=new WeakRef(x); x=null; console.log(r.deref()===undefined||typeof r.deref()==='object')",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "registry callback optional",
+      "input": "let n=0; const f=new FinalizationRegistry(()=>n++); let x={}; f.register(x,1); x=null; console.log(n===0)",
+      "expected_behavior": "prints true synchronously"
+    }
+  ]
+}

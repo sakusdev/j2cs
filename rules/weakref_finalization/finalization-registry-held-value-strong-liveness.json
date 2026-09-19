@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.held-value.strong-liveness",
+  "category": "weakref_finalization",
+  "summary": "A registry cell strongly retains heldValue while the registration remains.",
+  "source": {
+    "pattern": "$registry.register($target,$heldValue,$token?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_held_value_strong_liveness($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "held_value": "live while cell exists",
+    "target": "weak",
+    "token": "weak when present"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "held value identity accepted",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={},h={}; console.log(f.register(x,h)===undefined)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "held value may be primitive",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; console.log(f.register(x,42)===undefined)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

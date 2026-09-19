@@ -1,0 +1,37 @@
+{
+  "id": "finalization-registry.register.return-undefined",
+  "category": "weakref_finalization",
+  "summary": "register returns undefined rather than the registry or target.",
+  "source": {
+    "pattern": "$registry.register($target,$held,$token?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_register_return_undefined($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "return undefined",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; console.log(f.register(x,1)===undefined)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "tokened return undefined",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={},t={}; console.log(f.register(x,1,t)===undefined)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

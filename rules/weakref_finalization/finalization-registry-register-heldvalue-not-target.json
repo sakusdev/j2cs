@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.register.heldvalue-not-target",
+  "category": "weakref_finalization",
+  "summary": "register forbids heldValue being SameValue to target.",
+  "source": {
+    "pattern": "$registry.register($target,$target)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_register_heldvalue_not_target($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "comparison": "SameValue(target, heldValue)",
+    "reason": "prevents registry cell from strongly retaining its own target",
+    "error": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "same object rejected",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; try{f.register(x,x)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "different object accepted",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={},h={}; console.log(f.register(x,h))",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.cleanup.order-unspecified",
+  "category": "weakref_finalization",
+  "summary": "When multiple cleared cells are eligible, cleanup selection/order is not specified.",
+  "source": {
+    "pattern": "cleanup job with multiple cleared cells",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_cleanup_order_unspecified($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "selection": "implementation may choose any eligible cell each iteration",
+    "order": "not registration order guarantee",
+    "batching": "implementation may process some, all, or none in a cleanup invocation"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "do not assert order",
+      "input": "const out=[]; const f=new FinalizationRegistry(v=>out.push(v)); let a={},b={}; f.register(a,'a'); f.register(b,'b'); a=b=null; console.log(Array.isArray(out))",
+      "expected_behavior": "prints true; later cleanup order must not be asserted"
+    },
+    {
+      "name": "multiple cells allowed",
+      "input": "const f=new FinalizationRegistry(()=>{}); const a={},b={}; console.log(f.register(a,1),f.register(b,2))",
+      "expected_behavior": "prints undefined undefined"
+    }
+  ]
+}

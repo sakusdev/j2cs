@@ -1,0 +1,38 @@
+{
+  "id": "weakref.deref.live-target",
+  "category": "weakref_finalization",
+  "summary": "deref returns the exact live target without cloning or coercion.",
+  "source": {
+    "pattern": "$weakRef.deref()",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_deref_live_target($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "live": "returns target value",
+    "identity": "preserved exactly"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "identity",
+      "input": "const x={}; const r=new WeakRef(x); console.log(r.deref()===x)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "mutation visible",
+      "input": "const x={a:1}; const r=new WeakRef(x); x.a=2; console.log(r.deref().a)",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}
