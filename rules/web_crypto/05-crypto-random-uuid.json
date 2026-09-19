@@ -1,0 +1,42 @@
+{
+  "id": "web.crypto.random-uuid",
+  "category": "web_crypto",
+  "summary": "Generate RFC 4122 version 4 UUID string.",
+  "source": {
+    "pattern": "crypto.randomUUID()",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.RandomUuid",
+    "template": "JsWebCrypto.RandomUuid(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Result uses canonical lowercase hyphenated v4 UUID shape and secure random source."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "crypto.randomUUID()",
+      "expected_behavior": "Generate RFC 4122 version 4 UUID string."
+    },
+    {
+      "name": "semantic trap",
+      "input": "crypto.randomUUID()",
+      "expected_behavior": "Result uses canonical lowercase hyphenated v4 UUID shape and secure random source."
+    }
+  ]
+}

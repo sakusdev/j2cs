@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.export-key.raw",
+  "category": "web_crypto",
+  "summary": "Export raw key bytes where supported.",
+  "source": {
+    "pattern": "subtle.exportKey('raw',key)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ExportKey",
+    "template": "JsWebCrypto.ExportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Fulfills ArrayBuffer and preserves algorithm-defined encoding."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.exportKey('raw',key)",
+      "expected_behavior": "Export raw key bytes where supported."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.exportKey('raw',key)",
+      "expected_behavior": "Fulfills ArrayBuffer and preserves algorithm-defined encoding."
+    }
+  ]
+}

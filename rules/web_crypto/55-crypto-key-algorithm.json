@@ -1,0 +1,42 @@
+{
+  "id": "web.crypto-key.algorithm",
+  "category": "web_crypto",
+  "summary": "Expose cached normalized key algorithm metadata.",
+  "source": {
+    "pattern": "key.algorithm",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.KeyAlgorithm",
+    "template": "JsWebCrypto.KeyAlgorithm(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Metadata reflects internal algorithm and is not a Node KeyObject."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "key.algorithm",
+      "expected_behavior": "Expose cached normalized key algorithm metadata."
+    },
+    {
+      "name": "semantic trap",
+      "input": "key.algorithm",
+      "expected_behavior": "Metadata reflects internal algorithm and is not a Node KeyObject."
+    }
+  ]
+}

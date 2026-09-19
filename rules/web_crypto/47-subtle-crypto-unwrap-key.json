@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.unwrap-key",
+  "category": "web_crypto",
+  "summary": "Decrypt wrapped material then import CryptoKey.",
+  "source": {
+    "pattern": "subtle.unwrapKey(format,wrappedKey,unwrappingKey,unwrapAlgorithm,unwrappedKeyAlgorithm,extractable,keyUsages)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.UnwrapKey",
+    "template": "JsWebCrypto.UnwrapKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Unwrap errors reject without exposing partial key material."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.unwrapKey(format,wrappedKey,unwrappingKey,unwrapAlgorithm,unwrappedKeyAlgorithm,extractable,keyUsages)",
+      "expected_behavior": "Decrypt wrapped material then import CryptoKey."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.unwrapKey(format,wrappedKey,unwrappingKey,unwrapAlgorithm,unwrappedKeyAlgorithm,extractable,keyUsages)",
+      "expected_behavior": "Unwrap errors reject without exposing partial key material."
+    }
+  ]
+}

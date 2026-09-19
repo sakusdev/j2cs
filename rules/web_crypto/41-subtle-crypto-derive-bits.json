@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.derive-bits",
+  "category": "web_crypto",
+  "summary": "Derive pseudorandom/shared-secret bits.",
+  "source": {
+    "pattern": "subtle.deriveBits(algorithm,baseKey,length)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.DeriveBits",
+    "template": "JsWebCrypto.DeriveBits(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Requires deriveBits usage and validates requested bit length per algorithm."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.deriveBits(algorithm,baseKey,length)",
+      "expected_behavior": "Derive pseudorandom/shared-secret bits."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.deriveBits(algorithm,baseKey,length)",
+      "expected_behavior": "Requires deriveBits usage and validates requested bit length per algorithm."
+    }
+  ]
+}

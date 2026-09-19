@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.sign.ed25519",
+  "category": "web_crypto",
+  "summary": "Sign Ed25519 data.",
+  "source": {
+    "pattern": "subtle.sign('Ed25519',key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Sign",
+    "template": "JsWebCrypto.Sign(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Algorithm availability is profile-dependent but contract is WebCrypto."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.sign('Ed25519',key,data)",
+      "expected_behavior": "Sign Ed25519 data."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.sign('Ed25519',key,data)",
+      "expected_behavior": "Algorithm availability is profile-dependent but contract is WebCrypto."
+    }
+  ]
+}

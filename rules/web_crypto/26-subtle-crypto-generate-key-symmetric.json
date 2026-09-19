@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.generate-key.symmetric",
+  "category": "web_crypto",
+  "summary": "Generate one symmetric secret CryptoKey.",
+  "source": {
+    "pattern": "subtle.generateKey({name:'AES-GCM',length:256},extractable,usages)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.GenerateKey",
+    "template": "JsWebCrypto.GenerateKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Unsupported key length/usages reject."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.generateKey({name:'AES-GCM',length:256},extractable,usages)",
+      "expected_behavior": "Generate one symmetric secret CryptoKey."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.generateKey({name:'AES-GCM',length:256},extractable,usages)",
+      "expected_behavior": "Unsupported key length/usages reject."
+    }
+  ]
+}

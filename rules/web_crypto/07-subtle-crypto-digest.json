@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.digest",
+  "category": "web_crypto",
+  "summary": "Digest complete BufferSource input and fulfill with ArrayBuffer.",
+  "source": {
+    "pattern": "crypto.subtle.digest(algorithm,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Digest",
+    "template": "JsWebCrypto.Digest(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "No streaming input; algorithm normalization and BufferSource snapshot semantics apply."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "crypto.subtle.digest(algorithm,data)",
+      "expected_behavior": "Digest complete BufferSource input and fulfill with ArrayBuffer."
+    },
+    {
+      "name": "semantic trap",
+      "input": "crypto.subtle.digest(algorithm,data)",
+      "expected_behavior": "No streaming input; algorithm normalization and BufferSource snapshot semantics apply."
+    }
+  ]
+}

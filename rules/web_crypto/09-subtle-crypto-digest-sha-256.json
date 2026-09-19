@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.digest.sha-256",
+  "category": "web_crypto",
+  "summary": "Perform SHA-256 WebCrypto digest.",
+  "source": {
+    "pattern": "subtle.digest('SHA-256',data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Digest",
+    "template": "JsWebCrypto.Digest(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Returns 32-byte ArrayBuffer."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.digest('SHA-256',data)",
+      "expected_behavior": "Perform SHA-256 WebCrypto digest."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.digest('SHA-256',data)",
+      "expected_behavior": "Returns 32-byte ArrayBuffer."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.generate-key.ec",
+  "category": "web_crypto",
+  "summary": "Generate EC key pair for registered curve.",
+  "source": {
+    "pattern": "subtle.generateKey({name,namedCurve},...)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.GenerateKey",
+    "template": "JsWebCrypto.GenerateKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "namedCurve and algorithm-specific support are validated."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.generateKey({name,namedCurve},...)",
+      "expected_behavior": "Generate EC key pair for registered curve."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.generateKey({name,namedCurve},...)",
+      "expected_behavior": "namedCurve and algorithm-specific support are validated."
+    }
+  ]
+}

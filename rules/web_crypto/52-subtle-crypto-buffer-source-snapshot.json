@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.buffer-source-snapshot",
+  "category": "web_crypto",
+  "summary": "Use WebCrypto BufferSource copy/snapshot semantics.",
+  "source": {
+    "pattern": "subtle.operation(...,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.CopyBufferSource",
+    "template": "JsWebCrypto.CopyBufferSource(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Later mutation of input must not retroactively alter already captured operation data."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.operation(...,data)",
+      "expected_behavior": "Use WebCrypto BufferSource copy/snapshot semantics."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.operation(...,data)",
+      "expected_behavior": "Later mutation of input must not retroactively alter already captured operation data."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.encrypt.aes-ctr",
+  "category": "web_crypto",
+  "summary": "Encrypt AES-CTR with counter-length semantics.",
+  "source": {
+    "pattern": "subtle.encrypt({name:'AES-CTR',counter,length},key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Encrypt",
+    "template": "JsWebCrypto.Encrypt(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Counter reuse/wrap constraints and length validation follow WebCrypto."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.encrypt({name:'AES-CTR',counter,length},key,data)",
+      "expected_behavior": "Encrypt AES-CTR with counter-length semantics."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.encrypt({name:'AES-CTR',counter,length},key,data)",
+      "expected_behavior": "Counter reuse/wrap constraints and length validation follow WebCrypto."
+    }
+  ]
+}

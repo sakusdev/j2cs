@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.verify",
+  "category": "web_crypto",
+  "summary": "Verify signature and fulfill boolean.",
+  "source": {
+    "pattern": "subtle.verify(algorithm,key,signature,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Verify",
+    "template": "JsWebCrypto.Verify(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Signature mismatch fulfills false; operational/key errors reject."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.verify(algorithm,key,signature,data)",
+      "expected_behavior": "Verify signature and fulfill boolean."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.verify(algorithm,key,signature,data)",
+      "expected_behavior": "Signature mismatch fulfills false; operational/key errors reject."
+    }
+  ]
+}

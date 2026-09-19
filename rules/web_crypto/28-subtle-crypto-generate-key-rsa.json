@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.generate-key.rsa",
+  "category": "web_crypto",
+  "summary": "Normalize and generate RSA key parameters.",
+  "source": {
+    "pattern": "subtle.generateKey({name,modulusLength,publicExponent,hash},...)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.GenerateKey",
+    "template": "JsWebCrypto.GenerateKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "publicExponent BufferSource and modulus/hash constraints follow WebCrypto."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.generateKey({name,modulusLength,publicExponent,hash},...)",
+      "expected_behavior": "Normalize and generate RSA key parameters."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.generateKey({name,modulusLength,publicExponent,hash},...)",
+      "expected_behavior": "publicExponent BufferSource and modulus/hash constraints follow WebCrypto."
+    }
+  ]
+}

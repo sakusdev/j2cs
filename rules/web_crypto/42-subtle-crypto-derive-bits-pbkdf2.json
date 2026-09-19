@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.derive-bits.pbkdf2",
+  "category": "web_crypto",
+  "summary": "Derive PBKDF2 bits.",
+  "source": {
+    "pattern": "subtle.deriveBits({name:'PBKDF2',salt,iterations,hash},key,length)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.DeriveBits",
+    "template": "JsWebCrypto.DeriveBits(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Salt/iterations/hash are normalized and iterations must be valid."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.deriveBits({name:'PBKDF2',salt,iterations,hash},key,length)",
+      "expected_behavior": "Derive PBKDF2 bits."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.deriveBits({name:'PBKDF2',salt,iterations,hash},key,length)",
+      "expected_behavior": "Salt/iterations/hash are normalized and iterations must be valid."
+    }
+  ]
+}

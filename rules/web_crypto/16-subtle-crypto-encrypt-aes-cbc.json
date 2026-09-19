@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.encrypt.aes-cbc",
+  "category": "web_crypto",
+  "summary": "Encrypt AES-CBC with 16-byte IV and WebCrypto padding rules.",
+  "source": {
+    "pattern": "subtle.encrypt({name:'AES-CBC',iv},key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Encrypt",
+    "template": "JsWebCrypto.Encrypt(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Invalid IV/key length/algorithm state rejects."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.encrypt({name:'AES-CBC',iv},key,data)",
+      "expected_behavior": "Encrypt AES-CBC with 16-byte IV and WebCrypto padding rules."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.encrypt({name:'AES-CBC',iv},key,data)",
+      "expected_behavior": "Invalid IV/key length/algorithm state rejects."
+    }
+  ]
+}

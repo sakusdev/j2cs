@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.export-key.spki",
+  "category": "web_crypto",
+  "summary": "Export public key as SPKI.",
+  "source": {
+    "pattern": "subtle.exportKey('spki',publicKey)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ExportKey",
+    "template": "JsWebCrypto.ExportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Private/unsupported key type rejects."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.exportKey('spki',publicKey)",
+      "expected_behavior": "Export public key as SPKI."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.exportKey('spki',publicKey)",
+      "expected_behavior": "Private/unsupported key type rejects."
+    }
+  ]
+}

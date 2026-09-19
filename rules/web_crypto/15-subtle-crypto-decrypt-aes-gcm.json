@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.decrypt.aes-gcm",
+  "category": "web_crypto",
+  "summary": "Authenticate then decrypt AES-GCM data.",
+  "source": {
+    "pattern": "subtle.decrypt({name:'AES-GCM',iv,...},key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Decrypt",
+    "template": "JsWebCrypto.Decrypt(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Wrong tag/AAD/IV rejects with OperationError and no unauthenticated plaintext."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.decrypt({name:'AES-GCM',iv,...},key,data)",
+      "expected_behavior": "Authenticate then decrypt AES-GCM data."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.decrypt({name:'AES-GCM',iv,...},key,data)",
+      "expected_behavior": "Wrong tag/AAD/IV rejects with OperationError and no unauthenticated plaintext."
+    }
+  ]
+}

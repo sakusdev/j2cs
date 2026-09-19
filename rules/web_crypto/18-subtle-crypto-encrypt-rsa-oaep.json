@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.encrypt.rsa-oaep",
+  "category": "web_crypto",
+  "summary": "Encrypt RSA-OAEP using key's bound hash and optional label.",
+  "source": {
+    "pattern": "subtle.encrypt({name:'RSA-OAEP',label},key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Encrypt",
+    "template": "JsWebCrypto.Encrypt(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Public encrypt key and encrypt usage are required."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.encrypt({name:'RSA-OAEP',label},key,data)",
+      "expected_behavior": "Encrypt RSA-OAEP using key's bound hash and optional label."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.encrypt({name:'RSA-OAEP',label},key,data)",
+      "expected_behavior": "Public encrypt key and encrypt usage are required."
+    }
+  ]
+}

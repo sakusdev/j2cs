@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.import-key.pkcs8",
+  "category": "web_crypto",
+  "summary": "Import private PKCS#8 key material.",
+  "source": {
+    "pattern": "subtle.importKey('pkcs8',data,algorithm,extractable,usages)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ImportKey",
+    "template": "JsWebCrypto.ImportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Private key usages and algorithm metadata are enforced."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.importKey('pkcs8',data,algorithm,extractable,usages)",
+      "expected_behavior": "Import private PKCS#8 key material."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.importKey('pkcs8',data,algorithm,extractable,usages)",
+      "expected_behavior": "Private key usages and algorithm metadata are enforced."
+    }
+  ]
+}

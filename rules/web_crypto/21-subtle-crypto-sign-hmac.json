@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.sign.hmac",
+  "category": "web_crypto",
+  "summary": "Compute HMAC using key-bound hash.",
+  "source": {
+    "pattern": "subtle.sign('HMAC',key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Sign",
+    "template": "JsWebCrypto.Sign(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Requires sign usage; output length follows hash."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.sign('HMAC',key,data)",
+      "expected_behavior": "Compute HMAC using key-bound hash."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.sign('HMAC',key,data)",
+      "expected_behavior": "Requires sign usage; output length follows hash."
+    }
+  ]
+}

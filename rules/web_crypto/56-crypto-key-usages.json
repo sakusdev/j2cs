@@ -1,0 +1,42 @@
+{
+  "id": "web.crypto-key.usages",
+  "category": "web_crypto",
+  "summary": "Expose permitted WebCrypto operations.",
+  "source": {
+    "pattern": "key.usages",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.KeyUsages",
+    "template": "JsWebCrypto.KeyUsages(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Usages are algorithm/type validated and determine allowed operations."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "key.usages",
+      "expected_behavior": "Expose permitted WebCrypto operations."
+    },
+    {
+      "name": "semantic trap",
+      "input": "key.usages",
+      "expected_behavior": "Usages are algorithm/type validated and determine allowed operations."
+    }
+  ]
+}

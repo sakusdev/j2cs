@@ -1,0 +1,41 @@
+{
+  "id": "web.subtle-crypto.algorithm-normalization",
+  "category": "web_crypto",
+  "summary": "Normalize AlgorithmIdentifier against operation registry.",
+  "source": {
+    "pattern": "subtle.operation(algorithm,...)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsWebCrypto.NormalizeAlgorithm(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Algorithm names/dictionaries are normalized by WebCrypto registry; unsupported algorithm rejects NotSupportedError."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.operation(algorithm,...)",
+      "expected_behavior": "Normalize AlgorithmIdentifier against operation registry."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.operation(algorithm,...)",
+      "expected_behavior": "Algorithm names/dictionaries are normalized by WebCrypto registry; unsupported algorithm rejects NotSupportedError."
+    }
+  ]
+}
