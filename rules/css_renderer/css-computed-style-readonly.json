@@ -1,0 +1,39 @@
+{
+  "id": "css.computed-style.readonly",
+  "category": "css_renderer",
+  "summary": "Computed style declaration blocks are readonly even though they are live.",
+  "source": {
+    "pattern": "mutation through getComputedStyle($element)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "readonly": true,
+    "error": "NoModificationAllowedError on CSSStyleDeclaration mutators"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const cs=getComputedStyle(document.documentElement); try{cs.setProperty('color','red')}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws NoModificationAllowedError"
+    },
+    {
+      "name": "edge",
+      "input": "const cs=getComputedStyle(document.documentElement); try{cs.removeProperty('color')}catch(e){console.log(e.name)}",
+      "expected_behavior": "removeProperty also cannot mutate computed style"
+    }
+  ]
+}

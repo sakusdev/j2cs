@@ -1,0 +1,48 @@
+{
+  "id": "layout.metric.offset-parent",
+  "category": "css_renderer",
+  "summary": "Abstract offsetParent selection follows containing-block, table/body, fixed-position, effective-zoom, flat-tree and closed-shadow constraints.",
+  "source": {
+    "pattern": "[[LayoutOffsetParent]]($element)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_style_and_flat_tree_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "null_cases": [
+      "no associated box",
+      "root",
+      "body",
+      "fixed without qualifying containing-block ancestor"
+    ],
+    "search": "flat-tree ancestor conditions",
+    "zoom": "different effective zoom can establish returned ancestor",
+    "shadow": "closed-shadow hiding affects visibility of ancestor result"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.offsetParent",
+      "expected_behavior": "DOM getter delegates to renderer/flat-tree algorithm"
+    },
+    {
+      "name": "edge",
+      "input": "fixed element without qualifying containing block",
+      "expected_behavior": "returns null"
+    }
+  ]
+}

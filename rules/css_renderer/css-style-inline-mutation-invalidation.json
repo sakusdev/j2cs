@@ -1,0 +1,40 @@
+{
+  "id": "css.style.inline-mutation-invalidation",
+  "category": "css_renderer",
+  "summary": "Inline declaration mutation participates in cascade and invalidates style/layout/paint according to property effects.",
+  "source": {
+    "pattern": "mutation of $element.style",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cascade": "element inline declarations change",
+    "invalidation": "style recalculation required",
+    "layout_or_paint": "property-dependent"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.style.color='red'",
+      "expected_behavior": "subsequent computed style/rendering uses new color"
+    },
+    {
+      "name": "edge",
+      "input": "element.style.display='none'",
+      "expected_behavior": "box tree/layout can disappear; cached geometry must be invalidated"
+    }
+  ]
+}

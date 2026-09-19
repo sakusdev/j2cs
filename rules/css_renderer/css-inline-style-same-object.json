@@ -1,0 +1,40 @@
+{
+  "id": "css.inline-style.same-object",
+  "category": "css_renderer",
+  "summary": "Element.style exposes a SameObject CSSStyleProperties wrapper for the element's inline style declaration block.",
+  "source": {
+    "pattern": "$element.style",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "same object on repeated gets",
+    "owner": "element inline style",
+    "mutation": "writes affect style attribute"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); console.log(e.style===e.style);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.setAttribute('style','color:red'); console.log(e.style.color);",
+      "expected_behavior": "wrapper reflects attribute-backed declaration state"
+    }
+  ]
+}

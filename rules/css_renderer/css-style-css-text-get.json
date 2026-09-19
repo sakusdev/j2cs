@@ -1,0 +1,40 @@
+{
+  "id": "css.style.css-text.get",
+  "category": "css_renderer",
+  "summary": "Serialize a CSS declaration block through CSSOM cssText rules.",
+  "source": {
+    "pattern": "$declaration.cssText",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "serialization of the declaration block",
+    "order": "declaration order is observable",
+    "important": "serialized as !important where set"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.cssText='color:red; margin: 1px'; console.log(e.style.cssText);",
+      "expected_behavior": "returns a CSSOM serialization of both declarations"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); console.log(e.style.cssText==='');",
+      "expected_behavior": "an empty declaration block serializes to the empty string"
+    }
+  ]
+}

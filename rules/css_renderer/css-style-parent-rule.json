@@ -1,0 +1,40 @@
+{
+  "id": "css.style.parent-rule",
+  "category": "css_renderer",
+  "summary": "parentRule returns the associated CSSRule or null for declaration blocks without a parent rule.",
+  "source": {
+    "pattern": "$declaration.parentRule",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "rule_style": "associated CSS rule",
+    "inline_style": "null",
+    "computed_style": "null"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=document.createElement('style'); s.textContent='a{color:red}'; document.head.append(s); console.log(s.sheet.cssRules[0].style.parentRule===s.sheet.cssRules[0]);",
+      "expected_behavior": "rule declaration returns parent rule"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); console.log(e.style.parentRule===null);",
+      "expected_behavior": "inline style parentRule is null"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "css.computed-style.resolved-value-boundary",
+  "category": "css_renderer",
+  "summary": "getComputedStyle exposes resolved values, which may depend on computed or used values and layout rather than raw authored tokens.",
+  "source": {
+    "pattern": "computed style value resolution for $property",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "raw_authored_value": "not generally returned",
+    "resolved_value": "property-specific resolved-value algorithm",
+    "layout_dependency": "some properties need layout/used values"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.width='1in'; document.body.append(e); console.log(getComputedStyle(e).width);",
+      "expected_behavior": "returns the engine's resolved serialization rather than necessarily the authored token"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.width='50%'; document.body.append(e); console.log(getComputedStyle(e).width);",
+      "expected_behavior": "layout/context can affect resolved result; do not compile to the source percentage string"
+    }
+  ]
+}

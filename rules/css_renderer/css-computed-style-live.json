@@ -1,0 +1,40 @@
+{
+  "id": "css.computed-style.live",
+  "category": "css_renderer",
+  "summary": "A computed-style object is live and can reflect later style changes without being an immutable snapshot.",
+  "source": {
+    "pattern": "previously returned computed CSSStyleProperties read after style change",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "liveness": true,
+    "snapshot": false,
+    "renderer": "may recompute resolved values on access"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); document.body.append(e); const cs=getComputedStyle(e); e.style.color='rgb(1, 2, 3)'; console.log(cs.color);",
+      "expected_behavior": "live object can expose the updated resolved color"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); document.body.append(e); const cs=getComputedStyle(e); e.remove(); console.log(typeof cs.cssText);",
+      "expected_behavior": "object identity remains usable while resolved declaration contents are host/style-tree dependent"
+    }
+  ]
+}

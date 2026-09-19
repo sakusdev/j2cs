@@ -1,0 +1,44 @@
+{
+  "id": "layout.metric.offset-position",
+  "category": "css_renderer",
+  "summary": "Abstract offsetTop/offsetLeft metric is unscaled, relative to offsetParent padding edge or initial containing block, and ignores transforms.",
+  "source": {
+    "pattern": "[[LayoutOffsetPosition]]($element,$axis)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "public_element_getter_owned_by": "DOM_GEOMETRY_SCROLL",
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "body_or_no_box": "0",
+    "no_offset_parent": "border edge relative to initial containing block",
+    "with_offset_parent": "element border edge minus offsetParent padding edge",
+    "inline": "first associated box is significant",
+    "transforms": "ignored"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.offsetTop / element.offsetLeft",
+      "expected_behavior": "DOM getter delegates to renderer relation with offsetParent"
+    },
+    {
+      "name": "edge",
+      "input": "multi-line inline element offsetTop",
+      "expected_behavior": "first associated box semantics matter rather than union of all visual fragments"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "css.style.set-property-invalid-value",
+  "category": "css_renderer",
+  "summary": "A value that fails the property's CSS parser is a no-op rather than arbitrary string storage.",
+  "source": {
+    "pattern": "$declaration.setProperty($property,$invalidCss)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parse_failure": "return without declaration update",
+    "raw_string_storage": false
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.setProperty('width','10px'); console.log(e.style.width);",
+      "expected_behavior": "valid width is stored"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.width='10px'; e.style.setProperty('width','not a width ???'); console.log(e.style.width);",
+      "expected_behavior": "existing valid value is not replaced by invalid parsed value"
+    }
+  ]
+}

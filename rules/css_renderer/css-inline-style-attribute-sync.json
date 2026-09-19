@@ -1,0 +1,40 @@
+{
+  "id": "css.inline-style.attribute-sync",
+  "category": "css_renderer",
+  "summary": "Mutating an inline declaration block synchronizes the element style attribute through DOM mutation/CE reaction machinery.",
+  "source": {
+    "pattern": "inline CSS declaration mutation",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "update style attribute from declaration block",
+    "dom_effects": "attribute mutation semantics remain DOM-owned",
+    "ce_reactions": "WebIDL CEReactions boundary is preserved"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.color='red'; console.log(e.getAttribute('style').includes('color'));",
+      "expected_behavior": "style attribute reflects CSSOM mutation"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.setAttribute('style','color:red'); e.style.removeProperty('color'); console.log(e.getAttribute('style'));",
+      "expected_behavior": "attribute is updated according to CSSOM declaration serialization"
+    }
+  ]
+}

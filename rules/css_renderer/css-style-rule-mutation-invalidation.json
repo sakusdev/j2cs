@@ -1,0 +1,40 @@
+{
+  "id": "css.style.rule-mutation-invalidation",
+  "category": "css_renderer",
+  "summary": "Changing a declaration associated with a CSS rule invalidates/recomputes affected style rather than only mutating a detached map.",
+  "source": {
+    "pattern": "mutation of $cssRule.style",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cascade": "associated stylesheet rule changes",
+    "invalidation": "affected elements must be restyled as needed",
+    "layout": "layout invalidation depends on changed property"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "styleRule.style.setProperty('color','red')",
+      "expected_behavior": "elements matched by the rule can observe new computed color"
+    },
+    {
+      "name": "edge",
+      "input": "styleRule.style.setProperty('width','1px')",
+      "expected_behavior": "layout-affecting declaration may require layout invalidation, not just repaint"
+    }
+  ]
+}

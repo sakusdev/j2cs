@@ -1,0 +1,38 @@
+{
+  "id": "css.style.set-property-invalid-priority",
+  "category": "css_renderer",
+  "summary": "A nonempty priority other than important makes setProperty a no-op after the empty-value case.",
+  "source": {
+    "pattern": "$declaration.setProperty($property,$value,$invalidPriority)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "invalid_nonempty_priority": "return without changing declaration"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.color='blue'; e.style.setProperty('color','red','bogus'); console.log(e.style.color);",
+      "expected_behavior": "remains blue"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.color='blue'; e.style.setProperty('color','','bogus'); console.log(e.style.color==='');",
+      "expected_behavior": "empty-value removal has already taken precedence"
+    }
+  ]
+}

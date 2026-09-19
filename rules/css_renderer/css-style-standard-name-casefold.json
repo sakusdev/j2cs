@@ -1,0 +1,39 @@
+{
+  "id": "css.style.standard-name-casefold",
+  "category": "css_renderer",
+  "summary": "CSSOM operations ASCII-lowercase non-custom property names before standard-property lookup.",
+  "source": {
+    "pattern": "CSSOM property-name normalization of $property",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "standard": "ASCII lowercase",
+    "custom": "excluded from case folding"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.setProperty('CoLoR','red'); console.log(e.style.getPropertyValue('COLOR'));",
+      "expected_behavior": "standard property accesses match after ASCII case folding"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.setProperty('--X','1'); console.log(e.style.getPropertyValue('--x'));",
+      "expected_behavior": "custom properties are not case-folded"
+    }
+  ]
+}

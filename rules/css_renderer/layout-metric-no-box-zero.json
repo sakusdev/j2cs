@@ -1,0 +1,43 @@
+{
+  "id": "layout.metric.no-box-zero",
+  "category": "css_renderer",
+  "summary": "Layout metrics with CSSOM View no-associated-box guards return zero/null instead of stale cached geometry.",
+  "source": {
+    "pattern": "[[LayoutMetric]]($element) when no associated layout box",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "renderer_layout_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "client_sizes": "0",
+    "client_borders": "0",
+    "scroll_sizes": "0 after applicable document/root special cases",
+    "offset_size_position": "0",
+    "offset_parent": "null"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "display:none element clientWidth",
+      "expected_behavior": "zero rather than previous visible width"
+    },
+    {
+      "name": "edge",
+      "input": "display:none element offsetParent",
+      "expected_behavior": "null rather than cached former parent"
+    }
+  ]
+}

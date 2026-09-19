@@ -1,0 +1,45 @@
+{
+  "id": "css.computed-style.get",
+  "category": "css_renderer",
+  "summary": "getComputedStyle returns a new live readonly CSSStyleProperties view of resolved values for the element or supported pseudo-element.",
+  "source": {
+    "pattern": "getComputedStyle($element,$pseudo?)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "webidl": "[NewObject]",
+    "declaration": {
+      "computed": true,
+      "readonly": true,
+      "parentRule": null
+    },
+    "values": "resolved values from document style rules",
+    "host": "requires style engine"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.documentElement; const a=getComputedStyle(e),b=getComputedStyle(e); console.log(a!==b,a.parentRule===null);",
+      "expected_behavior": "each call returns a distinct readonly computed declaration object"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); const cs=getComputedStyle(e); console.log(cs.parentRule===null);",
+      "expected_behavior": "computed declaration has no parent CSS rule"
+    }
+  ]
+}

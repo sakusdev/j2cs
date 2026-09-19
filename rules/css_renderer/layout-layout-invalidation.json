@@ -1,0 +1,41 @@
+{
+  "id": "layout.layout-invalidation",
+  "category": "css_renderer",
+  "summary": "Style changes affecting box generation or geometry invalidate layout measurements and box-tree state.",
+  "source": {
+    "pattern": "[[InvalidateLayout]]($styleChange)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true,
+      "native_renderer_or_retained_web_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CssLayout",
+    "template": "JsRuntime.CssLayout($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "triggers": "property-dependent",
+    "cached_metrics": "cannot survive invalidating changes",
+    "box_tree": "display/content/layout changes may create/remove/reflow boxes"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "element.style.width='20px'; element.clientWidth",
+      "expected_behavior": "measurement reflects the new layout state"
+    },
+    {
+      "name": "edge",
+      "input": "element.style.display='none'; element.offsetWidth",
+      "expected_behavior": "measurement becomes zero/no-box rather than stale cached value"
+    }
+  ]
+}

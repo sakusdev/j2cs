@@ -1,0 +1,41 @@
+{
+  "id": "css.style.get-property-value-shorthand",
+  "category": "css_renderer",
+  "summary": "getPropertyValue on a shorthand serializes its complete longhand set only when all required longhands exist with compatible importance.",
+  "source": {
+    "pattern": "$declaration.getPropertyValue($shorthand)",
+    "requirements": {
+      "web_css_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeCss.Style",
+    "template": "NativeCss.Style($args)",
+    "notes": "Preserve CSSOM/parser/renderer semantics; this is not an ordinary C# dictionary or geometry-field access."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "longhands": "canonical order",
+    "missing_longhand": "empty string",
+    "importance_mismatch": "empty string",
+    "otherwise": "serialize shorthand value"
+  },
+  "caveats": [],
+  "references": [
+    "https://drafts.csswg.org/cssom/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const e=document.createElement('div'); e.style.margin='1px 2px'; console.log(e.style.getPropertyValue('margin'));",
+      "expected_behavior": "returns a shorthand serialization"
+    },
+    {
+      "name": "edge",
+      "input": "const e=document.createElement('div'); e.style.setProperty('margin-top','1px','important'); e.style.marginRight='2px'; console.log(e.style.getPropertyValue('margin'));",
+      "expected_behavior": "cannot synthesize shorthand when full compatible longhand set is absent"
+    }
+  ]
+}
