@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.reader.release-lock",
+  "category": "web_streams",
+  "summary": "Release a reader lock without canceling the stream.",
+  "source": {
+    "pattern": "$reader.releaseLock()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReaderReleaseLock",
+    "template": "JsWebStreams.ReaderReleaseLock(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "unlocks the stream when no pending read blocks release",
+    "edge": "pending reads are rejected/validated according to the reader type and stream state"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "(()=>{const s=new ReadableStream();const r=s.getReader();r.releaseLock();return s.locked})()",
+      "expected_behavior": "unlocks the stream when no pending read blocks release"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const r=new ReadableStream().getReader();const p=r.read();r.releaseLock();return p})()",
+      "expected_behavior": "pending reads are rejected/validated according to the reader type and stream state"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "web.transform-stream.controller.enqueue",
+  "category": "web_streams",
+  "summary": "Enqueue a transformed chunk on the readable side.",
+  "source": {
+    "pattern": "$controller.enqueue($chunk?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.TransformEnqueue",
+    "template": "JsWebStreams.TransformEnqueue(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "delivers chunk while respecting readable backpressure",
+    "edge": "enqueue after termination/error throws"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream({transform(x,c){c.enqueue(x)}})",
+      "expected_behavior": "delivers chunk while respecting readable backpressure"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new TransformStream({transform(x,c){c.terminate();c.enqueue(x)}})",
+      "expected_behavior": "enqueue after termination/error throws"
+    }
+  ]
+}

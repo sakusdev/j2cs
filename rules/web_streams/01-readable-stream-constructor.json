@@ -1,0 +1,41 @@
+{
+  "id": "web.readable-stream.constructor",
+  "category": "web_streams",
+  "summary": "Construct a ReadableStream from arbitrary underlying source algorithms and a queuing strategy.",
+  "source": {
+    "pattern": "new ReadableStream($underlyingSource?, $strategy?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebReadableStreamCreate(/* lowered operands */)",
+    "notes": "Arbitrary start/pull/cancel properties can be getters or user functions; preserve dynamic lookup and callback semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "start/pull/cancel algorithms are invoked with Web Streams timing and controller objects",
+    "edge": "invalid type or strategy values throw with Web IDL/Streams semantics"
+  },
+  "caveats": [
+    "Arbitrary start/pull/cancel properties can be getters or user functions; preserve dynamic lookup and callback semantics."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.enqueue(1);c.close();}})",
+      "expected_behavior": "start/pull/cancel algorithms are invoked with Web Streams timing and controller objects"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream({type:'nope'})",
+      "expected_behavior": "invalid type or strategy values throw with Web IDL/Streams semantics"
+    }
+  ]
+}

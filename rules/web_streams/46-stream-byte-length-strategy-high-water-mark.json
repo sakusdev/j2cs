@@ -1,0 +1,39 @@
+{
+  "id": "web.stream.byte-length-strategy.high-water-mark",
+  "category": "web_streams",
+  "summary": "Read ByteLengthQueuingStrategy.highWaterMark.",
+  "source": {
+    "pattern": "$strategy.highWaterMark",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.StrategyHighWaterMark",
+    "template": "JsWebStreams.StrategyHighWaterMark(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns configured double",
+    "edge": "zero highWaterMark remains zero"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ByteLengthQueuingStrategy({highWaterMark:8}).highWaterMark",
+      "expected_behavior": "returns configured double"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ByteLengthQueuingStrategy({highWaterMark:0}).highWaterMark",
+      "expected_behavior": "zero highWaterMark remains zero"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.writer.ready",
+  "category": "web_streams",
+  "summary": "Read the backpressure-ready promise.",
+  "source": {
+    "pattern": "$writer.ready",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WriterReady",
+    "template": "JsWebStreams.WriterReady(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "fulfills when desiredSize becomes positive/no backpressure",
+    "edge": "rejects if the stream errors"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().getWriter().ready",
+      "expected_behavior": "fulfills when desiredSize becomes positive/no backpressure"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new WritableStream({write(){throw 1}}).getWriter().ready",
+      "expected_behavior": "rejects if the stream errors"
+    }
+  ]
+}

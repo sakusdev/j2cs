@@ -1,0 +1,41 @@
+{
+  "id": "web.writable-stream.constructor",
+  "category": "web_streams",
+  "summary": "Construct a WritableStream from arbitrary sink algorithms and a queuing strategy.",
+  "source": {
+    "pattern": "new WritableStream($underlyingSink?, $strategy?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebWritableStreamCreate(/* lowered operands */)",
+    "notes": "Arbitrary sink algorithms and getters require JS-call semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "start/write/close/abort algorithms are invoked with ordered promise-aware semantics",
+    "edge": "strategy/sink getters and invalid values preserve JS/Web IDL failures"
+  },
+  "caveats": [
+    "Arbitrary sink algorithms and getters require JS-call semantics."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream({write(){}})",
+      "expected_behavior": "start/write/close/abort algorithms are invoked with ordered promise-aware semantics"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new WritableStream({get write(){throw 1}})",
+      "expected_behavior": "strategy/sink getters and invalid values preserve JS/Web IDL failures"
+    }
+  ]
+}

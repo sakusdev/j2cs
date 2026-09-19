@@ -1,0 +1,39 @@
+{
+  "id": "web.stream.count-strategy.constructor",
+  "category": "web_streams",
+  "summary": "Create a count-based queuing strategy.",
+  "source": {
+    "pattern": "new CountQueuingStrategy({highWaterMark:$hwm})",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.CountStrategyCreate",
+    "template": "JsWebStreams.CountStrategyCreate(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "stores the validated highWaterMark",
+    "edge": "missing/invalid highWaterMark follows Web IDL conversion/RangeError behavior"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new CountQueuingStrategy({highWaterMark:2})",
+      "expected_behavior": "stores the validated highWaterMark"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new CountQueuingStrategy({})",
+      "expected_behavior": "missing/invalid highWaterMark follows Web IDL conversion/RangeError behavior"
+    }
+  ]
+}

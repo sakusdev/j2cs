@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.close",
+  "category": "web_streams",
+  "summary": "Request closure after queued writes complete.",
+  "source": {
+    "pattern": "$stream.close()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WritableClose",
+    "template": "JsWebStreams.WritableClose(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise fulfilled when closing completes",
+    "edge": "locked/already closing/closed/error states preserve rejection behavior"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().close()",
+      "expected_behavior": "returns a promise fulfilled when closing completes"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new WritableStream();const w=s.getWriter();return s.close()})()",
+      "expected_behavior": "locked/already closing/closed/error states preserve rejection behavior"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.pipe-to",
+  "category": "web_streams",
+  "summary": "Pipe a readable stream to a writable stream with backpressure and shutdown propagation.",
+  "source": {
+    "pattern": "$stream.pipeTo($destination, $options?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.PipeTo",
+    "template": "JsWebStreams.PipeTo(/* lowered operands */)",
+    "notes": "Preserve preventClose/preventAbort/preventCancel and AbortSignal behavior; do not model as a naive copy loop."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise for completion and locks source/destination while piping",
+    "edge": "locked endpoints cause a rejected promise and prevent a second pipe"
+  },
+  "caveats": [
+    "Preserve preventClose/preventAbort/preventCancel and AbortSignal behavior; do not model as a naive copy loop."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.close()}}).pipeTo(new WritableStream())",
+      "expected_behavior": "returns a promise for completion and locks source/destination while piping"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new ReadableStream();s.getReader();return s.pipeTo(new WritableStream())})()",
+      "expected_behavior": "locked endpoints cause a rejected promise and prevent a second pipe"
+    }
+  ]
+}

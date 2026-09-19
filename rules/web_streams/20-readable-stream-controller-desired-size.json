@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.controller.desired-size",
+  "category": "web_streams",
+  "summary": "Read desiredSize from a readable controller.",
+  "source": {
+    "pattern": "$controller.desiredSize",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableDesiredSize",
+    "template": "JsWebStreams.ReadableDesiredSize(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "highWaterMark minus queued total size while readable",
+    "edge": "returns 0 when closed and null when errored"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){void c.desiredSize}})",
+      "expected_behavior": "highWaterMark minus queued total size while readable"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream({start(c){c.error(1);void c.desiredSize}})",
+      "expected_behavior": "returns 0 when closed and null when errored"
+    }
+  ]
+}

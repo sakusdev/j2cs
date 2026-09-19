@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.writer.desired-size",
+  "category": "web_streams",
+  "summary": "Read writable desiredSize for backpressure decisions.",
+  "source": {
+    "pattern": "$writer.desiredSize",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WriterDesiredSize",
+    "template": "JsWebStreams.WriterDesiredSize(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "highWaterMark minus queued size",
+    "edge": "null when errored and 0 when closed"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().getWriter().desiredSize",
+      "expected_behavior": "highWaterMark minus queued size"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const w=new WritableStream().getWriter();w.close();return w.desiredSize})()",
+      "expected_behavior": "null when errored and 0 when closed"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "web.stream.count-strategy.high-water-mark",
+  "category": "web_streams",
+  "summary": "Read CountQueuingStrategy.highWaterMark.",
+  "source": {
+    "pattern": "$strategy.highWaterMark",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.StrategyHighWaterMark",
+    "template": "JsWebStreams.StrategyHighWaterMark(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns configured double",
+    "edge": "preserves Infinity where permitted by the platform specification/profile"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new CountQueuingStrategy({highWaterMark:2}).highWaterMark",
+      "expected_behavior": "returns configured double"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new CountQueuingStrategy({highWaterMark:0}).highWaterMark",
+      "expected_behavior": "preserves Infinity where permitted by the platform specification/profile"
+    }
+  ]
+}

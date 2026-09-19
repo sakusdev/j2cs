@@ -1,0 +1,41 @@
+{
+  "id": "web.transform-stream.constructor",
+  "category": "web_streams",
+  "summary": "Construct a TransformStream from arbitrary transformer algorithms.",
+  "source": {
+    "pattern": "new TransformStream($transformer?, $writableStrategy?, $readableStrategy?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebTransformStreamCreate(/* lowered operands */)",
+    "notes": "Arbitrary transformer functions/getters require JS runtime call semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "creates coupled writable/readable sides with backpressure",
+    "edge": "transformer getters/algorithms preserve JS throws and promise adoption"
+  },
+  "caveats": [
+    "Arbitrary transformer functions/getters require JS runtime call semantics."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream({transform(c,ctl){ctl.enqueue(c)}})",
+      "expected_behavior": "creates coupled writable/readable sides with backpressure"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new TransformStream({get transform(){throw 1}})",
+      "expected_behavior": "transformer getters/algorithms preserve JS throws and promise adoption"
+    }
+  ]
+}

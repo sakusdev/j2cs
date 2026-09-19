@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.controller.error",
+  "category": "web_streams",
+  "summary": "Error a readable stream with an arbitrary JS reason.",
+  "source": {
+    "pattern": "$controller.error($error?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableControllerError",
+    "template": "JsWebStreams.ReadableControllerError(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "clears queued chunks and rejects future reads with the same reason",
+    "edge": "error reason is preserved verbatim including non-Error values"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.error('boom')}})",
+      "expected_behavior": "clears queued chunks and rejects future reads with the same reason"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream({start(c){c.error(null)}})",
+      "expected_behavior": "error reason is preserved verbatim including non-Error values"
+    }
+  ]
+}

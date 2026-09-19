@@ -1,0 +1,39 @@
+{
+  "id": "web.transform-stream.controller.error",
+  "category": "web_streams",
+  "summary": "Error both sides of a transform stream with the supplied reason.",
+  "source": {
+    "pattern": "$controller.error($reason?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.TransformError",
+    "template": "JsWebStreams.TransformError(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "readable and writable interactions fail with the same reason",
+    "edge": "queued transform work is discarded"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream({start(c){c.error('x')}})",
+      "expected_behavior": "readable and writable interactions fail with the same reason"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new TransformStream({transform(x,c){c.error(null)}})",
+      "expected_behavior": "queued transform work is discarded"
+    }
+  ]
+}

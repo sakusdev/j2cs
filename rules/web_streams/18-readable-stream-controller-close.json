@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.controller.close",
+  "category": "web_streams",
+  "summary": "Request graceful closure after queued chunks drain.",
+  "source": {
+    "pattern": "$controller.close()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableControllerClose",
+    "template": "JsWebStreams.ReadableControllerClose(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "stream becomes closed once its queue is consumed",
+    "edge": "double close or close after error is invalid"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.close()}})",
+      "expected_behavior": "stream becomes closed once its queue is consumed"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream({start(c){c.close();c.close()}})",
+      "expected_behavior": "double close or close after error is invalid"
+    }
+  ]
+}

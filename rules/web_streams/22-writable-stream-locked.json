@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.locked",
+  "category": "web_streams",
+  "summary": "Read whether a WritableStream has an active writer or pipe lock.",
+  "source": {
+    "pattern": "$stream.locked",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WritableLocked",
+    "template": "JsWebStreams.WritableLocked(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "false without a writer",
+    "edge": "true after getWriter until release"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().locked",
+      "expected_behavior": "false without a writer"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new WritableStream();s.getWriter();return s.locked})()",
+      "expected_behavior": "true after getWriter until release"
+    }
+  ]
+}

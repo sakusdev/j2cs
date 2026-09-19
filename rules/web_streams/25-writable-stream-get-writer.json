@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.get-writer",
+  "category": "web_streams",
+  "summary": "Acquire the exclusive default writer.",
+  "source": {
+    "pattern": "$stream.getWriter()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.GetWriter",
+    "template": "JsWebStreams.GetWriter(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "locks the stream and returns a writer",
+    "edge": "throws TypeError when already locked"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().getWriter()",
+      "expected_behavior": "locks the stream and returns a writer"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new WritableStream();s.getWriter();return s.getWriter()})()",
+      "expected_behavior": "throws TypeError when already locked"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "web.transform-stream.readable",
+  "category": "web_streams",
+  "summary": "Return the stable readable side of a TransformStream.",
+  "source": {
+    "pattern": "$transform.readable",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.TransformReadable",
+    "template": "JsWebStreams.TransformReadable(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "same readable object on repeated access",
+    "edge": "side state reflects transform errors/termination"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream().readable",
+      "expected_behavior": "same readable object on repeated access"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const t=new TransformStream();return t.readable===t.readable})()",
+      "expected_behavior": "side state reflects transform errors/termination"
+    }
+  ]
+}

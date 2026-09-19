@@ -1,0 +1,39 @@
+{
+  "id": "web.transform-stream.writable",
+  "category": "web_streams",
+  "summary": "Return the stable writable side of a TransformStream.",
+  "source": {
+    "pattern": "$transform.writable",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.TransformWritable",
+    "template": "JsWebStreams.TransformWritable(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "same writable object on repeated access",
+    "edge": "side state reflects transform errors/termination"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream().writable",
+      "expected_behavior": "same writable object on repeated access"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const t=new TransformStream();return t.writable===t.writable})()",
+      "expected_behavior": "side state reflects transform errors/termination"
+    }
+  ]
+}

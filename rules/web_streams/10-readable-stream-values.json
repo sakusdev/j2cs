@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.values",
+  "category": "web_streams",
+  "summary": "Create the ReadableStream async iterator with optional preventCancel.",
+  "source": {
+    "pattern": "$stream.values($options?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableValues",
+    "template": "JsWebStreams.ReadableValues(/* lowered operands */)",
+    "notes": "Reuse generic async-iterator lowering; this rule owns stream-specific cancel-on-return behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "acquires a reader and yields chunks asynchronously",
+    "edge": "early iterator return cancels unless preventCancel is true"
+  },
+  "caveats": [
+    "Reuse generic async-iterator lowering; this rule owns stream-specific cancel-on-return behavior."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.close()}}).values()",
+      "expected_behavior": "acquires a reader and yields chunks asynchronously"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream().values({preventCancel:true})",
+      "expected_behavior": "early iterator return cancels unless preventCancel is true"
+    }
+  ]
+}

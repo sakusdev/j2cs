@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.locked",
+  "category": "web_streams",
+  "summary": "Read whether a ReadableStream currently has an active reader or pipe lock.",
+  "source": {
+    "pattern": "$stream.locked",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableLocked",
+    "template": "JsWebStreams.ReadableLocked(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "false without an acquired reader or active pipe",
+    "edge": "true while a reader owns the stream"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream().locked",
+      "expected_behavior": "false without an acquired reader or active pipe"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new ReadableStream();s.getReader();return s.locked})()",
+      "expected_behavior": "true while a reader owns the stream"
+    }
+  ]
+}

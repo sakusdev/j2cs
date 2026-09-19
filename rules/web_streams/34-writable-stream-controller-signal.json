@@ -1,0 +1,42 @@
+{
+  "id": "web.writable-stream.controller.signal",
+  "category": "web_streams",
+  "summary": "Expose the controller AbortSignal used to notify sink algorithms of stream abort.",
+  "source": {
+    "pattern": "$controller.signal",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WritableControllerSignal",
+    "template": "JsWebStreams.WritableControllerSignal(/* lowered operands */)",
+    "notes": "The AbortSignal surface is owned by WEB_ABORT_SIGNALS; this rule owns only stream integration."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a stable AbortSignal tied to the controller",
+    "edge": "aborting the stream aborts this signal with the stream abort reason"
+  },
+  "caveats": [
+    "The AbortSignal surface is owned by WEB_ABORT_SIGNALS; this rule owns only stream integration."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream({start(c){void c.signal}})",
+      "expected_behavior": "returns a stable AbortSignal tied to the controller"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new WritableStream({start(c){const s=c.signal;queueMicrotask(()=>{});}})",
+      "expected_behavior": "aborting the stream aborts this signal with the stream abort reason"
+    }
+  ]
+}
