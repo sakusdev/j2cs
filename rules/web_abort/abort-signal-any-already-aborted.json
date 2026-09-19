@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.any-already-aborted",
+  "category": "web_abort",
+  "summary": "Select the first already-aborted source in sequence order.",
+  "source": {
+    "pattern": "AbortSignal.any($signals) with pre-aborted source",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Any($signals)",
+    "helper": "WebAbort.Any",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "selection": "first aborted source in input order",
+    "result": "immediately aborted new signal",
+    "reason": "selected source reason"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "first wins",
+      "input": "const a=AbortSignal.abort('a'),b=AbortSignal.abort('b');console.log(AbortSignal.any([a,b]).reason);",
+      "expected_behavior": "prints a"
+    },
+    {
+      "name": "late listener absent",
+      "input": "const s=AbortSignal.any([AbortSignal.abort('x')]);let n=0;s.addEventListener('abort',()=>n++);console.log(n);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

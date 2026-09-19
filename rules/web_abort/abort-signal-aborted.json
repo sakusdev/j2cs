@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.aborted",
+  "category": "web_abort",
+  "summary": "Expose whether an abort reason has been set.",
+  "source": {
+    "pattern": "$signal.aborted",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.GetAborted($signal)",
+    "helper": "WebAbort.GetAborted",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "initial": "false",
+    "after_abort": "true forever"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "initial false",
+      "input": "console.log(new AbortController().signal.aborted);",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "after abort",
+      "input": "const c=new AbortController();c.abort();console.log(c.signal.aborted);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

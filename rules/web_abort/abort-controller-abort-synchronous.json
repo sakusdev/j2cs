@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-controller.abort-synchronous",
+  "category": "web_abort",
+  "summary": "Run abort steps synchronously inside abort().",
+  "source": {
+    "pattern": "$controller.abort($reason)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortController($controller, $reason)",
+    "helper": "WebAbort.AbortController",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "timing": "reason, abort algorithms, and event dispatch occur before return",
+    "event_target": "uses inherited EventTarget dispatch"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "listener before return",
+      "input": "const c=new AbortController();let x=0;c.signal.addEventListener('abort',()=>x=1);c.abort();console.log(x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "state visible in listener",
+      "input": "const c=new AbortController();c.signal.addEventListener('abort',()=>console.log(c.signal.aborted));c.abort();",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

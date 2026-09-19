@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.any-flatten-dependent",
+  "category": "web_abort",
+  "summary": "Flatten dependent sources to their non-dependent source signals.",
+  "source": {
+    "pattern": "AbortSignal.any($signals) dependent-source setup",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Any($signals)",
+    "helper": "WebAbort.Any",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "flattening": "dependent inputs contribute their source signals",
+    "bookkeeping": "weak source/dependent sets",
+    "observable": "same reason and one-shot propagation"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "nested propagation",
+      "input": "const a=new AbortController();const y=AbortSignal.any([AbortSignal.any([a.signal])]);a.abort('z');console.log(y.reason);",
+      "expected_behavior": "prints z"
+    },
+    {
+      "name": "nested one-shot",
+      "input": "const a=new AbortController(),b=new AbortController();const y=AbortSignal.any([AbortSignal.any([a.signal,b.signal])]);a.abort('a');b.abort('b');console.log(y.reason);",
+      "expected_behavior": "prints a"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.reason-aborted",
+  "category": "web_abort",
+  "summary": "Return the exact stored reason after abortion.",
+  "source": {
+    "pattern": "$signal.reason after abort",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.GetReason($signal)",
+    "helper": "WebAbort.GetReason",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "stored JS value",
+    "default": "AbortError DOMException when undefined/omitted"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "zero reason",
+      "input": "const c=new AbortController();c.abort(0);console.log(Object.is(c.signal.reason,0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "object identity",
+      "input": "const c=new AbortController(),r={};c.abort(r);console.log(c.signal.reason===r);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

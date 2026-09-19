@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-controller.abort-idempotent",
+  "category": "web_abort",
+  "summary": "Ignore abort attempts after the first transition.",
+  "source": {
+    "pattern": "$controller.abort($reason) on already-aborted signal",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortController($controller, $reason)",
+    "helper": "WebAbort.AbortController",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "one_shot": "already-aborted signals return immediately",
+    "reason": "first abort reason wins"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "first reason wins",
+      "input": "const c=new AbortController();c.abort('a');c.abort('b');console.log(c.signal.reason);",
+      "expected_behavior": "prints a"
+    },
+    {
+      "name": "event once",
+      "input": "const c=new AbortController();let n=0;c.signal.addEventListener('abort',()=>n++);c.abort();c.abort();console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

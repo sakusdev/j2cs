@@ -1,0 +1,39 @@
+{
+  "id": "web.abort-signal.timeout-zero-async",
+  "category": "web_abort",
+  "summary": "Keep timeout(0) asynchronous.",
+  "source": {
+    "pattern": "AbortSignal.timeout(0)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "WebAbort.Timeout(0)",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "initial": "not aborted on return",
+    "scheduling": "abort in a later timer task"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "not inline",
+      "input": "const s=AbortSignal.timeout(0);console.log(s.aborted);",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "later aborted",
+      "input": "const s=AbortSignal.timeout(0);setTimeout(()=>console.log(s.aborted,s.reason.name),5);",
+      "expected_behavior": "prints true TimeoutError"
+    }
+  ]
+}

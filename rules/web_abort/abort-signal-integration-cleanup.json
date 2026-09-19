@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.integration-cleanup",
+  "category": "web_abort",
+  "summary": "Detach operation-local abort hooks after normal completion.",
+  "source": {
+    "pattern": "host API completes operation using $signal",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Detach($signal, $registration)",
+    "helper": "WebAbort.Detach",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "cleanup": "remove internal algorithm/listener",
+    "lifetime": "avoid later reaction/retention",
+    "race": "consumer preserves its own settlement ordering"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "removed observer not called",
+      "input": "const c=new AbortController();let n=0;const f=()=>n++;c.signal.addEventListener('abort',f);c.signal.removeEventListener('abort',f);c.abort();console.log(n,c.signal.aborted);",
+      "expected_behavior": "prints 0 true"
+    },
+    {
+      "name": "other observer remains",
+      "input": "const c=new AbortController();let n=0;const a=()=>{},b=()=>n++;c.signal.addEventListener('abort',a);c.signal.addEventListener('abort',b);c.signal.removeEventListener('abort',a);c.abort();console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

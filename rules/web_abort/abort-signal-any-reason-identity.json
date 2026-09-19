@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.any-reason-identity",
+  "category": "web_abort",
+  "summary": "Propagate source reason by identity.",
+  "source": {
+    "pattern": "AbortSignal.any($signals) reason propagation",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Any($signals)",
+    "helper": "WebAbort.Any",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reason": "exact source reason",
+    "identity": "objects preserved"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "object identity",
+      "input": "const a=new AbortController(),r={};const s=AbortSignal.any([a.signal]);a.abort(r);console.log(s.reason===r);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "primitive preserved",
+      "input": "const a=new AbortController(),s=AbortSignal.any([a.signal]);a.abort(0);console.log(Object.is(s.reason,0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

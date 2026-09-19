@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.abort-algorithms-before-event",
+  "category": "web_abort",
+  "summary": "Run internal abort algorithms before public abort event dispatch.",
+  "source": {
+    "pattern": "internal: signal abort($signal,$reason)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.SignalAbort($signal, $reason)",
+    "helper": "WebAbort.SignalAbort",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "set reason, propagate dependent reasons, run algorithms, clear them, fire abort event",
+    "algorithms": "execute before event listeners"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "listener sees state",
+      "input": "const c=new AbortController();c.signal.addEventListener('abort',()=>console.log(c.signal.aborted,c.signal.reason));c.abort('x');",
+      "expected_behavior": "prints true x"
+    },
+    {
+      "name": "synchronous event order",
+      "input": "const c=new AbortController();let a=[];c.signal.addEventListener('abort',()=>a.push('event'));a.push('before');c.abort();a.push('after');console.log(a.join(','));",
+      "expected_behavior": "prints before,event,after"
+    }
+  ]
+}

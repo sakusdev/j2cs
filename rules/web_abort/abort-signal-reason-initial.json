@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.reason-initial",
+  "category": "web_abort",
+  "summary": "Return undefined before abortion.",
+  "source": {
+    "pattern": "$signal.reason before abort",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.GetReason($signal)",
+    "helper": "WebAbort.GetReason",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "coercion": "none"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "initial undefined",
+      "input": "const s=new AbortController().signal;console.log(s.reason===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "not null",
+      "input": "const s=new AbortController().signal;console.log(s.reason===null);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

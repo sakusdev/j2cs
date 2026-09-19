@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.dependent-propagation-order",
+  "category": "web_abort",
+  "summary": "Run source signal abort steps before newly-aborted dependent signals' abort steps.",
+  "source": {
+    "pattern": "internal: signal abort with dependent signals",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.SignalAbort($signal, $reason)",
+    "helper": "WebAbort.SignalAbort",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "source abort algorithms/event complete before abort steps for collected dependent signals",
+    "reason": "dependent reasons are assigned before source abort steps"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "source event before dependent",
+      "input": "const c=new AbortController(),d=AbortSignal.any([c.signal]);let a=[];c.signal.addEventListener('abort',()=>a.push('source'));d.addEventListener('abort',()=>a.push('dependent'));c.abort();console.log(a.join(','));",
+      "expected_behavior": "prints source,dependent"
+    },
+    {
+      "name": "dependent already has reason during source event",
+      "input": "const c=new AbortController(),d=AbortSignal.any([c.signal]);c.signal.addEventListener('abort',()=>console.log(d.aborted,d.reason));c.abort('x');",
+      "expected_behavior": "prints true x"
+    }
+  ]
+}

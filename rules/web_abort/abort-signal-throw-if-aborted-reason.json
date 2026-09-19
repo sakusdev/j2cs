@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.throw-if-aborted-reason",
+  "category": "web_abort",
+  "summary": "Throw the exact abort reason when aborted.",
+  "source": {
+    "pattern": "$signal.throwIfAborted() on aborted signal",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.ThrowIfAborted($signal)",
+    "helper": "WebAbort.ThrowIfAborted",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "abrupt_completion": "throws stored reason",
+    "coercion": "no Error wrapping"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "throws string",
+      "input": "const c=new AbortController();c.abort('x');try{c.signal.throwIfAborted()}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "object identity",
+      "input": "const c=new AbortController(),r={};c.abort(r);try{c.signal.throwIfAborted()}catch(e){console.log(e===r)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
