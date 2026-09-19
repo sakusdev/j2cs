@@ -1,0 +1,40 @@
+{
+  "id": "node.process.lifecycle.before-exit",
+  "category": "node_process_io",
+  "summary": "Emit beforeExit on natural event-loop exhaustion.",
+  "source": {
+    "pattern": "process.on('beforeExit',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnBeforeExit($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "natural drain",
+    "argument": "process.exitCode",
+    "event_emitter": "synchronous listener invocation"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "arg",
+      "input": "process.exitCode=3;process.on('beforeExit',c=>console.log(c));",
+      "expected_behavior": "prints 3 on natural drain"
+    },
+    {
+      "name": "natural",
+      "input": "process.on('beforeExit',()=>console.log('b'));",
+      "expected_behavior": "fires on normal drain"
+    }
+  ]
+}

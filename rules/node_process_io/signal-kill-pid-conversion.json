@@ -1,0 +1,41 @@
+{
+  "id": "node.process.signal.kill-pid-conversion",
+  "category": "node_process_io",
+  "summary": "Preserve Node pid validation rather than arbitrary host conversion.",
+  "source": {
+    "pattern": "process.kill($pid,$signal?)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.ValidatePid($pid)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.ValidatePid"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "pid": "Node accepted process identifier",
+    "errors": "invalid pid fails synchronously",
+    "order": "argument evaluation before signaling"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "self pid",
+      "input": "console.log(Number.isInteger(process.pid),process.pid>0);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "bad pid",
+      "input": "try{process.kill(NaN,0)}catch(e){console.log(e instanceof TypeError||e instanceof RangeError)}",
+      "expected_behavior": "prints true on current Node"
+    }
+  ]
+}

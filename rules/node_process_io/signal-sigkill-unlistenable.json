@@ -1,0 +1,39 @@
+{
+  "id": "node.process.signal.sigkill-unlistenable",
+  "category": "node_process_io",
+  "summary": "Reject SIGKILL listeners.",
+  "source": {
+    "pattern": "process.on('SIGKILL',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.RejectUncatchableSignal(\"SIGKILL\")",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "signal": "cannot install listener",
+    "effect": "unconditional termination when delivered"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "fails",
+      "input": "try{process.on('SIGKILL',()=>{})}catch(e){console.log(e.code||e.name)}",
+      "expected_behavior": "throws"
+    },
+    {
+      "name": "generic on exists",
+      "input": "console.log(typeof process.on);",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

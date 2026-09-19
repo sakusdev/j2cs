@@ -1,0 +1,40 @@
+{
+  "id": "node.process.stdio.stdout-host-kind",
+  "category": "node_process_io",
+  "summary": "Select stdout stream shape from underlying host descriptor.",
+  "source": {
+    "pattern": "process.stdout",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.CreateStdout()",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "file": "Writable stream",
+    "tty_or_pipe": "net.Socket/Duplex where applicable",
+    "observable": "host connection changes capabilities/timing"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "write exists",
+      "input": "console.log(typeof process.stdout.write);",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "host-dependent tty",
+      "input": "console.log(Boolean(process.stdout.isTTY));",
+      "expected_behavior": "depends on stdout attachment"
+    }
+  ]
+}

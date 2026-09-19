@@ -1,0 +1,41 @@
+{
+  "id": "node.process.stdio.stdout-fd",
+  "category": "node_process_io",
+  "summary": "Expose fd 1 for process.stdout on the main thread.",
+  "source": {
+    "pattern": "process.stdout.fd",
+    "requirements": {
+      "node_process_binding": true,
+      "thread": "main"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.GetFd(process.stdout)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.GetFd"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "main_thread": "1",
+    "worker_threads": "property absent"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "main fd",
+      "input": "console.log(process.stdout.fd);",
+      "expected_behavior": "prints 1 on main thread"
+    },
+    {
+      "name": "numeric",
+      "input": "console.log(process.stdout.fd===1);",
+      "expected_behavior": "prints true on main thread"
+    }
+  ]
+}

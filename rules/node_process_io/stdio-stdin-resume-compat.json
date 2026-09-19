@@ -1,0 +1,41 @@
+{
+  "id": "node.process.stdio.stdin-resume-compat",
+  "category": "node_process_io",
+  "summary": "Preserve process.stdin.resume() compatibility behavior, including transition into old-mode semantics where applicable.",
+  "source": {
+    "pattern": "process.stdin.resume()",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.ResumeStdin()",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "stdin stream",
+    "flowing": "begins/resumes data flow using Node stream compatibility behavior",
+    "legacy": "calling resume participates in old-mode compatibility described for process.stdin",
+    "reuse": "generic Readable pause/resume semantics remain EVENTS_STREAMS"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "returns stream",
+      "input": "console.log(process.stdin.resume()===process.stdin);process.stdin.pause();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "flow control",
+      "input": "process.stdin.resume();process.stdin.pause();console.log('ok');",
+      "expected_behavior": "prints ok without replacing stdin object"
+    }
+  ]
+}

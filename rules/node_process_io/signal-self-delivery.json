@@ -1,0 +1,40 @@
+{
+  "id": "node.process.signal.self-delivery",
+  "category": "node_process_io",
+  "summary": "Route self-signals through Node/OS signal machinery.",
+  "source": {
+    "pattern": "process.kill(process.pid,$signal)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.KillSelf($signal)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "delivery": "host signal machinery",
+    "listeners": "supported listeners may intercept",
+    "default": "may terminate absent listener"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "zero safe",
+      "input": "console.log(process.kill(process.pid,0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "listener boundary",
+      "input": "/* POSIX SIGUSR1 self-signal with listener */",
+      "expected_behavior": "listener delivery is host event, not direct function call"
+    }
+  ]
+}

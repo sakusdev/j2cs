@@ -1,0 +1,41 @@
+{
+  "id": "node.process.lifecycle.exit-code-argument",
+  "category": "node_process_io",
+  "summary": "Pass final exit code to exit listeners with NODE_CORE precedence.",
+  "source": {
+    "pattern": "process.on('exit',($code)=>...)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.ExitListenerCode()",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.ExitListenerCode"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "explicit": "process.exit(code) wins",
+    "stored": "natural uses exitCode/default",
+    "ownership": "validation in NODE_CORE"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "stored",
+      "input": "process.exitCode=4;process.on('exit',c=>console.log(c));",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "explicit",
+      "input": "process.exitCode=4;process.on('exit',c=>console.log(c));process.exit(2);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.process.lifecycle.before-exit-not-explicit",
+  "category": "node_process_io",
+  "summary": "Suppress beforeExit for explicit process.exit and uncaught forced termination.",
+  "source": {
+    "pattern": "process.exit($code) with beforeExit listeners",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.ForcedExitWithoutBeforeExit($code)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "explicit_exit": "no beforeExit",
+    "uncaught": "no beforeExit",
+    "ownership": "exit core remains NODE_CORE"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "explicit",
+      "input": "process.on('beforeExit',()=>console.log('before'));process.on('exit',()=>console.log('exit'));process.exit(0);",
+      "expected_behavior": "prints exit not before"
+    },
+    {
+      "name": "natural contrast",
+      "input": "process.on('beforeExit',()=>console.log('before'));",
+      "expected_behavior": "before may print"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.process.stdio.forced-exit-may-truncate",
+  "category": "node_process_io",
+  "summary": "Preserve process.exit interaction with pending asynchronous output.",
+  "source": {
+    "pattern": "process.stdout.write(...); process.exit($code)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.WriteThenForcedExit(...)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "interaction": "node.process.exit does not wait for all async stdio",
+    "observable": "output may truncate",
+    "ownership": "exit semantics remain NODE_CORE"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "hazard",
+      "input": "process.stdout.write(largeData); process.exit(1);",
+      "expected_behavior": "pending async output may be lost"
+    },
+    {
+      "name": "graceful alternative",
+      "input": "process.stdout.write('x'); process.exitCode=1;",
+      "expected_behavior": "natural exit may allow pending output to drain"
+    }
+  ]
+}

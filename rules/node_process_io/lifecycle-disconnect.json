@@ -1,0 +1,40 @@
+{
+  "id": "node.process.lifecycle.disconnect",
+  "category": "node_process_io",
+  "summary": "Emit disconnect when current process IPC channel closes.",
+  "source": {
+    "pattern": "process.on('disconnect',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnDisconnect($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "IPC-enabled child",
+    "trigger": "IPC channel closed",
+    "ordinary": "no transition without IPC"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "forked",
+      "input": "/* IPC child */ process.on('disconnect',()=>console.log('d'));",
+      "expected_behavior": "prints d when channel closes"
+    },
+    {
+      "name": "context",
+      "input": "console.log(typeof process.disconnect);",
+      "expected_behavior": "availability depends on IPC context"
+    }
+  ]
+}

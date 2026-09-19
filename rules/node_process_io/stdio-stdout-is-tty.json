@@ -1,0 +1,40 @@
+{
+  "id": "node.process.stdio.stdout-is-tty",
+  "category": "node_process_io",
+  "summary": "Expose stdout TTY status from actual terminal attachment.",
+  "source": {
+    "pattern": "process.stdout.isTTY",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.IsTty(1)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "truthy for TTY",
+    "pipe": "Boolean false when piped",
+    "host": "runtime dependent"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "booleanized",
+      "input": "console.log(Boolean(process.stdout.isTTY));",
+      "expected_behavior": "depends on terminal"
+    },
+    {
+      "name": "pipe false",
+      "input": "/* node script | cat */ console.log(Boolean(process.stdout.isTTY));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

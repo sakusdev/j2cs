@@ -1,0 +1,40 @@
+{
+  "id": "node.process.signal.sigterm",
+  "category": "node_process_io",
+  "summary": "Model SIGTERM with platform-specific support/emulation.",
+  "source": {
+    "pattern": "process.on('SIGTERM',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnSignal(\"SIGTERM\",$listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "posix": "normal",
+    "windows": "listenable but Unix signal unavailable/emulated for kill",
+    "default": "POSIX terminates absent listener"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "register",
+      "input": "const f=()=>{};process.on('SIGTERM',f);process.off('SIGTERM',f);console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "platform",
+      "input": "console.log(process.platform);",
+      "expected_behavior": "behavior differs on win32/POSIX"
+    }
+  ]
+}

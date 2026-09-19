@@ -1,0 +1,40 @@
+{
+  "id": "node.process.signal.sigint",
+  "category": "node_process_io",
+  "summary": "Model SIGINT including terminal Ctrl+C/raw-mode behavior.",
+  "source": {
+    "pattern": "process.on('SIGINT',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnSignal(\"SIGINT\",$listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "availability": "all platforms",
+    "terminal": "usually Ctrl+C",
+    "raw_mode": "Ctrl+C does not generate SIGINT in raw mode"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "register",
+      "input": "const f=()=>{};process.on('SIGINT',f);process.off('SIGINT',f);console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "raw caveat",
+      "input": "/* stdin raw mode + Ctrl+C */",
+      "expected_behavior": "must not assume SIGINT"
+    }
+  ]
+}

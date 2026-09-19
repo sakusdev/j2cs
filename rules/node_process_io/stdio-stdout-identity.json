@@ -1,0 +1,41 @@
+{
+  "id": "node.process.stdio.stdout-identity",
+  "category": "node_process_io",
+  "summary": "Return the stable process stdout stream object.",
+  "source": {
+    "pattern": "process.stdout",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.Stdout",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.Stdout"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "stable",
+    "fd": "standard output",
+    "stream": "Writable or net.Socket/Duplex depending host"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "stable",
+      "input": "console.log(process.stdout===process.stdout);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "writable",
+      "input": "console.log(typeof process.stdout.write);",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

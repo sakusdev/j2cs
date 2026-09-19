@@ -1,0 +1,43 @@
+{
+  "id": "node.process.stdio.stdout-write-platform-timing",
+  "category": "node_process_io",
+  "summary": "Preserve Node stdout write timing matrix across files, TTYs, pipes, and OS.",
+  "source": {
+    "pattern": "process.stdout.write($chunk,$encoding?,$callback?)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.StdoutWrite($chunk,$encoding,$callback)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "files": "sync on Windows/POSIX",
+    "tty": "async Windows, sync POSIX",
+    "pipes": "sync Windows, async POSIX",
+    "return_value": "backpressure boolean remains EVENTS_STREAMS-owned"
+  },
+  "caveats": [
+    "Do not promise uniformly async Task behavior."
+  ],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "return boolean",
+      "input": "console.log(typeof process.stdout.write(''));",
+      "expected_behavior": "prints boolean"
+    },
+    {
+      "name": "host timing",
+      "input": "process.stdout.write('x');",
+      "expected_behavior": "timing depends on OS/descriptor"
+    }
+  ]
+}
