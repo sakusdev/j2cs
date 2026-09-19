@@ -1,0 +1,41 @@
+{
+  "id": "web.clipboard.item.presentation-style",
+  "category": "dom_clipboard_drag",
+  "summary": "Return the ClipboardItem presentationStyle captured at construction/read.",
+  "source": {
+    "pattern": "$item.presentationStyle",
+    "requirements": {
+      "receiver_is_clipboard_item": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboardItem.PresentationStyle",
+    "template": "WebClipboardItem.PresentationStyle($item)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "values": [
+      "unspecified",
+      "inline",
+      "attachment"
+    ],
+    "mutation": "readonly"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "default",
+      "input": "// browser: new ClipboardItem({'text/plain':blob}).presentationStyle",
+      "expected_behavior": "returns unspecified unless supplied/host-derived otherwise"
+    },
+    {
+      "name": "attachment",
+      "input": "// browser item created with presentationStyle:'attachment'",
+      "expected_behavior": "returns attachment"
+    }
+  ]
+}

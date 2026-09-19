@@ -1,0 +1,41 @@
+{
+  "id": "web.clipboard.read",
+  "category": "dom_clipboard_drag",
+  "summary": "Read clipboard item metadata through the Web Clipboard host runtime.",
+  "source": {
+    "pattern": "navigator.clipboard.read($formats)",
+    "requirements": {
+      "secure_context": true,
+      "builtin_not_overridden": true,
+      "receiver_is_web_clipboard": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardRead",
+    "template": "JsRuntime.WebClipboardRead($clipboard, $formats)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<sequence<ClipboardItem>>",
+    "permission": "read gate",
+    "snapshot": "clipboard change count/metadata snapshot",
+    "payload": "representation bytes may be read lazily by ClipboardItem.getType"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "metadata items",
+      "input": "// browser: const items=await navigator.clipboard.read()",
+      "expected_behavior": "resolves to ClipboardItem objects representing clipboard entries"
+    },
+    {
+      "name": "permission denied",
+      "input": "// browser with denied clipboard read",
+      "expected_behavior": "rejects NotAllowedError"
+    }
+  ]
+}

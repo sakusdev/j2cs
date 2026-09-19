@@ -1,0 +1,39 @@
+{
+  "id": "web.clipboard.item.supports",
+  "category": "dom_clipboard_drag",
+  "summary": "Check whether a MIME/custom format is supported by ClipboardItem without accessing the system clipboard.",
+  "source": {
+    "pattern": "ClipboardItem.supports($type)",
+    "requirements": {
+      "builtin_static_method_not_overridden": true,
+      "type_is_dom_string_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboardItem.Supports",
+    "template": "WebClipboardItem.Supports($type)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "host_access": "none",
+    "formats": "mandatory/optional/custom format support per spec"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "plain text",
+      "input": "// browser: ClipboardItem.supports('text/plain')",
+      "expected_behavior": "returns true for mandatory text/plain support"
+    },
+    {
+      "name": "unknown",
+      "input": "// browser: ClipboardItem.supports('application/x-not-a-real-required-format')",
+      "expected_behavior": "returns false unless implementation/spec recognizes it"
+    }
+  ]
+}

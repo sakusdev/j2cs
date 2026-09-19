@@ -1,0 +1,38 @@
+{
+  "id": "dom.data-transfer.item-list.clear",
+  "category": "dom_clipboard_drag",
+  "summary": "Clear all drag data items only while the store is read/write.",
+  "source": {
+    "pattern": "$items.clear()",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemListClear",
+    "template": "NativeDom.DataTransferItemListClear($items)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "read_write": "remove all text and file items",
+    "other_modes": "no mutation",
+    "return": "undefined"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "detached clear",
+      "input": "// browser: d=new DataTransfer(); d.items.add('x','text/plain'); d.items.clear(); d.items.length",
+      "expected_behavior": "returns 0"
+    },
+    {
+      "name": "mode guarded",
+      "input": "// drop/protected-mode item list clear",
+      "expected_behavior": "store remains unchanged"
+    }
+  ]
+}

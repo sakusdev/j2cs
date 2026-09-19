@@ -1,0 +1,38 @@
+{
+  "id": "web.clipboard.write-permission",
+  "category": "dom_clipboard_drag",
+  "summary": "Keep clipboard-write permission/user-activation policy at the Web host boundary.",
+  "source": {
+    "pattern": "[[CheckClipboardWritePermission]]()",
+    "requirements": {
+      "semantic_operation": "clipboard write permission"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CheckClipboardWritePermission",
+    "template": "JsRuntime.CheckClipboardWritePermission($global)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "persistent_permission": "allowWithoutGesture grant can authorize",
+    "transient_activation": "copy/cut activation or permission request can authorize",
+    "denial": "host policy observable"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "persistent grant",
+      "input": "// semantic host case with granted clipboard-write allowWithoutGesture",
+      "expected_behavior": "write gate succeeds without transient activation"
+    },
+    {
+      "name": "no grant or gesture",
+      "input": "// semantic host case without write permission/activation",
+      "expected_behavior": "write gate denies"
+    }
+  ]
+}

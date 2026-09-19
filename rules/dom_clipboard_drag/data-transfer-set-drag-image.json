@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.set-drag-image",
+  "category": "dom_clipboard_drag",
+  "summary": "Keep setDragImage rendered-image extraction and drag-feedback hotspot as a renderer/runtime boundary.",
+  "source": {
+    "pattern": "$dt.setDragImage($element, $x, $y)",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.SetDragImage",
+    "template": "JsRuntime.SetDragImage($dt, $element, $x, $y)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mode": "effective while drag feedback store is usable",
+    "image": "rendered element/image bitmap extraction is host/renderer behavior",
+    "hotspot": "x/y coordinates stored with feedback",
+    "layout_dependency": true
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "hotspot",
+      "input": "// dragstart browser: e.dataTransfer.setDragImage(img,10,20)",
+      "expected_behavior": "updates drag feedback bitmap/hotspot when permitted"
+    },
+    {
+      "name": "renderer boundary",
+      "input": "// semantic: setDragImage(non-image rendered element,...)",
+      "expected_behavior": "capturing rendered appearance requires host renderer semantics"
+    }
+  ]
+}

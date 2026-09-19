@@ -1,0 +1,41 @@
+{
+  "id": "dom.data-transfer.item.kind",
+  "category": "dom_clipboard_drag",
+  "summary": "Expose whether a DataTransferItem represents string or file data.",
+  "source": {
+    "pattern": "$item.kind",
+    "requirements": {
+      "receiver_is_data_transfer_item": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemKind",
+    "template": "NativeDom.DataTransferItemKind($item)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "values": [
+      "string",
+      "file"
+    ],
+    "readonly": true,
+    "mode": "metadata remains visible even in protected mode"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "string",
+      "input": "// browser: d.items.add('x','text/plain').kind",
+      "expected_behavior": "returns string"
+    },
+    {
+      "name": "file",
+      "input": "// browser semantic: item created from File.kind",
+      "expected_behavior": "returns file"
+    }
+  ]
+}

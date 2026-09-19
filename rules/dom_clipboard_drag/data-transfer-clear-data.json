@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.clear-data",
+  "category": "dom_clipboard_drag",
+  "summary": "Clear text-format entries in read/write mode without deleting File-kind entries.",
+  "source": {
+    "pattern": "$dt.clearData($format?)",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferClearData",
+    "template": "NativeDom.DataTransferClearData($dt, $formatOrOmitted)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode": "read/write only",
+    "omitted": "remove all text-kind entries",
+    "provided": "remove matching text type",
+    "files": "not removed by clearData"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "specific",
+      "input": "// browser: set text/plain + text/html then clearData('text/plain')",
+      "expected_behavior": "text/html remains"
+    },
+    {
+      "name": "all text",
+      "input": "// browser: clearData()",
+      "expected_behavior": "all text items removed while File items are not cleared by this method"
+    }
+  ]
+}

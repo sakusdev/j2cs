@@ -1,0 +1,39 @@
+{
+  "id": "dom.data-transfer.item-list.remove",
+  "category": "dom_clipboard_drag",
+  "summary": "Remove an indexed drag item only in read/write mode.",
+  "source": {
+    "pattern": "$items.remove($index)",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true,
+      "index_conversion_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemListRemove",
+    "template": "NativeDom.DataTransferItemListRemove($items, $index)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode_non_read_write": "no mutation",
+    "valid_index": "remove entry and shift later indices",
+    "out_of_range": "no removal"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "remove",
+      "input": "// browser: add two items then items.remove(0)",
+      "expected_behavior": "former second item moves to index 0"
+    },
+    {
+      "name": "read-only no mutation",
+      "input": "// drop-event semantic: items.remove(0)",
+      "expected_behavior": "does not modify read-only drag store"
+    }
+  ]
+}

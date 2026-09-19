@@ -1,0 +1,39 @@
+{
+  "id": "dom.data-transfer.item.get-as-file",
+  "category": "dom_clipboard_drag",
+  "summary": "Return a File for readable file-kind drag items and null otherwise.",
+  "source": {
+    "pattern": "$item.getAsFile()",
+    "requirements": {
+      "receiver_is_data_transfer_item": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemGetAsFile",
+    "template": "NativeDom.DataTransferItemGetAsFile($item)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "file_and_readable": "File object",
+    "string": "null",
+    "protected_or_unavailable_data": "null",
+    "identity": "file payload object follows File ownership contract"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "string returns null",
+      "input": "// browser: d=new DataTransfer(); d.items.add('x','text/plain').getAsFile()",
+      "expected_behavior": "returns null"
+    },
+    {
+      "name": "file returns file",
+      "input": "// browser semantic: file-kind item.getAsFile()",
+      "expected_behavior": "returns associated File while payload is readable"
+    }
+  ]
+}

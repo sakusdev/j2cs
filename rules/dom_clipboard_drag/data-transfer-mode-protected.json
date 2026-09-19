@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.mode.protected",
+  "category": "dom_clipboard_drag",
+  "summary": "Use protected mode for drag events other than dragstart/drop so metadata is visible but payload bytes/text are not.",
+  "source": {
+    "pattern": "dragenter/dragover/dragleave/etc $event.dataTransfer",
+    "requirements": {
+      "event_type": "drag event other than dragstart/drop",
+      "host_drag_operation": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DragDataStoreProtectedView",
+    "template": "JsRuntime.DragDataStoreProtectedView($event)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mode": "protected",
+    "metadata": "formats/kinds enumerable",
+    "payload": "unavailable",
+    "mutation": "not permitted"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "types visible",
+      "input": "// browser dragover handler: e.dataTransfer.types",
+      "expected_behavior": "format metadata can be enumerated"
+    },
+    {
+      "name": "payload hidden",
+      "input": "// browser dragover handler: e.dataTransfer.getData(type)",
+      "expected_behavior": "returns no payload data in protected mode"
+    }
+  ]
+}

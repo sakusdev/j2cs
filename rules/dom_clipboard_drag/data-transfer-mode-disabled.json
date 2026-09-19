@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.mode.disabled",
+  "category": "dom_clipboard_drag",
+  "summary": "Model DataTransferItemList disabled behavior after it is no longer associated with a drag data store.",
+  "source": {
+    "pattern": "$items after store association is disabled",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true,
+      "store_association_ended": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DisableDataTransferItemList",
+    "template": "NativeDom.DisableDataTransferItemList($items)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length": 0,
+    "supported_indices": "none",
+    "mutation": "no associated store",
+    "payload": "unavailable"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "length",
+      "input": "// semantic disabled DataTransferItemList.length",
+      "expected_behavior": "returns 0"
+    },
+    {
+      "name": "index",
+      "input": "// semantic disabled DataTransferItemList[0]",
+      "expected_behavior": "is unsupported/undefined"
+    }
+  ]
+}

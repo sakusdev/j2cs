@@ -1,0 +1,39 @@
+{
+  "id": "dom.data-transfer.items",
+  "category": "dom_clipboard_drag",
+  "summary": "Return the stable DataTransferItemList view associated with a DataTransfer store.",
+  "source": {
+    "pattern": "$dt.items",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItems",
+    "template": "NativeDom.DataTransferItems($dt)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "associated live item-list view",
+    "mode": "inherits store mode",
+    "ordering": "store insertion order"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "live list",
+      "input": "// browser: const d=new DataTransfer(); const xs=d.items; d.items.add('x','text/plain'); xs.length",
+      "expected_behavior": "returns 1"
+    },
+    {
+      "name": "same backing",
+      "input": "// semantic: dt.items accesses same associated store",
+      "expected_behavior": "mutations are visible through prior item-list references"
+    }
+  ]
+}

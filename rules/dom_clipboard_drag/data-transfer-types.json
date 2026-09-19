@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.types",
+  "category": "dom_clipboard_drag",
+  "summary": "Expose frozen drag data type strings in current item order with the Files marker for file entries.",
+  "source": {
+    "pattern": "$dt.types",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferTypes",
+    "template": "NativeDom.DataTransferTypes($dt)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "FrozenArray<DOMString>",
+    "text_types": "ASCII-lowercase type strings in item order",
+    "file_marker": "Files when any file item exists",
+    "protected_mode": "types remain enumerable"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "text type lowercase",
+      "input": "// browser: d.setData('Text/Plain','x'); d.types",
+      "expected_behavior": "contains text/plain"
+    },
+    {
+      "name": "frozen snapshot",
+      "input": "// semantic: dt.types",
+      "expected_behavior": "returned array cannot mutate the data store"
+    }
+  ]
+}

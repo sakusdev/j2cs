@@ -1,0 +1,38 @@
+{
+  "id": "dom.data-transfer.item.type",
+  "category": "dom_clipboard_drag",
+  "summary": "Expose the normalized type string of a DataTransferItem.",
+  "source": {
+    "pattern": "$item.type",
+    "requirements": {
+      "receiver_is_data_transfer_item": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemType",
+    "template": "NativeDom.DataTransferItemType($item)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "text": "ASCII-lowercase type supplied at insertion",
+    "file": "File MIME type string",
+    "protected_mode": "metadata still visible"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "lowercase",
+      "input": "// browser: d.items.add('x','TEXT/PLAIN').type",
+      "expected_behavior": "returns text/plain"
+    },
+    {
+      "name": "readonly",
+      "input": "// semantic: item.type",
+      "expected_behavior": "does not provide a mutation channel to the data store"
+    }
+  ]
+}

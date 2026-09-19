@@ -1,0 +1,40 @@
+{
+  "id": "web.clipboard.item.custom-format",
+  "category": "dom_clipboard_drag",
+  "summary": "Preserve the Web Clipboard 'web ' custom-format namespace rather than treating it as an OS MIME alias.",
+  "source": {
+    "pattern": "new ClipboardItem({'web application/x-example': $blob})",
+    "requirements": {
+      "builtin_constructor_not_overridden": true,
+      "custom_format_key_statically_known": true,
+      "blob_semantics_reused": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboardItem.CreateCustomFormat",
+    "template": "WebClipboardItem.CreateCustomFormat($type, $blob)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "prefix": "web ",
+    "mapping": "uses custom-format mapping algorithms rather than standard well-known MIME path",
+    "round_trip": "type string remains observable through ClipboardItem.types/getType"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "custom prefix",
+      "input": "// browser semantic: ClipboardItem with 'web application/x-example'",
+      "expected_behavior": "stores the custom web format distinctly"
+    },
+    {
+      "name": "not plain mime alias",
+      "input": "// semantic comparison of 'web application/x-example' and 'application/x-example'",
+      "expected_behavior": "they are distinct representation type keys"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "web.clipboard.navigator-access",
+  "category": "dom_clipboard_drag",
+  "summary": "Access the realm's Web Clipboard host object rather than Electron or an arbitrary OS clipboard wrapper.",
+  "source": {
+    "pattern": "navigator.clipboard",
+    "requirements": {
+      "secure_context": true,
+      "builtin_not_overridden": true,
+      "navigator_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebClipboard.Get",
+    "template": "WebClipboard.Get($navigator)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exposure": "SecureContext Navigator clipboard attribute",
+    "identity": "host Clipboard object associated with relevant global",
+    "not_electron": true
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "clipboard object",
+      "input": "// browser: typeof navigator.clipboard === 'object'",
+      "expected_behavior": "in a supporting secure context navigator.clipboard exposes a Clipboard object"
+    },
+    {
+      "name": "not node electron alias",
+      "input": "// semantic: navigator.clipboard",
+      "expected_behavior": "uses Web Clipboard permissions/origin context, not Electron clipboard semantics"
+    }
+  ]
+}

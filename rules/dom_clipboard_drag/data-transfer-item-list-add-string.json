@@ -1,0 +1,40 @@
+{
+  "id": "dom.data-transfer.item-list.add-string",
+  "category": "dom_clipboard_drag",
+  "summary": "Add a text item only in read/write mode and enforce one text item per normalized type.",
+  "source": {
+    "pattern": "$items.add($data, $type)",
+    "requirements": {
+      "receiver_is_data_transfer_item_list": true,
+      "data_static_type": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferItemListAddString",
+    "template": "NativeDom.DataTransferItemListAddString($items, $data, $type)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mode_non_read_write": "return null",
+    "type": "ASCII lowercase",
+    "duplicate_text_type": "throw NotSupportedError",
+    "success": "append and return DataTransferItem"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "add",
+      "input": "// browser: d=new DataTransfer(); const i=d.items.add('x','Text/Plain'); i.type",
+      "expected_behavior": "returns item whose type is text/plain"
+    },
+    {
+      "name": "duplicate type",
+      "input": "// browser: add text/plain twice through items.add",
+      "expected_behavior": "second add throws NotSupportedError"
+    }
+  ]
+}

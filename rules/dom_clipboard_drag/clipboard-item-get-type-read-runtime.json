@@ -1,0 +1,39 @@
+{
+  "id": "web.clipboard.item.get-type-read-runtime",
+  "category": "dom_clipboard_drag",
+  "summary": "Use host runtime lazy OS clipboard reads for ClipboardItems returned by Clipboard.read().",
+  "source": {
+    "pattern": "$item.getType($type)",
+    "requirements": {
+      "receiver_is_clipboard_item_from_system_read": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebClipboardItemGetType",
+    "template": "JsRuntime.WebClipboardItemGetType($item, $type)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "lazy_read": "first getType(type) can initiate OS clipboard data read",
+    "dedup": "concurrent same-type calls share the in-flight resolver",
+    "change_count": "clipboard changes may invalidate/protect snapshot semantics",
+    "return": "Promise<Blob>"
+  },
+  "references": [
+    "https://www.w3.org/TR/clipboard-apis/"
+  ],
+  "tests": [
+    {
+      "name": "lazy payload",
+      "input": "// browser: items=await clipboard.read(); await items[0].getType(type)",
+      "expected_behavior": "payload access occurs at getType boundary rather than necessarily during read metadata creation"
+    },
+    {
+      "name": "concurrent calls",
+      "input": "// browser semantic: Promise.all([item.getType(t),item.getType(t)])",
+      "expected_behavior": "same-type host read is shared rather than duplicated"
+    }
+  ]
+}

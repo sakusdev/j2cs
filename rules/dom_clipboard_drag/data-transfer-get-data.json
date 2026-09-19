@@ -1,0 +1,39 @@
+{
+  "id": "dom.data-transfer.get-data",
+  "category": "dom_clipboard_drag",
+  "summary": "Read text data for a format only when the drag data store mode permits payload access.",
+  "source": {
+    "pattern": "$dt.getData($format)",
+    "requirements": {
+      "receiver_is_data_transfer": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.DataTransferGetData",
+    "template": "NativeDom.DataTransferGetData($dt, $format)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "format": "DOMString plus legacy normalization and ASCII-lowercase matching",
+    "missing_or_protected": "empty string",
+    "readable": "first matching text item's data"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/dnd.html"
+  ],
+  "tests": [
+    {
+      "name": "set/get",
+      "input": "// browser: const d=new DataTransfer(); d.setData('text/plain','x'); d.getData('text/plain')",
+      "expected_behavior": "returns x"
+    },
+    {
+      "name": "missing",
+      "input": "// browser: new DataTransfer().getData('text/plain')",
+      "expected_behavior": "returns empty string"
+    }
+  ]
+}
