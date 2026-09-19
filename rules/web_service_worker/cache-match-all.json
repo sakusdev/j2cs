@@ -1,0 +1,42 @@
+{
+  "id": "web.cache.match-all",
+  "category": "web_service_worker",
+  "summary": "Return all matching cached Responses in cache entry order, or all entries when request is omitted.",
+  "source": {
+    "pattern": "$cache.matchAll($request?, $options)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.MatchAll",
+    "template": "WebCache.MatchAll($cache, $requestOrOmitted, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<FrozenArray<Response>>",
+    "omitted_request": "all cached entries",
+    "provided": "all query matches",
+    "responses": "cloned response objects",
+    "order": "request-response list order"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "omitted",
+      "input": "// semantic: await cache.matchAll()",
+      "expected_behavior": "resolves all cached responses in cache order"
+    },
+    {
+      "name": "none",
+      "input": "// semantic: await cache.matchAll('/missing')",
+      "expected_behavior": "resolves an empty array"
+    }
+  ]
+}

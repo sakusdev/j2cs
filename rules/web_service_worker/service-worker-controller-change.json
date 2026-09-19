@@ -1,0 +1,41 @@
+{
+  "id": "web.service-worker.controller-change",
+  "category": "web_service_worker",
+  "summary": "Deliver controllerchange through ServiceWorkerContainer EventTarget when the client controller changes.",
+  "source": {
+    "pattern": "navigator.serviceWorker on controllerchange",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerControllerChange",
+    "template": "JsRuntime.ServiceWorkerControllerChange($container, $newController)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "controllerchange",
+    "dispatch": "DOM EventTarget semantics reused",
+    "cause": "Notify Controller Change from activation/client claiming lifecycle",
+    "timing": "task/event-loop ordered"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "controller change",
+      "input": "// browser container.addEventListener('controllerchange',...)",
+      "expected_behavior": "listener runs when UA changes this client's controller"
+    },
+    {
+      "name": "not registration update alone",
+      "input": "// semantic update installs waiting worker",
+      "expected_behavior": "controllerchange is tied to actual client controller change, not merely any registration update"
+    }
+  ]
+}

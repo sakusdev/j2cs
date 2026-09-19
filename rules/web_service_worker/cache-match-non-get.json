@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.match-non-get",
+  "category": "web_service_worker",
+  "summary": "Return no matches for a non-GET Request unless ignoreMethod is true.",
+  "source": {
+    "pattern": "$cache.match($request, $options)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "request_method_proven_non_get": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.Match",
+    "template": "WebCache.Match($cache, $request, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default": "resolve undefined",
+    "ignore_method_true": "perform normal matching",
+    "request_body": "not consumed merely to test cache query"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "post default",
+      "input": "// semantic: cache.match(new Request(url,{method:'POST'}))",
+      "expected_behavior": "resolves undefined"
+    },
+    {
+      "name": "ignore method",
+      "input": "// semantic: match(POST request,{ignoreMethod:true})",
+      "expected_behavior": "method does not prevent matching"
+    }
+  ]
+}

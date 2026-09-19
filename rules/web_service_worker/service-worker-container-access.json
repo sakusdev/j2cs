@@ -1,0 +1,39 @@
+{
+  "id": "web.service-worker.container-access",
+  "category": "web_service_worker",
+  "summary": "Access Navigator.serviceWorker as the client-associated ServiceWorkerContainer host object.",
+  "source": {
+    "pattern": "navigator.serviceWorker",
+    "requirements": {
+      "secure_context": true,
+      "navigator_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.GetServiceWorkerContainer",
+    "template": "JsRuntime.GetServiceWorkerContainer($navigator)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "association": "service worker client/environment settings",
+    "events": "controllerchange/message/messageerror via EventTarget",
+    "host_lifecycle": true
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "container",
+      "input": "// browser: navigator.serviceWorker",
+      "expected_behavior": "returns the client-associated ServiceWorkerContainer"
+    },
+    {
+      "name": "not thread",
+      "input": "// semantic",
+      "expected_behavior": "container lifecycle is browser service-worker infrastructure, not a raw CLR thread"
+    }
+  ]
+}

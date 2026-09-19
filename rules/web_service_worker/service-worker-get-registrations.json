@@ -1,0 +1,40 @@
+{
+  "id": "web.service-worker.get-registrations",
+  "category": "web_service_worker",
+  "summary": "Return registrations visible to the client storage key as asynchronously created wrapper objects.",
+  "source": {
+    "pattern": "navigator.serviceWorker.getRegistrations()",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerGetRegistrations",
+    "template": "JsRuntime.ServiceWorkerGetRegistrations($container)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<sequence<ServiceWorkerRegistration>>",
+    "scope": "storage-key accessible registrations",
+    "wrappers": "realm-appropriate registration objects"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "sequence",
+      "input": "// browser: await navigator.serviceWorker.getRegistrations()",
+      "expected_behavior": "resolves a sequence of visible registrations"
+    },
+    {
+      "name": "partition",
+      "input": "// semantic different storage key",
+      "expected_behavior": "does not reveal registrations outside the client's storage key"
+    }
+  ]
+}

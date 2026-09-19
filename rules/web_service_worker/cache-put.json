@@ -1,0 +1,42 @@
+{
+  "id": "web.cache.put",
+  "category": "web_service_worker",
+  "summary": "Store a GET/http(s) Request and cloneable Response using Cache batch put semantics.",
+  "source": {
+    "pattern": "$cache.put($request, $response)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachePut",
+    "template": "JsRuntime.WebCachePut($cache, $request, $response)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request": "RequestInfo conversion; http(s) GET only",
+    "response": "Response object",
+    "body": "must be usable; body is cloned/read for stored response",
+    "return": "Promise<undefined>",
+    "replacement": "matching request entry replaced per batch algorithm"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "put then match",
+      "input": "// await cache.put('/a',new Response('x')); await cache.match('/a')",
+      "expected_behavior": "stored match has response body x"
+    },
+    {
+      "name": "non-get",
+      "input": "// cache.put(POST request,response)",
+      "expected_behavior": "rejects TypeError"
+    }
+  ]
+}

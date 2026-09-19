@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.match",
+  "category": "web_service_worker",
+  "summary": "Resolve the first cached response matching a RequestInfo under Cache query options.",
+  "source": {
+    "pattern": "$cache.match($request, $options)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.Match",
+    "template": "WebCache.Match($cache, $request, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Response|undefined>",
+    "request_conversion": "reuse WebRequest construction",
+    "result": "first match, cloned Response object",
+    "query": "URL/method/Vary options per CacheQueryOptions"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "missing",
+      "input": "// semantic: await cache.match('/none')",
+      "expected_behavior": "resolves undefined"
+    },
+    {
+      "name": "found",
+      "input": "// after put(req,res), await cache.match(req)",
+      "expected_behavior": "resolves a response with independently usable body branch"
+    }
+  ]
+}

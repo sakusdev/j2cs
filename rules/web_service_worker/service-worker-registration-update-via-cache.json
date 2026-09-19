@@ -1,0 +1,43 @@
+{
+  "id": "web.service-worker.registration.update-via-cache",
+  "category": "web_service_worker",
+  "summary": "Return the registration's update via cache mode.",
+  "source": {
+    "pattern": "$registration.updateViaCache",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebServiceWorker.UpdateViaCache",
+    "template": "WebServiceWorker.UpdateViaCache($registration)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "values": [
+      "imports",
+      "all",
+      "none"
+    ],
+    "source": "registration job option/default",
+    "effect": "influences subsequent update script fetch cache use"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "default/value",
+      "input": "// registration.updateViaCache",
+      "expected_behavior": "returns one of imports/all/none"
+    },
+    {
+      "name": "none",
+      "input": "// registered with updateViaCache:'none'",
+      "expected_behavior": "returns none"
+    }
+  ]
+}

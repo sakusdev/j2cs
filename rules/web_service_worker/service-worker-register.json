@@ -1,0 +1,42 @@
+{
+  "id": "web.service-worker.register",
+  "category": "web_service_worker",
+  "summary": "Schedule a service-worker register/update job with URL, scope, type, and storage-key checks.",
+  "source": {
+    "pattern": "navigator.serviceWorker.register($scriptURL, $options)",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerRegister",
+    "template": "JsRuntime.ServiceWorkerRegister($container, $scriptURL, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<ServiceWorkerRegistration>",
+    "url": "TrustedScriptURL/WebIDL conversion then URL parse against API base",
+    "scope": "explicit or derived",
+    "job": "service-worker job queue",
+    "network": "worker script fetch/update algorithms"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "register",
+      "input": "// browser: await navigator.serviceWorker.register('/sw.js')",
+      "expected_behavior": "schedules register job and resolves a registration if successful"
+    },
+    {
+      "name": "invalid URL/security",
+      "input": "// cross-origin/disallowed script or scope",
+      "expected_behavior": "rejects with the specified security/URL error"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.service-worker.get-registration",
+  "category": "web_service_worker",
+  "summary": "Look up the registration matching a supplied client URL within the current storage key.",
+  "source": {
+    "pattern": "navigator.serviceWorker.getRegistration($clientURL)",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerGetRegistration",
+    "template": "JsRuntime.ServiceWorkerGetRegistration($container, $clientURL)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<ServiceWorkerRegistration|undefined>",
+    "url": "resolved against relevant settings base",
+    "storage_key": "current client",
+    "match": "scope registration match"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "matching",
+      "input": "// browser: await navigator.serviceWorker.getRegistration('/app/page')",
+      "expected_behavior": "resolves matching registration when present"
+    },
+    {
+      "name": "none",
+      "input": "// URL outside registered scopes",
+      "expected_behavior": "resolves undefined"
+    }
+  ]
+}

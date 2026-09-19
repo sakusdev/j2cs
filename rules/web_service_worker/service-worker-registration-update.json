@@ -1,0 +1,40 @@
+{
+  "id": "web.service-worker.registration.update",
+  "category": "web_service_worker",
+  "summary": "Schedule a service worker update job and resolve with the registration after update processing.",
+  "source": {
+    "pattern": "$registration.update()",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerUpdate",
+    "template": "JsRuntime.ServiceWorkerUpdate($registration)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<ServiceWorkerRegistration>",
+    "precondition": "newest worker exists and caller state permits update",
+    "job_queue": "serialized/equivalent jobs",
+    "network": "script update fetch/version/cache policy"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "update",
+      "input": "// browser: await registration.update()",
+      "expected_behavior": "runs/schedules service-worker update algorithm"
+    },
+    {
+      "name": "invalid state",
+      "input": "// registration with no newest worker or disallowed installing global case",
+      "expected_behavior": "rejects InvalidStateError"
+    }
+  ]
+}

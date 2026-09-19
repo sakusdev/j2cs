@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.keys-filter",
+  "category": "web_service_worker",
+  "summary": "Filter Cache.keys by an optional RequestInfo and query options while preserving cache order.",
+  "source": {
+    "pattern": "$cache.keys($request, $options)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "request_argument_present": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.Keys",
+    "template": "WebCache.Keys($cache, $request, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "matching": "same Cache query matching algorithm",
+    "result": "only cloned matching Requests",
+    "order": "underlying cache order"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "filter",
+      "input": "// semantic: await cache.keys('/a')",
+      "expected_behavior": "returns request keys matching /a"
+    },
+    {
+      "name": "ignoreSearch",
+      "input": "// semantic: cache.keys('/a?x=2',{ignoreSearch:true})",
+      "expected_behavior": "can match stored /a?x=1"
+    }
+  ]
+}

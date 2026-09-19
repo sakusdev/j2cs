@@ -1,0 +1,41 @@
+{
+  "id": "web.service-worker.controller",
+  "category": "web_service_worker",
+  "summary": "Expose the active ServiceWorker currently controlling this client, or null.",
+  "source": {
+    "pattern": "navigator.serviceWorker.controller",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerController",
+    "template": "JsRuntime.ServiceWorkerController($container)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "ServiceWorker|null",
+    "client_specific": true,
+    "changes": "controllerchange event when control changes",
+    "registration_presence": "a registration may exist while controller is null"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "uncontrolled",
+      "input": "// first page load before a worker takes control",
+      "expected_behavior": "controller may be null"
+    },
+    {
+      "name": "controlled",
+      "input": "// controlled client",
+      "expected_behavior": "returns the active ServiceWorker representing current controller"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.match-ignore-search",
+  "category": "web_service_worker",
+  "summary": "Model ignoreSearch by comparing request URLs without query components while retaining other matching rules.",
+  "source": {
+    "pattern": "$cache.match($request, {ignoreSearch:true,...$options})",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "ignore_search": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebCache.Match",
+    "template": "WebCache.Match($cache, $request, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "url_match": "ignore query/search component",
+    "method": "still checked unless ignoreMethod",
+    "vary": "still checked unless ignoreVary"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "query ignored",
+      "input": "// cached /a?x=1 then match /a?x=2 with ignoreSearch:true",
+      "expected_behavior": "can match"
+    },
+    {
+      "name": "path not ignored",
+      "input": "// cached /a then match /b with ignoreSearch:true",
+      "expected_behavior": "does not match by URL path"
+    }
+  ]
+}

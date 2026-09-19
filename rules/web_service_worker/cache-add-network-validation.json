@@ -1,0 +1,42 @@
+{
+  "id": "web.cache.add-network-validation",
+  "category": "web_service_worker",
+  "summary": "Keep Cache.add response/network validation coupled to Fetch rather than accepting arbitrary HTTP failures as cacheable add results.",
+  "source": {
+    "pattern": "$cache.add($request)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "network_response_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCacheAdd",
+    "template": "JsRuntime.WebCacheAdd($cache, $request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "fetch": "uses Fetch semantics",
+    "network_error": "reject",
+    "non_success_status": "add/addAll validation can reject",
+    "partial_store": "do not commit invalid fetched entry"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "network error",
+      "input": "// semantic: add URL whose fetch is a network error",
+      "expected_behavior": "rejects and does not add an entry"
+    },
+    {
+      "name": "validation",
+      "input": "// semantic: fetched response invalid for add operation",
+      "expected_behavior": "rejects rather than silently storing it"
+    }
+  ]
+}

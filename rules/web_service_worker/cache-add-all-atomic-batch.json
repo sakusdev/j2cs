@@ -1,0 +1,41 @@
+{
+  "id": "web.cache.add-all-batch",
+  "category": "web_service_worker",
+  "summary": "Preserve Cache.addAll batch validation/conflict behavior rather than exposing a partially committed prefix.",
+  "source": {
+    "pattern": "$cache.addAll($requests)",
+    "requirements": {
+      "receiver_is_intrinsic_cache": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "multiple_requests": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCacheAddAll",
+    "template": "JsRuntime.WebCacheAddAll($cache, $requests)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "batch": "cache batch operation validates before commit",
+    "duplicate_conflict": "conflicting operations reject according to batch algorithm",
+    "failure": "do not model as simple sequential put prefix"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "later failure",
+      "input": "// semantic addAll where a later fetch/response fails",
+      "expected_behavior": "operation rejects without pretending a successful sequential prefix is the specified result"
+    },
+    {
+      "name": "duplicates",
+      "input": "// semantic addAll with conflicting duplicate request operations",
+      "expected_behavior": "batch conflict rules are preserved"
+    }
+  ]
+}

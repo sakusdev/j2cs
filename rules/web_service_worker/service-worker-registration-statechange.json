@@ -1,0 +1,40 @@
+{
+  "id": "web.service-worker.statechange",
+  "category": "web_service_worker",
+  "summary": "Expose ServiceWorker state transitions and statechange events through the browser worker lifecycle runtime.",
+  "source": {
+    "pattern": "$worker.state / statechange",
+    "requirements": {
+      "receiver_is_service_worker": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerStateChange",
+    "template": "JsRuntime.ServiceWorkerStateChange($worker)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "state": "installing/installed/activating/activated/redundant",
+    "event": "statechange via EventTarget",
+    "ordering": "UA lifecycle tasks",
+    "identity": "same worker wrapper observes evolving state"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "state evolves",
+      "input": "// browser worker.addEventListener('statechange',...)",
+      "expected_behavior": "statechange accompanies lifecycle transitions"
+    },
+    {
+      "name": "redundant",
+      "input": "// worker replaced/registration cleared",
+      "expected_behavior": "worker can transition to redundant"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.caches.match-cache-name",
+  "category": "web_service_worker",
+  "summary": "Restrict CacheStorage.match to the cacheName option when present.",
+  "source": {
+    "pattern": "caches.match($request, {cacheName:$name, ...$options})",
+    "requirements": {
+      "receiver_is_intrinsic_cache_storage": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "cache_name_option_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachesMatchNamed",
+    "template": "JsRuntime.WebCachesMatchNamed($caches, $request, $name, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "search": "only matching cache name",
+    "missing_cache": "resolve undefined",
+    "query_options": "forward ignoreSearch/ignoreMethod/ignoreVary to Cache matching"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "named cache only",
+      "input": "// semantic: caches.match(req,{cacheName:'b'})",
+      "expected_behavior": "does not return a matching entry from cache a"
+    },
+    {
+      "name": "unknown cache",
+      "input": "// semantic: caches.match(req,{cacheName:'none'})",
+      "expected_behavior": "resolves undefined"
+    }
+  ]
+}

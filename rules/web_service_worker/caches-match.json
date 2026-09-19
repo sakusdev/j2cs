@@ -1,0 +1,44 @@
+{
+  "id": "web.caches.match",
+  "category": "web_service_worker",
+  "summary": "Search named caches in CacheStorage order and resolve the first matching Response or undefined.",
+  "source": {
+    "pattern": "caches.match($request, $options)",
+    "requirements": {
+      "receiver_is_intrinsic_cache_storage": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebCachesMatch",
+    "template": "JsRuntime.WebCachesMatch($caches, $request, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Response|undefined>",
+    "search": "sequential cache-map order unless cacheName specified",
+    "matching": "delegates canonical Cache query matching",
+    "response": "cloned Web Response semantics"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "first match",
+      "input": "// semantic: two caches contain same request; await caches.match(req)",
+      "expected_behavior": "resolves the first match in CacheStorage order"
+    },
+    {
+      "name": "missing",
+      "input": "// await caches.match('/missing')",
+      "expected_behavior": "resolves undefined"
+    }
+  ],
+  "caveats": [
+    "Request/Response construction, cloning, URL, headers, and body semantics remain owned by WEB_URL_FETCH."
+  ]
+}

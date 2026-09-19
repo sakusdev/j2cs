@@ -1,0 +1,41 @@
+{
+  "id": "web.service-worker.ready",
+  "category": "web_service_worker",
+  "summary": "Return the stable ready Promise that resolves when a matching registration has an active worker and never rejects.",
+  "source": {
+    "pattern": "navigator.serviceWorker.ready",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerReady",
+    "template": "JsRuntime.ServiceWorkerReady($container)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "promise_identity": "same ready promise per container once created",
+    "resolution": "matching registration with active worker",
+    "rejection": "never rejects",
+    "pending": "can remain pending indefinitely until activation"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "eventual resolve",
+      "input": "// browser after successful activation: await navigator.serviceWorker.ready",
+      "expected_behavior": "resolves ServiceWorkerRegistration"
+    },
+    {
+      "name": "no registration",
+      "input": "// semantic client with no active matching registration",
+      "expected_behavior": "Promise remains pending rather than rejecting"
+    }
+  ]
+}

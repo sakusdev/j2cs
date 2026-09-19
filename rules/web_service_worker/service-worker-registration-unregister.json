@@ -1,0 +1,40 @@
+{
+  "id": "web.service-worker.registration.unregister",
+  "category": "web_service_worker",
+  "summary": "Schedule unregister and resolve whether a matching registration mapping was removed.",
+  "source": {
+    "pattern": "$registration.unregister()",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_registration": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerUnregister",
+    "template": "JsRuntime.ServiceWorkerUnregister($registration)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Boolean>",
+    "mapping": "remove scope registration if still matches",
+    "existing_controlled_clients": "active worker remains effective for current clients until lifecycle permits clearing",
+    "future_navigation": "unregistration affects subsequent matching"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "success",
+      "input": "// browser: await registration.unregister()",
+      "expected_behavior": "typically resolves true when registration is removed"
+    },
+    {
+      "name": "current client",
+      "input": "// controlled page calls unregister()",
+      "expected_behavior": "does not synchronously turn current controller into null merely because mapping is removed"
+    }
+  ]
+}

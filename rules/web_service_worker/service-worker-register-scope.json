@@ -1,0 +1,41 @@
+{
+  "id": "web.service-worker.register-scope",
+  "category": "web_service_worker",
+  "summary": "Preserve registration scope URL parsing and same-origin/service-worker-allowed constraints.",
+  "source": {
+    "pattern": "navigator.serviceWorker.register($scriptURL,{scope:$scope})",
+    "requirements": {
+      "receiver_is_intrinsic_service_worker_container": true,
+      "builtin_not_overridden": true,
+      "secure_context": true,
+      "scope_option_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ServiceWorkerRegister",
+    "template": "JsRuntime.ServiceWorkerRegister($container, $scriptURL, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope_url": "parsed relative to API base; fragment excluded for registration mapping",
+    "security": "same-origin and Service-Worker-Allowed maximum scope constraints",
+    "matching": "longest matching scope controls clients"
+  },
+  "references": [
+    "https://w3c.github.io/ServiceWorker/"
+  ],
+  "tests": [
+    {
+      "name": "relative scope",
+      "input": "// register('/sw.js',{scope:'/app/'})",
+      "expected_behavior": "scope is resolved as an absolute same-origin URL"
+    },
+    {
+      "name": "too broad scope",
+      "input": "// script path/header does not allow requested broader scope",
+      "expected_behavior": "registration rejects with security failure"
+    }
+  ]
+}
