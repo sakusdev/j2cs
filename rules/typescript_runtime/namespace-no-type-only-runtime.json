@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.no-type-only-runtime",
+  "category": "typescript_runtime",
+  "summary": "Erase type-only namespace members while keeping value members.",
+  "source": {
+    "pattern": "namespace N { export interface I {}; export type T=number; export const x=1 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.EraseTypeOnlyNamespaceMembers()",
+    "helper": "TsLowering.EraseTypeOnlyNamespaceMembers"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type_only": "interface/type alias absent at runtime",
+    "runtime": "value declarations emitted"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "types absent",
+      "input": "namespace N { export interface I {}; export type T=number; export const x=1 }; console.log((N as any).I,(N as any).T,N.x);",
+      "expected_behavior": "prints undefined undefined 1"
+    },
+    {
+      "name": "value class",
+      "input": "namespace N { export class C {} }; console.log(typeof N.C);",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

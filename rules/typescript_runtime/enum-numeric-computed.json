@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.numeric-computed",
+  "category": "typescript_runtime",
+  "summary": "Preserve runtime evaluation for computed numeric enum initializer.",
+  "source": {
+    "pattern": "enum E { A=$runtimeExpr }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",$runtimeExpr)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "evaluation": "runtime at enum initialization",
+    "reverse": "numeric result receives reverse mapping"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "call initializer",
+      "input": "function f(){return 9}; enum E { A=f() }; console.log(E.A,E[9]);",
+      "expected_behavior": "prints 9 A"
+    },
+    {
+      "name": "ordering",
+      "input": "let a=[] as number[];const f=(x:number)=>(a.push(x),x); enum E { A=f(1),B=f(2) }; console.log(a.join(','));",
+      "expected_behavior": "prints 1,2"
+    }
+  ]
+}

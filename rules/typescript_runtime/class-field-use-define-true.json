@@ -1,0 +1,42 @@
+{
+  "id": "typescript.class-field.use-define-true",
+  "category": "typescript_runtime",
+  "summary": "Respect useDefineForClassFields=true downlevel define semantics.",
+  "source": {
+    "pattern": "class C { x=$init }",
+    "requirements": {
+      "typescript_ast": true,
+      "useDefineForClassFields": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.DefineField(this,\"x\",$init)",
+    "helper": "TsLowering.DefineField"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "profile": "useDefineForClassFields=true",
+    "effect": "Object.defineProperty-style own data field when downleveling",
+    "setter": "does not invoke inherited setter"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "own",
+      "input": "class C { x=1 }; console.log(Object.hasOwn(new C(),'x'));",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "setter boundary",
+      "input": "class B{set x(v){console.log('set')}}; class C extends B{x=1}; new C();",
+      "expected_behavior": "define profile avoids inherited setter"
+    }
+  ]
+}

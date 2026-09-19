@@ -1,0 +1,40 @@
+{
+  "id": "typescript.parameter-property.default-before-store",
+  "category": "typescript_runtime",
+  "summary": "Evaluate parameter default before parameter-property store.",
+  "source": {
+    "pattern": "constructor(public x=$default){}",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.ParameterPropertyAssign(this,\"x\",x)",
+    "helper": "TsLowering.ParameterPropertyAssign"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "order": "JS parameter default first",
+    "store": "then property init"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "default",
+      "input": "class C { constructor(public x=3){} }; console.log(new C().x);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "undefined default",
+      "input": "class C { constructor(public x=3){} }; console.log(new C(undefined).x);",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

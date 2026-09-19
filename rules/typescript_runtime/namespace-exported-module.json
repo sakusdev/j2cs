@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.exported-module",
+  "category": "typescript_runtime",
+  "summary": "Preserve module export linkage for exported namespace.",
+  "source": {
+    "pattern": "export namespace N { export const x=1 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.ExportNamespace(\"N\",N)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "module": "MODULES owns linkage",
+    "namespace": "runtime object initialized/exported",
+    "not_erased": "value-bearing namespace remains"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "runtime export",
+      "input": "export namespace N { export const x=1 }",
+      "expected_behavior": "module exports runtime N object with x=1"
+    },
+    {
+      "name": "function member",
+      "input": "export namespace N { export function f(){return 1} }",
+      "expected_behavior": "runtime namespace body emitted"
+    }
+  ]
+}

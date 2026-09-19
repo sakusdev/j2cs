@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.numeric-auto-increment",
+  "category": "typescript_runtime",
+  "summary": "Auto-increment following constant numeric enum members.",
+  "source": {
+    "pattern": "enum E { A=$n, B }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"B\",$n+1)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "previous numeric constant + 1",
+    "reverse": "reverse mapping emitted"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "increments",
+      "input": "enum E { A=3,B }; console.log(E.B,E[4]);",
+      "expected_behavior": "prints 4 B"
+    },
+    {
+      "name": "negative increments",
+      "input": "enum E { A=-2,B }; console.log(E.B);",
+      "expected_behavior": "prints -1"
+    }
+  ]
+}

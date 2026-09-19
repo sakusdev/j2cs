@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.local-hidden",
+  "category": "typescript_runtime",
+  "summary": "Keep non-exported namespace declarations local to IIFE.",
+  "source": {
+    "pattern": "namespace N { const hidden=$v; export ... }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.NamespaceLocal($binding)",
+    "helper": "TsLowering.NamespaceLocal"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "visibility": "not namespace property",
+    "capture": "exported functions may close over local"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "not property",
+      "input": "namespace N { const hidden=2; export const x=1 }; console.log((N as any).hidden);",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "closure",
+      "input": "namespace N { const hidden=2; export function f(){return hidden} }; console.log(N.f());",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

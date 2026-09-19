@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.string-member",
+  "category": "typescript_runtime",
+  "summary": "Emit only forward mapping for string enum member.",
+  "source": {
+    "pattern": "enum E { A=\"x\" }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumStringMember(E,\"A\",\"x\")"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "forward": "E.A is string",
+    "reverse": "no reverse mapping"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "string value",
+      "input": "enum E { A='x' }; console.log(E.A);",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "no reverse",
+      "input": "enum E { A='x' }; console.log(E['x' as any]);",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

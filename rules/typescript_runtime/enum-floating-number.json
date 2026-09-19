@@ -1,0 +1,41 @@
+{
+  "id": "typescript.enum.floating-number",
+  "category": "typescript_runtime",
+  "summary": "Preserve non-integer numeric enum values and JS Number reverse keys.",
+  "source": {
+    "pattern": "enum E { A=1.5 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",1.5)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "JS Number 1.5",
+    "reverse_key": "ToPropertyKey of number"
+  },
+  "caveats": [
+    "Do not assume CLR enum integer constraints."
+  ],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "fractional",
+      "input": "enum E { A=1.5 }; console.log(E.A,E[1.5]);",
+      "expected_behavior": "prints 1.5 A"
+    },
+    {
+      "name": "number type",
+      "input": "enum E { A=1.5 }; console.log(typeof E.A);",
+      "expected_behavior": "prints number"
+    }
+  ]
+}

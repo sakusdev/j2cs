@@ -1,0 +1,40 @@
+{
+  "id": "typescript.enum.ambient-erasure",
+  "category": "typescript_runtime",
+  "summary": "Emit no runtime object for declare enum.",
+  "source": {
+    "pattern": "declare enum E { A }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.EraseAmbientDeclaration()",
+    "helper": "TsLowering.EraseAmbientDeclaration"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "runtime": "type/declaration only",
+    "external": "runtime value must be supplied externally if referenced"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "erased",
+      "input": "declare enum E { A };",
+      "expected_behavior": "no JS declaration emitted"
+    },
+    {
+      "name": "external reference",
+      "input": "declare enum E { A }; console.log(E.A);",
+      "expected_behavior": "emitted reference assumes external E"
+    }
+  ]
+}

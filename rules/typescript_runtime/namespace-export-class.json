@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.export-class",
+  "category": "typescript_runtime",
+  "summary": "Assign exported class constructor to namespace.",
+  "source": {
+    "pattern": "namespace N { export class C {} }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.NamespaceExport(N,\"C\",C)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "class": "CLASSES semantics reused",
+    "identity": "N.C is class constructor",
+    "order": "class evaluated before assignment"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "construct",
+      "input": "namespace N { export class C { x=1 } }; console.log(new N.C().x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "identity",
+      "input": "namespace N { export class C {} }; const C=N.C; console.log(C===N.C);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

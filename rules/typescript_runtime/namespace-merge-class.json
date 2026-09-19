@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.merge-class",
+  "category": "typescript_runtime",
+  "summary": "Augment class constructor object with namespace exports.",
+  "source": {
+    "pattern": "class C {} namespace C { export const x=1 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.AugmentValue(C)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity": "same class constructor",
+    "effect": "export becomes own property",
+    "instances": "CLASSES semantics unchanged"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "class property",
+      "input": "class C {}; namespace C { export const x=1 }; console.log(C.x,new C() instanceof C);",
+      "expected_behavior": "prints 1 true"
+    },
+    {
+      "name": "enumerable",
+      "input": "class C {}; namespace C { export const x=1 }; console.log(Object.keys(C).includes('x'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

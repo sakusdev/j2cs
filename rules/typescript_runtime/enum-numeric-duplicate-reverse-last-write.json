@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.numeric-duplicate-reverse-last-write",
+  "category": "typescript_runtime",
+  "summary": "Later same-valued numeric member overwrites reverse name.",
+  "source": {
+    "pattern": "enum E { A=$n, B=$n }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",$n); TsRuntime.EnumNumericMember(E,\"B\",$n)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "forward": "both forward properties remain",
+    "reverse": "later name wins via property overwrite"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "later wins",
+      "input": "enum E { A=1,B=1 }; console.log(E.A,E.B,E[1]);",
+      "expected_behavior": "prints 1 1 B"
+    },
+    {
+      "name": "forward keys remain",
+      "input": "enum E { A=1,B=1 }; console.log('A' in E,'B' in E);",
+      "expected_behavior": "prints true true"
+    }
+  ]
+}

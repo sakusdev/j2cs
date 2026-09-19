@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.numeric-explicit",
+  "category": "typescript_runtime",
+  "summary": "Evaluate explicit numeric initializer once and write forward/reverse mappings.",
+  "source": {
+    "pattern": "enum E { A=$expr }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",$expr)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "evaluation": "once in declaration order",
+    "writes": "name->value then value->name emitted assignment pattern"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "explicit number",
+      "input": "enum E { A=7 }; console.log(E.A,E[7]);",
+      "expected_behavior": "prints 7 A"
+    },
+    {
+      "name": "side effect once",
+      "input": "let n=0; enum E { A=(++n) }; console.log(n,E.A);",
+      "expected_behavior": "prints 1 1"
+    }
+  ]
+}

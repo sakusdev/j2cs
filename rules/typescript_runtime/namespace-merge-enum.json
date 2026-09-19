@@ -1,0 +1,39 @@
+{
+  "id": "typescript.namespace.merge-enum",
+  "category": "typescript_runtime",
+  "summary": "Augment enum object with namespace exports.",
+  "source": {
+    "pattern": "enum E { A=1 } namespace E { export const extra=2 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.AugmentValue(E)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity": "same enum object",
+    "effect": "extra coexists with mappings"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "coexist",
+      "input": "enum E { A=1 }; namespace E { export const extra=2 }; console.log(E.A,E[1],E.extra);",
+      "expected_behavior": "prints 1 A 2"
+    },
+    {
+      "name": "identity",
+      "input": "enum E { A=1 }; const r=E; namespace E { export const x=1 }; console.log(r===E);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

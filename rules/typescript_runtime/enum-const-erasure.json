@@ -1,0 +1,42 @@
+{
+  "id": "typescript.enum.const-erasure",
+  "category": "typescript_runtime",
+  "summary": "Inline const enum members when preserveConstEnums is false.",
+  "source": {
+    "pattern": "const enum E { A=1 }",
+    "requirements": {
+      "typescript_ast": true,
+      "preserveConstEnums": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.InlineConstEnum(E.A)",
+    "helper": "TsLowering.InlineConstEnum"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "runtime_object": "none in this profile",
+    "uses": "constant substitution",
+    "reflection": "no emitted E object"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "inline",
+      "input": "const enum E { A=1 }; const x=E.A;",
+      "expected_behavior": "default emit substitutes value and emits no E object"
+    },
+    {
+      "name": "profile boundary",
+      "input": "const enum E { A=1 }; const x=E.A;",
+      "expected_behavior": "preserveConstEnums=true is a different rule profile"
+    }
+  ]
+}

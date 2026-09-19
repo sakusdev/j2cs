@@ -1,0 +1,40 @@
+{
+  "id": "typescript.parameter-property.readonly",
+  "category": "typescript_runtime",
+  "summary": "Treat readonly parameter property as compile-time restriction, not frozen JS property.",
+  "source": {
+    "pattern": "constructor(readonly x:T){}",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.ParameterPropertyAssign(this,\"x\",x)",
+    "helper": "TsLowering.ParameterPropertyAssign"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "readonly": "checker restriction",
+    "runtime": "ordinary writable property under standard emit"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "mutate any",
+      "input": "class C { constructor(readonly x:number){} }; const c=new C(1); (c as any).x=2; console.log(c.x);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "init",
+      "input": "class C { constructor(readonly x:number){} }; console.log(new C(5).x);",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.negative-number",
+  "category": "typescript_runtime",
+  "summary": "Preserve negative numeric values and reverse mappings.",
+  "source": {
+    "pattern": "enum E { A=-1 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",-1)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "-1 Number",
+    "reverse": "E[-1] -> A"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "negative",
+      "input": "enum E { A=-1 }; console.log(E.A,E[-1]);",
+      "expected_behavior": "prints -1 A"
+    },
+    {
+      "name": "key",
+      "input": "enum E { A=-1 }; console.log(Object.keys(E).includes('-1'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.reopen",
+  "category": "typescript_runtime",
+  "summary": "Mutate same namespace object for reopened declarations.",
+  "source": {
+    "pattern": "namespace N {...} namespace N {...}",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.GetOrCreateNamespace(\"N\")"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity": "stable",
+    "writes": "later body augments",
+    "order": "body source order"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "combine",
+      "input": "namespace N { export const a=1 }; namespace N { export const b=2 }; console.log(N.a,N.b);",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "identity",
+      "input": "namespace N { export const a=1 }; const x=N; namespace N { export const b=2 }; console.log(x===N);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

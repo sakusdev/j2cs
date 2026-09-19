@@ -1,0 +1,42 @@
+{
+  "id": "typescript.class-field.use-define-false",
+  "category": "typescript_runtime",
+  "summary": "Respect useDefineForClassFields=false assignment semantics.",
+  "source": {
+    "pattern": "class C { x=$init }",
+    "requirements": {
+      "typescript_ast": true,
+      "useDefineForClassFields": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.AssignField(this,\"x\",$init)",
+    "helper": "TsLowering.AssignField"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "profile": "useDefineForClassFields=false",
+    "effect": "this.x = initializer",
+    "setter": "inherited setter can observe assignment"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "setter can run",
+      "input": "class B{set x(v){console.log('set',v)}}; class C extends B{x=1}; new C();",
+      "expected_behavior": "assignment-style emit can invoke inherited setter"
+    },
+    {
+      "name": "value",
+      "input": "class C{x=1};console.log(new C().x);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}
