@@ -24,7 +24,7 @@ on:
       top_n:
         description: "Maximum number of issues to create"
         required: true
-        default: "10"
+        default: "30"
       min_score:
         description: "Minimum gap score"
         required: true
@@ -43,7 +43,7 @@ jobs:
       - name: Analyze coverage
         run: |
           python tools/coverage_gap.py \
-            --top 30 \
+            --top 60 \
             --json-out coverage-report.json \
             --markdown-out coverage-report.md \
             --issues-out coverage-issues.json
