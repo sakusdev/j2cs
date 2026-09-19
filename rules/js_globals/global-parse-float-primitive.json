@@ -1,0 +1,42 @@
+{
+  "id": "global.parse-float.primitive",
+  "category": "js_globals",
+  "summary": "Stringify a proven non-String primitive then reuse canonical parseFloat.",
+  "source": {
+    "pattern": "parseFloat($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseFloat%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true,
+      "argument_static_type_excludes": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsGlobals.ParseFloatPrimitive",
+    "template": "JsGlobals.ParseFloatPrimitive($value)",
+    "notes": "Reuse JsCoercion.ToStringPrimitive + JsNumber.ParseFloatPrimitive."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToString before parse",
+    "symbol": "TypeError",
+    "bigint": "stringified then converted to Number"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "number",
+      "input": "console.log(parseFloat(12.5));",
+      "expected_behavior": "prints 12.5"
+    },
+    {
+      "name": "undefined",
+      "input": "console.log(Number.isNaN(parseFloat(undefined)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

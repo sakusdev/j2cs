@@ -1,0 +1,43 @@
+{
+  "id": "global.is-nan.primitive",
+  "category": "js_globals",
+  "summary": "Apply canonical ToNumber to non-Number primitives before global isNaN.",
+  "source": {
+    "pattern": "isNaN($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%isNaN%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true,
+      "argument_static_type_excludes": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsGlobals.IsNaNPrimitive",
+    "template": "JsGlobals.IsNaNPrimitive($value)",
+    "notes": "Reuse JsCoercion.ToNumberPrimitive."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ECMAScript ToNumber",
+    "undefined": true,
+    "non_numeric_string": true,
+    "null": false
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "string coerced to nan",
+      "input": "console.log(isNaN('x'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "empty string to zero",
+      "input": "console.log(isNaN(''));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

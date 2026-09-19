@@ -1,0 +1,46 @@
+{
+  "id": "global.eval.direct-sloppy",
+  "category": "js_globals",
+  "summary": "Retain runtime direct-eval semantics for String source in a non-strict caller.",
+  "source": {
+    "pattern": "eval($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%eval%",
+      "builtin_not_replaced": true,
+      "argument_may_be_string": true,
+      "direct_eval_syntax": true,
+      "caller_strict": false
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DirectEval",
+    "template": "JsRuntime.DirectEval($source, $executionContext)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "current lexical/variable/private environment as specified",
+    "this_binding": "current execution context",
+    "declarations": "can interact with caller var environment under sloppy rules",
+    "host_gate": "HostEnsureCanCompileStrings"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "reads local",
+      "input": "function f(){let x=3; return eval('x')} console.log(f());",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "var can affect sloppy function",
+      "input": "function f(){eval('var x=4'); return x} console.log(f());",
+      "expected_behavior": "prints 4"
+    }
+  ],
+  "caveats": [
+    "Do not approximate with C# expression evaluation or compilation in a fresh scope."
+  ]
+}

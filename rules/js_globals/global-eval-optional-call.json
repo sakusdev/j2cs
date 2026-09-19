@@ -1,0 +1,40 @@
+{
+  "id": "global.eval.optional-call",
+  "category": "js_globals",
+  "summary": "Optional-call syntax on intrinsic eval is indirect eval, not direct eval.",
+  "source": {
+    "pattern": "eval?.($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%eval%",
+      "builtin_not_replaced": true,
+      "optional_call_syntax": true,
+      "argument_may_be_string": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.IndirectEval",
+    "template": "JsRuntime.IndirectEval($source, $evalRealm)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "global environment",
+    "direct": false
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "optional is indirect",
+      "input": "globalThis.__o=9; function f(){let __o=1; return eval?.('__o')} console.log(f()); delete globalThis.__o;",
+      "expected_behavior": "prints 9"
+    },
+    {
+      "name": "syntax accepted",
+      "input": "console.log(eval?.('1+2'));",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

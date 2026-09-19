@@ -1,0 +1,42 @@
+{
+  "id": "uri.decode-uri.malformed",
+  "category": "js_globals",
+  "summary": "Preserve URIError for statically recognized malformed input to decodeURI.",
+  "source": {
+    "pattern": "decodeURI($string)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%decodeURI%",
+      "builtin_not_replaced": true,
+      "argument_static_type": "String",
+      "input_statically_known_malformed_for_operation": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsUri.DecodeUri",
+    "template": "JsUri.DecodeUri($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "decoding": "decode valid UTF-8 percent sequences",
+    "preserve": "percent escapes denoting URI reserved characters remain escaped",
+    "errors": "malformed percent syntax or invalid UTF-8 scalar sequence throws URIError",
+    "error": "URIError; no lossy replacement or permissive decoder"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "malformed",
+      "input": "try{decodeURI(\"%\")}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints URIError"
+    },
+    {
+      "name": "error category",
+      "input": "try{decodeURI(\"%\")}catch(e){console.log(e instanceof URIError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

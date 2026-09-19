@@ -1,0 +1,39 @@
+{
+  "id": "global.eval.aliased",
+  "category": "js_globals",
+  "summary": "An alias of intrinsic eval is an indirect eval for String source.",
+  "source": {
+    "pattern": "$evalAlias($source)",
+    "requirements": {
+      "callee_resolves_to_intrinsic_eval": true,
+      "call_is_not_direct_eval_syntax": true,
+      "argument_may_be_string": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.IndirectEval",
+    "template": "JsRuntime.IndirectEval($source, $evalRealm)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "global environment; local caller bindings not captured",
+    "call_semantics": "ordinary call leading to PerformEval direct=false"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "alias indirect",
+      "input": "globalThis.__a=8; function f(){const e=eval; let __a=1; return e('__a')} console.log(f()); delete globalThis.__a;",
+      "expected_behavior": "prints 8"
+    },
+    {
+      "name": "alias non-string unchanged",
+      "input": "const e=eval, x={}; console.log(e(x)===x);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

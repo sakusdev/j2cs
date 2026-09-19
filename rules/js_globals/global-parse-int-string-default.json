@@ -1,0 +1,42 @@
+{
+  "id": "global.parse-int.string-default",
+  "category": "js_globals",
+  "summary": "Reuse the canonical ECMAScript parseInt parser for a String and omitted/zero radix.",
+  "source": {
+    "pattern": "parseInt($string)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseInt%",
+      "builtin_not_replaced": true,
+      "argument_static_type": "String",
+      "radix_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ParseIntPrimitive",
+    "template": "JsNumber.ParseIntPrimitive($string, 0)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "alias": "same intrinsic parseInt semantics used by Number.parseInt",
+    "leading_whitespace": "trim",
+    "radix": "infer 16 only from 0x/0X after sign, otherwise 10",
+    "longest_prefix": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "decimal",
+      "input": "console.log(parseInt('  -12px'));",
+      "expected_behavior": "prints -12"
+    },
+    {
+      "name": "hex inferred",
+      "input": "console.log(parseInt('0x10'));",
+      "expected_behavior": "prints 16"
+    }
+  ]
+}

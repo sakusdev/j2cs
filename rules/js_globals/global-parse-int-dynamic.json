@@ -1,0 +1,40 @@
+{
+  "id": "global.parse-int.dynamic",
+  "category": "js_globals",
+  "summary": "Use runtime parseInt when value/radix conversion may execute arbitrary JavaScript.",
+  "source": {
+    "pattern": "parseInt($value, $radix)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseInt%",
+      "builtin_not_replaced": true,
+      "value_or_radix_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.GlobalParseInt",
+    "template": "JsRuntime.GlobalParseInt($value, $radix)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion_order": "ToString(value) before ToInt32(radix)",
+    "side_effects": true,
+    "parser": "same %parseInt% grammar as Number.parseInt"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "order",
+      "input": "const log=[]; parseInt({toString(){log.push('v');return '10'}},{valueOf(){log.push('r');return 10}}); console.log(log.join(''));",
+      "expected_behavior": "prints vr"
+    },
+    {
+      "name": "throw propagates",
+      "input": "try{parseInt({toString(){throw 'x'}},10)}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "uri.decode-uri-component.primitive",
+  "category": "js_globals",
+  "summary": "Coerce a non-String primitive with ECMAScript ToString before decodeURIComponent.",
+  "source": {
+    "pattern": "decodeURIComponent($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%decodeURIComponent%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true,
+      "argument_static_type_excludes": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsUri.DecodeUriComponentPrimitive",
+    "template": "JsUri.DecodeUriComponentPrimitive($value)",
+    "notes": "Reuse JsCoercion.ToStringPrimitive."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "decoding": "decode valid UTF-8 percent sequences including reserved delimiters",
+    "preserve": "no URI-reserved preserve set",
+    "errors": "malformed percent syntax or invalid UTF-8 scalar sequence throws URIError",
+    "conversion": "ToString before URI operation",
+    "symbol": "TypeError during ToString"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "number stringified",
+      "input": "console.log(decodeURIComponent(123));",
+      "expected_behavior": "operates on the string '123'"
+    },
+    {
+      "name": "symbol rejected",
+      "input": "try{decodeURIComponent(Symbol())}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

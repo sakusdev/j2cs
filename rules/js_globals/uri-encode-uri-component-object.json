@@ -1,0 +1,41 @@
+{
+  "id": "uri.encode-uri-component.object",
+  "category": "js_globals",
+  "summary": "Use runtime ToString + encodeURIComponent semantics for objects/Proxies.",
+  "source": {
+    "pattern": "encodeURIComponent($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%encodeURIComponent%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.UriEncodeUriComponent",
+    "template": "JsRuntime.UriEncodeUriComponent($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "unescaped": "only URIUnescaped set remains literal; URI reserved delimiters are percent-escaped",
+    "surrogates": "unpaired UTF-16 surrogate throws URIError",
+    "conversion": "observable object ToString",
+    "exceptions": "conversion or URI errors propagate"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "custom toString",
+      "input": "console.log(encodeURIComponent({toString(){return \"a/b?c=d\"}}));",
+      "expected_behavior": "prints a%2Fb%3Fc%3Dd"
+    },
+    {
+      "name": "throwing conversion",
+      "input": "try{encodeURIComponent({toString(){throw 'x'}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

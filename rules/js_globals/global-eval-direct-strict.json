@@ -1,0 +1,42 @@
+{
+  "id": "global.eval.direct-strict",
+  "category": "js_globals",
+  "summary": "Retain strict direct-eval lexical isolation and caller-context access.",
+  "source": {
+    "pattern": "eval($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%eval%",
+      "builtin_not_replaced": true,
+      "argument_may_be_string": true,
+      "direct_eval_syntax": true,
+      "caller_strict": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.DirectEvalStrict",
+    "template": "JsRuntime.DirectEvalStrict($source, $executionContext)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "can read caller lexical bindings",
+    "declarations": "strict eval declarations stay in eval environment",
+    "host_gate": "HostEnsureCanCompileStrings"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "reads local strict",
+      "input": "function f(){'use strict'; let x=3; return eval('x')} console.log(f());",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "var does not leak",
+      "input": "function f(){'use strict'; eval('var x=4'); return typeof x} console.log(f());",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

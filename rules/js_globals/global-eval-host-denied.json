@@ -1,0 +1,40 @@
+{
+  "id": "global.eval.host-denied",
+  "category": "js_globals",
+  "summary": "Preserve host policy that can reject string compilation for eval.",
+  "source": {
+    "pattern": "eval($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%eval%",
+      "builtin_not_replaced": true,
+      "argument_may_be_string": true,
+      "host_string_compilation_policy_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EvalWithHostPolicy",
+    "template": "JsRuntime.EvalWithHostPolicy($source, $executionContext)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "host_hook": "HostEnsureCanCompileStrings may abruptly reject",
+    "no_approximation": "must not silently execute when host policy denies dynamic compilation"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "ordinary host permits",
+      "input": "console.log(eval('1+1'));",
+      "expected_behavior": "prints 2 on a host that permits eval"
+    },
+    {
+      "name": "policy boundary",
+      "input": "// host-policy semantic case: eval('1')",
+      "expected_behavior": "host may reject dynamic string compilation through the specified host hook"
+    }
+  ]
+}

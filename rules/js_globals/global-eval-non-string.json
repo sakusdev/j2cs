@@ -1,0 +1,40 @@
+{
+  "id": "global.eval.non-string",
+  "category": "js_globals",
+  "summary": "Intrinsic eval returns a non-String argument unchanged, even for a syntactically direct eval call.",
+  "source": {
+    "pattern": "eval($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%eval%",
+      "builtin_not_replaced": true,
+      "argument_proven_non_string": true,
+      "direct_eval_syntax": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "$value"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "parsing": "none",
+    "return_value": "exact input value",
+    "side_effects": "argument evaluated once before call"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "number unchanged",
+      "input": "const x={}; console.log(eval(x)===x);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "number",
+      "input": "console.log(eval(3));",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}
