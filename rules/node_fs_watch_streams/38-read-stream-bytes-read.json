@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.read-stream.bytes-read",
+  "category": "node_fs_watch_streams",
+  "summary": "Report bytes read by this stream.",
+  "source": {
+    "pattern": "stream.bytesRead",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.ReadStreamBytesRead",
+    "template": "NodeFs.ReadStreamBytesRead(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Count reflects stream IO, not file size."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.bytesRead",
+      "expected_behavior": "Report bytes read by this stream."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.bytesRead",
+      "expected_behavior": "Count reflects stream IO, not file size."
+    }
+  ]
+}

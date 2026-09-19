@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.unwatch-file-all",
+  "category": "node_fs_watch_streams",
+  "summary": "Remove all watchFile listeners for path.",
+  "source": {
+    "pattern": "fs.unwatchFile(path)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.UnwatchFileAll",
+    "template": "NodeFs.UnwatchFileAll(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Unwatched path is a no-op, not an error."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.unwatchFile(path)",
+      "expected_behavior": "Remove all watchFile listeners for path."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.unwatchFile(path)",
+      "expected_behavior": "Unwatched path is a no-op, not an error."
+    }
+  ]
+}

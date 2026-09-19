@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.create",
+  "category": "node_fs_watch_streams",
+  "summary": "Create Node fs.WriteStream with open/write/close lifecycle.",
+  "source": {
+    "pattern": "fs.createWriteStream(path,options)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.CreateWriteStream",
+    "template": "NodeFs.CreateWriteStream(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Do not replace with File.Create because flags, backpressure, events and fd ownership are observable."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.createWriteStream(path,options)",
+      "expected_behavior": "Create Node fs.WriteStream with open/write/close lifecycle."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.createWriteStream(path,options)",
+      "expected_behavior": "Do not replace with File.Create because flags, backpressure, events and fd ownership are observable."
+    }
+  ]
+}

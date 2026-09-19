@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.read-stream.open-event",
+  "category": "node_fs_watch_streams",
+  "summary": "Emit open with fd after successful open.",
+  "source": {
+    "pattern": "stream.on('open',fd=>{})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.ReadStreamOpen",
+    "template": "NodeFs.ReadStreamOpen(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Not emitted when a supplied fd avoids opening."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.on('open',fd=>{})",
+      "expected_behavior": "Emit open with fd after successful open."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.on('open',fd=>{})",
+      "expected_behavior": "Not emitted when a supplied fd avoids opening."
+    }
+  ]
+}

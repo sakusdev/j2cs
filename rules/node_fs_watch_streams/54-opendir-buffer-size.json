@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.opendir.buffer-size",
+  "category": "node_fs_watch_streams",
+  "summary": "Preserve internal directory-entry buffering size.",
+  "source": {
+    "pattern": "opendir(path,{bufferSize:n})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.OpenDir",
+    "template": "NodeFs.OpenDir(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Buffering changes batching/performance, not iteration order."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "opendir(path,{bufferSize:n})",
+      "expected_behavior": "Preserve internal directory-entry buffering size."
+    },
+    {
+      "name": "semantic trap",
+      "input": "opendir(path,{bufferSize:n})",
+      "expected_behavior": "Buffering changes batching/performance, not iteration order."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.stat-watcher-unref",
+  "category": "node_fs_watch_streams",
+  "summary": "Allow process exit with StatWatcher active.",
+  "source": {
+    "pattern": "statWatcher.unref()",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.StatWatcherUnref",
+    "template": "NodeFs.StatWatcherUnref(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Returns watcher."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "statWatcher.unref()",
+      "expected_behavior": "Allow process exit with StatWatcher active."
+    },
+    {
+      "name": "semantic trap",
+      "input": "statWatcher.unref()",
+      "expected_behavior": "Returns watcher."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.close-event",
+  "category": "node_fs_watch_streams",
+  "summary": "Emit close after watcher stops.",
+  "source": {
+    "pattern": "watcher.on('close',listener)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.FSWatcherCloseEvent",
+    "template": "NodeFs.FSWatcherCloseEvent(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "No later watch events should be invented."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "watcher.on('close',listener)",
+      "expected_behavior": "Emit close after watcher stops."
+    },
+    {
+      "name": "semantic trap",
+      "input": "watcher.on('close',listener)",
+      "expected_behavior": "No later watch events should be invented."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.watcher-unref",
+  "category": "node_fs_watch_streams",
+  "summary": "Allow process to exit while watcher is active.",
+  "source": {
+    "pattern": "watcher.unref()",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.FSWatcherUnref",
+    "template": "NodeFs.FSWatcherUnref(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Returns watcher for chaining."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "watcher.unref()",
+      "expected_behavior": "Allow process to exit while watcher is active."
+    },
+    {
+      "name": "semantic trap",
+      "input": "watcher.unref()",
+      "expected_behavior": "Returns watcher for chaining."
+    }
+  ]
+}

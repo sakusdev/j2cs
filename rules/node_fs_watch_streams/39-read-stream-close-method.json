@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.read-stream.close-method",
+  "category": "node_fs_watch_streams",
+  "summary": "Close underlying fd and invoke callback after close.",
+  "source": {
+    "pattern": "stream.close(callback)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.ReadStreamCloseMethod",
+    "template": "NodeFs.ReadStreamCloseMethod(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Errors and already-closed state follow Node fs.ReadStream behavior."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.close(callback)",
+      "expected_behavior": "Close underlying fd and invoke callback after close."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.close(callback)",
+      "expected_behavior": "Errors and already-closed state follow Node fs.ReadStream behavior."
+    }
+  ]
+}

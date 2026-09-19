@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.watcher-ref",
+  "category": "node_fs_watch_streams",
+  "summary": "Make watcher keep process alive.",
+  "source": {
+    "pattern": "watcher.ref()",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.FSWatcherRef",
+    "template": "NodeFs.FSWatcherRef(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Returns watcher for chaining."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "watcher.ref()",
+      "expected_behavior": "Make watcher keep process alive."
+    },
+    {
+      "name": "semantic trap",
+      "input": "watcher.ref()",
+      "expected_behavior": "Returns watcher for chaining."
+    }
+  ]
+}

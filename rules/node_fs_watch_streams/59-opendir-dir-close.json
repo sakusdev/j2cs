@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.opendir.dir-close",
+  "category": "node_fs_watch_streams",
+  "summary": "Close directory handle asynchronously.",
+  "source": {
+    "pattern": "dir.close(callback)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.DirClose",
+    "template": "NodeFs.DirClose(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Subsequent operations fail according to Node."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "dir.close(callback)",
+      "expected_behavior": "Close directory handle asynchronously."
+    },
+    {
+      "name": "semantic trap",
+      "input": "dir.close(callback)",
+      "expected_behavior": "Subsequent operations fail according to Node."
+    }
+  ]
+}

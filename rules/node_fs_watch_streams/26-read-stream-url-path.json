@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.read-stream.url-path",
+  "category": "node_fs_watch_streams",
+  "summary": "Accept file: URL path input per Node fs rules.",
+  "source": {
+    "pattern": "fs.createReadStream(fileUrl,options)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.CreateReadStream",
+    "template": "NodeFs.CreateReadStream(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Reuse NODE_CORE fileURL/path semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.createReadStream(fileUrl,options)",
+      "expected_behavior": "Accept file: URL path input per Node fs rules."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.createReadStream(fileUrl,options)",
+      "expected_behavior": "Reuse NODE_CORE fileURL/path semantics."
+    }
+  ]
+}

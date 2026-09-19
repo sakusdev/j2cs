@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.error-event",
+  "category": "node_fs_watch_streams",
+  "summary": "Expose open/write errors with Node error semantics.",
+  "source": {
+    "pattern": "stream.on('error',err=>{})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.WriteStreamError",
+    "template": "NodeFs.WriteStreamError(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Partial writes and error codes remain observable."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.on('error',err=>{})",
+      "expected_behavior": "Expose open/write errors with Node error semantics."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.on('error',err=>{})",
+      "expected_behavior": "Partial writes and error codes remain observable."
+    }
+  ]
+}

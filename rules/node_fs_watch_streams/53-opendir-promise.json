@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.opendir.promise",
+  "category": "node_fs_watch_streams",
+  "summary": "Open a directory as a Promise<Dir>.",
+  "source": {
+    "pattern": "fs.promises.opendir(path,options)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.OpenDirAsync",
+    "template": "NodeFs.OpenDirAsync(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Promise rejection preserves Node fs error."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.promises.opendir(path,options)",
+      "expected_behavior": "Open a directory as a Promise<Dir>."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.promises.opendir(path,options)",
+      "expected_behavior": "Promise rejection preserves Node fs error."
+    }
+  ]
+}

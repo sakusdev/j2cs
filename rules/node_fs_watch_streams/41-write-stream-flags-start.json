@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.flags-start",
+  "category": "node_fs_watch_streams",
+  "summary": "Preserve open flags and optional write offset.",
+  "source": {
+    "pattern": "fs.createWriteStream(path,{flags,start})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.CreateWriteStream",
+    "template": "NodeFs.CreateWriteStream(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "start must be non-negative and append-mode OS semantics can ignore positional writes."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.createWriteStream(path,{flags,start})",
+      "expected_behavior": "Preserve open flags and optional write offset."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.createWriteStream(path,{flags,start})",
+      "expected_behavior": "start must be non-negative and append-mode OS semantics can ignore positional writes."
+    }
+  ]
+}
