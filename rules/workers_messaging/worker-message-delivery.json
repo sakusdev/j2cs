@@ -1,0 +1,40 @@
+{
+  "id": "worker.message-delivery",
+  "category": "workers_messaging",
+  "summary": "Deliver worker-to-outside messages as asynchronous MessageEvent tasks through the implicit port.",
+  "source": {
+    "pattern": "[[DedicatedWorkerOutsideMessageTask]]($record)",
+    "requirements": {
+      "semantic_operation": "dedicated Worker outside-port delivery"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_message_delivery",
+    "template": "JsRuntime.WorkersMessaging.worker_message_delivery($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "message",
+    "data": "target-realm deserialized clone",
+    "ports": "transferred ports",
+    "synchronous": false
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "ordering",
+      "input": "// browser: worker response handler after current synchronous turn",
+      "expected_behavior": "message callback is asynchronous"
+    },
+    {
+      "name": "clone",
+      "input": "// worker posts {x:1}",
+      "expected_behavior": "outside receives cloned data"
+    }
+  ]
+}

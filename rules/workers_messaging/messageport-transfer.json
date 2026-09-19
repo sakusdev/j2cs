@@ -1,0 +1,40 @@
+{
+  "id": "messageport.transfer",
+  "category": "workers_messaging",
+  "summary": "Transfer MessagePort ownership by moving its queued tasks and re-entangling the received port.",
+  "source": {
+    "pattern": "[[Transfer]]($port)",
+    "requirements": {
+      "semantic_operation": "MessagePort transfer"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_transfer",
+    "template": "JsRuntime.WorkersMessaging.messageport_transfer($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "queue": "moved",
+    "remote": "re-entangled",
+    "sender": "shipped/detached semantics",
+    "recipient": "new port identity"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html",
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "transfer succeeds",
+      "input": "const a=new MessageChannel(),b=new MessageChannel();b.port1.postMessage('p',[a.port1]);console.log('sent');a.port2.close();b.port1.close();b.port2.close();",
+      "expected_behavior": "prints sent"
+    },
+    {
+      "name": "clone without transfer",
+      "input": "const c=new MessageChannel();try{structuredClone(c.port1)}catch(e){console.log(e.name)}c.port1.close();c.port2.close();",
+      "expected_behavior": "prints DataCloneError in conforming environments"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "worker.global-close",
+  "category": "workers_messaging",
+  "summary": "DedicatedWorkerGlobalScope.close sets worker closing state and shuts down only that worker global.",
+  "source": {
+    "pattern": "self.close()",
+    "requirements": {
+      "global": "DedicatedWorkerGlobalScope",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_global_close",
+    "template": "JsRuntime.WorkersMessaging.worker_global_close($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "closing_flag": true,
+    "scope": "worker only",
+    "host_process_exit": false
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "return",
+      "input": "// worker: close()",
+      "expected_behavior": "returns undefined before shutdown"
+    },
+    {
+      "name": "scope",
+      "input": "// worker calls close()",
+      "expected_behavior": "owning page/application remains alive"
+    }
+  ]
+}

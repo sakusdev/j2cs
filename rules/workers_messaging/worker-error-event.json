@@ -1,0 +1,39 @@
+{
+  "id": "worker.error-event",
+  "category": "workers_messaging",
+  "summary": "Report uncaught worker script errors through HTML ErrorEvent/report-error semantics instead of sharing CLR exception identity.",
+  "source": {
+    "pattern": "[[WorkerUnhandledError]]($error)",
+    "requirements": {
+      "semantic_operation": "worker error reporting"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_error_event",
+    "template": "JsRuntime.WorkersMessaging.worker_error_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "error",
+    "cross_origin": "details may be sanitized",
+    "error_identity": "not a shared cross-realm object contract"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "error handler",
+      "input": "// browser: worker.onerror=e=>console.log(e.type)",
+      "expected_behavior": "uncaught worker failures can fire error"
+    },
+    {
+      "name": "identity",
+      "input": "// worker throws new Error('x')",
+      "expected_behavior": "outside observes reporting semantics, not a shared Error reference"
+    }
+  ]
+}

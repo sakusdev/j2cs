@@ -1,0 +1,40 @@
+{
+  "id": "messageport.post-message",
+  "category": "workers_messaging",
+  "summary": "Synchronously serialize a message, then queue asynchronous delivery to the entangled target port.",
+  "source": {
+    "pattern": "$port.postMessage($message,$options?)",
+    "requirements": {
+      "receiver": "intrinsic MessagePort",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_post_message",
+    "template": "JsRuntime.WorkersMessaging.messageport_post_message($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "StructuredSerializeWithTransfer synchronously",
+    "delivery": "queued port task",
+    "return": "undefined"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html",
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "async",
+      "input": "const c=new MessageChannel();let sync=true;c.port2.onmessage=()=>console.log(sync);c.port1.postMessage(1);sync=false;",
+      "expected_behavior": "event prints false"
+    },
+    {
+      "name": "transfer buffer",
+      "input": "const c=new MessageChannel(),b=new ArrayBuffer(2);c.port1.postMessage(b,[b]);console.log(b.byteLength);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

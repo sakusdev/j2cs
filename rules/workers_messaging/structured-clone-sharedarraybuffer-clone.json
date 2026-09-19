@@ -1,0 +1,39 @@
+{
+  "id": "structured-clone.sharedarraybuffer-clone",
+  "category": "workers_messaging",
+  "summary": "Clone a SharedArrayBuffer wrapper while sharing its underlying shared memory subject to agent-cluster policy.",
+  "source": {
+    "pattern": "[[StructuredSerialize]]($sab)",
+    "requirements": {
+      "static_type": "SharedArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.structured_clone_sharedarraybuffer_clone",
+    "template": "JsRuntime.WorkersMessaging.structured_clone_sharedarraybuffer_clone($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "wrapper_identity": "new",
+    "memory": "shared",
+    "source_detached": false,
+    "host_policy": "agent cluster restrictions"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "shared",
+      "input": "const s=new SharedArrayBuffer(1),c=structuredClone(s);new Uint8Array(c)[0]=8;console.log(new Uint8Array(s)[0],c!==s);",
+      "expected_behavior": "prints 8 true where SAB is exposed"
+    },
+    {
+      "name": "live",
+      "input": "const s=new SharedArrayBuffer(4);structuredClone(s);console.log(s.byteLength);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

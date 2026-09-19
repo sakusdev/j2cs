@@ -1,0 +1,40 @@
+{
+  "id": "worker.global-post-message",
+  "category": "workers_messaging",
+  "summary": "DedicatedWorkerGlobalScope.postMessage serializes/transfers through the implicit worker-side port to the outside Worker object.",
+  "source": {
+    "pattern": "self.postMessage($message,$options?)",
+    "requirements": {
+      "global": "DedicatedWorkerGlobalScope",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_global_post_message",
+    "template": "JsRuntime.WorkersMessaging.worker_global_post_message($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "serialization": "StructuredSerializeWithTransfer",
+    "delivery": "outside port task",
+    "return": "undefined"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "reply",
+      "input": "// worker: onmessage=e=>postMessage(e.data+1)",
+      "expected_behavior": "outside later receives reply"
+    },
+    {
+      "name": "transfer",
+      "input": "// worker: const b=new ArrayBuffer(4);postMessage(b,[b])",
+      "expected_behavior": "worker-side ArrayBuffer detaches and outside receives storage"
+    }
+  ]
+}

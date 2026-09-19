@@ -1,0 +1,41 @@
+{
+  "id": "worker.terminate",
+  "category": "workers_messaging",
+  "summary": "Terminate the associated worker using HTML worker termination rather than cooperative task cancellation.",
+  "source": {
+    "pattern": "$worker.terminate()",
+    "requirements": {
+      "receiver": "intrinsic Worker",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_terminate",
+    "template": "JsRuntime.WorkersMessaging.worker_terminate($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "effect": "terminate worker",
+    "cooperative_cleanup": "not guaranteed",
+    "host_lifecycle": "observable"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "return",
+      "input": "// browser: worker.terminate()",
+      "expected_behavior": "returns undefined"
+    },
+    {
+      "name": "not graceful join",
+      "input": "// outside terminates long-running worker",
+      "expected_behavior": "does not require normal JS completion/finally as a join contract"
+    }
+  ]
+}

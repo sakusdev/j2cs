@@ -1,0 +1,38 @@
+{
+  "id": "structured-clone.clone",
+  "category": "workers_messaging",
+  "summary": "Apply HTML structured cloning, preserving graph shape instead of JSON semantics.",
+  "source": {
+    "pattern": "structuredClone($value)",
+    "requirements": {
+      "binding": "intrinsic structuredClone"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.structured_clone_clone",
+    "template": "JsRuntime.WorkersMessaging.structured_clone_clone($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cycles": "preserved",
+    "target_realm": true,
+    "unserializable": "DataCloneError"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "deep clone",
+      "input": "const x={a:{b:1}};const y=structuredClone(x);console.log(y!==x,y.a!==x.a);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "function rejected",
+      "input": "try{structuredClone(()=>{})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError"
+    }
+  ]
+}

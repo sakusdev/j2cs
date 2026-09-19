@@ -1,0 +1,38 @@
+{
+  "id": "messageport.onmessage-auto-start",
+  "category": "workers_messaging",
+  "summary": "Enable a MessagePort queue the first time its onmessage event-handler attribute is set.",
+  "source": {
+    "pattern": "$port.onmessage = $handler",
+    "requirements": {
+      "receiver": "MessagePort",
+      "event_handler_attribute": "onmessage"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.messageport_onmessage_auto_start",
+    "template": "JsRuntime.WorkersMessaging.messageport_onmessage_auto_start($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "implicit_start": true,
+    "event_handler": "EventTarget semantics"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "implicit",
+      "input": "const c=new MessageChannel();c.port2.onmessage=e=>{console.log(e.data);c.port1.close();c.port2.close()};c.port1.postMessage('x');",
+      "expected_behavior": "eventually prints x without explicit start"
+    },
+    {
+      "name": "null",
+      "input": "const c=new MessageChannel();c.port2.onmessage=null;console.log(c.port2.onmessage);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints null"
+    }
+  ]
+}

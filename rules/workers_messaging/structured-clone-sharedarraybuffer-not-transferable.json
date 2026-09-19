@@ -1,0 +1,37 @@
+{
+  "id": "structured-clone.sharedarraybuffer-not-transferable",
+  "category": "workers_messaging",
+  "summary": "Reject SharedArrayBuffer in a transfer list; SAB uses shared-memory cloning, not transfer/detachment.",
+  "source": {
+    "pattern": "structuredClone($value,{transfer:[$sab]})",
+    "requirements": {
+      "transfer_item": "SharedArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_sharedarraybuffer_not_transferable",
+    "template": "JsWorkersMessaging.structured_clone_sharedarraybuffer_not_transferable($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "DataCloneError",
+    "source_detached": false
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "reject",
+      "input": "const s=new SharedArrayBuffer(4);try{structuredClone(s,{transfer:[s]})}catch(e){console.log(e.name,s.byteLength)}",
+      "expected_behavior": "prints DataCloneError 4"
+    },
+    {
+      "name": "clone works",
+      "input": "const s=new SharedArrayBuffer(1);console.log(structuredClone(s).byteLength);",
+      "expected_behavior": "prints 1 where SAB is exposed"
+    }
+  ]
+}

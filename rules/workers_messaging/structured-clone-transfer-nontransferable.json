@@ -1,0 +1,37 @@
+{
+  "id": "structured-clone.transfer-nontransferable",
+  "category": "workers_messaging",
+  "summary": "Reject transfer-list entries that do not define transferable steps even if otherwise serializable.",
+  "source": {
+    "pattern": "structuredClone($value,{transfer:[$object]})",
+    "requirements": {
+      "transfer_item_not_transferable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.structured_clone_transfer_nontransferable",
+    "template": "JsWorkersMessaging.structured_clone_transfer_nontransferable($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "DataCloneError",
+    "serializable_not_sufficient": true
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "object",
+      "input": "const o={};try{structuredClone(o,{transfer:[o]})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError"
+    },
+    {
+      "name": "view",
+      "input": "const v=new Uint8Array(1);try{structuredClone(v,{transfer:[v]})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError; transfer v.buffer instead"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "worker.constructor-module",
+  "category": "workers_messaging",
+  "summary": "Create a module Worker with module graph loading and module-specific credentials semantics.",
+  "source": {
+    "pattern": "new Worker($scriptURL,{type:'module',$options})",
+    "requirements": {
+      "binding": "intrinsic Worker",
+      "worker_type": "module",
+      "host_workers_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WorkersMessaging.worker_constructor_module",
+    "template": "JsRuntime.WorkersMessaging.worker_constructor_module($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "script": "module",
+    "imports": "module graph",
+    "credentials": "WorkerOptions semantics",
+    "module_execution": "preserved"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/workers.html",
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "module",
+      "input": "// browser: new Worker('./w.js',{type:'module',name:'w'})",
+      "expected_behavior": "loads as module worker"
+    },
+    {
+      "name": "imports",
+      "input": "// worker module: import './dep.js'",
+      "expected_behavior": "resolves module dependency instead of classic-script text"
+    }
+  ]
+}

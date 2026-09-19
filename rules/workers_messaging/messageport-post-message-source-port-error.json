@@ -1,0 +1,38 @@
+{
+  "id": "messageport.post-message-source-port-error",
+  "category": "workers_messaging",
+  "summary": "Reject transferring the source MessagePort through itself.",
+  "source": {
+    "pattern": "$port.postMessage($message,{transfer:[$port]})",
+    "requirements": {
+      "receiver": "MessagePort",
+      "transfer_contains_source_port": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWorkersMessaging.messageport_post_message_source_port_error",
+    "template": "JsWorkersMessaging.messageport_post_message_source_port_error($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "exception": "DataCloneError",
+    "delivery": "none"
+  },
+  "references": [
+    "https://html.spec.whatwg.org/multipage/web-messaging.html"
+  ],
+  "tests": [
+    {
+      "name": "self",
+      "input": "const c=new MessageChannel();try{c.port1.postMessage('x',[c.port1])}catch(e){console.log(e.name)}c.port2.close();",
+      "expected_behavior": "prints DataCloneError"
+    },
+    {
+      "name": "other transfer",
+      "input": "const c=new MessageChannel(),b=new ArrayBuffer(1);c.port1.postMessage('x',[b]);console.log(b.byteLength);c.port1.close();c.port2.close();",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}
