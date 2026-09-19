@@ -1,0 +1,47 @@
+{
+  "id": "set.prototype.intersection.builtin-this-no-larger",
+  "category": "map_set",
+  "summary": "intersection fast path when receiver size is no larger than intrinsic other Set.",
+  "source": {
+    "pattern": "$set.intersection($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size <= other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.Intersection",
+    "template": "JsSet.Intersection($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "equality": "SameValueZero",
+    "receiver_mutation": false,
+    "result": "new ordinary Set",
+    "path": "iterate receiver data and call other.has for each live value",
+    "has_result": "ToBoolean",
+    "receiver_reentrancy": "receiver growth during has calls is observable and iteration extends"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "this-side path",
+      "input": "const a=new Set([1]); const b=new Set([1,2]); console.log([...a.intersection(b)]);",
+      "expected_behavior": "uses receiver-scan branch with the specified result"
+    },
+    {
+      "name": "signed-zero membership",
+      "input": "const a=new Set([-0]); const b=new Set([+0,2]); console.log([...a.intersection(b)].length);",
+      "expected_behavior": "membership uses SameValueZero"
+    }
+  ]
+}

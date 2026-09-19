@@ -1,0 +1,45 @@
+{
+  "id": "set.prototype.is-subset.builtin-scan",
+  "category": "map_set",
+  "summary": "isSubsetOf scans the required side when intrinsic Set sizes allow the relation.",
+  "source": {
+    "pattern": "$set.isSubsetOf($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size <= other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsSubsetOf",
+    "template": "JsSet.IsSubsetOf($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "scan": "iterate receiver and call other.has; receiver can grow during calls",
+    "equality": "SameValueZero",
+    "short_circuit": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "relation true",
+      "input": "console.log(new Set([1]).isSubsetOf(new Set([1,2])));",
+      "expected_behavior": "returns the mathematically corresponding Boolean under the chosen receiver/other sizes"
+    },
+    {
+      "name": "NaN equality",
+      "input": "console.log(new Set([NaN]).isSubsetOf(new Set([NaN,1])));",
+      "expected_behavior": "uses SameValueZero so NaN matches NaN"
+    }
+  ]
+}

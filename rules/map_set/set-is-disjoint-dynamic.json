@@ -1,0 +1,47 @@
+{
+  "id": "set.prototype.is-disjoint.dynamic-setlike",
+  "category": "map_set",
+  "summary": "Retain runtime protocol, reentrancy, and iterator-close semantics for dynamic isDisjointFrom.",
+  "source": {
+    "pattern": "$set.isDisjointFrom($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "static_set_like_shape_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.SetIsDisjointFrom",
+    "template": "JsRuntime.SetIsDisjointFrom($set, $other)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "get_set_record_order": [
+      "size",
+      "has",
+      "keys"
+    ],
+    "size_branch": "determines has scan or keys iterator",
+    "iterator_close": "required on keys-path early overlap",
+    "user_code": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "dynamic getter order",
+      "input": "const log=[]; const o={get size(){log.push('s');return 0},get has(){log.push('h');return ()=>false},get keys(){log.push('k');return function*(){}}}; new Set().isDisjointFrom(o); console.log(log.join(''));",
+      "expected_behavior": "prints shk"
+    },
+    {
+      "name": "primitive other rejected",
+      "input": "try{new Set().isDisjointFrom(1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

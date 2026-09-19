@@ -1,0 +1,50 @@
+{
+  "id": "set.prototype.difference.known-this-no-larger",
+  "category": "map_set",
+  "summary": "difference over a statically analyzable set-like object using the receiver-scan branch.",
+  "source": {
+    "pattern": "$set.difference($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_not_builtin_set": true,
+      "other_set_like_shape_proven": true,
+      "size_is_known_data_property": true,
+      "has_is_known_callable": true,
+      "keys_is_known_callable": true,
+      "keys_iterator_lowerable": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size <= other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.DifferenceSetLike",
+    "template": "JsSet.DifferenceSetLike($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "equality": "SameValueZero",
+    "receiver_mutation": false,
+    "result": "new ordinary Set",
+    "path": "iterate receiver; invoke known other.has with other as this; ToBoolean result",
+    "set_like_protocol": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "truthy has result",
+      "input": "const o={size:5,has(v){return v===1?'yes':''},*keys(){}}; const a=new Set([1]); console.log([...a.difference(o)]);",
+      "expected_behavior": "has result is converted with JavaScript ToBoolean"
+    },
+    {
+      "name": "has this binding",
+      "input": "const o={size:5,tag:1,has(v){return this.tag===v},*keys(){}}; const a=new Set([1]); console.log([...a.difference(o)].length);",
+      "expected_behavior": "other.has is called with other as this"
+    }
+  ]
+}

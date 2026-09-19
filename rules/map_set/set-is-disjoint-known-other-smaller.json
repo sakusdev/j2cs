@@ -1,0 +1,49 @@
+{
+  "id": "set.prototype.is-disjoint.known-other-smaller",
+  "category": "map_set",
+  "summary": "Check disjointness by iterating a smaller known set-like object's keys.",
+  "source": {
+    "pattern": "$set.isDisjointFrom($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_not_builtin_set": true,
+      "other_set_like_shape_proven": true,
+      "size_is_known_data_property": true,
+      "has_is_known_callable": true,
+      "keys_is_known_callable": true,
+      "keys_iterator_lowerable": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size > other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsDisjointFromSetLike",
+    "template": "JsSet.IsDisjointFromSetLike($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "path": "iterate other.keys()",
+    "short_circuit": "shared key requires IteratorClose before false",
+    "iterator_protocol": "reuse ITERATORS_GENERATORS"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "keys path",
+      "input": "const o={size:1,has(){throw 'unused'},*keys(){yield 2}}; console.log(new Set([1,2]).isDisjointFrom(o));",
+      "expected_behavior": "prints false without calling has"
+    },
+    {
+      "name": "keys duplicate harmless",
+      "input": "const o={size:1,has(){},*keys(){yield 9;yield 9}}; console.log(new Set([1,2]).isDisjointFrom(o));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "set.prototype.is-disjoint.builtin-other-smaller",
+  "category": "map_set",
+  "summary": "Check disjointness by scanning intrinsic other Set keys when it is smaller.",
+  "source": {
+    "pattern": "$set.isDisjointFrom($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size > other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsDisjointFrom",
+    "template": "JsSet.IsDisjointFrom($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "path": "iterate other.keys and test receiver SetData",
+    "short_circuit": "on shared key, close iterator then return false"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "shared value",
+      "input": "console.log(new Set([1,2,3]).isDisjointFrom(new Set([2])));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "disjoint smaller other",
+      "input": "console.log(new Set([1,2,3]).isDisjointFrom(new Set([4])));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

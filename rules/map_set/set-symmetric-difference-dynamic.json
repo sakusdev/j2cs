@@ -1,0 +1,46 @@
+{
+  "id": "set.prototype.symmetric-difference.dynamic-setlike",
+  "category": "map_set",
+  "summary": "Retain dynamic GetSetRecord and iterator behavior for symmetricDifference.",
+  "source": {
+    "pattern": "$set.symmetricDifference($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "static_set_like_shape_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.SetSymmetricDifference",
+    "template": "JsRuntime.SetSymmetricDifference($set, $other)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "get_set_record_order": [
+      "size",
+      "has",
+      "keys"
+    ],
+    "iteration": "keys() iterator with arbitrary user code",
+    "canonicalization": "-0 becomes +0 for keyed collection matching",
+    "result": "ordinary Set independent of @@species"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "dynamic keys getter",
+      "input": "let log=[]; const o={size:0,has(){},get keys(){log.push('keys');return function*(){}}}; new Set().symmetricDifference(o); console.log(log);",
+      "expected_behavior": "prints ['keys']"
+    },
+    {
+      "name": "NaN size rejected",
+      "input": "try{new Set().symmetricDifference({size:NaN,has(){},keys(){}})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "set.prototype.is-subset.dynamic-setlike",
+  "category": "map_set",
+  "summary": "Use runtime GetSetRecord/call/iterator semantics for dynamic isSubsetOf.",
+  "source": {
+    "pattern": "$set.isSubsetOf($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "static_set_like_shape_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.SetIsSubsetOf",
+    "template": "JsRuntime.SetIsSubsetOf($set, $other)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "get_set_record": "observable and throwable",
+    "branch": "reported size controls whether has or keys is invoked",
+    "iterator_close": "preserved on keys-path early false",
+    "receiver_reentrancy": "observable where has can mutate receiver"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "protocol getter order",
+      "input": "const log=[]; const o={get size(){log.push('s');return 0},get has(){log.push('h');return ()=>false},get keys(){log.push('k');return function*(){}}}; new Set().isSubsetOf(o); console.log(log.join(''));",
+      "expected_behavior": "prints shk"
+    },
+    {
+      "name": "size coercion can throw",
+      "input": "const o={size:{valueOf(){throw 'x'}},has(){},keys(){}}; try{new Set().isSubsetOf(o)}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

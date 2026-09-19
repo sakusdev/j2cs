@@ -1,0 +1,48 @@
+{
+  "id": "set.prototype.symmetric-difference.known-setlike",
+  "category": "map_set",
+  "summary": "Compute symmetric difference against a statically analyzable set-like keys() stream.",
+  "source": {
+    "pattern": "$set.symmetricDifference($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_not_builtin_set": true,
+      "other_set_like_shape_proven": true,
+      "size_is_known_data_property": true,
+      "has_is_known_callable": true,
+      "keys_is_known_callable": true,
+      "keys_iterator_lowerable": true,
+      "other_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.SymmetricDifferenceSetLike",
+    "template": "JsSet.SymmetricDifferenceSetLike($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "new ordinary Set",
+    "keys_only": "has is fetched by GetSetRecord but the algorithm consumes keys",
+    "duplicate_keys": "duplicates do not toggle more than once because membership is tested against original receiver and result presence",
+    "order": "receiver survivors then first occurrence of other-only keys"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "duplicate keys do not retoggle",
+      "input": "const o={size:2,has(){return false},*keys(){yield 2;yield 2}}; console.log([...new Set([1]).symmetricDifference(o)]);",
+      "expected_behavior": "prints [1,2]"
+    },
+    {
+      "name": "has still required callable",
+      "input": "const o={size:0,has:1,*keys(){}}; try{new Set().symmetricDifference(o)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}
