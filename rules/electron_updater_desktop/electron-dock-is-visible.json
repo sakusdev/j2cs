@@ -1,0 +1,38 @@
+{
+  "id": "electron.dock.is-visible",
+  "category": "electron.updater_desktop",
+  "summary": "dock.isVisible synchronously reports current Dock icon visibility.",
+  "source": {
+    "pattern": "app.dock.isVisible()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.IsVisible",
+    "template": "ElectronCompat.Dock.IsVisible($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean host visibility state"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.isVisible()",
+      "expected_behavior": "visible state returned"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.isVisible()",
+      "expected_behavior": "must query host state rather than cached compile-time flag"
+    }
+  ]
+}

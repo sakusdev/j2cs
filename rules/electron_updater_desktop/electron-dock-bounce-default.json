@@ -1,0 +1,40 @@
+{
+  "id": "electron.dock.bounce-default",
+  "category": "electron.updater_desktop",
+  "summary": "dock.bounce() defaults to informational and returns a request id.",
+  "source": {
+    "pattern": "app.dock.bounce()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.Bounce",
+    "template": "ElectronCompat.Dock.Bounce($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "informational",
+    "return": "integer request id",
+    "duration": "visual bounce about one second but request remains active until focus/cancel"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.bounce()",
+      "expected_behavior": "returns id"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.bounce()",
+      "expected_behavior": "timing must stay host-controlled"
+    }
+  ]
+}

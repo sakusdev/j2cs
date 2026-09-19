@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.mac-signing",
+  "category": "electron.updater_desktop",
+  "summary": "macOS automatic updates require the application to be signed.",
+  "source": {
+    "pattern": "autoUpdater on macOS",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.PlatformPreconditions",
+    "template": "ElectronCompat.AutoUpdater.PlatformPreconditions($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "platform": "darwin",
+    "requirement": "signed application"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater on macOS",
+      "expected_behavior": "signed packaged app may update"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater on macOS",
+      "expected_behavior": "unsigned app must not be reported as fully supported"
+    }
+  ]
+}

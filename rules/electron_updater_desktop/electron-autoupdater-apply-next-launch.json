@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.apply-next-launch",
+  "category": "electron.updater_desktop",
+  "summary": "A successfully downloaded update is applied on a later app launch even if quitAndInstall is never called.",
+  "source": {
+    "pattern": "downloaded update then normal later launch",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.PersistDownloadedUpdate",
+    "template": "ElectronCompat.AutoUpdater.PersistDownloadedUpdate($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "persistence": "downloaded update survives current process",
+    "installation": "next launch applies it"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: downloaded update then normal later launch",
+      "expected_behavior": "manual install call not mandatory"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: downloaded update then normal later launch",
+      "expected_behavior": "runtime must retain updater-managed state"
+    }
+  ]
+}

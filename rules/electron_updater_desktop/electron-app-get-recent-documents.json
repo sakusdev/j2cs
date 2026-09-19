@@ -1,0 +1,42 @@
+{
+  "id": "electron.app.get-recent-documents",
+  "category": "electron.updater_desktop",
+  "summary": "getRecentDocuments returns the OS-managed recent document paths.",
+  "source": {
+    "pattern": "app.getRecentDocuments()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.AppDesktop.GetRecentDocuments",
+    "template": "ElectronCompat.AppDesktop.GetRecentDocuments($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
+    "return": "string[]"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/app"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.getRecentDocuments()",
+      "expected_behavior": "returns path array"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.getRecentDocuments()",
+      "expected_behavior": "ordering/content are OS state"
+    }
+  ]
+}

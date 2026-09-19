@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.set-menu",
+  "category": "electron.updater_desktop",
+  "summary": "dock.setMenu installs a Menu as the application Dock menu.",
+  "source": {
+    "pattern": "app.dock.setMenu($menu)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.SetMenu",
+    "template": "ElectronCompat.Dock.SetMenu($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument": "Electron Menu",
+    "identity": "host retains menu semantics"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.setMenu($menu)",
+      "expected_behavior": "menu installed"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.setMenu($menu)",
+      "expected_behavior": "generic Menu behavior reused from Electron menu rules"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "electron.app.add-recent-document",
+  "category": "electron.updater_desktop",
+  "summary": "addRecentDocument adds a path to the OS-managed recent documents list on macOS/Windows.",
+  "source": {
+    "pattern": "app.addRecentDocument($path)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.AppDesktop.AddRecentDocument",
+    "template": "ElectronCompat.AppDesktop.AddRecentDocument($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
+    "storage": "OS-managed"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/app"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.addRecentDocument($path)",
+      "expected_behavior": "path forwarded to OS"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.addRecentDocument($path)",
+      "expected_behavior": "Linux must remain platform-gated"
+    }
+  ]
+}

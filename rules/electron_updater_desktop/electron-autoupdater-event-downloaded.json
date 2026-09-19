@@ -1,0 +1,46 @@
+{
+  "id": "electron.autoupdater.event-downloaded",
+  "category": "electron.updater_desktop",
+  "summary": "update-downloaded carries release metadata with platform-dependent field availability.",
+  "source": {
+    "pattern": "autoUpdater.on('update-downloaded',$listener)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.OnEvent",
+    "template": "ElectronCompat.AutoUpdater.OnEvent($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "update-downloaded",
+    "payload": [
+      "event",
+      "releaseNotes",
+      "releaseName",
+      "releaseDate",
+      "updateURL"
+    ],
+    "windows_squirrel": "only releaseName is guaranteed"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.on('update-downloaded',$listener)",
+      "expected_behavior": "metadata delivered after download"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.on('update-downloaded',$listener)",
+      "expected_behavior": "Windows Squirrel partial payload must be preserved"
+    }
+  ]
+}

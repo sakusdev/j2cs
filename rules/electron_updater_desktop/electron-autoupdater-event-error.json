@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.event-error",
+  "category": "electron.updater_desktop",
+  "summary": "Updater failures are surfaced through the error event with an Error object.",
+  "source": {
+    "pattern": "autoUpdater.on('error',$listener)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.OnEvent",
+    "template": "ElectronCompat.AutoUpdater.OnEvent($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "error",
+    "argument": "Error"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.on('error',$listener)",
+      "expected_behavior": "network/update failure reaches error listener"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.on('error',$listener)",
+      "expected_behavior": "error is not update-not-available"
+    }
+  ]
+}

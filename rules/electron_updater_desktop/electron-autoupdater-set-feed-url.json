@@ -1,0 +1,41 @@
+{
+  "id": "electron.autoupdater.set-feed-url",
+  "category": "electron.updater_desktop",
+  "summary": "setFeedURL configures and initializes the platform updater feed.",
+  "source": {
+    "pattern": "autoUpdater.setFeedURL($options)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.SetFeedURL",
+    "template": "ElectronCompat.AutoUpdater.SetFeedURL($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "url": "required string",
+    "headers": "macOS optional",
+    "serverType": "macOS optional",
+    "allowAnyVersion": "Windows MSIX optional"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.setFeedURL($options)",
+      "expected_behavior": "configured feed is retained"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.setFeedURL($options)",
+      "expected_behavior": "platform-only options must remain gated"
+    }
+  ]
+}

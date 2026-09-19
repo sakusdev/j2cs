@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.bounce-focused",
+  "category": "electron.updater_desktop",
+  "summary": "dock.bounce returns -1 when the app is focused.",
+  "source": {
+    "pattern": "app.dock.bounce($type) while focused",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.Bounce",
+    "template": "ElectronCompat.Dock.Bounce($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "focused_return": -1,
+    "effect": "no valid bounce request"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.bounce($type) while focused",
+      "expected_behavior": "focused path returns -1"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.bounce($type) while focused",
+      "expected_behavior": "caller may use -1 as sentinel"
+    }
+  ]
+}

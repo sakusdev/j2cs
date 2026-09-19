@@ -1,0 +1,38 @@
+{
+  "id": "electron.dock.get-badge",
+  "category": "electron.updater_desktop",
+  "summary": "dock.getBadge returns the currently configured Dock badge string.",
+  "source": {
+    "pattern": "app.dock.getBadge()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.GetBadge",
+    "template": "ElectronCompat.Dock.GetBadge($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "string"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.getBadge()",
+      "expected_behavior": "returns current badge text"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.getBadge()",
+      "expected_behavior": "empty text remains distinct from numeric app badge count"
+    }
+  ]
+}

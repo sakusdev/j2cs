@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.mac-ats",
+  "category": "electron.updater_desktop",
+  "summary": "macOS updater network requests are subject to App Transport Security policy.",
+  "source": {
+    "pattern": "autoUpdater network request on macOS",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.PlatformPreconditions",
+    "template": "ElectronCompat.AutoUpdater.PlatformPreconditions($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "platform": "darwin",
+    "network_policy": "ATS applies"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater network request on macOS",
+      "expected_behavior": "HTTPS-compatible feed works under policy"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater network request on macOS",
+      "expected_behavior": "insecure transport exemptions are host configuration, not compiler semantics"
+    }
+  ]
+}

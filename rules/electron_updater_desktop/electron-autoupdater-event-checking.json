@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.event-checking",
+  "category": "electron.updater_desktop",
+  "summary": "checking-for-update is emitted when an update check starts.",
+  "source": {
+    "pattern": "autoUpdater.on('checking-for-update',$listener)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.OnEvent",
+    "template": "ElectronCompat.AutoUpdater.OnEvent($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "checking-for-update",
+    "ordering": "after check begins, before availability result"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.on('checking-for-update',$listener)",
+      "expected_behavior": "listener sees start event"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.on('checking-for-update',$listener)",
+      "expected_behavior": "generic EventEmitter listener semantics remain owned elsewhere"
+    }
+  ]
+}

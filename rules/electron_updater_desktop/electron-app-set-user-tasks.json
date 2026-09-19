@@ -1,0 +1,40 @@
+{
+  "id": "electron.app.set-user-tasks",
+  "category": "electron.updater_desktop",
+  "summary": "setUserTasks configures the Windows Jump List Tasks category and returns success.",
+  "source": {
+    "pattern": "app.setUserTasks($tasks)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.AppDesktop.SetUserTasks",
+    "template": "ElectronCompat.AppDesktop.SetUserTasks($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "platform": "win32",
+    "return": "boolean",
+    "argument": "Task[]"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/app"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.setUserTasks($tasks)",
+      "expected_behavior": "success boolean preserved"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.setUserTasks($tasks)",
+      "expected_behavior": "must not pretend support on non-Windows"
+    }
+  ]
+}

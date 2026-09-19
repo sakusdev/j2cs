@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.windows-squirrel-firstrun",
+  "category": "electron.updater_desktop",
+  "summary": "Squirrel.Windows first-run locking can make immediate update checks fail.",
+  "source": {
+    "pattern": "autoUpdater.checkForUpdates() during --squirrel-firstrun",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.CheckForUpdates",
+    "template": "ElectronCompat.AutoUpdater.CheckForUpdates($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "platform": "win32",
+    "squirrel_firstrun": "updater lock may reject early requests"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.checkForUpdates() during --squirrel-firstrun",
+      "expected_behavior": "delayed check can succeed"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.checkForUpdates() during --squirrel-firstrun",
+      "expected_behavior": "first-run failure must not be normalized to no-update"
+    }
+  ]
+}

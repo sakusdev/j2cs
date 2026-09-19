@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.quit-and-install",
+  "category": "electron.updater_desktop",
+  "summary": "quitAndInstall is valid after update-downloaded and restarts to install the downloaded update.",
+  "source": {
+    "pattern": "autoUpdater.quitAndInstall()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.QuitAndInstall",
+    "template": "ElectronCompat.AutoUpdater.QuitAndInstall($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "downloaded update",
+    "effect": "close windows, quit, restart/install"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.quitAndInstall()",
+      "expected_behavior": "downloaded update can be installed immediately"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.quitAndInstall()",
+      "expected_behavior": "calling too early must remain host-defined/error-prone rather than fabricated success"
+    }
+  ]
+}
