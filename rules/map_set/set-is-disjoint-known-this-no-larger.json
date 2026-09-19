@@ -1,0 +1,49 @@
+{
+  "id": "set.prototype.is-disjoint.known-this-no-larger",
+  "category": "map_set",
+  "summary": "Check disjointness against known set-like object through its has method.",
+  "source": {
+    "pattern": "$set.isDisjointFrom($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_not_builtin_set": true,
+      "other_set_like_shape_proven": true,
+      "size_is_known_data_property": true,
+      "has_is_known_callable": true,
+      "keys_is_known_callable": true,
+      "keys_iterator_lowerable": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size <= other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsDisjointFromSetLike",
+    "template": "JsSet.IsDisjointFromSetLike($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "path": "call other.has with other as this",
+    "boolean_conversion": "ToBoolean",
+    "short_circuit": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "truthy has indicates overlap",
+      "input": "const o={size:5,has(v){return v===1?'x':''},*keys(){}}; console.log(new Set([1]).isDisjointFrom(o));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "this binding",
+      "input": "const o={size:5,x:1,has(v){return this.x===v},*keys(){}}; console.log(new Set([2]).isDisjointFrom(o));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

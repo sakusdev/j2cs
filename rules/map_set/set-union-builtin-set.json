@@ -1,0 +1,44 @@
+{
+  "id": "set.prototype.union.builtin-set",
+  "category": "map_set",
+  "summary": "Union two proven intrinsic Set instances, preserving Set insertion order and SameValueZero.",
+  "source": {
+    "pattern": "$set.union($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.Union",
+    "template": "JsSet.Union($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "new ordinary Set using %Set.prototype%, not species",
+    "receiver_mutation": false,
+    "order": "all live receiver values in insertion order, then previously-absent other keys in keys() order",
+    "equality": "SameValueZero with -0 canonicalization"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "ordered union",
+      "input": "console.log([...new Set([2,1]).union(new Set([1,3]))]);",
+      "expected_behavior": "prints [2,1,3]"
+    },
+    {
+      "name": "same-value-zero",
+      "input": "const r=new Set([NaN,-0]).union(new Set([NaN,+0])); console.log(r.size,Object.is([...r][1],0));",
+      "expected_behavior": "prints 2 true"
+    }
+  ]
+}

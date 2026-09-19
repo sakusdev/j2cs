@@ -1,0 +1,49 @@
+{
+  "id": "set.prototype.union.dynamic-setlike",
+  "category": "map_set",
+  "summary": "Retain runtime GetSetRecord and iterator semantics when the set-like object can expose getters, Proxies, or dynamic callables.",
+  "source": {
+    "pattern": "$set.union($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "static_set_like_shape_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.SetUnion",
+    "template": "JsRuntime.SetUnion($set, $other)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "get_set_record_order": [
+      "Get size",
+      "ToNumber/ToIntegerOrInfinity",
+      "Get has and verify callable",
+      "Get keys and verify callable"
+    ],
+    "iterator": "GetIteratorFromMethod on keys; abrupt completions propagate with iterator protocol semantics",
+    "user_code": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "observable property order",
+      "input": "const log=[]; const o={get size(){log.push('size');return 0},get has(){log.push('has');return ()=>false},get keys(){log.push('keys');return function*(){}}}; new Set().union(o); console.log(log.join(','));",
+      "expected_behavior": "prints size,has,keys"
+    },
+    {
+      "name": "negative size rejected before methods",
+      "input": "const o={size:-1,get has(){throw 'late'},keys(){}}; try{new Set().union(o)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ],
+  "caveats": [
+    "Do not lower to LINQ Union: the set-like protocol and property/call ordering are observable."
+  ]
+}

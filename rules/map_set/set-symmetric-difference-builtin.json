@@ -1,0 +1,44 @@
+{
+  "id": "set.prototype.symmetric-difference.builtin-set",
+  "category": "map_set",
+  "summary": "Compute symmetric difference with an intrinsic Set while preserving original receiver order and appending new other-only keys.",
+  "source": {
+    "pattern": "$set.symmetricDifference($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.SymmetricDifference",
+    "template": "JsSet.SymmetricDifference($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "new ordinary Set",
+    "receiver_mutation": false,
+    "algorithm": "copy receiver; for each other key remove receiver members, append other-only members",
+    "equality": "SameValueZero"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "ordering",
+      "input": "console.log([...new Set([3,1,2]).symmetricDifference(new Set([2,4,1,5]))]);",
+      "expected_behavior": "prints [3,4,5]"
+    },
+    {
+      "name": "receiver unchanged",
+      "input": "const a=new Set([1]); a.symmetricDifference(new Set([1,2])); console.log([...a]);",
+      "expected_behavior": "prints [1]"
+    }
+  ]
+}

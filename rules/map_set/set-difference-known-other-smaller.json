@@ -1,0 +1,50 @@
+{
+  "id": "set.prototype.difference.known-other-smaller",
+  "category": "map_set",
+  "summary": "difference over a statically analyzable set-like object using its keys iterator.",
+  "source": {
+    "pattern": "$set.difference($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_not_builtin_set": true,
+      "other_set_like_shape_proven": true,
+      "size_is_known_data_property": true,
+      "has_is_known_callable": true,
+      "keys_is_known_callable": true,
+      "keys_iterator_lowerable": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size > other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.DifferenceSetLike",
+    "template": "JsSet.DifferenceSetLike($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "equality": "SameValueZero",
+    "receiver_mutation": false,
+    "result": "new ordinary Set",
+    "path": "invoke known other.keys with other as this and iterate returned iterator",
+    "iterator_close": "preserve canonical iterator close when algorithm exits early"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "keys this binding",
+      "input": "const o={size:1,tag:2,*keys(){yield this.tag},has(){return false}}; const a=new Set([1,2,3]); console.log([...a.difference(o)]);",
+      "expected_behavior": "keys is invoked with other as this"
+    },
+    {
+      "name": "duplicate keys tolerated",
+      "input": "const o={size:1,*keys(){yield 2;yield 2},has(){return false}}; const a=new Set([1,2,3]); console.log([...a.difference(o)]);",
+      "expected_behavior": "duplicate keys cannot create duplicate Set entries"
+    }
+  ]
+}

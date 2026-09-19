@@ -1,0 +1,44 @@
+{
+  "id": "set.prototype.is-subset.builtin-size-fast-false",
+  "category": "map_set",
+  "summary": "isSubsetOf returns false after GetSetRecord when intrinsic Set sizes make the relation impossible.",
+  "source": {
+    "pattern": "$set.isSubsetOf($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size > other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsSubsetOf",
+    "template": "JsSet.IsSubsetOf($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean false",
+    "short_circuit": "after set-record acquisition; no element membership/keys iteration",
+    "equality": "SameValueZero"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "size rejects relation",
+      "input": "console.log(new Set([1,2]).isSubsetOf(new Set([1])));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "no mutation",
+      "input": "const a=new Set([1,2]); a.isSubsetOf(new Set([1])); console.log(a.size);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "set.prototype.is-subset.known-scan",
+  "category": "map_set",
+  "summary": "isSubsetOf scan path for a statically analyzable set-like object.",
+  "source": {
+    "pattern": "$set.isSubsetOf($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_not_builtin_set": true,
+      "other_set_like_shape_proven": true,
+      "size_is_known_data_property": true,
+      "has_is_known_callable": true,
+      "keys_is_known_callable": true,
+      "keys_iterator_lowerable": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size <= other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsSubsetOfSetLike",
+    "template": "JsSet.IsSubsetOfSetLike($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "scan": "iterate receiver and call other.has; receiver can grow during calls",
+    "method_this": "other object",
+    "boolean_conversion": "has return uses ToBoolean when has is used",
+    "iterator_close": "required for keys-path early false"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "set-like relation",
+      "input": "const o={size:2,has(v){return v===1},*keys(){yield 1;yield 2}}; console.log(new Set([1]).isSubsetOf(o));",
+      "expected_behavior": "returns according to set-like membership semantics"
+    },
+    {
+      "name": "truthy has",
+      "input": "const o={size:2,has(){return {}},*keys(){yield 9}}; console.log(typeof new Set([1]).isSubsetOf(o));",
+      "expected_behavior": "prints boolean"
+    }
+  ]
+}

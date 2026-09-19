@@ -1,0 +1,45 @@
+{
+  "id": "set.prototype.is-disjoint.builtin-this-no-larger",
+  "category": "map_set",
+  "summary": "Check disjointness by scanning receiver when it is no larger than intrinsic other Set.",
+  "source": {
+    "pattern": "$set.isDisjointFrom($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "other_inferred_builtin_set": true,
+      "other_set_protocol_intrinsic": true,
+      "other_not_proxy": true,
+      "size_relation": "receiver_size <= other_reported_size"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsSet.IsDisjointFrom",
+    "template": "JsSet.IsDisjointFrom($set, $other)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "Boolean",
+    "path": "iterate receiver and test other membership",
+    "short_circuit": "first shared value returns false",
+    "receiver_reentrancy": "receiver growth during has calls is observable"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "disjoint",
+      "input": "console.log(new Set([1]).isDisjointFrom(new Set([2,3])));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "shared NaN",
+      "input": "console.log(new Set([NaN]).isDisjointFrom(new Set([NaN,2])));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

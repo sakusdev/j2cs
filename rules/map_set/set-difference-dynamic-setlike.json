@@ -1,0 +1,45 @@
+{
+  "id": "set.prototype.difference.dynamic-setlike",
+  "category": "map_set",
+  "summary": "Use runtime semantics for difference when set-like protocol access or iteration is dynamically observable.",
+  "source": {
+    "pattern": "$set.difference($other)",
+    "requirements": {
+      "receiver_inferred_builtin_set": true,
+      "builtin_member_not_overridden_or_shadowed": true,
+      "receiver_not_proxy": true,
+      "static_set_like_shape_not_proven": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.SetDifference",
+    "template": "JsRuntime.SetDifference($set, $other)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "equality": "SameValueZero",
+    "receiver_mutation": false,
+    "result": "new ordinary Set",
+    "get_set_record": "observable size/has/keys property access and conversions",
+    "branching": "reported size chooses has-scan vs keys-iterator branch",
+    "user_code": true,
+    "iterator_close": "preserve on abrupt/early completion where specified"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/keyed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "size getter observable",
+      "input": "let n=0; const o={get size(){n++;return 0},has(){return false},*keys(){}}; new Set().difference(o); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "noncallable protocol method",
+      "input": "const o={size:0,has:1,keys(){}}; try{new Set().difference(o)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}
