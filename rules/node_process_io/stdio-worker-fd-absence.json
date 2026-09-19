@@ -1,0 +1,39 @@
+{
+  "id": "node.process.stdio.worker-fd-absence",
+  "category": "node_process_io",
+  "summary": "Preserve absence of stdio fd properties inside Worker threads.",
+  "source": {
+    "pattern": "process.$stdio.fd in Worker",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.WorkerStdioFd($stdio)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "worker": "fd property does not exist on process stdin/stdout/stderr in Worker threads",
+    "main": "main-thread fd rules are separate"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "worker boundary",
+      "input": "/* Worker */ console.log(process.stdout.fd);",
+      "expected_behavior": "undefined/no fd property in Node Worker context"
+    },
+    {
+      "name": "main differs",
+      "input": "console.log(process.stdout.fd===1);",
+      "expected_behavior": "true on main thread"
+    }
+  ]
+}

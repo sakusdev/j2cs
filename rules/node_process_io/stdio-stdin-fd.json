@@ -1,0 +1,41 @@
+{
+  "id": "node.process.stdio.stdin-fd",
+  "category": "node_process_io",
+  "summary": "Expose fd 0 for process.stdin on the main thread.",
+  "source": {
+    "pattern": "process.stdin.fd",
+    "requirements": {
+      "node_process_binding": true,
+      "thread": "main"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.GetFd(process.stdin)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.GetFd"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "main_thread": "0",
+    "worker_threads": "property absent per Node host behavior"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "main fd",
+      "input": "console.log(process.stdin.fd);",
+      "expected_behavior": "prints 0 on main thread"
+    },
+    {
+      "name": "numeric",
+      "input": "console.log(process.stdin.fd===0);",
+      "expected_behavior": "prints true on main thread"
+    }
+  ]
+}

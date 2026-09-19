@@ -1,0 +1,41 @@
+{
+  "id": "node.process.stdio.stderr-identity",
+  "category": "node_process_io",
+  "summary": "Return the stable process stderr stream object.",
+  "source": {
+    "pattern": "process.stderr",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.Stderr",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.Stderr"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "stable",
+    "fd": "standard error",
+    "stream": "Writable or net.Socket/Duplex depending host"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "stable",
+      "input": "console.log(process.stderr===process.stderr);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "writable",
+      "input": "console.log(typeof process.stderr.write);",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

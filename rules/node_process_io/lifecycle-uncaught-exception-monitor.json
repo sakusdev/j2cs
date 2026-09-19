@@ -1,0 +1,40 @@
+{
+  "id": "node.process.lifecycle.uncaught-exception-monitor",
+  "category": "node_process_io",
+  "summary": "Run uncaughtExceptionMonitor before handling without changing crash behavior.",
+  "source": {
+    "pattern": "process.on('uncaughtExceptionMonitor',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnUncaughtExceptionMonitor($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "before uncaughtException/capture callback",
+    "default": "monitor alone does not prevent crash",
+    "args": "error, origin"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "register",
+      "input": "const f=()=>{};process.on('uncaughtExceptionMonitor',f);process.off('uncaughtExceptionMonitor',f);console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "not handler",
+      "input": "/* monitor only + uncaught throw */",
+      "expected_behavior": "process still crashes by default"
+    }
+  ]
+}

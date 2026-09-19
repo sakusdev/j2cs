@@ -1,0 +1,41 @@
+{
+  "id": "node.process.lifecycle.unhandled-rejection",
+  "category": "node_process_io",
+  "summary": "Emit unhandledRejection when rejected Promise stays unhandled for the relevant turn.",
+  "source": {
+    "pattern": "process.on('unhandledRejection',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnUnhandledRejection($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "rejection without handler within turn",
+    "args": "reason, Promise",
+    "reason": "arbitrary JS value",
+    "ownership": "Promise semantics in ASYNC"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "identity",
+      "input": "const r={};process.once('unhandledRejection',(reason,p)=>{console.log(reason===r,p instanceof Promise)});Promise.reject(r);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "late handler",
+      "input": "const p=Promise.reject('x');setImmediate(()=>p.catch(()=>{}));",
+      "expected_behavior": "may emit unhandledRejection then rejectionHandled"
+    }
+  ]
+}

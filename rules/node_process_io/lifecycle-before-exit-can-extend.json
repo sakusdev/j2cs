@@ -1,0 +1,39 @@
+{
+  "id": "node.process.lifecycle.before-exit-can-extend",
+  "category": "node_process_io",
+  "summary": "Allow beforeExit listener to schedule work and extend lifetime.",
+  "source": {
+    "pattern": "process.on('beforeExit',$listenerSchedulingWork)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.BeforeExitCanExtend($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "extension": "new async work keeps process alive",
+    "repeat": "beforeExit may recur after work drains"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "schedule",
+      "input": "let once=false;process.on('beforeExit',()=>{if(!once){once=true;setTimeout(()=>console.log('work'),0)}});",
+      "expected_behavior": "work runs"
+    },
+    {
+      "name": "not final-only",
+      "input": "process.on('beforeExit',()=>setImmediate(()=>{}));",
+      "expected_behavior": "can extend loop"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.process.signal.kill-invalid-name",
+  "category": "node_process_io",
+  "summary": "Reject unknown signal names.",
+  "source": {
+    "pattern": "process.kill($pid,$invalidSignal)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.ValidateSignal($invalidSignal)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.ValidateSignal"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "validation": "recognized signal required",
+    "exception": "throws unknown signal"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "invalid",
+      "input": "try{process.kill(process.pid,'SIG_NOT_REAL')}catch(e){console.log(e.code||e.name)}",
+      "expected_behavior": "throws"
+    },
+    {
+      "name": "zero valid",
+      "input": "console.log(process.kill(process.pid,0));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

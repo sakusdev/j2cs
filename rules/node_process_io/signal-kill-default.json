@@ -1,0 +1,41 @@
+{
+  "id": "node.process.signal.kill-default",
+  "category": "node_process_io",
+  "summary": "Send SIGTERM by default from process.kill(pid).",
+  "source": {
+    "pattern": "process.kill($pid)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.Kill($pid,\"SIGTERM\")",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default_signal": "SIGTERM",
+    "return_value": "true on successful send",
+    "errors": "system errors on failure",
+    "platform": "Windows restricted/emulated"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "default contract",
+      "input": "/* child pid */ process.kill(pid);",
+      "expected_behavior": "requests SIGTERM-equivalent termination"
+    },
+    {
+      "name": "success boolean",
+      "input": "/* live permitted pid */ console.log(process.kill(pid));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

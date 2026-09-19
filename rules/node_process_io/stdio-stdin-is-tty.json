@@ -1,0 +1,40 @@
+{
+  "id": "node.process.stdio.stdin-is-tty",
+  "category": "node_process_io",
+  "summary": "Expose stdin TTY status from actual terminal attachment.",
+  "source": {
+    "pattern": "process.stdin.isTTY",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.IsTty(0)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "truthy only when fd 0 is TTY",
+    "pipe": "Boolean false when piped/file input",
+    "host": "runtime query"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "booleanized",
+      "input": "console.log(Boolean(process.stdin.isTTY));",
+      "expected_behavior": "true in interactive TTY, false when piped"
+    },
+    {
+      "name": "pipe false",
+      "input": "/* echo x | node script */ console.log(Boolean(process.stdin.isTTY));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

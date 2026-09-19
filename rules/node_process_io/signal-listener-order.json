@@ -1,0 +1,41 @@
+{
+  "id": "node.process.signal.listener-order",
+  "category": "node_process_io",
+  "summary": "Reuse EventEmitter synchronous registration order after host signal delivery.",
+  "source": {
+    "pattern": "process.on($signal,$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "NodeProcessIo.SignalListenerDispatch($signal)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics.",
+    "helper": "NodeProcessIo.SignalListenerDispatch"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "delivery_boundary": "host-owned",
+    "listener_order": "EVENTS_STREAMS registration order",
+    "mutation": "EventEmitter mutation semantics reused"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "cleanup",
+      "input": "const f=()=>{};process.on('SIGINT',f);process.off('SIGINT',f);console.log(process.listeners('SIGINT').includes(f));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "order model",
+      "input": "/* two SIGUSR1 listeners */",
+      "expected_behavior": "run registration order once host delivers event"
+    }
+  ]
+}

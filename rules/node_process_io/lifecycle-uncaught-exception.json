@@ -1,0 +1,41 @@
+{
+  "id": "node.process.lifecycle.uncaught-exception",
+  "category": "node_process_io",
+  "summary": "Expose uncaughtException hook with error and origin and lifecycle effects.",
+  "source": {
+    "pattern": "process.on('uncaughtException',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnUncaughtException($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "uncaught exception reaches event loop",
+    "args": "error, origin",
+    "default": "without handler stderr + exit 1",
+    "handler": "overrides default immediate crash behavior"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "origin",
+      "input": "process.on('uncaughtException',(e,o)=>{console.log(typeof o);process.exit(0)});setImmediate(()=>{throw Error('x')});",
+      "expected_behavior": "listener gets origin string"
+    },
+    {
+      "name": "host hook",
+      "input": "/* uncaught throw */",
+      "expected_behavior": "runs only after normal JS handling is exhausted"
+    }
+  ]
+}

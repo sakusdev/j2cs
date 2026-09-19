@@ -1,0 +1,40 @@
+{
+  "id": "node.process.stdio.stderr-is-tty",
+  "category": "node_process_io",
+  "summary": "Expose stderr TTY status from actual terminal attachment.",
+  "source": {
+    "pattern": "process.stderr.isTTY",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.IsTty(2)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "result": "host dependent",
+    "tty": "truthy",
+    "pipe_or_file": "Boolean false otherwise"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "booleanized",
+      "input": "console.log(Boolean(process.stderr.isTTY));",
+      "expected_behavior": "depends on attachment"
+    },
+    {
+      "name": "independent redirection",
+      "input": "console.log(Boolean(process.stderr.isTTY)===Boolean(process.stdout.isTTY));",
+      "expected_behavior": "not guaranteed"
+    }
+  ]
+}

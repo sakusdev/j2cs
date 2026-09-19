@@ -1,0 +1,40 @@
+{
+  "id": "node.process.signal.sigwinch",
+  "category": "node_process_io",
+  "summary": "Model SIGWINCH terminal resize delivery.",
+  "source": {
+    "pattern": "process.on('SIGWINCH',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnSignal(\"SIGWINCH\",$listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "meaning": "console resize",
+    "windows": "delivery caveats",
+    "posix": "host signal"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "register",
+      "input": "const f=()=>{};process.on('SIGWINCH',f);process.off('SIGWINCH',f);console.log('ok');",
+      "expected_behavior": "prints ok where listenable"
+    },
+    {
+      "name": "host source",
+      "input": "/* resize terminal */",
+      "expected_behavior": "delivery comes from host integration"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "node.process.stdio.stderr-write-platform-timing",
+  "category": "node_process_io",
+  "summary": "Preserve Node stderr write timing matrix.",
+  "source": {
+    "pattern": "process.stderr.write($chunk,$encoding?,$callback?)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.StderrWrite($chunk,$encoding,$callback)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "files": "sync Windows/POSIX",
+    "tty": "async Windows, sync POSIX",
+    "pipes": "sync Windows, async POSIX",
+    "return_value": "stream backpressure reused"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "return boolean",
+      "input": "console.log(typeof process.stderr.write(''));",
+      "expected_behavior": "prints boolean"
+    },
+    {
+      "name": "host timing",
+      "input": "process.stderr.write('x');",
+      "expected_behavior": "timing depends on platform/attachment"
+    }
+  ]
+}

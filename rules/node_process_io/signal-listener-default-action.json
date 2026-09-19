@@ -1,0 +1,40 @@
+{
+  "id": "node.process.signal.listener-default-action",
+  "category": "node_process_io",
+  "summary": "Installing supported signal listener can remove Node default termination for that signal.",
+  "source": {
+    "pattern": "process.on($signal,$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnSignal($signal,$listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_emitter": "reuse EVENTS_STREAMS",
+    "default_action": "signal-specific default can be removed",
+    "platform": "differences apply"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "register",
+      "input": "const f=()=>{};process.on('SIGINT',f);process.off('SIGINT',f);console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "boundary",
+      "input": "/* SIGINT listener installed */",
+      "expected_behavior": "do not apply no-listener default termination unconditionally"
+    }
+  ]
+}

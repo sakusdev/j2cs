@@ -1,0 +1,40 @@
+{
+  "id": "node.process.lifecycle.exit-event",
+  "category": "node_process_io",
+  "summary": "Emit exit synchronously immediately before termination.",
+  "source": {
+    "pattern": "process.on('exit',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnExit($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timing": "final synchronous event",
+    "argument": "final exit code",
+    "extension": "cannot schedule useful async continuation"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "arg",
+      "input": "process.on('exit',c=>console.log(c));process.exitCode=2;",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "timer ignored",
+      "input": "process.on('exit',()=>setTimeout(()=>console.log('late'),0));",
+      "expected_behavior": "late does not run"
+    }
+  ]
+}

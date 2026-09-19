@@ -1,0 +1,39 @@
+{
+  "id": "node.process.lifecycle.rejection-handled",
+  "category": "node_process_io",
+  "summary": "Emit rejectionHandled when previously reported unhandled Promise later gains handler.",
+  "source": {
+    "pattern": "process.on('rejectionHandled',$listener)",
+    "requirements": {
+      "node_process_binding": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeProcessHost.OnRejectionHandled($listener)",
+    "notes": "Reuse EVENTS_STREAMS for EventEmitter/stream mechanics and NODE_CORE for existing process basics/exit semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "reported unhandled rejection becomes handled",
+    "arg": "same Promise object"
+  },
+  "caveats": [],
+  "references": [
+    "Node.js process documentation",
+    "Node.js stream/EventEmitter documentation"
+  ],
+  "tests": [
+    {
+      "name": "same promise",
+      "input": "const p=Promise.reject('x');process.once('unhandledRejection',()=>setImmediate(()=>p.catch(()=>{})));process.once('rejectionHandled',q=>console.log(q===p));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "immediate handled",
+      "input": "const p=Promise.reject('x');p.catch(()=>{});",
+      "expected_behavior": "normally no unhandled/rejectionHandled pair"
+    }
+  ]
+}
