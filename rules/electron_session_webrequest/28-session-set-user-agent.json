@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.set-user-agent",
+  "category": "electron.session",
+  "summary": "Override Session-wide user agent and accept-languages.",
+  "source": {
+    "pattern": "$ses.setUserAgent($userAgent, $acceptLanguages?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.SetUserAgent",
+    "template": "ElectronCompat.Session.SetUserAgent(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "affects future Session requests/web contents",
+    "edge": "does not retroactively change existing WebContents-specific overrides"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setUserAgent('UA','en-US,ja')",
+      "expected_behavior": "affects future Session requests/web contents"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setUserAgent('UA')",
+      "expected_behavior": "does not retroactively change existing WebContents-specific overrides"
+    }
+  ]
+}

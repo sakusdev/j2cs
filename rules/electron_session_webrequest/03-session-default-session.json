@@ -1,0 +1,41 @@
+{
+  "id": "electron.session.default-session",
+  "category": "electron.session",
+  "summary": "Read the app default Session after readiness.",
+  "source": {
+    "pattern": "session.defaultSession",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.Default",
+    "template": "ElectronCompat.Session.Default(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns stable default Session identity",
+    "edge": "availability begins after app ready"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession",
+      "expected_behavior": "returns stable default Session identity"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession",
+      "expected_behavior": "availability begins after app ready"
+    }
+  ]
+}

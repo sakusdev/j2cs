@@ -1,0 +1,40 @@
+{
+  "id": "electron.cookies.session-isolation",
+  "category": "electron.cookies",
+  "summary": "Preserve cookie-store identity and partition isolation.",
+  "source": {
+    "pattern": "$sesA.cookies !== $sesB.cookies",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Cookies.SessionIsolation",
+    "template": "ElectronCompat.Cookies.SessionIsolation(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "each Session exposes its own cookie service/store identity",
+    "edge": "same partition Session reuse shares its cookie store"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/cookies"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.fromPartition('a').cookies!==session.fromPartition('b').cookies",
+      "expected_behavior": "each Session exposes its own cookie service/store identity"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('a').cookies===session.fromPartition('a').cookies",
+      "expected_behavior": "same partition Session reuse shares its cookie store"
+    }
+  ]
+}

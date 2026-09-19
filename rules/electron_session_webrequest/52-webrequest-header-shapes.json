@@ -1,0 +1,40 @@
+{
+  "id": "electron.webrequest.header-shapes",
+  "category": "electron.webrequest",
+  "summary": "Preserve Electron request/response header record shapes.",
+  "source": {
+    "pattern": "$details.requestHeaders / $details.responseHeaders",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.Headers",
+    "template": "ElectronCompat.WebRequest.Headers(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "request header values are strings; response headers are arrays where documented",
+    "edge": "missing responseHeaders remains representable as undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onSendHeaders(d=>void d.requestHeaders)",
+      "expected_behavior": "request header values are strings; response headers are arrays where documented"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onCompleted(d=>void d.responseHeaders)",
+      "expected_behavior": "missing responseHeaders remains representable as undefined"
+    }
+  ]
+}

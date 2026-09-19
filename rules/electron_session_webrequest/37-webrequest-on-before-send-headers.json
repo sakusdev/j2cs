@@ -1,0 +1,42 @@
+{
+  "id": "electron.webrequest.on-before-send-headers",
+  "category": "electron.webrequest",
+  "summary": "Register the onBeforeSendHeaders Session network interception stage.",
+  "source": {
+    "pattern": "$webRequest.onBeforeSendHeaders($filter?, $listener)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.onBeforeSendHeaders",
+    "template": "ElectronCompat.WebRequest.onBeforeSendHeaders(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "before request headers are sent; callback may cancel or replace headers",
+    "edge": "only the last listener registered for this event is used; null unsubscribes"
+  },
+  "caveats": [
+    "Filters are URL-pattern based and listener replacement is per WebRequest event."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onBeforeSendHeaders({urls:['https://*/*']},()=>{})",
+      "expected_behavior": "before request headers are sent; callback may cancel or replace headers"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onBeforeSendHeaders(null)",
+      "expected_behavior": "only the last listener registered for this event is used; null unsubscribes"
+    }
+  ]
+}

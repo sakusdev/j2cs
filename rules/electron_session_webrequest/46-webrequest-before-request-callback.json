@@ -1,0 +1,39 @@
+{
+  "id": "electron.webrequest.before-request-callback",
+  "category": "electron.webrequest",
+  "summary": "Preserve callback-driven cancel/redirect interception.",
+  "source": {
+    "pattern": "webRequest.onBeforeRequest($filter?, ($details,$callback)=>...)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebRequestBeforeRequest(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "listener must invoke callback with response to continue/cancel/redirect",
+    "edge": "callback timing blocks that request stage until resolved by Electron contract"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onBeforeRequest((d,cb)=>cb({cancel:false}))",
+      "expected_behavior": "listener must invoke callback with response to continue/cancel/redirect"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onBeforeRequest((d,cb)=>cb({redirectURL:'https://example.com'}))",
+      "expected_behavior": "callback timing blocks that request stage until resolved by Electron contract"
+    }
+  ]
+}

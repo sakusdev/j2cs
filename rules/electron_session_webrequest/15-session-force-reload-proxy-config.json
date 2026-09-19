@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.force-reload-proxy-config",
+  "category": "electron.session",
+  "summary": "Reset proxy service state and reload configuration.",
+  "source": {
+    "pattern": "$ses.forceReloadProxyConfig()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ForceReloadProxyConfig",
+    "template": "ElectronCompat.Session.ForceReloadProxyConfig(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> after reload",
+    "edge": "PAC mode refetches the PAC script"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.forceReloadProxyConfig()",
+      "expected_behavior": "returns Promise<void> after reload"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.forceReloadProxyConfig().then(()=>{})",
+      "expected_behavior": "PAC mode refetches the PAC script"
+    }
+  ]
+}

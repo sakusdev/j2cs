@@ -1,0 +1,39 @@
+{
+  "id": "electron.session.set-permission-check-handler",
+  "category": "electron.session",
+  "summary": "Install synchronous permission checks for the Session.",
+  "source": {
+    "pattern": "$ses.setPermissionCheckHandler($handler)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSessionSetPermissionCheckHandler(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "handler result gates permission checks",
+    "edge": "origin/context information is host-provided and null removes handler"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setPermissionCheckHandler(()=>true)",
+      "expected_behavior": "handler result gates permission checks"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setPermissionCheckHandler(null)",
+      "expected_behavior": "origin/context information is host-provided and null removes handler"
+    }
+  ]
+}

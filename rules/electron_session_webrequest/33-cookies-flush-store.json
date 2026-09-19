@@ -1,0 +1,40 @@
+{
+  "id": "electron.cookies.flush-store",
+  "category": "electron.cookies",
+  "summary": "Flush cookie writes to disk.",
+  "source": {
+    "pattern": "$cookies.flushStore()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Cookies.FlushStore",
+    "template": "ElectronCompat.Cookies.FlushStore(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> after store flush",
+    "edge": "in-memory sessions preserve in-memory semantics rather than inventing persistence"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/cookies"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.cookies.flushStore()",
+      "expected_behavior": "returns Promise<void> after store flush"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('temp').cookies.flushStore()",
+      "expected_behavior": "in-memory sessions preserve in-memory semantics rather than inventing persistence"
+    }
+  ]
+}

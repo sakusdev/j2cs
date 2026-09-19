@@ -1,0 +1,43 @@
+{
+  "id": "electron.session.from-path",
+  "category": "electron.session",
+  "summary": "Get or create a Session keyed by absolute storage path.",
+  "source": {
+    "pattern": "session.fromPath($path, $options?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.FromPath",
+    "template": "ElectronCompat.Session.FromPath(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "same absolute path reuses Session identity",
+    "edge": "empty or non-absolute paths throw"
+  },
+  "caveats": [
+    "Options only apply before that path has been used."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.fromPath('/tmp/profile')",
+      "expected_behavior": "same absolute path reuses Session identity"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPath('relative')",
+      "expected_behavior": "empty or non-absolute paths throw"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.disable-network-emulation",
+  "category": "electron.session",
+  "summary": "Restore original network configuration.",
+  "source": {
+    "pattern": "$ses.disableNetworkEmulation()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.DisableNetworkEmulation",
+    "template": "ElectronCompat.Session.DisableNetworkEmulation(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "removes active emulation",
+    "edge": "repeated disable remains a host no-op"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.disableNetworkEmulation()",
+      "expected_behavior": "removes active emulation"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.disableNetworkEmulation()",
+      "expected_behavior": "repeated disable remains a host no-op"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.set-download-path",
+  "category": "electron.session",
+  "summary": "Set default download directory for the Session.",
+  "source": {
+    "pattern": "$ses.setDownloadPath($path)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.SetDownloadPath",
+    "template": "ElectronCompat.Session.SetDownloadPath(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "updates future download save location",
+    "edge": "does not move already-started downloads"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setDownloadPath('/tmp/downloads')",
+      "expected_behavior": "updates future download save location"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setDownloadPath('/tmp/other')",
+      "expected_behavior": "does not move already-started downloads"
+    }
+  ]
+}

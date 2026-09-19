@@ -1,0 +1,40 @@
+{
+  "id": "electron.webrequest.details-frame-lifetime",
+  "category": "electron.webrequest",
+  "summary": "Preserve nullable WebFrameMain request metadata.",
+  "source": {
+    "pattern": "$details.frame",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.Frame",
+    "template": "ElectronCompat.WebRequest.Frame(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "frame may identify requesting frame while alive",
+    "edge": "frame can be null if navigated/destroyed before access"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onCompleted(d=>void d.frame)",
+      "expected_behavior": "frame may identify requesting frame while alive"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onCompleted(d=>console.log(d.frame===null))",
+      "expected_behavior": "frame can be null if navigated/destroyed before access"
+    }
+  ]
+}

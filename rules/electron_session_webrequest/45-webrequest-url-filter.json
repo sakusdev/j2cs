@@ -1,0 +1,40 @@
+{
+  "id": "electron.webrequest.url-filter",
+  "category": "electron.webrequest",
+  "summary": "Apply Electron URL pattern filters before invoking a WebRequest listener.",
+  "source": {
+    "pattern": "$webRequest.$event({urls:$patterns}, $listener)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.UrlFilter",
+    "template": "ElectronCompat.WebRequest.UrlFilter(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "listener sees only matching request URLs",
+    "edge": "omitted filter matches all requests"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onCompleted({urls:['https://*.example.com/*']},()=>{})",
+      "expected_behavior": "listener sees only matching request URLs"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onCompleted(()=>{})",
+      "expected_behavior": "omitted filter matches all requests"
+    }
+  ]
+}

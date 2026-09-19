@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.clear-cache",
+  "category": "electron.session",
+  "summary": "Clear the Session HTTP cache.",
+  "source": {
+    "pattern": "$ses.clearCache()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ClearCache",
+    "template": "ElectronCompat.Session.ClearCache(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> fulfilled after cache clear",
+    "edge": "does not mean all storage/cookies are cleared"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.clearCache()",
+      "expected_behavior": "returns Promise<void> fulfilled after cache clear"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.clearCache().then(()=>{})",
+      "expected_behavior": "does not mean all storage/cookies are cleared"
+    }
+  ]
+}

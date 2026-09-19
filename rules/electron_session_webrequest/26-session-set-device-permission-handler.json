@@ -1,0 +1,39 @@
+{
+  "id": "electron.session.set-device-permission-handler",
+  "category": "electron.session",
+  "summary": "Install device permission selection logic.",
+  "source": {
+    "pattern": "$ses.setDevicePermissionHandler($handler)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSessionSetDevicePermissionHandler(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "handler controls device permission decisions",
+    "edge": "null restores default behavior"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setDevicePermissionHandler(()=>true)",
+      "expected_behavior": "handler controls device permission decisions"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setDevicePermissionHandler(null)",
+      "expected_behavior": "null restores default behavior"
+    }
+  ]
+}

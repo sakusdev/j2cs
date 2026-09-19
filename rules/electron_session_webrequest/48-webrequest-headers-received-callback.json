@@ -1,0 +1,39 @@
+{
+  "id": "electron.webrequest.headers-received-callback",
+  "category": "electron.webrequest",
+  "summary": "Preserve callback-driven response-header/status modification.",
+  "source": {
+    "pattern": "webRequest.onHeadersReceived($filter?, ($details,$callback)=>...)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebRequestHeadersReceived(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "callback can replace responseHeaders/statusLine or cancel",
+    "edge": "statusLine behavior when overriding headers follows Electron network stack"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onHeadersReceived((d,cb)=>cb({responseHeaders:d.responseHeaders}))",
+      "expected_behavior": "callback can replace responseHeaders/statusLine or cancel"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onHeadersReceived((d,cb)=>cb({cancel:true}))",
+      "expected_behavior": "statusLine behavior when overriding headers follows Electron network stack"
+    }
+  ]
+}

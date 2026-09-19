@@ -1,0 +1,42 @@
+{
+  "id": "electron.session.set-proxy",
+  "category": "electron.session",
+  "summary": "Apply Chromium proxy configuration asynchronously.",
+  "source": {
+    "pattern": "$ses.setProxy($config)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.SetProxy",
+    "template": "ElectronCompat.Session.SetProxy(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> when proxy settings are applied",
+    "edge": "existing pooled connections may continue using previous proxy until closed"
+  },
+  "caveats": [
+    "Network stack semantics differ from .NET WebProxy; pooled connections are observable."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setProxy({proxyRules:'http://localhost:8080'})",
+      "expected_behavior": "returns Promise<void> when proxy settings are applied"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setProxy({mode:'direct'})",
+      "expected_behavior": "existing pooled connections may continue using previous proxy until closed"
+    }
+  ]
+}

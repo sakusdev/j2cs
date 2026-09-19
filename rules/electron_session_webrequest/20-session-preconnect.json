@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.preconnect",
+  "category": "electron.session",
+  "summary": "Preconnect sockets to a URL origin.",
+  "source": {
+    "pattern": "$ses.preconnect($options)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.Preconnect",
+    "template": "ElectronCompat.Session.Preconnect(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "opens up to requested sockets for the origin",
+    "edge": "numSockets must satisfy Electron bounds and only origin is relevant"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.preconnect({url:'https://example.com',numSockets:2})",
+      "expected_behavior": "opens up to requested sockets for the origin"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.preconnect({url:'https://example.com',numSockets:99})",
+      "expected_behavior": "numSockets must satisfy Electron bounds and only origin is relevant"
+    }
+  ]
+}

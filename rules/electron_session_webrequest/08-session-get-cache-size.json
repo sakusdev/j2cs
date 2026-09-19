@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.get-cache-size",
+  "category": "electron.session",
+  "summary": "Read current HTTP cache size asynchronously.",
+  "source": {
+    "pattern": "$ses.getCacheSize()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.GetCacheSize",
+    "template": "ElectronCompat.Session.GetCacheSize(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<Integer> bytes",
+    "edge": "observes current host cache, not a compile-time estimate"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.getCacheSize()",
+      "expected_behavior": "returns Promise<Integer> bytes"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('temp').getCacheSize()",
+      "expected_behavior": "observes current host cache, not a compile-time estimate"
+    }
+  ]
+}

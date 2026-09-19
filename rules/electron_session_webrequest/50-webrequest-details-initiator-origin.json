@@ -1,0 +1,40 @@
+{
+  "id": "electron.webrequest.details-initiator-origin",
+  "category": "electron.webrequest",
+  "summary": "Preserve original request initiator origin metadata.",
+  "source": {
+    "pattern": "$details.initiatorOrigin",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.InitiatorOrigin",
+    "template": "ElectronCompat.WebRequest.InitiatorOrigin(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "initiatorOrigin describes origin that issued request",
+    "edge": "it can be absent or 'null' for browser/opaque origins and is retained across redirects"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onCompleted(d=>console.log(d.initiatorOrigin))",
+      "expected_behavior": "initiatorOrigin describes origin that issued request"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onBeforeRedirect(d=>console.log(d.initiatorOrigin))",
+      "expected_behavior": "it can be absent or 'null' for browser/opaque origins and is retained across redirects"
+    }
+  ]
+}

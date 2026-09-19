@@ -1,0 +1,40 @@
+{
+  "id": "electron.cookies.set",
+  "category": "electron.cookies",
+  "summary": "Set or overwrite a Session cookie.",
+  "source": {
+    "pattern": "$cookies.set($details)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Cookies.Set",
+    "template": "ElectronCompat.Cookies.Set(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> after cookie is stored",
+    "edge": "URL/sameSite/secure/domain/path/expiration validation follows Chromium rules"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/cookies"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.cookies.set({url:'https://example.com',name:'a',value:'1'})",
+      "expected_behavior": "returns Promise<void> after cookie is stored"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.cookies.set({url:'http://example.com',name:'a',value:'1',secure:true})",
+      "expected_behavior": "URL/sameSite/secure/domain/path/expiration validation follows Chromium rules"
+    }
+  ]
+}

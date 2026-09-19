@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.storage-path",
+  "category": "electron.session",
+  "summary": "Read the storage directory of a persistent Session.",
+  "source": {
+    "pattern": "$ses.storagePath",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.StoragePath",
+    "template": "ElectronCompat.Session.StoragePath(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "persistent Session returns absolute path",
+    "edge": "in-memory Session returns null"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.storagePath",
+      "expected_behavior": "persistent Session returns absolute path"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('temp').storagePath",
+      "expected_behavior": "in-memory Session returns null"
+    }
+  ]
+}

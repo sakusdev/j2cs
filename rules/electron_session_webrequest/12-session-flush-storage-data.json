@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.flush-storage-data",
+  "category": "electron.session",
+  "summary": "Flush unwritten DOMStorage data.",
+  "source": {
+    "pattern": "$ses.flushStorageData()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.FlushStorageData",
+    "template": "ElectronCompat.Session.FlushStorageData(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "requests host storage flush",
+    "edge": "is not equivalent to clearing or closing storage"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.flushStorageData()",
+      "expected_behavior": "requests host storage flush"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('temp').flushStorageData()",
+      "expected_behavior": "is not equivalent to clearing or closing storage"
+    }
+  ]
+}

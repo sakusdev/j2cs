@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.clear-data",
+  "category": "electron.session",
+  "summary": "Use Electron's broader browsing-data removal API.",
+  "source": {
+    "pattern": "$ses.clearData($options?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ClearData",
+    "template": "ElectronCompat.Session.ClearData(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "clears requested dataTypes/origins asynchronously",
+    "edge": "origins and excludeOrigins are mutually exclusive and cookie clearing can operate at registrable-domain scope"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.clearData({dataTypes:['cache']})",
+      "expected_behavior": "clears requested dataTypes/origins asynchronously"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.clearData({origins:['https://a.test'],excludeOrigins:['https://b.test']})",
+      "expected_behavior": "origins and excludeOrigins are mutually exclusive and cookie clearing can operate at registrable-domain scope"
+    }
+  ]
+}
