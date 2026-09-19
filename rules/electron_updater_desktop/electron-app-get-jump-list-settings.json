@@ -1,0 +1,42 @@
+{
+  "id": "electron.app.get-jump-list-settings",
+  "category": "electron.updater_desktop",
+  "summary": "getJumpListSettings returns Windows Jump List constraints and user-removed items.",
+  "source": {
+    "pattern": "app.getJumpListSettings()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.AppDesktop.GetJumpListSettings",
+    "template": "ElectronCompat.AppDesktop.GetJumpListSettings($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "platform": "win32",
+    "return": {
+      "minItems": "integer",
+      "removedItems": "JumpListItem[]"
+    }
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/app"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.getJumpListSettings()",
+      "expected_behavior": "settings object preserved"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.getJumpListSettings()",
+      "expected_behavior": "removedItems influence later valid setJumpList calls"
+    }
+  ]
+}

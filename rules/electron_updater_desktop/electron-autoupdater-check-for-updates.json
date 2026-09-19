@@ -1,0 +1,40 @@
+{
+  "id": "electron.autoupdater.check-for-updates",
+  "category": "electron.updater_desktop",
+  "summary": "checkForUpdates requires a configured feed and begins an asynchronous host update check.",
+  "source": {
+    "pattern": "autoUpdater.checkForUpdates()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.CheckForUpdates",
+    "template": "ElectronCompat.AutoUpdater.CheckForUpdates($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "setFeedURL called",
+    "effects": "network/update service check",
+    "return": "void-style Electron API"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.checkForUpdates()",
+      "expected_behavior": "starts checking"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.checkForUpdates()",
+      "expected_behavior": "missing/unusable feed surfaces updater error behavior"
+    }
+  ]
+}

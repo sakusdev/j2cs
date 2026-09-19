@@ -1,0 +1,43 @@
+{
+  "id": "electron.autoupdater.platform-support",
+  "category": "electron.updater_desktop",
+  "summary": "autoUpdater is a main-process host service supported by Electron on macOS and Windows, not Linux.",
+  "source": {
+    "pattern": "autoUpdater",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.PlatformSupport",
+    "template": "ElectronCompat.AutoUpdater.PlatformSupport($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "process": "main",
+    "supported": [
+      "darwin",
+      "win32"
+    ],
+    "linux": "no built-in updater"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater",
+      "expected_behavior": "autoUpdater is available in the Electron main process on supported packaged targets"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater",
+      "expected_behavior": "Linux must not be silently emulated as Squirrel/MSIX"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "electron.app.jump-list-removed-items",
+  "category": "electron.updater_desktop",
+  "summary": "Items explicitly removed by the user must not be re-added in the next custom Jump List.",
+  "source": {
+    "pattern": "app.setJumpList($categories) after getJumpListSettings()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AppDesktop.SetJumpList",
+    "template": "ElectronCompat.AppDesktop.SetJumpList($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "platform": "win32",
+    "constraint": "removedItems must be respected by next custom categories"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/app"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.setJumpList($categories) after getJumpListSettings()",
+      "expected_behavior": "filtered list can succeed"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.setJumpList($categories) after getJumpListSettings()",
+      "expected_behavior": "re-adding removed items can suppress custom categories/violate host contract"
+    }
+  ]
+}

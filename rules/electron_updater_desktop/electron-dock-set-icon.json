@@ -1,0 +1,42 @@
+{
+  "id": "electron.dock.set-icon",
+  "category": "electron.updater_desktop",
+  "summary": "dock.setIcon accepts NativeImage or string and changes the macOS Dock icon.",
+  "source": {
+    "pattern": "app.dock.setIcon($image)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.SetIcon",
+    "template": "ElectronCompat.Dock.SetIcon($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "accepted": [
+      "NativeImage",
+      "string"
+    ],
+    "ownership": "NativeImage conversion semantics reused"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.setIcon($image)",
+      "expected_behavior": "NativeImage path works through host"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.setIcon($image)",
+      "expected_behavior": "do not reinterpret string with generic image loader"
+    }
+  ]
+}

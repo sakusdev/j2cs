@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.bounce-critical",
+  "category": "electron.updater_desktop",
+  "summary": "dock.bounce('critical') remains active until app activation or cancellation.",
+  "source": {
+    "pattern": "app.dock.bounce('critical')",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.Bounce",
+    "template": "ElectronCompat.Dock.Bounce($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "critical",
+    "lifetime": "until active or canceled"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.bounce('critical')",
+      "expected_behavior": "critical returns id"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.bounce('critical')",
+      "expected_behavior": "must not use fixed one-second informational behavior"
+    }
+  ]
+}

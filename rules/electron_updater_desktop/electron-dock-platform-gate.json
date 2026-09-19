@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.platform-gate",
+  "category": "electron.updater_desktop",
+  "summary": "app.dock exists only on macOS and is undefined on other platforms.",
+  "source": {
+    "pattern": "app.dock",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.Get",
+    "template": "ElectronCompat.Dock.Get($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "darwin": "Dock object",
+    "other": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock",
+      "expected_behavior": "macOS receives Dock object"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock",
+      "expected_behavior": "Windows/Linux must preserve undefined platform gate"
+    }
+  ]
+}

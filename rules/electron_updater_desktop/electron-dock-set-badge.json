@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.set-badge",
+  "category": "electron.updater_desktop",
+  "summary": "dock.setBadge sets arbitrary badge text on the macOS Dock icon subject to notification permission.",
+  "source": {
+    "pattern": "app.dock.setBadge($text)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.SetBadge",
+    "template": "ElectronCompat.Dock.SetBadge($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "string",
+    "permission": "notification permission can affect visible result"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.setBadge($text)",
+      "expected_behavior": "text preserved"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.setBadge($text)",
+      "expected_behavior": "permission failure must not be hidden as guaranteed rendering"
+    }
+  ]
+}

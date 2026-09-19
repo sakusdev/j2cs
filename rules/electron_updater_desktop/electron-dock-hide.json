@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.hide",
+  "category": "electron.updater_desktop",
+  "summary": "dock.hide requests hiding the macOS Dock icon and has a documented near-consecutive-call limitation.",
+  "source": {
+    "pattern": "app.dock.hide()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.Dock.Hide",
+    "template": "ElectronCompat.Dock.Hide($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "platform": "darwin",
+    "known_issue": "calls within about one second of a prior call may have no effect"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.hide()",
+      "expected_behavior": "hide routed to host"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.hide()",
+      "expected_behavior": "compiler must not promise immediate repeat-call success"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "electron.app.set-badge-count",
+  "category": "electron.updater_desktop",
+  "summary": "app.setBadgeCount controls the app counter badge on macOS/Linux and returns success.",
+  "source": {
+    "pattern": "app.setBadgeCount($count?)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.AppDesktop.SetBadgeCount",
+    "template": "ElectronCompat.AppDesktop.SetBadgeCount($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "platforms": [
+      "darwin",
+      "linux"
+    ],
+    "zero": "hide badge",
+    "omitted": "macOS dot; Linux no display",
+    "return": "boolean"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/app"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.setBadgeCount($count?)",
+      "expected_behavior": "zero hides badge"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.setBadgeCount($count?)",
+      "expected_behavior": "omitted argument is platform-sensitive"
+    }
+  ]
+}

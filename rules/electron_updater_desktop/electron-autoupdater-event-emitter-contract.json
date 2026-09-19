@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.event-emitter-contract",
+  "category": "electron.updater_desktop",
+  "summary": "autoUpdater event subscription reuses EventEmitter listener identity and ordering semantics.",
+  "source": {
+    "pattern": "autoUpdater.on($event,$listener)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.AutoUpdater.OnEvent",
+    "template": "ElectronCompat.AutoUpdater.OnEvent($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "base": "EventEmitter",
+    "ownership": "generic listener mechanics belong to EVENTS_STREAMS"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.on($event,$listener)",
+      "expected_behavior": "event listener registration preserved"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.on($event,$listener)",
+      "expected_behavior": "do not duplicate EventEmitter core rules"
+    }
+  ]
+}

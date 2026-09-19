@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.event-available",
+  "category": "electron.updater_desktop",
+  "summary": "update-available is emitted when an update exists and Electron automatically downloads it.",
+  "source": {
+    "pattern": "autoUpdater.on('update-available',$listener)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.OnEvent",
+    "template": "ElectronCompat.AutoUpdater.OnEvent($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "update-available",
+    "download": "automatic after availability"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.on('update-available',$listener)",
+      "expected_behavior": "available event is observable"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.on('update-available',$listener)",
+      "expected_behavior": "translation must not require a separate user download call"
+    }
+  ]
+}

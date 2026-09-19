@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.before-quit-for-update",
+  "category": "electron.updater_desktop",
+  "summary": "quitAndInstall emits before-quit-for-update because ordinary before-quit is not emitted before windows close in this path.",
+  "source": {
+    "pattern": "autoUpdater.on('before-quit-for-update',$listener)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.OnEvent",
+    "template": "ElectronCompat.AutoUpdater.OnEvent($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event": "before-quit-for-update",
+    "relation": "special update-quit lifecycle signal"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.on('before-quit-for-update',$listener)",
+      "expected_behavior": "special event can run cleanup"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.on('before-quit-for-update',$listener)",
+      "expected_behavior": "do not model it as ordinary app before-quit"
+    }
+  ]
+}

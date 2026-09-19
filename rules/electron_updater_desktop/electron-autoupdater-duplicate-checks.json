@@ -1,0 +1,39 @@
+{
+  "id": "electron.autoupdater.duplicate-checks",
+  "category": "electron.updater_desktop",
+  "summary": "Repeated checkForUpdates calls are independent and can trigger repeated downloads.",
+  "source": {
+    "pattern": "autoUpdater.checkForUpdates(); autoUpdater.checkForUpdates()",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "ElectronCompat.AutoUpdater.CheckForUpdates",
+    "template": "ElectronCompat.AutoUpdater.CheckForUpdates($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "deduplication": "not guaranteed",
+    "download": "two checks can download twice"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/auto-updater"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: autoUpdater.checkForUpdates(); autoUpdater.checkForUpdates()",
+      "expected_behavior": "two calls remain observable"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: autoUpdater.checkForUpdates(); autoUpdater.checkForUpdates()",
+      "expected_behavior": "do not coalesce into one Task/request"
+    }
+  ]
+}

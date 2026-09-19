@@ -1,0 +1,39 @@
+{
+  "id": "electron.dock.cancel-bounce",
+  "category": "electron.updater_desktop",
+  "summary": "cancelBounce cancels the request identified by its integer id.",
+  "source": {
+    "pattern": "app.dock.cancelBounce($id)",
+    "requirements": {
+      "electron_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Dock.CancelBounce",
+    "template": "ElectronCompat.Dock.CancelBounce($args)",
+    "notes": "Preserve Electron host/platform behavior rather than substituting a superficially similar .NET API."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "argument": "bounce request id",
+    "effect": "cancel matching request"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/dock"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "// Electron host test: app.dock.cancelBounce($id)",
+      "expected_behavior": "matching id is canceled"
+    },
+    {
+      "name": "edge",
+      "input": "// Electron semantic edge: app.dock.cancelBounce($id)",
+      "expected_behavior": "unknown/expired ids remain host behavior"
+    }
+  ]
+}
