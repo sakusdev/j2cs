@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.promise-contract",
+  "category": "web_crypto",
+  "summary": "Preserve SubtleCrypto Promise settlement and rejection reasons.",
+  "source": {
+    "pattern": "subtle.operation(...)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.PromiseOperation",
+    "template": "JsWebCrypto.PromiseOperation(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Cryptographic operation completion is asynchronous and errors follow WebCrypto DOMException categories."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.operation(...)",
+      "expected_behavior": "Preserve SubtleCrypto Promise settlement and rejection reasons."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.operation(...)",
+      "expected_behavior": "Cryptographic operation completion is asynchronous and errors follow WebCrypto DOMException categories."
+    }
+  ]
+}

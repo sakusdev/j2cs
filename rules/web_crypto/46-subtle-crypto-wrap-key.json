@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.wrap-key",
+  "category": "web_crypto",
+  "summary": "Export then cryptographically wrap an extractable key.",
+  "source": {
+    "pattern": "subtle.wrapKey(format,key,wrappingKey,wrapAlgorithm)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.WrapKey",
+    "template": "JsWebCrypto.WrapKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Key to wrap must be extractable and wrapping key needs wrapKey usage."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.wrapKey(format,key,wrappingKey,wrapAlgorithm)",
+      "expected_behavior": "Export then cryptographically wrap an extractable key."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.wrapKey(format,key,wrappingKey,wrapAlgorithm)",
+      "expected_behavior": "Key to wrap must be extractable and wrapping key needs wrapKey usage."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.export-key.jwk",
+  "category": "web_crypto",
+  "summary": "Export JSON Web Key metadata/material.",
+  "source": {
+    "pattern": "subtle.exportKey('jwk',key)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ExportKey",
+    "template": "JsWebCrypto.ExportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "JWK fields reflect key algorithm/usages/extractability."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.exportKey('jwk',key)",
+      "expected_behavior": "Export JSON Web Key metadata/material."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.exportKey('jwk',key)",
+      "expected_behavior": "JWK fields reflect key algorithm/usages/extractability."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.import-key.spki",
+  "category": "web_crypto",
+  "summary": "Import public key SubjectPublicKeyInfo.",
+  "source": {
+    "pattern": "subtle.importKey('spki',data,algorithm,extractable,usages)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ImportKey",
+    "template": "JsWebCrypto.ImportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Wrong algorithm/key encoding rejects DataError/NotSupportedError as specified."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.importKey('spki',data,algorithm,extractable,usages)",
+      "expected_behavior": "Import public key SubjectPublicKeyInfo."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.importKey('spki',data,algorithm,extractable,usages)",
+      "expected_behavior": "Wrong algorithm/key encoding rejects DataError/NotSupportedError as specified."
+    }
+  ]
+}

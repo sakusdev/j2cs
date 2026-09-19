@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.sign",
+  "category": "web_crypto",
+  "summary": "Sign BufferSource with key usage/algorithm validation.",
+  "source": {
+    "pattern": "subtle.sign(algorithm,key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Sign",
+    "template": "JsWebCrypto.Sign(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Returns Promise<ArrayBuffer> and preserves algorithm-specific signature encoding."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.sign(algorithm,key,data)",
+      "expected_behavior": "Sign BufferSource with key usage/algorithm validation."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.sign(algorithm,key,data)",
+      "expected_behavior": "Returns Promise<ArrayBuffer> and preserves algorithm-specific signature encoding."
+    }
+  ]
+}

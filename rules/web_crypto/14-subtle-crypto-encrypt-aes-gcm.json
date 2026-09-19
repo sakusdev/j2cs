@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.encrypt.aes-gcm",
+  "category": "web_crypto",
+  "summary": "Preserve AES-GCM IV/AAD/tagLength contract.",
+  "source": {
+    "pattern": "subtle.encrypt({name:'AES-GCM',iv,...},key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Encrypt",
+    "template": "JsWebCrypto.Encrypt(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Ciphertext result includes authentication tag according to WebCrypto format."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.encrypt({name:'AES-GCM',iv,...},key,data)",
+      "expected_behavior": "Preserve AES-GCM IV/AAD/tagLength contract."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.encrypt({name:'AES-GCM',iv,...},key,data)",
+      "expected_behavior": "Ciphertext result includes authentication tag according to WebCrypto format."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.import-key.jwk",
+  "category": "web_crypto",
+  "summary": "Import JSON Web Key while validating JWK metadata.",
+  "source": {
+    "pattern": "subtle.importKey('jwk',jwk,algorithm,extractable,usages)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ImportKey",
+    "template": "JsWebCrypto.ImportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "alg/use/key_ops/ext inconsistencies can reject."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.importKey('jwk',jwk,algorithm,extractable,usages)",
+      "expected_behavior": "Import JSON Web Key while validating JWK metadata."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.importKey('jwk',jwk,algorithm,extractable,usages)",
+      "expected_behavior": "alg/use/key_ops/ext inconsistencies can reject."
+    }
+  ]
+}

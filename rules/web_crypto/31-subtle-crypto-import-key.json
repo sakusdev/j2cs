@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.import-key",
+  "category": "web_crypto",
+  "summary": "Import key material into CryptoKey.",
+  "source": {
+    "pattern": "subtle.importKey(format,keyData,algorithm,extractable,keyUsages)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ImportKey",
+    "template": "JsWebCrypto.ImportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Format, algorithm, key metadata, extractability and usages are validated together."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.importKey(format,keyData,algorithm,extractable,keyUsages)",
+      "expected_behavior": "Import key material into CryptoKey."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.importKey(format,keyData,algorithm,extractable,keyUsages)",
+      "expected_behavior": "Format, algorithm, key metadata, extractability and usages are validated together."
+    }
+  ]
+}

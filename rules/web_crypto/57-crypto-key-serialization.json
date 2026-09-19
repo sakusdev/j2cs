@@ -1,0 +1,41 @@
+{
+  "id": "web.crypto-key.serialization",
+  "category": "web_crypto",
+  "summary": "Preserve CryptoKey structured-clone serialization semantics.",
+  "source": {
+    "pattern": "structuredClone(key)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsWebCrypto.SerializeCryptoKey(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Key internal type/extractable/algorithm/usages and key handle semantics survive clone without exporting secret material."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "structuredClone(key)",
+      "expected_behavior": "Preserve CryptoKey structured-clone serialization semantics."
+    },
+    {
+      "name": "semantic trap",
+      "input": "structuredClone(key)",
+      "expected_behavior": "Key internal type/extractable/algorithm/usages and key handle semantics survive clone without exporting secret material."
+    }
+  ]
+}

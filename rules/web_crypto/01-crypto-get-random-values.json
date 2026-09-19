@@ -1,0 +1,42 @@
+{
+  "id": "web.crypto.get-random-values",
+  "category": "web_crypto",
+  "summary": "Fill an integer TypedArray with cryptographically strong random bytes.",
+  "source": {
+    "pattern": "crypto.getRandomValues(array)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.GetRandomValues",
+    "template": "JsWebCrypto.GetRandomValues(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Only integer TypedArray families are accepted; array is mutated and returned."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "crypto.getRandomValues(array)",
+      "expected_behavior": "Fill an integer TypedArray with cryptographically strong random bytes."
+    },
+    {
+      "name": "semantic trap",
+      "input": "crypto.getRandomValues(array)",
+      "expected_behavior": "Only integer TypedArray families are accepted; array is mutated and returned."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.crypto.subtle-property",
+  "category": "web_crypto",
+  "summary": "Expose stable SubtleCrypto interface.",
+  "source": {
+    "pattern": "crypto.subtle",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Subtle",
+    "template": "JsWebCrypto.Subtle(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Generic SubtleCrypto semantics are distinct from Node crypto APIs."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "crypto.subtle",
+      "expected_behavior": "Expose stable SubtleCrypto interface."
+    },
+    {
+      "name": "semantic trap",
+      "input": "crypto.subtle",
+      "expected_behavior": "Generic SubtleCrypto semantics are distinct from Node crypto APIs."
+    }
+  ]
+}

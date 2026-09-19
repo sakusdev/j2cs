@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.export-key",
+  "category": "web_crypto",
+  "summary": "Export extractable CryptoKey in requested format.",
+  "source": {
+    "pattern": "subtle.exportKey(format,key)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ExportKey",
+    "template": "JsWebCrypto.ExportKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Non-extractable key rejects InvalidAccessException/InvalidAccessError semantics; no secret bypass."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.exportKey(format,key)",
+      "expected_behavior": "Export extractable CryptoKey in requested format."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.exportKey(format,key)",
+      "expected_behavior": "Non-extractable key rejects InvalidAccessException/InvalidAccessError semantics; no secret bypass."
+    }
+  ]
+}

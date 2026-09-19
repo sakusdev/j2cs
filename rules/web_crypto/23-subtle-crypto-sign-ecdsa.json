@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.sign.ecdsa",
+  "category": "web_crypto",
+  "summary": "Sign ECDSA with operation-selected hash.",
+  "source": {
+    "pattern": "subtle.sign({name:'ECDSA',hash},key,data)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.Sign",
+    "template": "JsWebCrypto.Sign(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "WebCrypto ECDSA signature uses fixed-width r||s format, not DER."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.sign({name:'ECDSA',hash},key,data)",
+      "expected_behavior": "Sign ECDSA with operation-selected hash."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.sign({name:'ECDSA',hash},key,data)",
+      "expected_behavior": "WebCrypto ECDSA signature uses fixed-width r||s format, not DER."
+    }
+  ]
+}

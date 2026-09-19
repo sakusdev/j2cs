@@ -1,0 +1,42 @@
+{
+  "id": "web.crypto.get-random-values.identity",
+  "category": "web_crypto",
+  "summary": "Preserve getRandomValues input object identity.",
+  "source": {
+    "pattern": "crypto.getRandomValues(array) === array",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.GetRandomValues",
+    "template": "JsWebCrypto.GetRandomValues(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Returns the exact same TypedArray object."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "crypto.getRandomValues(array) === array",
+      "expected_behavior": "Preserve getRandomValues input object identity."
+    },
+    {
+      "name": "semantic trap",
+      "input": "crypto.getRandomValues(array) === array",
+      "expected_behavior": "Returns the exact same TypedArray object."
+    }
+  ]
+}

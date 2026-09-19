@@ -1,0 +1,42 @@
+{
+  "id": "web.subtle-crypto.key-usage-validation",
+  "category": "web_crypto",
+  "summary": "Validate CryptoKey algorithm/type/usages before cryptographic operation.",
+  "source": {
+    "pattern": "subtle.operation(algorithm,key,...)",
+    "requirements": {
+      "intrinsic_web_crypto_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebCrypto.ValidateKeyUsage",
+    "template": "JsWebCrypto.ValidateKeyUsage(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "webcrypto_contract": true,
+    "binary": "reuse BINARY BufferSource semantics",
+    "async": "reuse ASYNC Promise job/settlement semantics"
+  },
+  "caveats": [
+    "Wrong usage or mismatched algorithm rejects rather than silently performing operation."
+  ],
+  "references": [
+    "https://www.w3.org/TR/WebCryptoAPI/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "subtle.operation(algorithm,key,...)",
+      "expected_behavior": "Validate CryptoKey algorithm/type/usages before cryptographic operation."
+    },
+    {
+      "name": "semantic trap",
+      "input": "subtle.operation(algorithm,key,...)",
+      "expected_behavior": "Wrong usage or mismatched algorithm rejects rather than silently performing operation."
+    }
+  ]
+}
