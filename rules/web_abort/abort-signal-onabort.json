@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.onabort",
+  "category": "web_abort",
+  "summary": "Implement onabort as an EventHandler IDL attribute.",
+  "source": {
+    "pattern": "$signal.onabort",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.EventHandlerSlot($signal, \"abort\")",
+    "helper": "WebAbort.EventHandlerSlot",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "getter": "current handler or null",
+    "setter": "replaces event-handler listener",
+    "dispatch": "same abort event as EventTarget listeners"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "handler runs",
+      "input": "const c=new AbortController();let n=0;c.signal.onabort=()=>n++;c.abort();console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "replacement",
+      "input": "const c=new AbortController();let a=[];c.signal.onabort=()=>a.push(1);c.signal.onabort=()=>a.push(2);c.abort();console.log(a.join(','));",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

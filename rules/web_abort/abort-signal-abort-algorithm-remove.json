@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.abort-algorithm-remove",
+  "category": "web_abort",
+  "summary": "Remove an internal abort algorithm when its operation completes.",
+  "source": {
+    "pattern": "internal: remove abort algorithm($signal,$algorithm)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.RemoveAlgorithm($signal, $algorithm)",
+    "helper": "WebAbort.RemoveAlgorithm",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "effect": "remove specified algorithm",
+    "lifetime": "settled operations do not react later",
+    "event_target": "public listeners are separate"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "detach analogue",
+      "input": "const c=new AbortController();let n=0;const f=()=>n++;c.signal.addEventListener('abort',f);c.signal.removeEventListener('abort',f);c.abort();console.log(n);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "signal still aborts",
+      "input": "const c=new AbortController();c.abort();console.log(c.signal.aborted);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

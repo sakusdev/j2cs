@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-controller.abort-default",
+  "category": "web_abort",
+  "summary": "Abort with default AbortError when reason is omitted or undefined.",
+  "source": {
+    "pattern": "$controller.abort()",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortController($controller, JsUndefined.Value)",
+    "helper": "WebAbort.AbortController",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "default_reason": "new DOMException named AbortError",
+    "state": "signals once"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "default AbortError",
+      "input": "const c=new AbortController();c.abort();console.log(c.signal.aborted,c.signal.reason.name);",
+      "expected_behavior": "prints true AbortError"
+    },
+    {
+      "name": "explicit undefined defaults",
+      "input": "const c=new AbortController();c.abort(undefined);console.log(c.signal.reason.name);",
+      "expected_behavior": "prints AbortError"
+    }
+  ]
+}

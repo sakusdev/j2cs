@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-controller.constructor",
+  "category": "web_abort",
+  "summary": "Create a controller with one fresh associated signal.",
+  "source": {
+    "pattern": "new AbortController()",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.CreateController()",
+    "helper": "WebAbort.CreateController",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "fresh AbortController",
+    "signal": "creates one fresh AbortSignal",
+    "identity": "distinct per controller"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "fresh associated signal",
+      "input": "const a=new AbortController(),b=new AbortController();console.log(a.signal instanceof AbortSignal,a.signal!==b.signal);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "initial state",
+      "input": "const c=new AbortController();console.log(c.signal.aborted,c.signal.reason===undefined);",
+      "expected_behavior": "prints false true"
+    }
+  ]
+}

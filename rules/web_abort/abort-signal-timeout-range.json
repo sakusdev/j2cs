@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.timeout-range",
+  "category": "web_abort",
+  "summary": "Apply Web IDL EnforceRange conversion to timeout milliseconds.",
+  "source": {
+    "pattern": "AbortSignal.timeout($milliseconds)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "WebAbort.Timeout($milliseconds)",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "[EnforceRange] unsigned long long",
+    "range": "exposed API accepts 0 through Number.MAX_SAFE_INTEGER",
+    "exception": "invalid range/non-finite values fail synchronously"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "negative throws",
+      "input": "try{AbortSignal.timeout(-1)}catch(e){console.log(e instanceof RangeError)}",
+      "expected_behavior": "prints true in conforming environments"
+    },
+    {
+      "name": "zero accepted",
+      "input": "console.log(AbortSignal.timeout(0) instanceof AbortSignal);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

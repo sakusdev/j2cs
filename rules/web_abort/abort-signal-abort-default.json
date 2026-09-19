@@ -1,0 +1,42 @@
+{
+  "id": "web.abort-signal.abort-default",
+  "category": "web_abort",
+  "summary": "Create a fresh already-aborted signal with default AbortError.",
+  "source": {
+    "pattern": "AbortSignal.abort()",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortedSignal(JsUndefined.Value)",
+    "helper": "WebAbort.AbortedSignal",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "new AbortSignal",
+    "aborted": "true immediately",
+    "reason": "AbortError DOMException",
+    "event": "no retroactive event for late listeners"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "already aborted",
+      "input": "const s=AbortSignal.abort();console.log(s.aborted,s.reason.name);",
+      "expected_behavior": "prints true AbortError"
+    },
+    {
+      "name": "late listener",
+      "input": "const s=AbortSignal.abort();let n=0;s.addEventListener('abort',()=>n++);console.log(n);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.any-first-future-source",
+  "category": "web_abort",
+  "summary": "Abort when the first initially-live source later aborts.",
+  "source": {
+    "pattern": "AbortSignal.any($signals)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Any($signals)",
+    "helper": "WebAbort.Any",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "dependency": "tracks source signals",
+    "first_future_abort": "first source in time sets reason",
+    "one_shot": "later sources cannot replace it"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "future first wins",
+      "input": "const a=new AbortController(),b=new AbortController(),s=AbortSignal.any([a.signal,b.signal]);b.abort('b');a.abort('a');console.log(s.reason);",
+      "expected_behavior": "prints b"
+    },
+    {
+      "name": "state propagates",
+      "input": "const a=new AbortController(),s=AbortSignal.any([a.signal]);a.abort();console.log(s.aborted);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

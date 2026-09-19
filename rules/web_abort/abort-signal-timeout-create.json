@@ -1,0 +1,42 @@
+{
+  "id": "web.abort-signal.timeout-create",
+  "category": "web_abort",
+  "summary": "Create a fresh signal and schedule timeout abortion using host active time.",
+  "source": {
+    "pattern": "AbortSignal.timeout($milliseconds)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "WebAbort.Timeout($milliseconds)",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "fresh initially-live AbortSignal",
+    "delay": "HTML active-time timeout then timer task-source task",
+    "reason": "TimeoutError DOMException"
+  },
+  "caveats": [
+    "Ordinary wall-clock Task.Delay is not generally equivalent to HTML active time."
+  ],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "initially live",
+      "input": "const s=AbortSignal.timeout(50);console.log(s.aborted);",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "eventual timeout",
+      "input": "const s=AbortSignal.timeout(0);s.addEventListener('abort',()=>console.log(s.reason.name));",
+      "expected_behavior": "eventually prints TimeoutError"
+    }
+  ]
+}

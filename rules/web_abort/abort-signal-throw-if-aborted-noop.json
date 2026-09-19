@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.throw-if-aborted-noop",
+  "category": "web_abort",
+  "summary": "Do nothing and return undefined when live.",
+  "source": {
+    "pattern": "$signal.throwIfAborted() on non-aborted signal",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.ThrowIfAborted($signal)",
+    "helper": "WebAbort.ThrowIfAborted",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "effect": "none"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "no throw",
+      "input": "const s=new AbortController().signal;console.log(s.throwIfAborted());",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "state unchanged",
+      "input": "const s=new AbortController().signal;s.throwIfAborted();console.log(s.aborted);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

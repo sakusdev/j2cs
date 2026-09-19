@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.timeout-one-shot",
+  "category": "web_abort",
+  "summary": "Make timeout abortion one-shot with stable reason.",
+  "source": {
+    "pattern": "AbortSignal.timeout($milliseconds) completion",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "WebAbort.Timeout($milliseconds)",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "one_shot": "single transition",
+    "reason": "stable TimeoutError",
+    "event": "abort event once"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "single event",
+      "input": "const s=AbortSignal.timeout(0);let n=0;s.addEventListener('abort',()=>n++);setTimeout(()=>console.log(n),10);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "stable reason",
+      "input": "const s=AbortSignal.timeout(0);s.addEventListener('abort',()=>{const r=s.reason;queueMicrotask(()=>console.log(s.reason===r))});",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

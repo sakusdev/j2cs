@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.any-empty",
+  "category": "web_abort",
+  "summary": "Return a fresh live signal for an empty source sequence.",
+  "source": {
+    "pattern": "AbortSignal.any([])",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Any(Array.Empty<JsAbortSignal>())",
+    "helper": "WebAbort.Any",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "fresh AbortSignal",
+    "aborted": "false",
+    "sources": "none"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "empty state",
+      "input": "const s=AbortSignal.any([]);console.log(s.aborted,s.reason===undefined);",
+      "expected_behavior": "prints false true"
+    },
+    {
+      "name": "fresh",
+      "input": "console.log(AbortSignal.any([])!==AbortSignal.any([]));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

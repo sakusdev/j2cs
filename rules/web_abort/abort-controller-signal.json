@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-controller.signal",
+  "category": "web_abort",
+  "summary": "Return the same associated signal on every access.",
+  "source": {
+    "pattern": "$controller.signal",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.GetSignal($controller)",
+    "helper": "WebAbort.GetSignal",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "associated AbortSignal",
+    "identity": "stable; getter does not clone"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "stable identity",
+      "input": "const c=new AbortController();console.log(c.signal===c.signal);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "shared state",
+      "input": "const c=new AbortController(),s=c.signal;c.abort('x');console.log(s.aborted,s.reason);",
+      "expected_behavior": "prints true x"
+    }
+  ]
+}

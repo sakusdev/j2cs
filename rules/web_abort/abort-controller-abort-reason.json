@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-controller.abort-reason",
+  "category": "web_abort",
+  "summary": "Preserve any non-undefined abort reason by identity.",
+  "source": {
+    "pattern": "$controller.abort($reason)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortController($controller, $reason)",
+    "helper": "WebAbort.AbortController",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "reason": "arbitrary JS value without coercion",
+    "identity": "object reasons preserved"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "string reason",
+      "input": "const c=new AbortController();c.abort('stop');console.log(c.signal.reason);",
+      "expected_behavior": "prints stop"
+    },
+    {
+      "name": "object identity",
+      "input": "const c=new AbortController(),r={};c.abort(r);console.log(c.signal.reason===r);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

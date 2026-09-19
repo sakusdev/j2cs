@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.abort-algorithm-add",
+  "category": "web_abort",
+  "summary": "Register an internal abort algorithm only while signal is live.",
+  "source": {
+    "pattern": "internal: add abort algorithm($signal,$algorithm)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AddAlgorithm($signal, $algorithm)",
+    "helper": "WebAbort.AddAlgorithm",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "live": "append algorithm",
+    "preaborted": "ignore registration; consumer must preflight",
+    "ownership": "generic integration primitive"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "preaborted visible",
+      "input": "const s=AbortSignal.abort('x');console.log(s.aborted,s.reason);",
+      "expected_behavior": "prints true x"
+    },
+    {
+      "name": "live event analogue",
+      "input": "const c=new AbortController();let n=0;c.signal.addEventListener('abort',()=>n++);c.abort();console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.abort-signal.integration-preflight",
+  "category": "web_abort",
+  "summary": "Require abort-aware host APIs to inspect current signal state before registering cancellation work.",
+  "source": {
+    "pattern": "host API begins operation with $signal",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Preflight($signal)",
+    "helper": "WebAbort.Preflight",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "preaborted": "consumer observes existing reason immediately under its own contract",
+    "live": "register only for future abortion",
+    "ownership": "fetch/streams/timers own API-specific outcome"
+  },
+  "caveats": [
+    "Fetch-specific rejection timing remains WEB_URL_FETCH ownership."
+  ],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "already aborted",
+      "input": "const s=AbortSignal.abort('stop');console.log(s.aborted,s.reason);",
+      "expected_behavior": "prints true stop"
+    },
+    {
+      "name": "live signal",
+      "input": "const s=new AbortController().signal;console.log(s.aborted,s.reason===undefined);",
+      "expected_behavior": "prints false true"
+    }
+  ]
+}

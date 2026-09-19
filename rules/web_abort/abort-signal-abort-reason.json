@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.abort-reason",
+  "category": "web_abort",
+  "summary": "Create a fresh already-aborted signal with supplied reason.",
+  "source": {
+    "pattern": "AbortSignal.abort($reason)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortedSignal($reason)",
+    "helper": "WebAbort.AbortedSignal",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "fresh AbortSignal",
+    "reason": "non-undefined value without coercion",
+    "aborted": "true"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "custom reason",
+      "input": "const s=AbortSignal.abort('why');console.log(s.aborted,s.reason);",
+      "expected_behavior": "prints true why"
+    },
+    {
+      "name": "fresh each call",
+      "input": "console.log(AbortSignal.abort('x')!==AbortSignal.abort('x'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

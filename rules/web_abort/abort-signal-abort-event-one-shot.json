@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.abort-event-one-shot",
+  "category": "web_abort",
+  "summary": "Fire one abort event for the one-way state transition.",
+  "source": {
+    "pattern": "internal: run abort steps($signal)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.RunAbortSteps($signal)",
+    "helper": "WebAbort.RunAbortSteps",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "event": "fire abort at signal after internal algorithms",
+    "one_shot": "transition cannot repeat",
+    "event_target": "DOM EventTarget semantics reused"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "one event",
+      "input": "const c=new AbortController();let n=0;c.signal.addEventListener('abort',()=>n++);c.abort();c.abort();console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "once listener",
+      "input": "const c=new AbortController();let n=0;c.signal.addEventListener('abort',()=>n++,{once:true});c.abort();console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

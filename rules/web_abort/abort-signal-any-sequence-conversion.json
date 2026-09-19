@@ -1,0 +1,41 @@
+{
+  "id": "web.abort-signal.any-sequence-conversion",
+  "category": "web_abort",
+  "summary": "Use Web IDL sequence<AbortSignal> conversion for any().",
+  "source": {
+    "pattern": "AbortSignal.any($signals)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.Any(WebIdl.ToSequenceAbortSignal($signals))",
+    "helper": "WebAbort.Any",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "input": "sequence conversion before dependency setup",
+    "members": "must be AbortSignal",
+    "abrupt_completion": "conversion/iteration errors propagate"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "array accepted",
+      "input": "const a=new AbortController(),b=new AbortController();console.log(AbortSignal.any([a.signal,b.signal]) instanceof AbortSignal);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "invalid member",
+      "input": "try{AbortSignal.any([{}])}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

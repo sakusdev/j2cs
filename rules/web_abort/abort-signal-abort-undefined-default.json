@@ -1,0 +1,40 @@
+{
+  "id": "web.abort-signal.abort-undefined-default",
+  "category": "web_abort",
+  "summary": "Treat undefined like an omitted reason in static abort().",
+  "source": {
+    "pattern": "AbortSignal.abort(undefined)",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebAbort.AbortedSignal(JsUndefined.Value)",
+    "helper": "WebAbort.AbortedSignal",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reason": "new AbortError DOMException",
+    "aborted": "true"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "undefined defaults",
+      "input": "const s=AbortSignal.abort(undefined);console.log(s.reason.name,s.aborted);",
+      "expected_behavior": "prints AbortError true"
+    },
+    {
+      "name": "null preserved",
+      "input": "const s=AbortSignal.abort(null);console.log(s.reason===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

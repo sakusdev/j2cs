@@ -1,0 +1,39 @@
+{
+  "id": "web.abort-signal.construct-illegal",
+  "category": "web_abort",
+  "summary": "Reject direct construction of AbortSignal.",
+  "source": {
+    "pattern": "new AbortSignal()",
+    "requirements": {
+      "builtin_not_overridden": true,
+      "webidl_semantics": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "WebAbort.ThrowIllegalConstructor()",
+    "notes": "Reuse the existing DOM EventTarget subsystem for listener registration/dispatch; this rule owns AbortSignal-specific state and abort algorithms."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "constructability": "no public constructor",
+    "exception": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG DOM Living Standard § AbortController / AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "direct construction throws",
+      "input": "try{new AbortSignal()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "controller signal works",
+      "input": "console.log(new AbortController().signal instanceof AbortSignal);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
