@@ -1,0 +1,44 @@
+{
+  "id": "web.form-data.append.blob",
+  "category": "web_encoding_file",
+  "summary": "Append Blob/File FormData entries with filename selection rules.",
+  "source": {
+    "pattern": "$fd.append($name, $blob, $filename)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true,
+      "value_inferred_as": "Blob"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.AppendBlob",
+    "template": "WebFormData.AppendBlob($fd, $name, $blob, $filename)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "Blob/File object identity retained logically",
+    "default_filename": "File.name for File; 'blob' for non-File Blob",
+    "explicit_filename": "USVString override",
+    "order": "append"
+  },
+  "caveats": [
+    "Multipart serialization is later transport behavior; this rule owns entry-list state."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "file default name",
+      "input": "const f=new FormData();const x=new File(['a'],'n.txt');f.append('x',x);console.log(f.get('x').name)",
+      "expected_behavior": "prints n.txt"
+    },
+    {
+      "name": "blob default name",
+      "input": "const f=new FormData();f.append('x',new Blob(['a']));console.log(f.get('x').name)",
+      "expected_behavior": "prints blob"
+    }
+  ]
+}

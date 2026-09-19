@@ -1,0 +1,42 @@
+{
+  "id": "web.file.name",
+  "category": "web_encoding_file",
+  "summary": "Expose immutable File.name metadata.",
+  "source": {
+    "pattern": "$file.name",
+    "requirements": {
+      "receiver_inferred_as": "File",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFile.GetName",
+    "template": "WebFile.GetName($file)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "USVString",
+    "readonly": true,
+    "path": "name only; no filesystem path semantics"
+  },
+  "caveats": [
+    "Do not interpret slash/backslash as permission to access a host path."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "name",
+      "input": "console.log(new File([],'a/b').name)",
+      "expected_behavior": "prints a/b"
+    },
+    {
+      "name": "readonly metadata",
+      "input": "const f=new File([],'x'); console.log(f.name)",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

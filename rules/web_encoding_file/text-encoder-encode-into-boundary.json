@@ -1,0 +1,44 @@
+{
+  "id": "web.text-encoder.encode-into.boundary",
+  "category": "web_encoding_file",
+  "summary": "Never emit a partial UTF-8 sequence from encodeInto.",
+  "source": {
+    "pattern": "$encoder.encodeInto($source, $destination)",
+    "requirements": {
+      "receiver_inferred_as": "TextEncoder",
+      "builtin_webidl_member_not_overridden": true,
+      "destination_inferred_as": "Uint8Array",
+      "destination_may_be_too_small": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.EncodeInto",
+    "template": "WebEncoding.EncodeInto($source, $destination)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "atomic_scalar_encoding": true,
+    "insufficient_space": "stop before scalar",
+    "read": "advances only for fully encoded source scalar"
+  },
+  "caveats": [
+    "A naive streaming Encoder.Convert call can report incompatible counts if it splits a scalar."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "three-byte scalar needs full room",
+      "input": "const d=new Uint8Array(2); console.log(JSON.stringify(new TextEncoder().encodeInto('€',d)))",
+      "expected_behavior": "prints {\"read\":0,\"written\":0}"
+    },
+    {
+      "name": "ascii prefix then stop",
+      "input": "const d=new Uint8Array(2); console.log(JSON.stringify(new TextEncoder().encodeInto('A€',d)))",
+      "expected_behavior": "prints {\"read\":1,\"written\":1}"
+    }
+  ]
+}

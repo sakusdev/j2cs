@@ -1,0 +1,39 @@
+{
+  "id": "web.form-data.keys",
+  "category": "web_encoding_file",
+  "summary": "Iterate FormData names in entry-list order including duplicates.",
+  "source": {
+    "pattern": "$fd.keys()",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Keys",
+    "template": "WebFormData.Keys($fd)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "order": "entry-list order",
+    "duplicates": "included"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "duplicates",
+      "input": "const f=new FormData();f.append('x','1');f.append('x','2');console.log([...f.keys()].join(','))",
+      "expected_behavior": "prints x,x"
+    },
+    {
+      "name": "order",
+      "input": "const f=new FormData();f.append('b','1');f.append('a','2');console.log([...f.keys()].join(','))",
+      "expected_behavior": "prints b,a"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.blob.string-part",
+  "category": "web_encoding_file",
+  "summary": "Convert Blob string parts to USVString then UTF-8 bytes.",
+  "source": {
+    "pattern": "new Blob([$string])",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true,
+      "part_inferred_as": "string"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Create",
+    "template": "WebBlob.Create([$string], undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "USVString then UTF-8",
+    "lone_surrogate": "U+FFFD"
+  },
+  "caveats": [
+    "JS UTF-16 string memory bytes are not Blob string bytes."
+  ],
+  "references": [
+    "W3C File API",
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "utf8 size",
+      "input": "console.log(new Blob(['€']).size)",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "lone surrogate replacement",
+      "input": "new Blob(['\\ud800']).arrayBuffer().then(b=>console.log([...new Uint8Array(b)].join(',')))",
+      "expected_behavior": "eventually prints 239,191,189"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "web.blob.slice",
+  "category": "web_encoding_file",
+  "summary": "Slice Blob by byte offsets with negative/clamped index semantics.",
+  "source": {
+    "pattern": "$blob.slice($start, $end, $contentType)",
+    "requirements": {
+      "receiver_inferred_as": "Blob",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Slice",
+    "template": "WebBlob.Slice($blob, $start, $end, $contentType)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "units": "bytes",
+    "negative": "relative to size",
+    "clamp": "0..size",
+    "range": "[start,end)",
+    "result": "new Blob sharing/copying immutable byte range"
+  },
+  "caveats": [
+    "String character boundaries are irrelevant; slice can split UTF-8 sequences."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "negative",
+      "input": "const b=new Blob([new Uint8Array([1,2,3])]); console.log(b.slice(-2).size)",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "end before start",
+      "input": "console.log(new Blob(['abc']).slice(2,1).size)",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

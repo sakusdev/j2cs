@@ -1,0 +1,38 @@
+{
+  "id": "web.text-decoder.invalid-label",
+  "category": "web_encoding_file",
+  "summary": "Throw RangeError for unsupported TextDecoder labels.",
+  "source": {
+    "pattern": "new TextDecoder($label)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true,
+      "label_not_in_whatwg_encoding_table": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.CreateTextDecoder",
+    "template": "WebEncoding.CreateTextDecoder($label, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "failure": "RangeError before decoder object is returned"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "unknown",
+      "input": "try{new TextDecoder('x-nope')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    },
+    {
+      "name": "replacement label unavailable",
+      "input": "try{new TextDecoder('replacement')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

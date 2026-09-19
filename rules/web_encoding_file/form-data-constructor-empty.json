@@ -1,0 +1,40 @@
+{
+  "id": "web.form-data.constructor.empty",
+  "category": "web_encoding_file",
+  "summary": "Construct an empty FormData entry list.",
+  "source": {
+    "pattern": "new FormData()",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Create",
+    "template": "WebFormData.Create()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "entries": "empty ordered list",
+    "duplicates": "allowed"
+  },
+  "caveats": [
+    "FormData is not a Dictionary because duplicate names and order are observable."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "empty",
+      "input": "console.log([...new FormData()].length)",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "iterable",
+      "input": "console.log(typeof new FormData()[Symbol.iterator])",
+      "expected_behavior": "prints function"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.blob.stream",
+  "category": "web_encoding_file",
+  "summary": "Create a fresh readable byte stream for a Blob while delegating stream semantics to WEB_STREAMS.",
+  "source": {
+    "pattern": "$blob.stream()",
+    "requirements": {
+      "receiver_inferred_as": "Blob",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.CreateReadableStream",
+    "template": "WebBlob.CreateReadableStream($blob)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "ReadableStream<Uint8Array>",
+    "fresh_stream_each_call": true,
+    "content": "Blob bytes in order",
+    "stream_semantics_owner": "WEB_STREAMS"
+  },
+  "caveats": [
+    "Do not substitute Node.js Readable; locking/backpressure/cancel semantics belong to Web Streams."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "fresh stream",
+      "input": "const b=new Blob(['x']); console.log(b.stream()===b.stream())",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "reads bytes",
+      "input": "new Blob(['A']).stream().getReader().read().then(r=>console.log(r.done,r.value[0]))",
+      "expected_behavior": "eventually prints false 65"
+    }
+  ]
+}

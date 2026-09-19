@@ -1,0 +1,41 @@
+{
+  "id": "web.blob.type",
+  "category": "web_encoding_file",
+  "summary": "Normalize Blob type to ASCII lowercase or empty string for non-ASCII-printable input.",
+  "source": {
+    "pattern": "new Blob($parts, {type:$type})",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Create",
+    "template": "WebBlob.Create($parts, {type:$type})"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "allowed_chars": "U+0020..U+007E only",
+    "normalization": "ASCII lowercase",
+    "invalid": "empty string"
+  },
+  "caveats": [
+    "Do not parse/validate MIME grammar beyond the specified character range for constructor type normalization."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "lowercase",
+      "input": "console.log(new Blob([],{type:'Text/PLAIN'}).type)",
+      "expected_behavior": "prints text/plain"
+    },
+    {
+      "name": "nonascii empties",
+      "input": "console.log(new Blob([],{type:'téxt/plain'}).type==='')",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

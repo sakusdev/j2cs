@@ -1,0 +1,42 @@
+{
+  "id": "web.blob.array-buffer",
+  "category": "web_encoding_file",
+  "summary": "Fulfill a Promise with a fresh ArrayBuffer containing Blob bytes.",
+  "source": {
+    "pattern": "$blob.arrayBuffer()",
+    "requirements": {
+      "receiver_inferred_as": "Blob",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.ArrayBufferAsync",
+    "template": "WebBlob.ArrayBufferAsync($blob)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<ArrayBuffer>",
+    "copy": "fresh mutable buffer",
+    "blob": "remains immutable"
+  },
+  "caveats": [
+    "Returning internal backing storage would expose Blob mutation."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "bytes",
+      "input": "new Blob([new Uint8Array([1,2])]).arrayBuffer().then(b=>console.log([...new Uint8Array(b)].join(',')))",
+      "expected_behavior": "eventually prints 1,2"
+    },
+    {
+      "name": "fresh copy",
+      "input": "const b=new Blob(['a']); Promise.all([b.arrayBuffer(),b.arrayBuffer()]).then(([x,y])=>console.log(x===y))",
+      "expected_behavior": "eventually prints false"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.text-decoder.streaming",
+  "category": "web_encoding_file",
+  "summary": "Retain partial decoder state across decode(...,{stream:true}) calls.",
+  "source": {
+    "pattern": "$decoder.decode($input, {stream:true})",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.Decode",
+    "template": "WebEncoding.Decode($decoder, $input, {stream:true})"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "state": "retained",
+    "incomplete_sequence": "buffered instead of immediately replaced",
+    "flush": "subsequent stream:false/omitted decode finishes input"
+  },
+  "caveats": [
+    "Per-call independent Encoding.GetString loses split multibyte sequences."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "split utf8",
+      "input": "const d=new TextDecoder(); const a=d.decode(new Uint8Array([0xe2]),{stream:true}); const b=d.decode(new Uint8Array([0x82,0xac])); console.log(a,b)",
+      "expected_behavior": "prints empty-string then €"
+    },
+    {
+      "name": "flush incomplete",
+      "input": "const d=new TextDecoder(); d.decode(new Uint8Array([0xe2]),{stream:true}); console.log(d.decode().codePointAt(0).toString(16))",
+      "expected_behavior": "prints fffd"
+    }
+  ]
+}

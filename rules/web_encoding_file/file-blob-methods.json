@@ -1,0 +1,42 @@
+{
+  "id": "web.file.blob-inheritance",
+  "category": "web_encoding_file",
+  "summary": "Reuse Blob methods on File byte content while preserving File metadata on the original object.",
+  "source": {
+    "pattern": "$file.$blobMethod(...$args)",
+    "requirements": {
+      "receiver_inferred_as": "File",
+      "method_resolves_to_blob_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.DispatchInherited",
+    "template": "WebBlob.DispatchInherited($file, $blobMethod, $args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inheritance": "File is a Blob",
+    "slice_result": "Blob rather than File",
+    "metadata": "original File metadata not propagated to slice"
+  },
+  "caveats": [
+    "File.slice() returns Blob, not File."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "slice result",
+      "input": "console.log(new File(['x'],'a').slice() instanceof File)",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "text inherited",
+      "input": "new File(['x'],'a').text().then(console.log)",
+      "expected_behavior": "eventually prints x"
+    }
+  ]
+}

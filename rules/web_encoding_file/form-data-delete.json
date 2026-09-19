@@ -1,0 +1,40 @@
+{
+  "id": "web.form-data.delete",
+  "category": "web_encoding_file",
+  "summary": "Delete all FormData entries with a name.",
+  "source": {
+    "pattern": "$fd.delete($name)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Delete",
+    "template": "WebFormData.Delete($fd, $name)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "effect": "remove every matching entry",
+    "other_entries": "preserve relative order"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "all removed",
+      "input": "const f=new FormData();f.append('x','1');f.append('x','2');f.delete('x');console.log(f.has('x'))",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "others stay",
+      "input": "const f=new FormData();f.append('a','1');f.append('b','2');f.delete('a');console.log(f.get('b'))",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

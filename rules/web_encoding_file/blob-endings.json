@@ -1,0 +1,41 @@
+{
+  "id": "web.blob.endings",
+  "category": "web_encoding_file",
+  "summary": "Apply Blob endings option only to string parts.",
+  "source": {
+    "pattern": "new Blob($parts, {endings:$endings})",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Create",
+    "template": "WebBlob.Create($parts, {endings:$endings})"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "transparent": "leave LF sequences unchanged",
+    "native": "convert line endings in string parts to host native convention",
+    "non_string_parts": "unchanged"
+  },
+  "caveats": [
+    "Platform-native newline behavior is intentionally host-sensitive."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "transparent",
+      "input": "new Blob(['a\\nb'],{endings:'transparent'}).text().then(x=>console.log(JSON.stringify(x)))",
+      "expected_behavior": "prints JSON form preserving \\n"
+    },
+    {
+      "name": "binary unchanged",
+      "input": "const a=new Uint8Array([10]); console.log(new Blob([a],{endings:'native'}).size)",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

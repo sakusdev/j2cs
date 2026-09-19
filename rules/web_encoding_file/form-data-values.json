@@ -1,0 +1,39 @@
+{
+  "id": "web.form-data.values",
+  "category": "web_encoding_file",
+  "summary": "Iterate FormData values in entry-list order.",
+  "source": {
+    "pattern": "$fd.values()",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Values",
+    "template": "WebFormData.Values($fd)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "values": "string or File",
+    "order": "entry-list order"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "values",
+      "input": "const f=new FormData();f.append('x','1');f.append('y','2');console.log([...f.values()].join(','))",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "file identity",
+      "input": "const f=new FormData(),x=new File([],'a');f.append('x',x);console.log(f.get('x')===x)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.text-decoder.utf16",
+  "category": "web_encoding_file",
+  "summary": "Decode UTF-16LE/BE labels according to WHATWG byte and BOM rules.",
+  "source": {
+    "pattern": "$decoder.decode($input)",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true,
+      "encoding_is_utf16": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.Decode",
+    "template": "WebEncoding.Decode($decoder, $input, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "endianness": "selected by canonical encoding; matching initial BOM handling follows ignoreBOM",
+    "odd_trailing_byte": "decoding error"
+  },
+  "caveats": [
+    "System.Text.Encoding BOM auto-detection defaults must not silently change selected endianness."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "utf16le",
+      "input": "console.log(new TextDecoder('utf-16le').decode(new Uint8Array([65,0])))",
+      "expected_behavior": "prints A"
+    },
+    {
+      "name": "utf16be",
+      "input": "console.log(new TextDecoder('utf-16be').decode(new Uint8Array([0,65])))",
+      "expected_behavior": "prints A"
+    }
+  ]
+}
