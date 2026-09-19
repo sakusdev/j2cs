@@ -1,0 +1,41 @@
+{
+  "id": "web.indexeddb.open-request.upgradeneeded",
+  "category": "web_indexeddb",
+  "summary": "Run schema upgrade in versionchange transaction",
+  "source": {
+    "pattern": "req.onupgradeneeded = listener",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsIndexedDb.OpenRequestUpgradeneeded(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "req.onupgradeneeded = listener",
+      "expected_behavior": "Run schema upgrade in versionchange transaction"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.onupgradeneeded = listener",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

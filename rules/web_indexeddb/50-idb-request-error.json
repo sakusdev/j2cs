@@ -1,0 +1,42 @@
+{
+  "id": "web.idb.request.error",
+  "category": "web_indexeddb",
+  "summary": "Read completed request error",
+  "source": {
+    "pattern": "req.error",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.RequestError",
+    "template": "JsIndexedDb.RequestError(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Reading error while pending raises InvalidStateError."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "req.error",
+      "expected_behavior": "Read completed request error"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.error",
+      "expected_behavior": "Reading error while pending raises InvalidStateError."
+    }
+  ]
+}

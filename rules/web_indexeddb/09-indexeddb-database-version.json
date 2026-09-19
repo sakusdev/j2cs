@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.database.version",
+  "category": "web_indexeddb",
+  "summary": "Read database version",
+  "source": {
+    "pattern": "db.version",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.DatabaseVersion",
+    "template": "JsIndexedDb.DatabaseVersion(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "db.version",
+      "expected_behavior": "Read database version"
+    },
+    {
+      "name": "edge semantics",
+      "input": "db.version",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

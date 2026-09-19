@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.cursor.continue",
+  "category": "web_indexeddb",
+  "summary": "Advance cursor in direction",
+  "source": {
+    "pattern": "cursor.continue(key)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.CursorContinue",
+    "template": "JsIndexedDb.CursorContinue(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "A non-advancing key raises DataError."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "cursor.continue(key)",
+      "expected_behavior": "Advance cursor in direction"
+    },
+    {
+      "name": "edge semantics",
+      "input": "cursor.continue(key)",
+      "expected_behavior": "A non-advancing key raises DataError."
+    }
+  ]
+}

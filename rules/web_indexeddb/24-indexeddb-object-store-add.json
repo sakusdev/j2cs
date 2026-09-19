@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.object-store.add",
+  "category": "web_indexeddb",
+  "summary": "Add without overwrite",
+  "source": {
+    "pattern": "store.add(value, key)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.ObjectStoreAdd",
+    "template": "JsIndexedDb.ObjectStoreAdd(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Duplicate key raises ConstraintError and an unhandled request error can abort the transaction."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "store.add(value, key)",
+      "expected_behavior": "Add without overwrite"
+    },
+    {
+      "name": "edge semantics",
+      "input": "store.add(value, key)",
+      "expected_behavior": "Duplicate key raises ConstraintError and an unhandled request error can abort the transaction."
+    }
+  ]
+}

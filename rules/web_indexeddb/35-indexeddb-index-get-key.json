@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.index.get-key",
+  "category": "web_indexeddb",
+  "summary": "Lookup primary key through index",
+  "source": {
+    "pattern": "index.getKey(query)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.IndexGetKey",
+    "template": "JsIndexedDb.IndexGetKey(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "index.getKey(query)",
+      "expected_behavior": "Lookup primary key through index"
+    },
+    {
+      "name": "edge semantics",
+      "input": "index.getKey(query)",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

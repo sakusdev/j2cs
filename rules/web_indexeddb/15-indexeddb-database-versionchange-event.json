@@ -1,0 +1,41 @@
+{
+  "id": "web.indexeddb.database.versionchange-event",
+  "category": "web_indexeddb",
+  "summary": "Observe versionchange request from another connection",
+  "source": {
+    "pattern": "db.onversionchange = listener",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsIndexedDb.DatabaseVersionchangeEvent(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "db.onversionchange = listener",
+      "expected_behavior": "Observe versionchange request from another connection"
+    },
+    {
+      "name": "edge semantics",
+      "input": "db.onversionchange = listener",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

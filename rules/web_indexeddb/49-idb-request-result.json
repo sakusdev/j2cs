@@ -1,0 +1,42 @@
+{
+  "id": "web.idb.request.result",
+  "category": "web_indexeddb",
+  "summary": "Read completed request result",
+  "source": {
+    "pattern": "req.result",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.RequestResult",
+    "template": "JsIndexedDb.RequestResult(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Reading result while pending raises InvalidStateError."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "req.result",
+      "expected_behavior": "Read completed request result"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.result",
+      "expected_behavior": "Reading result while pending raises InvalidStateError."
+    }
+  ]
+}

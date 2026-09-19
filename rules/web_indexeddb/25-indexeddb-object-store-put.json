@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.object-store.put",
+  "category": "web_indexeddb",
+  "summary": "Insert or replace structured-cloned record",
+  "source": {
+    "pattern": "store.put(value, key)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.ObjectStorePut",
+    "template": "JsIndexedDb.ObjectStorePut(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Values use structured clone; uncloneable values raise DataCloneError."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "store.put(value, key)",
+      "expected_behavior": "Insert or replace structured-cloned record"
+    },
+    {
+      "name": "edge semantics",
+      "input": "store.put(value, key)",
+      "expected_behavior": "Values use structured clone; uncloneable values raise DataCloneError."
+    }
+  ]
+}

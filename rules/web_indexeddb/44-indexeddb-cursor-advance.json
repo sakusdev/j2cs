@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.cursor.advance",
+  "category": "web_indexeddb",
+  "summary": "Advance cursor by positive count",
+  "source": {
+    "pattern": "cursor.advance(count)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.CursorAdvance",
+    "template": "JsIndexedDb.CursorAdvance(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Count must be positive."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "cursor.advance(count)",
+      "expected_behavior": "Advance cursor by positive count"
+    },
+    {
+      "name": "edge semantics",
+      "input": "cursor.advance(count)",
+      "expected_behavior": "Count must be positive."
+    }
+  ]
+}

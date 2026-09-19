@@ -1,0 +1,42 @@
+{
+  "id": "web.idb.request.ready-state",
+  "category": "web_indexeddb",
+  "summary": "Read pending/done request state",
+  "source": {
+    "pattern": "req.readyState",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.RequestReadyState",
+    "template": "JsIndexedDb.RequestReadyState(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "req.readyState",
+      "expected_behavior": "Read pending/done request state"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.readyState",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}
