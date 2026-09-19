@@ -1,0 +1,39 @@
+{
+  "id": "node.zlib.options.max-output-length",
+  "category": "node_zlib",
+  "summary": "maxOutputLength limits output from convenience methods and must fail rather than silently truncate.",
+  "source": {
+    "pattern": "zlib.$op($input,{maxOutputLength:$n})",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeZlib.Options",
+    "template": "NodeZlib.Options($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "limit": "maximum produced output length",
+    "overflow": "operation errors/throws when exceeded"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const c=z.gzipSync('abc'); console.log(z.gunzipSync(c,{maxOutputLength:3}).toString());",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const c=z.gzipSync('abcdef'); try{z.gunzipSync(c,{maxOutputLength:2})}catch(e){console.log(Boolean(e))}",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

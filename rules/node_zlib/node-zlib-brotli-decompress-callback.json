@@ -1,0 +1,41 @@
+{
+  "id": "node.zlib.brotli-decompress.callback",
+  "category": "node_zlib",
+  "summary": "brotliDecompress convenience API processes one input and invokes its callback asynchronously.",
+  "source": {
+    "pattern": "zlib.brotliDecompress($input,$options?,$callback)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeZlib.CallbackBrotliDecompress",
+    "template": "NodeZlib.CallbackBrotliDecompress($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "callback": "error-first callback",
+    "success": "Buffer (or info object when info option is true)",
+    "input": "Buffer/TypedArray/DataView/ArrayBuffer/string",
+    "ordering": "callback is asynchronous"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); z.brotliDecompress(z.brotliCompressSync('x'),(e,b)=>console.log(!e,Buffer.isBuffer(b)));",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); z.brotliDecompress(Buffer.from([1,2,3]),(e)=>console.log(Boolean(e)));",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.options.dictionary",
+  "category": "node_zlib",
+  "summary": "Deflate/inflate dictionary options preserve byte identity and algorithm requirements.",
+  "source": {
+    "pattern": "zlib.$op($input,{dictionary:$dictionary})",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeZlib.Options",
+    "template": "NodeZlib.Options($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "accepted": "Buffer/TypedArray/DataView/ArrayBuffer for zlib dictionary where supported",
+    "matching": "inflate may require matching dictionary",
+    "error": "wrong/missing dictionary can fail"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const d=Buffer.from('dict'); const c=z.deflateSync('dictdict',{dictionary:d}); console.log(z.inflateSync(c,{dictionary:d}).toString()==='dictdict');",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const d=Buffer.from('dict'); const c=z.deflateSync('dictdict',{dictionary:d}); try{z.inflateSync(c)}catch(e){console.log(Boolean(e))}",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

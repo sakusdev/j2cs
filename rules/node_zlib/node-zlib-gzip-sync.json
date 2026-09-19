@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.gzip.sync",
+  "category": "node_zlib",
+  "summary": "gzipSync performs the operation synchronously and returns a Buffer or throws.",
+  "source": {
+    "pattern": "zlib.gzipSync($input,$options?)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeZlib.SyncGzipSync",
+    "template": "NodeZlib.SyncGzipSync($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Buffer unless info option requests {buffer,engine}",
+    "error": "throws synchronously",
+    "input": "Buffer/TypedArray/DataView/ArrayBuffer/string"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const b=z.gzipSync('x'); console.log(Buffer.isBuffer(b));",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); try{z.gzipSync(Symbol());}catch(e){console.log(e instanceof Error)}",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

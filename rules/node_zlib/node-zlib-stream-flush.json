@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.stream.flush",
+  "category": "node_zlib",
+  "summary": "flush queues a compression-engine flush behind pending stream writes and may reduce compression quality.",
+  "source": {
+    "pattern": "$zlibStream.flush($kind?,$callback?)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeZlib.Flush",
+    "template": "NodeZlib.Flush($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "queueing": "stream operation, not OS stream flush",
+    "defaults": "Z_FULL_FLUSH for zlib streams; BROTLI_OPERATION_FLUSH for Brotli",
+    "callback": "after flush is processed"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const s=z.createGzip(); s.flush(()=>console.log('flushed')); s.end('x');",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const s=z.createGzip(); s.write('x'); s.flush(); s.end();",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}
