@@ -1,0 +1,41 @@
+{
+  "id": "symbol.function.primitive-description",
+  "category": "symbol",
+  "summary": "Intrinsic Symbol(description) converts a non-undefined primitive description with ToString and creates a fresh Symbol.",
+  "source": {
+    "pattern": "Symbol($description)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "builtin_not_replaced": true,
+      "description_statically_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.Create($description)",
+    "helper": "JsSymbol.Create",
+    "notes": "The helper must distinguish actual undefined from the String \"undefined\" and use canonical ToString semantics for other primitives."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined_description": "no description",
+    "other_primitive": "ToString(description)",
+    "fresh_identity_each_call": true
+  },
+  "tests": [
+    {
+      "name": "string description",
+      "input": "const s=Symbol(\"x\"); console.log(s.description, s.toString());",
+      "expected_behavior": "prints x Symbol(x)"
+    },
+    {
+      "name": "undefined differs from string undefined",
+      "input": "console.log(Symbol().description, Symbol(undefined).description, Symbol(\"undefined\").description);",
+      "expected_behavior": "first two values are undefined; third is the string undefined"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

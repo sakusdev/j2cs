@@ -1,0 +1,40 @@
+{
+  "id": "bigint.as-int-n",
+  "category": "bigint",
+  "summary": "BigInt.asIntN first applies ToIndex(bits), then ToBigInt(value), then wraps modulo 2^bits into the signed range.",
+  "source": {
+    "pattern": "BigInt.asIntN($bits, $value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%BigInt%",
+      "property_resolves_to_builtin": "BigInt.asIntN"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsBigInt.AsIntN($bits, $value)",
+    "helper": "JsBigInt.AsIntN",
+    "notes": "Reuse canonical ToIndex and ToBigInt implementations; preserve their exception types and coercion ordering."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion_order": "ToIndex(bits) then ToBigInt(value)",
+    "bits_zero": "returns 0n",
+    "signed_wrap": "remainder >= 2^(bits-1) subtracts 2^bits"
+  },
+  "tests": [
+    {
+      "name": "signed one-bit wrap",
+      "input": "console.log(BigInt.asIntN(1,1n), BigInt.asIntN(1,2n));",
+      "expected_behavior": "prints -1n 0n"
+    },
+    {
+      "name": "bits coercion precedes value coercion",
+      "input": "const log=[]; const b={valueOf(){log.push(\"bits\");return 8}}; const v={valueOf(){log.push(\"value\");return 1n}}; BigInt.asIntN(b,v); console.log(log.join(\",\"));",
+      "expected_behavior": "prints bits,value"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

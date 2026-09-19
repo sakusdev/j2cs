@@ -1,0 +1,9 @@
+{
+  "id": "values.same-value.dynamic",
+  "category": "values",
+  "summary": "Use a JavaScript-value helper for SameValue when operand types are not statically resolved.",
+  "source": {"pattern": "[[SameValue]]($left, $right)","requirements": {"semantic_operation": "SameValue","operand_types_not_fully_known": true}},
+  "target": {"kind": "helper","template": "JsValues.SameValue($left, $right)","helper": "JsValues.SameValue"},
+  "strategy": "helper","confidence": "high","semantics": {"same_type_check_first": true,"number": "NaN equal and signed zero distinct","non_number": "SameValueNonNumber"},
+  "tests": [{"name": "dynamic NaN","input": "const a=Math.random()>-1?NaN:0; console.log(Object.is(a,NaN));","expected_behavior": "prints true"},{"name": "dynamic distinct type","input": "const x=Math.random()>-1?1:1n; console.log(Object.is(x,1n));","expected_behavior": "prints false for the taken Number branch"}],"references": ["https://tc39.es/ecma262/2026/multipage/abstract-operations.html"]
+}

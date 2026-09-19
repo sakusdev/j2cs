@@ -1,0 +1,38 @@
+{
+  "id": "symbol.prototype.value-of",
+  "category": "symbol",
+  "summary": "Symbol.prototype.valueOf extracts the Symbol primitive from a Symbol value or boxed Symbol.",
+  "source": {
+    "pattern": "Symbol.prototype.valueOf.call($receiver)",
+    "requirements": {
+      "property_resolves_to_builtin": "Symbol.prototype.valueOf"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.ThisSymbolValue($receiver)",
+    "helper": "JsSymbol.ThisSymbolValue"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "symbol_primitive": "identity",
+    "symbol_wrapper": "returns [[SymbolData]]",
+    "other": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "primitive identity",
+      "input": "const s=Symbol(\"x\"); console.log(Symbol.prototype.valueOf.call(s)===s);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "wrapper unboxes",
+      "input": "const s=Symbol(\"x\"), o=Object(s); console.log(o.valueOf()===s);",
+      "expected_behavior": "prints true"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

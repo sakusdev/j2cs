@@ -1,0 +1,42 @@
+{
+  "id": "symbol.for.primitive-key",
+  "category": "symbol",
+  "summary": "Symbol.for on a primitive key converts it to String and returns the process-wide registered Symbol for that key.",
+  "source": {
+    "pattern": "Symbol.for($key)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "property_resolves_to_builtin": "Symbol.for",
+      "key_statically_primitive": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.For(JsCoercion.ToStringPrimitive($key))",
+    "helper": "JsSymbol.For",
+    "notes": "The registry is append-only and must be shared across realms, not scoped to one translated module."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "registry": "GlobalSymbolRegistry",
+    "shared_across_realms": true,
+    "key_conversion": "ToString",
+    "same_key_same_symbol": true
+  },
+  "tests": [
+    {
+      "name": "registry identity",
+      "input": "console.log(Symbol.for(\"x\")===Symbol.for(\"x\"));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "numeric key stringifies",
+      "input": "console.log(Symbol.for(1)===Symbol.for(\"1\"));",
+      "expected_behavior": "prints true"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

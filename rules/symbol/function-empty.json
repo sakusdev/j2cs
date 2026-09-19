@@ -1,0 +1,40 @@
+{
+  "id": "symbol.function.empty",
+  "category": "symbol",
+  "summary": "Intrinsic Symbol() creates a fresh unique Symbol with an undefined description.",
+  "source": {
+    "pattern": "Symbol()",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.Create(JsUndefined.Value)",
+    "helper": "JsSymbol.Create",
+    "notes": "Create a new symbol identity on every evaluation; never intern unregistered symbols."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "fresh_identity_each_call": true,
+    "description": "undefined",
+    "primitive_type": "Symbol"
+  },
+  "tests": [
+    {
+      "name": "fresh identity",
+      "input": "const a=Symbol(), b=Symbol(); console.log(a===b);",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "description is undefined",
+      "input": "console.log(Symbol().description === undefined);",
+      "expected_behavior": "prints true"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

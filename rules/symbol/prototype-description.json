@@ -1,0 +1,39 @@
+{
+  "id": "symbol.prototype.description",
+  "category": "symbol",
+  "summary": "Symbol.prototype.description returns the internal description without adding Symbol(...) decoration.",
+  "source": {
+    "pattern": "$symbol.description",
+    "requirements": {
+      "receiver_is_symbol_or_symbol_wrapper": true,
+      "property_resolves_to_builtin_accessor": "Symbol.prototype.description"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.GetDescription($symbol)",
+    "helper": "JsSymbol.GetDescription"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "undefined_description": "returns undefined",
+    "string_description": "returns exact stored String",
+    "invalid_receiver": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "empty and absent descriptions differ",
+      "input": "console.log(Symbol().description===undefined, Symbol(\"\").description===\"\");",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "borrowed getter rejects object",
+      "input": "const g=Object.getOwnPropertyDescriptor(Symbol.prototype,\"description\").get; try{g.call({})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

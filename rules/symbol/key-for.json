@@ -1,0 +1,39 @@
+{
+  "id": "symbol.key-for",
+  "category": "symbol",
+  "summary": "Symbol.keyFor returns a registry key only for registered Symbols and throws for non-Symbol arguments.",
+  "source": {
+    "pattern": "Symbol.keyFor($symbol)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "property_resolves_to_builtin": "Symbol.keyFor"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.KeyFor($symbol)",
+    "helper": "JsSymbol.KeyFor"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "registered_symbol": "returns registry String key",
+    "unregistered_symbol": "undefined",
+    "non_symbol": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "registered key",
+      "input": "console.log(Symbol.keyFor(Symbol.for(\"x\")));",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "unregistered and wrong type",
+      "input": "console.log(Symbol.keyFor(Symbol())===undefined); try{Symbol.keyFor(\"x\")}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints true then TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

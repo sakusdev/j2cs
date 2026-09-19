@@ -1,0 +1,40 @@
+{
+  "id": "bigint.literal",
+  "category": "bigint",
+  "summary": "Lower a parsed BigInt literal to an exact arbitrary-precision integer representation; do not pass through IEEE-754 Number.",
+  "source": {
+    "pattern": "$bigintLiteral",
+    "requirements": {
+      "ast_node": "BigIntLiteral",
+      "literal_value_already_parsed_exactly": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "System.Numerics.BigInteger.Parse(\"$canonicalDecimal\", System.Globalization.CultureInfo.InvariantCulture)",
+    "notes": "The compiler obtains $canonicalDecimal from the parsed BigInt AST value, not by converting through double."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "precision": "arbitrary exact integer",
+    "number_round_trip_forbidden": true,
+    "primitive_identity": "value semantics"
+  },
+  "tests": [
+    {
+      "name": "beyond safe integer exact",
+      "input": "console.log(9007199254740993n === 9007199254740993n);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "non-decimal source still exact",
+      "input": "console.log(0xffffffffffffffffn.toString());",
+      "expected_behavior": "prints 18446744073709551615"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html",
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

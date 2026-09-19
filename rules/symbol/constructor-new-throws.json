@@ -1,0 +1,38 @@
+{
+  "id": "symbol.constructor.new-throws",
+  "category": "symbol",
+  "summary": "Intrinsic Symbol is not constructible; new Symbol(...) throws TypeError after argument evaluation.",
+  "source": {
+    "pattern": "new Symbol($description)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "builtin_not_replaced": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.ThrowNotConstructor($description)",
+    "helper": "JsSymbol.ThrowNotConstructor"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "TypeError",
+    "argument_evaluation": "occurs before constructor failure"
+  },
+  "tests": [
+    {
+      "name": "new throws",
+      "input": "try{new Symbol(\"x\")}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "argument side effect preserved",
+      "input": "let n=0; try{new Symbol(n++)}catch{} console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "bigint.prototype.to-string-default",
+  "category": "bigint",
+  "summary": "BigInt.prototype.toString() with no radix formats in base 10 without performing radix coercion.",
+  "source": {
+    "pattern": "$bigint.toString()",
+    "requirements": {
+      "receiver_is_bigint_or_bigint_wrapper": true,
+      "property_resolves_to_builtin": "BigInt.prototype.toString"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsBigInt.ToString($bigint, 10)",
+    "helper": "JsBigInt.ToString"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "radix": 10,
+    "radix_coercion": "none because argument is absent",
+    "invalid_receiver": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "default decimal",
+      "input": "console.log((255n).toString());",
+      "expected_behavior": "prints 255"
+    },
+    {
+      "name": "boxed BigInt accepted",
+      "input": "console.log(Object(255n).toString());",
+      "expected_behavior": "prints 255"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "bigint.prototype.value-of",
+  "category": "bigint",
+  "summary": "BigInt.prototype.valueOf returns the BigInt primitive or unboxes [[BigIntData]], and rejects other receivers.",
+  "source": {
+    "pattern": "BigInt.prototype.valueOf.call($receiver)",
+    "requirements": {
+      "property_resolves_to_builtin": "BigInt.prototype.valueOf"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsBigInt.ThisBigIntValue($receiver)",
+    "helper": "JsBigInt.ThisBigIntValue"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "bigint_primitive": "identity",
+    "bigint_wrapper": "returns [[BigIntData]]",
+    "other": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "primitive value",
+      "input": "console.log(BigInt.prototype.valueOf.call(3n)===3n);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "boxed value",
+      "input": "const o=Object(3n); console.log(o.valueOf()===3n);",
+      "expected_behavior": "prints true"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}

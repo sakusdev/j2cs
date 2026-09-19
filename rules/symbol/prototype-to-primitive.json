@@ -1,0 +1,39 @@
+{
+  "id": "symbol.prototype.to-primitive",
+  "category": "symbol",
+  "summary": "The intrinsic Symbol @@toPrimitive method ignores its hint and returns the Symbol primitive from a Symbol value/wrapper.",
+  "source": {
+    "pattern": "Symbol.prototype[Symbol.toPrimitive].call($receiver, $hint)",
+    "requirements": {
+      "intrinsic_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsSymbol.ThisSymbolValue($receiver)",
+    "helper": "JsSymbol.ThisSymbolValue"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "hint": "ignored",
+    "symbol_primitive": "identity",
+    "symbol_wrapper": "unboxes [[SymbolData]]",
+    "other": "TypeError"
+  },
+  "tests": [
+    {
+      "name": "hint ignored",
+      "input": "const s=Symbol(\"x\"), o=Object(s); console.log(o[Symbol.toPrimitive](\"number\")===s);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "wrong receiver throws",
+      "input": "try{Symbol.prototype[Symbol.toPrimitive].call({},\"default\")}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

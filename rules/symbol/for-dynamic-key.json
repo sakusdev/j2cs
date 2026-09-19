@@ -1,0 +1,40 @@
+{
+  "id": "symbol.for.dynamic-key",
+  "category": "symbol",
+  "summary": "Symbol.for with an object key must run full ToString semantics before registry lookup.",
+  "source": {
+    "pattern": "Symbol.for($key)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Symbol%",
+      "property_resolves_to_builtin": "Symbol.for",
+      "key_may_be_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.SymbolFor($key)",
+    "helper": "JsRuntime.SymbolFor"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "key_conversion": "ToString",
+    "can_execute_user_code": true,
+    "registry_shared_across_realms": true
+  },
+  "tests": [
+    {
+      "name": "object key side effect",
+      "input": "let n=0; const s=Symbol.for({toString(){n++;return \"x\"}}); console.log(n,s===Symbol.for(\"x\"));",
+      "expected_behavior": "prints 1 true"
+    },
+    {
+      "name": "symbol key rejected by ToString",
+      "input": "try{Symbol.for(Symbol())}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html"
+  ]
+}

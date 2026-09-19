@@ -1,0 +1,39 @@
+{
+  "id": "bigint.as-uint-n",
+  "category": "bigint",
+  "summary": "BigInt.asUintN applies ToIndex and ToBigInt then returns value modulo 2^bits in the unsigned range.",
+  "source": {
+    "pattern": "BigInt.asUintN($bits, $value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%BigInt%",
+      "property_resolves_to_builtin": "BigInt.asUintN"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "JsBigInt.AsUintN($bits, $value)",
+    "helper": "JsBigInt.AsUintN"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "coercion_order": "ToIndex(bits) then ToBigInt(value)",
+    "bits_zero": "returns 0n",
+    "result_range": "0 <= result < 2^bits"
+  },
+  "tests": [
+    {
+      "name": "negative wraps unsigned",
+      "input": "console.log(BigInt.asUintN(8,-1n));",
+      "expected_behavior": "prints 255n"
+    },
+    {
+      "name": "negative bits rejected",
+      "input": "try{BigInt.asUintN(-1,1n)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/numbers-and-dates.html"
+  ]
+}
