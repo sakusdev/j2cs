@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.resolve6",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve DNS AAAA records with optional TTL result shape.",
+  "source": {
+    "pattern": "dns.resolve6($hostname, $options, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolve6($hostname, $options, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "AAAA",
+    "default": "IPv6 strings",
+    "ttl_true": "{address,ttl}[]"
+  },
+  "caveats": [
+    "Preserve Node IPv6 and TTL result shape."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').resolve6)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* resolve6(host,{ttl:true}) */",
+      "expected_behavior": "returns address/ttl objects"
+    }
+  ]
+}

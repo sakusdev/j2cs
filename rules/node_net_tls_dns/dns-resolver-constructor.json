@@ -1,0 +1,39 @@
+{
+  "id": "node.dns.resolver.constructor",
+  "category": "node_net_tls_dns",
+  "summary": "Create independent Resolver with per-instance server state.",
+  "source": {
+    "pattern": "new dns.Resolver($options)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsCreateResolver($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "independent_configuration": true,
+    "methods": "resolve*/reverse"
+  },
+  "caveats": [
+    "Do not alias instance configuration to global dns state."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const d=require('node:dns');console.log(new d.Resolver() instanceof d.Resolver)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* r1.setServers */",
+      "expected_behavior": "does not alter r2/global Resolver settings"
+    }
+  ]
+}

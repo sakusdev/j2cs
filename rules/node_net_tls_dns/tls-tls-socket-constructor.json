@@ -1,0 +1,40 @@
+{
+  "id": "node.tls.tls-socket.constructor",
+  "category": "node_net_tls_dns",
+  "summary": "Construct/wrap TLSSocket with secure context and TLS state.",
+  "source": {
+    "pattern": "new tls.TLSSocket($socket, $options)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeTlsSocketCreate($socket, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "inherits": "net.Socket",
+    "role": "client/server",
+    "secure_context": true
+  },
+  "caveats": [
+    "Wrapping a socket is protocol state creation, not a cast."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls'),net=require('node:net');const s=new tls.TLSSocket();console.log(s instanceof net.Socket)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* before handshake */",
+      "expected_behavior": "negotiated TLS metadata is not yet established"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "node.net.socket.set-no-delay",
+  "category": "node_net_tls_dns",
+  "summary": "Configure TCP_NODELAY with omitted argument default true.",
+  "source": {
+    "pattern": "$socket.setNoDelay($value)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.SetNoDelay",
+    "template": "NodeNet.SetNoDelay($socket, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Socket",
+    "omitted_value": true,
+    "effect": "true disables Nagle"
+  },
+  "caveats": [
+    "The option is inverse to Nagle enablement."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.setNoDelay()===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* setNoDelay() */",
+      "expected_behavior": "disables Nagle algorithm"
+    }
+  ]
+}

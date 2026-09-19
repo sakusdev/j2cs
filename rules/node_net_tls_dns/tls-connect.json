@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.connect",
+  "category": "node_net_tls_dns",
+  "summary": "Return TLSSocket immediately and complete asynchronous TLS handshake.",
+  "source": {
+    "pattern": "tls.connect($options, $listener)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeTlsConnect($options, $listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "TLSSocket immediately",
+    "success": "secureConnect",
+    "verification": "rejectUnauthorized policy",
+    "tcp_then_tls": true
+  },
+  "caveats": [
+    "TCP connect completion is not secureConnect."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');const s=tls.connect({port:9,rejectUnauthorized:false});console.log(s instanceof tls.TLSSocket);s.on('error',()=>{})",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* connect callback */",
+      "expected_behavior": "fires after TLS handshake succeeds"
+    }
+  ]
+}

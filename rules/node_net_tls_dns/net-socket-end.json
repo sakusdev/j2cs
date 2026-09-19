@@ -1,0 +1,41 @@
+{
+  "id": "node.net.socket.end",
+  "category": "node_net_tls_dns",
+  "summary": "Gracefully end writable side after optional final chunk.",
+  "source": {
+    "pattern": "$socket.end($data, $encoding, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeStreams.End",
+    "template": "NodeStreams.End($socket, $data, $encoding, $callback)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Socket",
+    "final_write": "ordered before FIN",
+    "readable_side": "may remain"
+  },
+  "caveats": [
+    "end() is not destroy()."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.end()===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* socket.end(data) */",
+      "expected_behavior": "queued final data completes before graceful FIN"
+    }
+  ]
+}

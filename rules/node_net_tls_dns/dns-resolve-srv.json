@@ -1,0 +1,44 @@
+{
+  "id": "node.dns.resolve-srv",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve SRV records with priority/weight/port/name.",
+  "source": {
+    "pattern": "dns.resolveSrv($hostname, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolveSrv($hostname, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "SRV",
+    "fields": [
+      "priority",
+      "weight",
+      "port",
+      "name"
+    ]
+  },
+  "caveats": [
+    "Do not discard priority or weight."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').resolveSrv)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* successful SRV */",
+      "expected_behavior": "records preserve all SRV fields"
+    }
+  ]
+}

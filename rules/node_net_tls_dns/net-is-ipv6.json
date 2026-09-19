@@ -1,0 +1,40 @@
+{
+  "id": "node.net.is-ipv6",
+  "category": "node_net_tls_dns",
+  "summary": "Test strict Node IPv6 literal without DNS.",
+  "source": {
+    "pattern": "net.isIPv6($input)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.IsIPv6",
+    "template": "NodeNet.IsIPv6($input)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "dns": false
+  },
+  "caveats": [
+    "Hostnames are not resolved."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(net.isIPv6('::1'))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const net=require('node:net');console.log(net.isIPv6('1.2.3.4'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

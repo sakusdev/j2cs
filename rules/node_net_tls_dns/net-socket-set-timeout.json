@@ -1,0 +1,42 @@
+{
+  "id": "node.net.socket.set-timeout",
+  "category": "node_net_tls_dns",
+  "summary": "Configure inactivity timeout event without automatic close.",
+  "source": {
+    "pattern": "$socket.setTimeout($ms, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.SetSocketTimeout",
+    "template": "NodeNet.SetSocketTimeout($socket, $ms, $callback)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Socket",
+    "event": "timeout",
+    "auto_destroy": false,
+    "activity_resets": true
+  },
+  "caveats": [
+    "Node timeout event is not a blocking I/O timeout property."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=new net.Socket();console.log(s.setTimeout(1)===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* timeout event */",
+      "expected_behavior": "socket remains open unless user closes/destroys it"
+    }
+  ]
+}

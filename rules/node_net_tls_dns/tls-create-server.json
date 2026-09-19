@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.create-server",
+  "category": "node_net_tls_dns",
+  "summary": "Create TLS server layered on net.Server/OpenSSL.",
+  "source": {
+    "pattern": "tls.createServer($options, $listener)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeTlsCreateServer($options, $listener)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "tls.Server",
+    "event": "secureConnection",
+    "inherits": "net.Server",
+    "provider": "OpenSSL/runtime"
+  },
+  "caveats": [
+    "TLS certificate/cipher/provider policy is host-runtime behavior."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls'),net=require('node:net');const s=tls.createServer({});console.log(s instanceof net.Server)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* createServer callback */",
+      "expected_behavior": "runs for secureConnection rather than raw TCP connection"
+    }
+  ]
+}

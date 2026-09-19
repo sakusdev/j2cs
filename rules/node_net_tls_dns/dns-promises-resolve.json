@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.promises.resolve",
+  "category": "node_net_tls_dns",
+  "summary": "Promise form of DNS protocol resolve.",
+  "source": {
+    "pattern": "dns.promises.resolve($hostname, $rrtype)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsPromisesResolve($hostname, $rrtype)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise",
+    "protocol": "DNS",
+    "default_rrtype": "A"
+  },
+  "caveats": [
+    "Do not implement as promises.lookup."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const d=require('node:dns').promises;console.log(d.resolve('localhost') instanceof Promise)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* promises.resolve */",
+      "expected_behavior": "uses configured DNS resolver rather than OS lookup"
+    }
+  ]
+}

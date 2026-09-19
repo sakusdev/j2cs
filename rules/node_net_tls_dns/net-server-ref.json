@@ -1,0 +1,41 @@
+{
+  "id": "node.net.server.ref",
+  "category": "node_net_tls_dns",
+  "summary": "Ref Server event-loop handle.",
+  "source": {
+    "pattern": "$server.ref()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.RefServer",
+    "template": "NodeNet.RefServer($server)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "same Server",
+    "idempotent": true,
+    "process_liveness": true
+  },
+  "caveats": [
+    "This affects process liveness, not object reachability."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');const s=net.createServer();console.log(s.ref()===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const net=require('node:net');const s=net.createServer();console.log(s.ref().ref()===s)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.tls.socket.authorization-error",
+  "category": "node_net_tls_dns",
+  "summary": "Expose Node/OpenSSL certificate authorization error.",
+  "source": {
+    "pattern": "$socket.authorizationError",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.GetAuthorizationError",
+    "template": "NodeTls.GetAuthorizationError($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "provider_error": true,
+    "state_dependent": true
+  },
+  "caveats": [
+    "Do not substitute .NET exception strings."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log('authorizationError' in new tls.TLSSocket())",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* verification failure */",
+      "expected_behavior": "reports Node/OpenSSL-compatible authorization error"
+    }
+  ]
+}

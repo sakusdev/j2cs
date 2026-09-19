@@ -1,0 +1,39 @@
+{
+  "id": "node.dns.resolve-any",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve DNS ANY to heterogeneous typed record objects.",
+  "source": {
+    "pattern": "dns.resolveAny($hostname, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsResolveAny($hostname, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "ANY",
+    "heterogeneous_records": true
+  },
+  "caveats": [
+    "ANY is not equivalent to issuing all resolve* methods."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(typeof require('node:dns').resolveAny)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* successful ANY response */",
+      "expected_behavior": "record fields vary by type discriminator"
+    }
+  ]
+}

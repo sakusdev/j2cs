@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.socket.renegotiate",
+  "category": "node_net_tls_dns",
+  "summary": "Request TLS renegotiation with protocol/security limits.",
+  "source": {
+    "pattern": "$socket.renegotiate($options, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeTlsRenegotiate($socket, $options, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean initiation",
+    "callback": "completion/error",
+    "TLS1_3": "unsupported",
+    "provider_limits": true
+  },
+  "caveats": [
+    "Renegotiation support and limits are protocol/provider-sensitive."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().renegotiate)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* TLS 1.3 connection */",
+      "expected_behavior": "renegotiation cannot be performed"
+    }
+  ]
+}

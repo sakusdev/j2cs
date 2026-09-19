@@ -1,0 +1,40 @@
+{
+  "id": "node.dns.get-servers",
+  "category": "node_net_tls_dns",
+  "summary": "Return configured DNS resolver server strings.",
+  "source": {
+    "pattern": "dns.getServers()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeDns.GetServers",
+    "template": "NodeDns.GetServers()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "fresh string[]",
+    "scope": "resolve* resolver configuration"
+  },
+  "caveats": [
+    "These servers need not control dns.lookup OS resolution."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(Array.isArray(require('node:dns').getServers()))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const d=require('node:dns');console.log(d.getServers()===d.getServers())",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

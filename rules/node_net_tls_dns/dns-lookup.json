@@ -1,0 +1,41 @@
+{
+  "id": "node.dns.lookup",
+  "category": "node_net_tls_dns",
+  "summary": "Resolve hostname using OS name-resolution facilities.",
+  "source": {
+    "pattern": "dns.lookup($hostname, $options, $callback)",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.NodeDnsLookup($hostname, $options, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "resolver": "OS getaddrinfo-like",
+    "callback": "address/family",
+    "family_options": true,
+    "hints": true
+  },
+  "caveats": [
+    "dns.lookup is not necessarily a DNS protocol query."
+  ],
+  "references": [
+    "Node.js dns API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "require('node:dns').lookup('127.0.0.1',(e,a,f)=>console.log(a,f))",
+      "expected_behavior": "prints 127.0.0.1 4"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* dns.setServers then dns.lookup */",
+      "expected_behavior": "lookup still uses OS resolver semantics"
+    }
+  ]
+}

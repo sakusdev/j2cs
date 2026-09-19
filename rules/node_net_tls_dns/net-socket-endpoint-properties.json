@@ -1,0 +1,47 @@
+{
+  "id": "node.net.socket.endpoint-properties",
+  "category": "node_net_tls_dns",
+  "summary": "Expose local/remote address/family/port properties when available.",
+  "source": {
+    "pattern": "$socket.$property",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeNet.GetSocketEndpointProperty",
+    "template": "NodeNet.GetSocketEndpointProperty($socket, $property)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "properties": [
+      "localAddress",
+      "localPort",
+      "localFamily",
+      "remoteAddress",
+      "remotePort",
+      "remoteFamily"
+    ],
+    "unavailable": "undefined"
+  },
+  "caveats": [
+    "Remote values are undefined before connection."
+  ],
+  "references": [
+    "Node.js net API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const net=require('node:net');console.log(new net.Socket().remoteAddress===undefined)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* connected socket */",
+      "expected_behavior": "remote fields describe actual peer"
+    }
+  ]
+}

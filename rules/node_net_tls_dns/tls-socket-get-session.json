@@ -1,0 +1,41 @@
+{
+  "id": "node.tls.socket.get-session",
+  "category": "node_net_tls_dns",
+  "summary": "Return opaque TLS session bytes for resumption when available.",
+  "source": {
+    "pattern": "$socket.getSession()",
+    "requirements": {
+      "builtin_node_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTls.GetSession",
+    "template": "NodeTls.GetSession($socket)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Buffer or undefined",
+    "opaque_provider_data": true,
+    "resumption": true
+  },
+  "caveats": [
+    "Do not deserialize or reinterpret provider session bytes."
+  ],
+  "references": [
+    "Node.js tls API"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const tls=require('node:tls');console.log(typeof new tls.TLSSocket().getSession)",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* session available */",
+      "expected_behavior": "returns Buffer usable as Node tls session input"
+    }
+  ]
+}
