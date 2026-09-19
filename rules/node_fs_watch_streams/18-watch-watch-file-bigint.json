@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.watch-file-bigint",
+  "category": "node_fs_watch_streams",
+  "summary": "Deliver BigInt-valued Stats snapshots.",
+  "source": {
+    "pattern": "fs.watchFile(path,{bigint:true},listener)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.WatchFile",
+    "template": "NodeFs.WatchFile(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Reuse NODE_FS Stats semantics."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.watchFile(path,{bigint:true},listener)",
+      "expected_behavior": "Deliver BigInt-valued Stats snapshots."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.watchFile(path,{bigint:true},listener)",
+      "expected_behavior": "Reuse NODE_FS Stats semantics."
+    }
+  ]
+}

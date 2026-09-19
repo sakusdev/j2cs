@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.change-event",
+  "category": "node_fs_watch_streams",
+  "summary": "Preserve FSWatcher change event payload.",
+  "source": {
+    "pattern": "watcher.on('change',listener)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.FSWatcherChange",
+    "template": "NodeFs.FSWatcherChange(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Generic EventEmitter listener mechanics remain EVENTS_STREAMS."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "watcher.on('change',listener)",
+      "expected_behavior": "Preserve FSWatcher change event payload."
+    },
+    {
+      "name": "semantic trap",
+      "input": "watcher.on('change',listener)",
+      "expected_behavior": "Generic EventEmitter listener mechanics remain EVENTS_STREAMS."
+    }
+  ]
+}

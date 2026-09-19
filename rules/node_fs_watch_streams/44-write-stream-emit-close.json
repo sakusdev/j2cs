@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.emit-close",
+  "category": "node_fs_watch_streams",
+  "summary": "Preserve close event emission option.",
+  "source": {
+    "pattern": "fs.createWriteStream(path,{emitClose:false})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.CreateWriteStream",
+    "template": "NodeFs.CreateWriteStream(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Resource close and event emission differ."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.createWriteStream(path,{emitClose:false})",
+      "expected_behavior": "Preserve close event emission option."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.createWriteStream(path,{emitClose:false})",
+      "expected_behavior": "Resource close and event emission differ."
+    }
+  ]
+}

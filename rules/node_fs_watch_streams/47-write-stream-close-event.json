@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.close-event",
+  "category": "node_fs_watch_streams",
+  "summary": "Emit close after underlying resource closure.",
+  "source": {
+    "pattern": "stream.on('close',()=>{})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.WriteStreamClose",
+    "template": "NodeFs.WriteStreamClose(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "emitClose can suppress event."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.on('close',()=>{})",
+      "expected_behavior": "Emit close after underlying resource closure."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.on('close',()=>{})",
+      "expected_behavior": "emitClose can suppress event."
+    }
+  ]
+}

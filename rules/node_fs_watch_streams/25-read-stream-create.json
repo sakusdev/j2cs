@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.read-stream.create",
+  "category": "node_fs_watch_streams",
+  "summary": "Create Node fs.ReadStream with lazy/open event lifecycle.",
+  "source": {
+    "pattern": "fs.createReadStream(path,options)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.CreateReadStream",
+    "template": "NodeFs.CreateReadStream(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Do not replace with File.OpenRead because Node stream/events/options are observable."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.createReadStream(path,options)",
+      "expected_behavior": "Create Node fs.ReadStream with lazy/open event lifecycle."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.createReadStream(path,options)",
+      "expected_behavior": "Do not replace with File.OpenRead because Node stream/events/options are observable."
+    }
+  ]
+}

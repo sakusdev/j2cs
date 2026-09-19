@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.opendir.callback",
+  "category": "node_fs_watch_streams",
+  "summary": "Open a directory and return fs.Dir asynchronously.",
+  "source": {
+    "pattern": "fs.opendir(path,options,callback)",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.OpenDir",
+    "template": "NodeFs.OpenDir(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Callback receives Node fs errors and a Dir wrapper."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.opendir(path,options,callback)",
+      "expected_behavior": "Open a directory and return fs.Dir asynchronously."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.opendir(path,options,callback)",
+      "expected_behavior": "Callback receives Node fs errors and a Dir wrapper."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.read-stream.high-water-mark",
+  "category": "node_fs_watch_streams",
+  "summary": "Preserve file read buffering threshold.",
+  "source": {
+    "pattern": "fs.createReadStream(path,{highWaterMark:n})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.CreateReadStream",
+    "template": "NodeFs.CreateReadStream(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "fs.ReadStream defaults differ from generic stream.Readable defaults by Node version."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.createReadStream(path,{highWaterMark:n})",
+      "expected_behavior": "Preserve file read buffering threshold."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.createReadStream(path,{highWaterMark:n})",
+      "expected_behavior": "fs.ReadStream defaults differ from generic stream.Readable defaults by Node version."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.watch.abort-signal",
+  "category": "node_fs_watch_streams",
+  "summary": "Close watcher when AbortSignal aborts.",
+  "source": {
+    "pattern": "fs.watch(path,{signal})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.Watch",
+    "template": "NodeFs.Watch(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Reuse WEB_ABORT_SIGNALS for generic signal behavior."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "fs.watch(path,{signal})",
+      "expected_behavior": "Close watcher when AbortSignal aborts."
+    },
+    {
+      "name": "semantic trap",
+      "input": "fs.watch(path,{signal})",
+      "expected_behavior": "Reuse WEB_ABORT_SIGNALS for generic signal behavior."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.open-event",
+  "category": "node_fs_watch_streams",
+  "summary": "Emit open after fd acquisition.",
+  "source": {
+    "pattern": "stream.on('open',fd=>{})",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.WriteStreamOpen",
+    "template": "NodeFs.WriteStreamOpen(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Not necessarily emitted for supplied descriptor."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.on('open',fd=>{})",
+      "expected_behavior": "Emit open after fd acquisition."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.on('open',fd=>{})",
+      "expected_behavior": "Not necessarily emitted for supplied descriptor."
+    }
+  ]
+}

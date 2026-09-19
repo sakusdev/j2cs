@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.opendir.dir-close-sync",
+  "category": "node_fs_watch_streams",
+  "summary": "Close directory handle synchronously.",
+  "source": {
+    "pattern": "dir.closeSync()",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.DirCloseSync",
+    "template": "NodeFs.DirCloseSync(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Double/closed-handle behavior preserved."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "dir.closeSync()",
+      "expected_behavior": "Close directory handle synchronously."
+    },
+    {
+      "name": "semantic trap",
+      "input": "dir.closeSync()",
+      "expected_behavior": "Double/closed-handle behavior preserved."
+    }
+  ]
+}

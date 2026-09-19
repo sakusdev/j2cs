@@ -1,0 +1,42 @@
+{
+  "id": "node.fs.write-stream.pending",
+  "category": "node_fs_watch_streams",
+  "summary": "Read whether fd is pending open.",
+  "source": {
+    "pattern": "stream.pending",
+    "requirements": {
+      "node_builtin_binding": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeFs.WriteStreamPending",
+    "template": "NodeFs.WriteStreamPending(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_host_semantics": true,
+    "events": "reuse EVENTS_STREAMS where generic",
+    "path_errors": "reuse NODE_FS core"
+  },
+  "caveats": [
+    "Tracks fd acquisition state."
+  ],
+  "references": [
+    "https://nodejs.org/api/fs.html"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "stream.pending",
+      "expected_behavior": "Read whether fd is pending open."
+    },
+    {
+      "name": "semantic trap",
+      "input": "stream.pending",
+      "expected_behavior": "Tracks fd acquisition state."
+    }
+  ]
+}
