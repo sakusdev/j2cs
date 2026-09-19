@@ -1,0 +1,42 @@
+{
+  "id": "electron.session.clear-storage-data",
+  "category": "electron.session",
+  "summary": "Clear selected Chromium storage types/origin.",
+  "source": {
+    "pattern": "$ses.clearStorageData($options?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ClearStorageData",
+    "template": "ElectronCompat.Session.ClearStorageData(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> after selected storage is cleared",
+    "edge": "omitted options clears all supported storage types"
+  },
+  "caveats": [
+    "Origin and storage-type matching follow Electron/Chromium, not arbitrary filesystem deletion."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.clearStorageData({storages:['cookies']})",
+      "expected_behavior": "returns Promise<void> after selected storage is cleared"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.clearStorageData()",
+      "expected_behavior": "omitted options clears all supported storage types"
+    }
+  ]
+}

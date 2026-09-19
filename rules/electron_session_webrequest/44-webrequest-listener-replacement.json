@@ -1,0 +1,40 @@
+{
+  "id": "electron.webrequest.listener-replacement",
+  "category": "electron.webrequest",
+  "summary": "Preserve Electron's single-listener-per-webRequest-event rule.",
+  "source": {
+    "pattern": "$webRequest.$event($filter?, $listener)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.ReplaceListener",
+    "template": "ElectronCompat.WebRequest.ReplaceListener(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "new listener replaces previous listener for the same stage",
+    "edge": "null listener unsubscribes"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "(()=>{const w=session.defaultSession.webRequest;w.onCompleted(()=>1);w.onCompleted(()=>2)})()",
+      "expected_behavior": "new listener replaces previous listener for the same stage"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onCompleted(null)",
+      "expected_behavior": "null listener unsubscribes"
+    }
+  ]
+}

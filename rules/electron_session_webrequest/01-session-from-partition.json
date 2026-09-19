@@ -1,0 +1,43 @@
+{
+  "id": "electron.session.from-partition",
+  "category": "electron.session",
+  "summary": "Get or create the Session for a partition.",
+  "source": {
+    "pattern": "session.fromPartition($partition, $options?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true,
+      "app_ready": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.FromPartition",
+    "template": "ElectronCompat.Session.FromPartition(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "same partition returns same Session identity",
+    "edge": "persist: partitions are persistent; empty partition returns defaultSession"
+  },
+  "caveats": [
+    "Options only apply when the partition Session is first created; existing Session options cannot be changed."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.fromPartition('persist:a')",
+      "expected_behavior": "same partition returns same Session identity"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('')",
+      "expected_behavior": "persist: partitions are persistent; empty partition returns defaultSession"
+    }
+  ]
+}

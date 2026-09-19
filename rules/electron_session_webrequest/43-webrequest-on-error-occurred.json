@@ -1,0 +1,42 @@
+{
+  "id": "electron.webrequest.on-error-occurred",
+  "category": "electron.webrequest",
+  "summary": "Register the onErrorOccurred Session network interception stage.",
+  "source": {
+    "pattern": "$webRequest.onErrorOccurred($filter?, $listener)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.onErrorOccurred",
+    "template": "ElectronCompat.WebRequest.onErrorOccurred(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "when a request fails",
+    "edge": "only the last listener registered for this event is used; null unsubscribes"
+  },
+  "caveats": [
+    "Filters are URL-pattern based and listener replacement is per WebRequest event."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onErrorOccurred({urls:['https://*/*']},()=>{})",
+      "expected_behavior": "when a request fails"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onErrorOccurred(null)",
+      "expected_behavior": "only the last listener registered for this event is used; null unsubscribes"
+    }
+  ]
+}

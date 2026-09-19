@@ -1,0 +1,40 @@
+{
+  "id": "electron.webrequest.details-request-id",
+  "category": "electron.webrequest",
+  "summary": "Preserve request IDs across stages for the same network request.",
+  "source": {
+    "pattern": "$details.id",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.RequestId",
+    "template": "ElectronCompat.WebRequest.RequestId(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "same request id correlates lifecycle events",
+    "edge": "redirects/stages must not be confused with unrelated requests"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onCompleted(d=>console.log(d.id))",
+      "expected_behavior": "same request id correlates lifecycle events"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onBeforeRedirect(d=>console.log(d.id))",
+      "expected_behavior": "redirects/stages must not be confused with unrelated requests"
+    }
+  ]
+}

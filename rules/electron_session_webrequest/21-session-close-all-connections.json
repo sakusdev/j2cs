@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.close-all-connections",
+  "category": "electron.session",
+  "summary": "Close Session network connections.",
+  "source": {
+    "pattern": "$ses.closeAllConnections()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.CloseAllConnections",
+    "template": "ElectronCompat.Session.CloseAllConnections(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> when connections are closed",
+    "edge": "in-flight requests are terminated/failed"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.closeAllConnections()",
+      "expected_behavior": "returns Promise<void> when connections are closed"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.closeAllConnections().then(()=>{})",
+      "expected_behavior": "in-flight requests are terminated/failed"
+    }
+  ]
+}

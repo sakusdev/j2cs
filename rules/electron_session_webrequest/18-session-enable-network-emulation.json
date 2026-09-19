@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.enable-network-emulation",
+  "category": "electron.session",
+  "summary": "Enable latency/throughput/offline network emulation.",
+  "source": {
+    "pattern": "$ses.enableNetworkEmulation($options)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.EnableNetworkEmulation",
+    "template": "ElectronCompat.Session.EnableNetworkEmulation(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "changes network conditions for Session requests",
+    "edge": "zero values disable the corresponding throttling dimension"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.enableNetworkEmulation({offline:true})",
+      "expected_behavior": "changes network conditions for Session requests"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.enableNetworkEmulation({latency:0,downloadThroughput:0,uploadThroughput:0})",
+      "expected_behavior": "zero values disable the corresponding throttling dimension"
+    }
+  ]
+}

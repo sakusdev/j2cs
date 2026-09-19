@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.get-user-agent",
+  "category": "electron.session",
+  "summary": "Read the Session user agent.",
+  "source": {
+    "pattern": "$ses.getUserAgent()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.GetUserAgent",
+    "template": "ElectronCompat.Session.GetUserAgent(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns current Session user-agent string",
+    "edge": "reflects prior setUserAgent override"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.getUserAgent()",
+      "expected_behavior": "returns current Session user-agent string"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=session.fromPartition('x');s.setUserAgent('X');return s.getUserAgent()})()",
+      "expected_behavior": "reflects prior setUserAgent override"
+    }
+  ]
+}

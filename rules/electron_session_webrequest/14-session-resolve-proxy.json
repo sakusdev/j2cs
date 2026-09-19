@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.resolve-proxy",
+  "category": "electron.session",
+  "summary": "Resolve effective proxy information for a URL.",
+  "source": {
+    "pattern": "$ses.resolveProxy($url)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ResolveProxy",
+    "template": "ElectronCompat.Session.ResolveProxy(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<string> proxy description",
+    "edge": "result reflects current PAC/proxy configuration"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.resolveProxy('https://example.com')",
+      "expected_behavior": "returns Promise<string> proxy description"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.resolveProxy('http://localhost')",
+      "expected_behavior": "result reflects current PAC/proxy configuration"
+    }
+  ]
+}

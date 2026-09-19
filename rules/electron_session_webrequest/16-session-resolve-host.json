@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.resolve-host",
+  "category": "electron.session",
+  "summary": "Resolve host names through Chromium's resolver.",
+  "source": {
+    "pattern": "$ses.resolveHost($host, $options?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ResolveHost",
+    "template": "ElectronCompat.Session.ResolveHost(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns host resolution result asynchronously",
+    "edge": "queryType A/AAAA and resolver policy remain Chromium-specific"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.resolveHost('example.com')",
+      "expected_behavior": "returns host resolution result asynchronously"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.resolveHost('example.com',{queryType:'AAAA'})",
+      "expected_behavior": "queryType A/AAAA and resolver policy remain Chromium-specific"
+    }
+  ]
+}

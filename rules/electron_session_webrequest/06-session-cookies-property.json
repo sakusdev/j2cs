@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.cookies-property",
+  "category": "electron.session",
+  "summary": "Return the stable Cookies service bound to the Session.",
+  "source": {
+    "pattern": "$ses.cookies",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.Cookies",
+    "template": "ElectronCompat.Session.Cookies(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "service is bound to that Session partition",
+    "edge": "different Sessions must not share cookie jars accidentally"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.cookies",
+      "expected_behavior": "service is bound to that Session partition"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('a').cookies",
+      "expected_behavior": "different Sessions must not share cookie jars accidentally"
+    }
+  ]
+}

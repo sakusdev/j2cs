@@ -1,0 +1,42 @@
+{
+  "id": "electron.webrequest.on-response-started",
+  "category": "electron.webrequest",
+  "summary": "Register the onResponseStarted Session network interception stage.",
+  "source": {
+    "pattern": "$webRequest.onResponseStarted($filter?, $listener)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.WebRequest.onResponseStarted",
+    "template": "ElectronCompat.WebRequest.onResponseStarted(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "when first response body bytes are imminent/started",
+    "edge": "only the last listener registered for this event is used; null unsubscribes"
+  },
+  "caveats": [
+    "Filters are URL-pattern based and listener replacement is per WebRequest event."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onResponseStarted({urls:['https://*/*']},()=>{})",
+      "expected_behavior": "when first response body bytes are imminent/started"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onResponseStarted(null)",
+      "expected_behavior": "only the last listener registered for this event is used; null unsubscribes"
+    }
+  ]
+}

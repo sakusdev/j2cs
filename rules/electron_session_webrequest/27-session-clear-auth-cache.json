@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.clear-auth-cache",
+  "category": "electron.session",
+  "summary": "Clear HTTP authentication cache.",
+  "source": {
+    "pattern": "$ses.clearAuthCache()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.ClearAuthCache",
+    "template": "ElectronCompat.Session.ClearAuthCache(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> after auth cache clear",
+    "edge": "does not clear cookies or general browsing data"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.clearAuthCache()",
+      "expected_behavior": "returns Promise<void> after auth cache clear"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.clearAuthCache().then(()=>{})",
+      "expected_behavior": "does not clear cookies or general browsing data"
+    }
+  ]
+}

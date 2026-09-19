@@ -1,0 +1,39 @@
+{
+  "id": "electron.webrequest.before-send-headers-callback",
+  "category": "electron.webrequest",
+  "summary": "Preserve callback-driven request-header modification.",
+  "source": {
+    "pattern": "webRequest.onBeforeSendHeaders($filter?, ($details,$callback)=>...)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronWebRequestBeforeSendHeaders(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "callback can replace requestHeaders or cancel",
+    "edge": "listener runs after TCP connection may already exist but before HTTP data is sent"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/web-request"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest.onBeforeSendHeaders((d,cb)=>cb({requestHeaders:d.requestHeaders}))",
+      "expected_behavior": "callback can replace requestHeaders or cancel"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.webRequest.onBeforeSendHeaders((d,cb)=>cb({cancel:true}))",
+      "expected_behavior": "listener runs after TCP connection may already exist but before HTTP data is sent"
+    }
+  ]
+}

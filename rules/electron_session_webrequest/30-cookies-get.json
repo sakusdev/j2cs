@@ -1,0 +1,40 @@
+{
+  "id": "electron.cookies.get",
+  "category": "electron.cookies",
+  "summary": "Query cookies in a Session cookie store.",
+  "source": {
+    "pattern": "$cookies.get($filter)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Cookies.Get",
+    "template": "ElectronCompat.Cookies.Get(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<Cookie[]> matching Electron filter fields",
+    "edge": "URL/domain/path/name/secure/session matching follows Chromium cookie rules"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/cookies"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.cookies.get({url:'https://example.com'})",
+      "expected_behavior": "returns Promise<Cookie[]> matching Electron filter fields"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.cookies.get({})",
+      "expected_behavior": "URL/domain/path/name/secure/session matching follows Chromium cookie rules"
+    }
+  ]
+}

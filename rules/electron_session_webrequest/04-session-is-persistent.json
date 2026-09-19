@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.is-persistent",
+  "category": "electron.session",
+  "summary": "Report whether a Session persists data to disk.",
+  "source": {
+    "pattern": "$ses.isPersistent()",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.IsPersistent",
+    "template": "ElectronCompat.Session.IsPersistent(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "default and persist: sessions are persistent",
+    "edge": "plain partition sessions are temporary"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.fromPartition('persist:x').isPersistent()",
+      "expected_behavior": "default and persist: sessions are persistent"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('temp').isPersistent()",
+      "expected_behavior": "plain partition sessions are temporary"
+    }
+  ]
+}

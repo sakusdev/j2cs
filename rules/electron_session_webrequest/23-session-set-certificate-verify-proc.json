@@ -1,0 +1,41 @@
+{
+  "id": "electron.session.set-certificate-verify-proc",
+  "category": "electron.session",
+  "summary": "Install or clear custom certificate verification callback.",
+  "source": {
+    "pattern": "$ses.setCertificateVerifyProc($proc)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSessionSetCertificateVerifyProc(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "callback result can override Chromium certificate verification",
+    "edge": "null restores default verifier; verification results may be cached"
+  },
+  "caveats": [
+    "Callback receives host certificate objects and controls security-critical network behavior."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setCertificateVerifyProc((req,cb)=>cb(0))",
+      "expected_behavior": "callback result can override Chromium certificate verification"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setCertificateVerifyProc(null)",
+      "expected_behavior": "null restores default verifier; verification results may be cached"
+    }
+  ]
+}

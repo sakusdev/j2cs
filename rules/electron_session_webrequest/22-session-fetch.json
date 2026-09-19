@@ -1,0 +1,42 @@
+{
+  "id": "electron.session.fetch",
+  "category": "electron.session",
+  "summary": "Fetch using Electron/Chromium network stack and Session state.",
+  "source": {
+    "pattern": "$ses.fetch($input, $init?)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.Fetch",
+    "template": "ElectronCompat.Session.Fetch(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<Response> using Session cookies/proxy/cache",
+    "edge": "custom protocol bypass option and Chromium stack differ from Node fetch"
+  },
+  "caveats": [
+    "Reuse WEB_URL_FETCH Request/Response/body semantics but preserve Electron Session network stack and partition state."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.fetch('https://example.com')",
+      "expected_behavior": "returns Promise<Response> using Session cookies/proxy/cache"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.fetch('app://x',{bypassCustomProtocolHandlers:true})",
+      "expected_behavior": "custom protocol bypass option and Chromium stack differ from Node fetch"
+    }
+  ]
+}

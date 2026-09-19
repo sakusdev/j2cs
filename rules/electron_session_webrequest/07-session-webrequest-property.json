@@ -1,0 +1,40 @@
+{
+  "id": "electron.session.webrequest-property",
+  "category": "electron.session",
+  "summary": "Return the WebRequest interceptor bound to the Session.",
+  "source": {
+    "pattern": "$ses.webRequest",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Session.WebRequest",
+    "template": "ElectronCompat.Session.WebRequest(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "interception applies to this Session network stack",
+    "edge": "listeners on one partition do not intercept another partition"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.webRequest",
+      "expected_behavior": "interception applies to this Session network stack"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.fromPartition('a').webRequest",
+      "expected_behavior": "listeners on one partition do not intercept another partition"
+    }
+  ]
+}

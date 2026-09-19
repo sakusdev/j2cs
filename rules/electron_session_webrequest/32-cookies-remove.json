@@ -1,0 +1,40 @@
+{
+  "id": "electron.cookies.remove",
+  "category": "electron.cookies",
+  "summary": "Remove the cookie matching URL and name.",
+  "source": {
+    "pattern": "$cookies.remove($url, $name)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Cookies.Remove",
+    "template": "ElectronCompat.Cookies.Remove(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns Promise<void> after removal",
+    "edge": "missing cookie removal remains non-fatal"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/cookies"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.cookies.remove('https://example.com','a')",
+      "expected_behavior": "returns Promise<void> after removal"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.cookies.remove('https://example.com','missing')",
+      "expected_behavior": "missing cookie removal remains non-fatal"
+    }
+  ]
+}

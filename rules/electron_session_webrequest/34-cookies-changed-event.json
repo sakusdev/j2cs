@@ -1,0 +1,42 @@
+{
+  "id": "electron.cookies.changed-event",
+  "category": "electron.cookies",
+  "summary": "Observe cookie store changes with Electron cause/removal metadata.",
+  "source": {
+    "pattern": "$cookies.on('changed', $listener)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Cookies.OnChanged",
+    "template": "ElectronCompat.Cookies.OnChanged(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "listener observes cookie, cause, and removed flag",
+    "edge": "generic EventEmitter registration order remains owned by EVENTS_STREAMS"
+  },
+  "caveats": [
+    "This rule owns host event payload semantics; generic EventEmitter mechanics remain canonical elsewhere."
+  ],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/cookies"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.cookies.on('changed',(e,c,cause,removed)=>{})",
+      "expected_behavior": "listener observes cookie, cause, and removed flag"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.cookies.on('changed',()=>{})",
+      "expected_behavior": "generic EventEmitter registration order remains owned by EVENTS_STREAMS"
+    }
+  ]
+}

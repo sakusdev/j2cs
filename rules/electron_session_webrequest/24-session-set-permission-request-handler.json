@@ -1,0 +1,39 @@
+{
+  "id": "electron.session.set-permission-request-handler",
+  "category": "electron.session",
+  "summary": "Install or clear asynchronous permission request handling.",
+  "source": {
+    "pattern": "$ses.setPermissionRequestHandler($handler)",
+    "requirements": {
+      "electron_binding_proven": true,
+      "builtin_not_overridden": true,
+      "main_process": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronSessionSetPermissionRequestHandler(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "normal": "handler decides each permission request via callback",
+    "edge": "null removes the custom handler and subframe origin must use requestingUrl"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.electronjs.org/docs/latest/api/session"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "session.defaultSession.setPermissionRequestHandler((wc,p,cb)=>cb(true))",
+      "expected_behavior": "handler decides each permission request via callback"
+    },
+    {
+      "name": "edge semantics",
+      "input": "session.defaultSession.setPermissionRequestHandler(null)",
+      "expected_behavior": "null removes the custom handler and subframe origin must use requestingUrl"
+    }
+  ]
+}
