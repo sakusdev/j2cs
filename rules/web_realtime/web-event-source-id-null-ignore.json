@@ -1,0 +1,39 @@
+{
+  "id": "web.event-source.id-null-ignore",
+  "category": "web_realtime",
+  "summary": "An id field containing U+0000 is ignored and does not replace the last event ID buffer.",
+  "source": {
+    "pattern": "SSE id field containing NUL",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "nul": "ignore field",
+    "linefeeds": "not part of legal Last-Event-ID header value"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "id: safe",
+      "expected_behavior": "updates id"
+    },
+    {
+      "name": "edge",
+      "input": "id containing NUL",
+      "expected_behavior": "is ignored"
+    }
+  ]
+}

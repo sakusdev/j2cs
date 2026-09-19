@@ -1,0 +1,39 @@
+{
+  "id": "web.event-source.unknown-fields",
+  "category": "web_realtime",
+  "summary": "Unknown SSE field names are ignored and field-name comparison is case-sensitive.",
+  "source": {
+    "pattern": "SSE unknown field",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "unknown": "ignored",
+    "case_folding": false
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "foo: x\\ndata: y\\n\\n",
+      "expected_behavior": "dispatches data y"
+    },
+    {
+      "name": "edge",
+      "input": "Data: x\\n\\n",
+      "expected_behavior": "Data is not data; no data field is added"
+    }
+  ]
+}

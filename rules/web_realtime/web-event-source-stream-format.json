@@ -1,0 +1,45 @@
+{
+  "id": "web.event-source.stream-format",
+  "category": "web_realtime",
+  "summary": "EventSource accepts text/event-stream and parses fields/comments according to the SSE grammar.",
+  "source": {
+    "pattern": "event-stream bytes",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mime": "text/event-stream",
+    "encoding": "UTF-8",
+    "line_endings": [
+      "CRLF",
+      "CR",
+      "LF"
+    ],
+    "comments": "colon-prefixed lines ignored"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "data: x\\n\\n",
+      "expected_behavior": "dispatches message x"
+    },
+    {
+      "name": "edge",
+      "input": ": comment\\n\\n",
+      "expected_behavior": "fires no message"
+    }
+  ]
+}

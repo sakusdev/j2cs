@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.close.queued-messages",
+  "category": "web_realtime",
+  "summary": "close does not discard messages queued by prior send calls; closing handshake begins after them.",
+  "source": {
+    "pattern": "$socket.send($data); $socket.close()",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "previous messages before close handshake",
+    "readyState": "CLOSING while handshake pending"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.send('last'); socket.close()",
+      "expected_behavior": "last queued message precedes close handshake"
+    },
+    {
+      "name": "edge",
+      "input": "close()",
+      "expected_behavior": "does not synchronously discard previously queued application data"
+    }
+  ]
+}

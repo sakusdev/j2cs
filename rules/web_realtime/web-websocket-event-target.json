@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.event-target",
+  "category": "web_realtime",
+  "summary": "WebSocket is an EventTarget; generic listener registration/removal semantics belong to DOM event ownership.",
+  "source": {
+    "pattern": "$socket.addEventListener($type,$listener)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketEvents",
+    "template": "JsRuntime.WebSocketEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "base": "EventTarget",
+    "ownership": "reuse DOM event rules"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.addEventListener('message',fn)",
+      "expected_behavior": "listener registration preserved"
+    },
+    {
+      "name": "edge",
+      "input": "socket.onmessage=fn",
+      "expected_behavior": "IDL event-handler slot semantics remain DOM-owned"
+    }
+  ]
+}

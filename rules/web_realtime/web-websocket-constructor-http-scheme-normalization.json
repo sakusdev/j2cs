@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.constructor.http-scheme-normalization",
+  "category": "web_realtime",
+  "summary": "HTTP/HTTPS constructor URLs are normalized to ws/wss connection URLs by the WebSocket algorithm.",
+  "source": {
+    "pattern": "new WebSocket($httpUrl)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "http": "ws",
+    "https": "wss",
+    "url_property": "serialized normalized URL"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "new WebSocket('https://example.com/socket')",
+      "expected_behavior": "uses secure WebSocket scheme"
+    },
+    {
+      "name": "edge",
+      "input": "new WebSocket('http://example.com/socket')",
+      "expected_behavior": "uses ws scheme"
+    }
+  ]
+}

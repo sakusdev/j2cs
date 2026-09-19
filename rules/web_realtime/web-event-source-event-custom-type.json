@@ -1,0 +1,39 @@
+{
+  "id": "web.event-source.event.custom-type",
+  "category": "web_realtime",
+  "summary": "An event field changes the dispatched MessageEvent type from message to the literal field value.",
+  "source": {
+    "pattern": "SSE field event:$type",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "field_matching": "literal/case-sensitive",
+    "default": "message"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "event: add\\ndata: 1\\n\\n",
+      "expected_behavior": "dispatches event type add"
+    },
+    {
+      "name": "edge",
+      "input": "event: Message\\n...",
+      "expected_behavior": "type is literal Message, not case-folded"
+    }
+  ]
+}

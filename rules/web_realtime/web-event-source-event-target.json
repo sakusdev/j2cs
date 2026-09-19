@@ -1,0 +1,44 @@
+{
+  "id": "web.event-source.event-target",
+  "category": "web_realtime",
+  "summary": "EventSource is an EventTarget; generic DOM listener behavior is reused.",
+  "source": {
+    "pattern": "$source.addEventListener($type,$listener)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.EventSourceEvents",
+    "template": "JsRuntime.EventSourceEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "base": "EventTarget",
+    "events": [
+      "open",
+      "message",
+      "error"
+    ],
+    "ownership": "DOM events"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "source.addEventListener('message',fn)",
+      "expected_behavior": "DOM listener rules apply"
+    },
+    {
+      "name": "edge",
+      "input": "source.onmessage=fn",
+      "expected_behavior": "event handler IDL semantics remain DOM-owned"
+    }
+  ]
+}

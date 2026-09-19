@@ -1,0 +1,39 @@
+{
+  "id": "web.websocket.network-runtime-boundary",
+  "category": "web_realtime",
+  "summary": "Handshake, proxy/TLS, DNS, HTTP upgrade, framing and network scheduling remain browser runtime responsibilities.",
+  "source": {
+    "pattern": "WebSocket network connection",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "runtime": true,
+    "not_equivalent": "raw TCP socket or .NET ClientWebSocket without browser policy/profile"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "new WebSocket('wss://example.com')",
+      "expected_behavior": "uses browser networking policy"
+    },
+    {
+      "name": "edge",
+      "input": "cross-origin/proxy/TLS failure",
+      "expected_behavior": "must preserve browser host behavior"
+    }
+  ]
+}

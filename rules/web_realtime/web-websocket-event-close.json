@@ -1,0 +1,44 @@
+{
+  "id": "web.websocket.event.close",
+  "category": "web_realtime",
+  "summary": "close is a CloseEvent carrying code, reason, and wasClean after connection closure.",
+  "source": {
+    "pattern": "$socket.onclose",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketEvents",
+    "template": "JsRuntime.WebSocketEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "event": "close",
+    "interface": "CloseEvent",
+    "fields": [
+      "code",
+      "reason",
+      "wasClean"
+    ]
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.onclose=e=>console.log(e.code,e.reason,e.wasClean)",
+      "expected_behavior": "observes close metadata"
+    },
+    {
+      "name": "edge",
+      "input": "abnormal network failure",
+      "expected_behavior": "close metadata/wasClean reflect protocol outcome"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.websocket.binary-type",
+  "category": "web_realtime",
+  "summary": "binaryType defaults to blob and can be changed to arraybuffer for future message exposure.",
+  "source": {
+    "pattern": "$socket.binaryType",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketState",
+    "template": "JsRuntime.WebSocketState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default": "blob",
+    "values": [
+      "blob",
+      "arraybuffer"
+    ],
+    "effect": "representation of binary MessageEvent.data"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.binaryType='arraybuffer'",
+      "expected_behavior": "binary messages are exposed as ArrayBuffer"
+    },
+    {
+      "name": "edge",
+      "input": "socket.binaryType",
+      "expected_behavior": "defaults to blob"
+    }
+  ]
+}

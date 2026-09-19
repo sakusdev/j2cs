@@ -1,0 +1,40 @@
+{
+  "id": "web.event-source.constructor.url",
+  "category": "web_realtime",
+  "summary": "EventSource constructor parses a USVString URL relative to the relevant settings object.",
+  "source": {
+    "pattern": "new EventSource($url,$options?)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "invalid": "SyntaxError DOMException",
+    "request": "potential-CORS fetch request",
+    "cache": "no-store"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "new EventSource('/events')",
+      "expected_behavior": "resolves relative URL and starts connection"
+    },
+    {
+      "name": "edge",
+      "input": "new EventSource('http://[invalid')",
+      "expected_behavior": "throws SyntaxError"
+    }
+  ]
+}

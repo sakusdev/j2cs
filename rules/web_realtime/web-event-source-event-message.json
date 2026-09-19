@@ -1,0 +1,40 @@
+{
+  "id": "web.event-source.event.message",
+  "category": "web_realtime",
+  "summary": "SSE data fields are UTF-8 parsed into MessageEvent.data, joining multiple data lines with LF.",
+  "source": {
+    "pattern": "$source.onmessage",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.EventSourceEvents",
+    "template": "JsRuntime.EventSourceEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "encoding": "UTF-8 only",
+    "data_fields": "append value plus LF; remove final LF on dispatch",
+    "default_type": "message"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "stream 'data: a\\ndata: b\\n\\n'",
+      "expected_behavior": "dispatches data 'a\\nb'"
+    },
+    {
+      "name": "edge",
+      "input": "block with empty data buffer/no dispatchable content",
+      "expected_behavior": "does not invent a message"
+    }
+  ]
+}

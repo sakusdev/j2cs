@@ -1,0 +1,39 @@
+{
+  "id": "web.event-source.event.open",
+  "category": "web_realtime",
+  "summary": "Successful connection queues an open event and transitions readyState to OPEN.",
+  "source": {
+    "pattern": "$source.onopen",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.EventSourceEvents",
+    "template": "JsRuntime.EventSourceEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "transition": "CONNECTING -> OPEN",
+    "dispatch": "queued task"
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "source.onopen=handler",
+      "expected_behavior": "handler runs on announced connection"
+    },
+    {
+      "name": "edge",
+      "input": "source.close() before queued open task",
+      "expected_behavior": "task aborts if CLOSED"
+    }
+  ]
+}

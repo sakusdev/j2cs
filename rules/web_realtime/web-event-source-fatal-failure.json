@@ -1,0 +1,40 @@
+{
+  "id": "web.event-source.fatal-failure",
+  "category": "web_realtime",
+  "summary": "Fatal connection failure sets CLOSED and fires error without reconnecting.",
+  "source": {
+    "pattern": "fatal EventSource response/network condition",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EventSource",
+    "template": "JsRuntime.EventSource($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "state": "CLOSED",
+    "event": "error",
+    "reconnect": false
+  },
+  "caveats": [],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "HTTP 204 response",
+      "expected_behavior": "stops reconnecting"
+    },
+    {
+      "name": "edge",
+      "input": "recoverable connection end",
+      "expected_behavior": "uses reconnect path instead of fatal CLOSED"
+    }
+  ]
+}

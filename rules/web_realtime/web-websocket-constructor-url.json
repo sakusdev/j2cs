@@ -1,0 +1,45 @@
+{
+  "id": "web.websocket.constructor.url",
+  "category": "web_realtime",
+  "summary": "WebSocket constructor parses a USVString URL relative to the relevant settings object and only accepts websocket-compatible schemes.",
+  "source": {
+    "pattern": "new WebSocket($url,$protocols?)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "invalid": "SyntaxError DOMException",
+    "allowed": [
+      "ws",
+      "wss",
+      "http",
+      "https"
+    ],
+    "fragment": "rejected"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "new WebSocket('wss://example.com/socket')",
+      "expected_behavior": "begins in CONNECTING"
+    },
+    {
+      "name": "edge",
+      "input": "new WebSocket('ftp://example.com')",
+      "expected_behavior": "throws SyntaxError"
+    }
+  ]
+}

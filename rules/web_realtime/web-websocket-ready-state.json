@@ -1,0 +1,41 @@
+{
+  "id": "web.websocket.ready-state",
+  "category": "web_realtime",
+  "summary": "WebSocket readyState follows CONNECTING=0, OPEN=1, CLOSING=2, CLOSED=3.",
+  "source": {
+    "pattern": "$socket.readyState",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketState",
+    "template": "JsRuntime.WebSocketState($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "initial": 0,
+    "open": 1,
+    "closing": 2,
+    "closed": 3
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=new WebSocket('wss://example.com'); s.readyState",
+      "expected_behavior": "initially 0"
+    },
+    {
+      "name": "edge",
+      "input": "WebSocket.CONNECTING===0&&WebSocket.CLOSED===3",
+      "expected_behavior": "constants match"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.event.message",
+  "category": "web_realtime",
+  "summary": "message is a MessageEvent carrying text string or binary data according to binaryType.",
+  "source": {
+    "pattern": "$socket.onmessage",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.WebSocketEvents",
+    "template": "JsRuntime.WebSocketEvents($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "event": "message",
+    "text": "string",
+    "binary": "Blob or ArrayBuffer according to binaryType"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "socket.onmessage=e=>use(e.data)",
+      "expected_behavior": "receives message payload"
+    },
+    {
+      "name": "edge",
+      "input": "binaryType changed before dispatch",
+      "expected_behavior": "representation follows current binaryType semantics"
+    }
+  ]
+}

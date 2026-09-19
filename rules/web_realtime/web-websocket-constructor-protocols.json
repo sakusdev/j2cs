@@ -1,0 +1,40 @@
+{
+  "id": "web.websocket.constructor.protocols",
+  "category": "web_realtime",
+  "summary": "Constructor subprotocols are DOMStrings validated as WebSocket protocol tokens and duplicates are rejected.",
+  "source": {
+    "pattern": "new WebSocket($url,$protocols)",
+    "requirements": {
+      "web_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebSocket",
+    "template": "JsRuntime.WebSocket($args)",
+    "notes": "Preserve browser networking, task/event dispatch, URL/WebIDL conversion, and protocol state rather than mapping to a raw socket."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "string": "treated as one protocol",
+    "sequence": "preserves order",
+    "duplicates_or_invalid": "SyntaxError DOMException"
+  },
+  "caveats": [],
+  "references": [
+    "https://websockets.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "new WebSocket('wss://example.com',['chat','superchat'])",
+      "expected_behavior": "offers protocols in order"
+    },
+    {
+      "name": "edge",
+      "input": "new WebSocket('wss://example.com',['chat','chat'])",
+      "expected_behavior": "throws SyntaxError"
+    }
+  ]
+}
