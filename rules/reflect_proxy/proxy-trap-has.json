@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.has",
+  "category": "proxy",
+  "summary": "Implement Proxy [[HasProperty]] via has trap while preventing hidden protected target properties.",
+  "source": {
+    "pattern": "Proxy [[HasProperty]]($proxy, $key)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyHasProperty($proxy, $key)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "has(target, P)",
+    "result": "ToBoolean of trap return",
+    "invariants": "false cannot hide non-configurable own property; false cannot hide any existing own property when target is non-extensible",
+    "prototype": "when trap absent target [[HasProperty]] retains prototype-chain behavior"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.7 Proxy [[HasProperty]]"
+  ],
+  "tests": [
+    {
+      "name": "trap may synthesize true",
+      "input": "const p=new Proxy({}, {has(t,k){return k==='virtual'}});console.log('virtual' in p);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "cannot hide non-configurable property",
+      "input": "const t={};Object.defineProperty(t,'x',{value:1,configurable:false});const p=new Proxy(t,{has(){return false}});try{console.log('x' in p)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

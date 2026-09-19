@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.get-own-property-descriptor",
+  "category": "proxy",
+  "summary": "Implement Proxy [[GetOwnProperty]] via getOwnPropertyDescriptor trap, descriptor normalization, and target descriptor invariants.",
+  "source": {
+    "pattern": "Proxy [[GetOwnProperty]]($proxy, $key)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyGetOwnPropertyDescriptor($proxy, $key)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "getOwnPropertyDescriptor(target, P)",
+    "trap_result": "must be Object or undefined; object is converted with ToPropertyDescriptor then completed",
+    "missing_invariants": "cannot hide non-configurable own property or any existing own property of non-extensible target",
+    "reported_invariants": "cannot invent property on non-extensible target or claim incompatible non-configurable/non-writable state"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.5 Proxy [[GetOwnProperty]]"
+  ],
+  "tests": [
+    {
+      "name": "configurable property may be virtualized",
+      "input": "const p=new Proxy({}, {getOwnPropertyDescriptor(){return {value:5,writable:true,enumerable:true,configurable:true}}});console.log(Reflect.getOwnPropertyDescriptor(p,'x').value);",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "cannot hide fixed property",
+      "input": "const t={};Object.defineProperty(t,'x',{value:1,configurable:false});const p=new Proxy(t,{getOwnPropertyDescriptor(){return undefined}});try{Reflect.getOwnPropertyDescriptor(p,'x')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

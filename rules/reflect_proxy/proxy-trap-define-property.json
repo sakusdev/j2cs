@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.define-property",
+  "category": "proxy",
+  "summary": "Implement Proxy [[DefineOwnProperty]] via defineProperty trap, boolean coercion, and descriptor/extensibility invariants.",
+  "source": {
+    "pattern": "Proxy [[DefineOwnProperty]]($proxy, $key, $desc)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyDefineOwnProperty($proxy, $key, $desc)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "defineProperty(target, P, FromPropertyDescriptor(Desc))",
+    "result": "ToBoolean of trap return",
+    "false_result": "returns false",
+    "invariants": "truthy result cannot add to non-extensible target, invent new non-configurable property, or claim descriptor changes incompatible with protected target descriptor"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.6 Proxy [[DefineOwnProperty]]"
+  ],
+  "tests": [
+    {
+      "name": "trap observes descriptor object",
+      "input": "let seen;const p=new Proxy({}, {defineProperty(t,k,d){seen=[k,d.value];return Reflect.defineProperty(t,k,d)}});console.log(Reflect.defineProperty(p,'x',{value:3}),seen[0],seen[1]);",
+      "expected_behavior": "prints true x 3"
+    },
+    {
+      "name": "cannot claim add on non-extensible target",
+      "input": "const t={};Object.preventExtensions(t);const p=new Proxy(t,{defineProperty(){return true}});try{Reflect.defineProperty(p,'x',{value:1})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

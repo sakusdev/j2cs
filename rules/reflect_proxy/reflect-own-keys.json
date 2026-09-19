@@ -1,0 +1,43 @@
+{
+  "id": "reflect.own-keys",
+  "category": "reflect",
+  "summary": "Return all own String and Symbol keys in [[OwnPropertyKeys]] order.",
+  "source": {
+    "pattern": "Reflect.ownKeys($target)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectOwnKeys($target)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "return_value": "new Array containing all own String and Symbol keys",
+    "ordering": "uses target [[OwnPropertyKeys]] order; numeric index strings precede other strings for ordinary objects, Symbols follow strings",
+    "enumerability": "non-enumerable keys are included",
+    "proxy": "ownKeys trap may choose order subject to invariants"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "includes non-enumerable and symbols",
+      "input": "const s=Symbol('s'),o={a:1};Object.defineProperty(o,'hidden',{value:2});o[s]=3;console.log(Reflect.ownKeys(o).map(k=>typeof k).join(','));",
+      "expected_behavior": "prints string,string,string,symbol for ordinary object keys including hidden and Symbol"
+    },
+    {
+      "name": "primitive target throws",
+      "input": "try{Reflect.ownKeys('x')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

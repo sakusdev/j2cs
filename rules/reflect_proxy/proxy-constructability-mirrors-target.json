@@ -1,0 +1,42 @@
+{
+  "id": "proxy.constructability-mirrors-target",
+  "category": "proxy",
+  "summary": "A callable Proxy is constructable only when its target is a constructor; a construct trap cannot add [[Construct]] to a non-constructor target.",
+  "source": {
+    "pattern": "new $proxy($args)",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyConstruct($proxy, $args, $newTarget)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "capability": "[[Construct]] is installed only if target is callable and IsConstructor(target) is true",
+    "construct_trap": "intercepts only when proxy has [[Construct]]",
+    "result": "when trap is used it must return an Object"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.15 ProxyCreate",
+    "ECMAScript 2026 §10.5.13 [[Construct]]"
+  ],
+  "tests": [
+    {
+      "name": "constructor target remains constructable",
+      "input": "function F(x){this.x=x};const P=new Proxy(F,{});console.log(new P(4).x);",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "arrow target cannot be made constructable",
+      "input": "const P=new Proxy(()=>1,{construct(){return {ok:true}}});try{new P()}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

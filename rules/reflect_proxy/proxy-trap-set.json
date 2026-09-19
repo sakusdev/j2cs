@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.set",
+  "category": "proxy",
+  "summary": "Implement Proxy [[Set]] via set trap, receiver propagation, boolean coercion, and fixed-property invariants.",
+  "source": {
+    "pattern": "Proxy [[Set]]($proxy, $key, $value, $receiver)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxySet($proxy, $key, $value, $receiver)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "set(target, P, V, Receiver)",
+    "result": "ToBoolean of trap return",
+    "receiver": "original Receiver is passed unchanged",
+    "invariants": "truthy result cannot claim a different value was written to non-configurable non-writable data property; cannot claim success for non-configurable accessor with undefined setter"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.9 Proxy [[Set]]"
+  ],
+  "tests": [
+    {
+      "name": "falsy trap reports assignment failure through Reflect",
+      "input": "const p=new Proxy({}, {set(){return false}});console.log(Reflect.set(p,'x',1));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "cannot claim incompatible fixed write",
+      "input": "const t={};Object.defineProperty(t,'x',{value:1,writable:false,configurable:false});const p=new Proxy(t,{set(){return true}});try{Reflect.set(p,'x',2)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

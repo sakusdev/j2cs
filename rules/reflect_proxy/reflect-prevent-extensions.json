@@ -1,0 +1,43 @@
+{
+  "id": "reflect.prevent-extensions",
+  "category": "reflect",
+  "summary": "Invoke [[PreventExtensions]] and return its boolean status rather than returning the target.",
+  "source": {
+    "pattern": "Reflect.preventExtensions($target)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectPreventExtensions($target)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "return_value": "boolean from [[PreventExtensions]]",
+    "effect": "true means subsequent [[IsExtensible]] is false",
+    "proxy": "preventExtensions trap result is checked against actual target extensibility"
+  },
+  "caveats": [
+    "Unlike Object.preventExtensions, Reflect.preventExtensions returns a boolean and requires an Object target.",
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "ordinary object returns true",
+      "input": "const o={}; console.log(Reflect.preventExtensions(o),Reflect.isExtensible(o));",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "proxy may report false without throwing",
+      "input": "const p=new Proxy({}, {preventExtensions(){return false}}); console.log(Reflect.preventExtensions(p));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

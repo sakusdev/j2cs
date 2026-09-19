@@ -1,0 +1,43 @@
+{
+  "id": "reflect.construct",
+  "category": "reflect",
+  "summary": "Construct with an array-like argument list and optional distinct newTarget.",
+  "source": {
+    "pattern": "Reflect.construct($target, $argumentsList, $newTarget?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectConstruct($target, $argumentsList, $newTarget)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be a constructor",
+    "new_target": "defaults to target; if supplied must be a constructor",
+    "arguments_list": "CreateListFromArrayLike",
+    "prototype_selection": "construction uses newTarget semantics, including newTarget.prototype",
+    "return_value": "constructed Object"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "distinct newTarget controls prototype",
+      "input": "function A(x){this.x=x}; function B(){}; const o=Reflect.construct(A,[7],B); console.log(o.x,Object.getPrototypeOf(o)===B.prototype);",
+      "expected_behavior": "prints 7 true"
+    },
+    {
+      "name": "non-constructor newTarget throws before argument list conversion",
+      "input": "try{Reflect.construct(function(){},{length:0},()=>{})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "proxy.invariant.nonextensible-target",
+  "category": "proxy",
+  "summary": "Enforce cross-trap invariants tying Proxy reports to the complete fixed own-property/prototype/extensibility state of a non-extensible target.",
+  "source": {
+    "pattern": "Proxy operation on non-extensible $target",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyEnforceNonExtensibleInvariant($proxy, $operation)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "extensibility": "isExtensible trap must equal target; successful preventExtensions requires target actually non-extensible",
+    "prototype": "getPrototypeOf/setPrototypeOf cannot report a different prototype once target is non-extensible",
+    "properties": "existing own properties cannot be hidden and new own properties/keys cannot be fabricated where invariants forbid it",
+    "own_keys": "must contain exactly target own keys when target is non-extensible"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §6.1.7.3 Invariants of the Essential Internal Methods",
+    "ECMAScript 2026 §10.5 Proxy Object Internal Methods"
+  ],
+  "tests": [
+    {
+      "name": "delete cannot claim existing property deleted",
+      "input": "const t={x:1};Object.preventExtensions(t);const p=new Proxy(t,{deleteProperty(){return true}});try{Reflect.deleteProperty(p,'x')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "ownKeys cannot omit property on non-extensible target",
+      "input": "const t={x:1};Object.preventExtensions(t);const p=new Proxy(t,{ownKeys(){return []}});try{Reflect.ownKeys(p)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

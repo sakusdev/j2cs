@@ -1,0 +1,43 @@
+{
+  "id": "reflect.delete-property",
+  "category": "reflect",
+  "summary": "Delete an own property through [[Delete]] and return its boolean result.",
+  "source": {
+    "pattern": "Reflect.deleteProperty($target, $key)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ReflectDeleteProperty($target, $key)",
+    "notes": "Dispatch through the ECMAScript object/internal-method runtime so Proxy traps, property descriptors, coercion, abrupt completion, and boolean-vs-throw behavior are preserved."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "must be Object",
+    "key": "ToPropertyKey",
+    "return_value": "boolean from [[Delete]]",
+    "proxy": "deleteProperty trap and invariants are observable",
+    "strictness": "does not introduce strict-mode delete syntax throwing behavior"
+  },
+  "caveats": [
+    "Do not replace this with C# reflection or ordinary property access when JavaScript object-model behavior is observable."
+  ],
+  "references": [
+    "ECMAScript 2026 §28.1 Reflect Object"
+  ],
+  "tests": [
+    {
+      "name": "configurable property deletes",
+      "input": "const o={x:1}; console.log(Reflect.deleteProperty(o,'x'),'x' in o);",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "non-configurable property returns false",
+      "input": "const o={}; Object.defineProperty(o,'x',{value:1,configurable:false}); console.log(Reflect.deleteProperty(o,'x'));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

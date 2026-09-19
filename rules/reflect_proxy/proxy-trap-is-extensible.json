@@ -1,0 +1,43 @@
+{
+  "id": "proxy.trap.is-extensible",
+  "category": "proxy",
+  "summary": "Implement Proxy [[IsExtensible]] and require trap truthiness to exactly match target extensibility.",
+  "source": {
+    "pattern": "Proxy [[IsExtensible]]($proxy)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyIsExtensible($proxy)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "isExtensible(target)",
+    "result": "ToBoolean of trap return",
+    "invariant": "boolean result must equal IsExtensible(target) or TypeError"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.3 Proxy [[IsExtensible]]"
+  ],
+  "tests": [
+    {
+      "name": "matching result succeeds",
+      "input": "const t={};const p=new Proxy(t,{isExtensible(){return true}});console.log(Reflect.isExtensible(p));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "lying result throws",
+      "input": "const t={};const p=new Proxy(t,{isExtensible(){return false}});try{Reflect.isExtensible(p)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

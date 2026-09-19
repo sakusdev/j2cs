@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.apply",
+  "category": "proxy",
+  "summary": "Implement callable Proxy [[Call]] via apply trap, preserving thisArgument, argument list, and arbitrary return values.",
+  "source": {
+    "pattern": "Proxy [[Call]]($proxy, $thisArgument, $argumentsList)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyApply($proxy, $thisArgument, $argumentsList)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "proxy has [[Call]] only because target is callable",
+    "trap": "apply(target, thisArgument, CreateArrayFromList(argumentsList))",
+    "missing": "absent trap calls target directly",
+    "return_value": "any ECMAScript value; no object restriction"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.12 Proxy [[Call]]"
+  ],
+  "tests": [
+    {
+      "name": "trap receives target this and array",
+      "input": "function f(){};const h={apply(t,thisArg,args){return [t===f,thisArg.x,args[0]]}};console.log(new Proxy(f,h).call({x:2},9).join(','));",
+      "expected_behavior": "prints true,2,9"
+    },
+    {
+      "name": "apply may return primitive",
+      "input": "const p=new Proxy(()=>0,{apply(){return 7}});console.log(p());",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

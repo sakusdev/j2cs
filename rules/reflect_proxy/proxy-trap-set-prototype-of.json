@@ -1,0 +1,44 @@
+{
+  "id": "proxy.trap.set-prototype-of",
+  "category": "proxy",
+  "summary": "Implement Proxy [[SetPrototypeOf]] via setPrototypeOf trap and enforce non-extensible-target prototype identity.",
+  "source": {
+    "pattern": "Proxy [[SetPrototypeOf]]($proxy, $proto)",
+    "requirements": {
+      "receiver_is_proxy_exotic_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxySetPrototypeOf($proxy, $proto)",
+    "notes": "Validate revocation, perform GetMethod trap lookup, call the trap with handler as this, then enforce the ECMAScript Proxy invariant before returning."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trap": "setPrototypeOf(target, V)",
+    "result": "ToBoolean of trap return",
+    "false_result": "returns false without invariant success checks",
+    "invariant": "truthy result on non-extensible target requires V SameValue target prototype"
+  },
+  "caveats": [
+    "If the trap is absent/undefined, forward to the corresponding target internal method.",
+    "Trap property lookup itself can invoke a getter and throw.",
+    "A C# interceptor that trusts the trap result without target invariant checks is not semantics-preserving."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5.2 Proxy [[SetPrototypeOf]]"
+  ],
+  "tests": [
+    {
+      "name": "falsy trap blocks change",
+      "input": "const t={},p=new Proxy(t,{setPrototypeOf(){return false}});console.log(Reflect.setPrototypeOf(p,{}),Object.getPrototypeOf(t)===Object.prototype);",
+      "expected_behavior": "prints false true"
+    },
+    {
+      "name": "truthy mismatch on fixed target throws",
+      "input": "const t={};Object.preventExtensions(t);const p=new Proxy(t,{setPrototypeOf(){return true}});try{Reflect.setPrototypeOf(p,{})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

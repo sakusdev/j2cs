@@ -1,0 +1,42 @@
+{
+  "id": "proxy.trap-lookup-forwarding",
+  "category": "proxy",
+  "summary": "Look up each handler trap with GetMethod; missing/undefined traps forward to the corresponding target internal method while non-callable trap values throw.",
+  "source": {
+    "pattern": "Proxy trap lookup $handler[$trapName]",
+    "requirements": {
+      "proxy_semantics_required": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ProxyGetTrapOrForward($proxy, $trapName, $operation)",
+    "notes": "Use the JavaScript object-model runtime. Proxy semantics require trap lookup, handler calls, target internal methods, revocation checks, and invariant enforcement."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "lookup": "GetMethod on handler; getters may execute and throw",
+    "missing": "undefined/null method result means forward to target internal method as specified",
+    "non_callable": "present non-callable trap value causes TypeError",
+    "ordering": "revocation validation and target/handler acquisition precede trap dispatch"
+  },
+  "caveats": [
+    "Do not model Proxy as a plain C# decorator or Dictionary wrapper; observable internal-method interception and invariants must be preserved."
+  ],
+  "references": [
+    "ECMAScript 2026 §10.5 Proxy Object Internal Methods and Internal Slots"
+  ],
+  "tests": [
+    {
+      "name": "missing get trap forwards",
+      "input": "const t={x:3};console.log(new Proxy(t,{}).x);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "non-callable trap throws",
+      "input": "const p=new Proxy({x:1},{get:1});try{p.x}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
