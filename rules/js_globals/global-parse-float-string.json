@@ -1,0 +1,40 @@
+{
+  "id": "global.parse-float.string",
+  "category": "js_globals",
+  "summary": "Reuse canonical parseFloat grammar for a proven String.",
+  "source": {
+    "pattern": "parseFloat($string)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseFloat%",
+      "builtin_not_replaced": true,
+      "argument_static_type": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ParseFloatPrimitive",
+    "template": "JsNumber.ParseFloatPrimitive($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "leading_whitespace": "trim",
+    "grammar": "longest valid decimal or Infinity prefix",
+    "invalid_prefix": "NaN"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "prefix",
+      "input": "console.log(parseFloat('  1.25px'));",
+      "expected_behavior": "prints 1.25"
+    },
+    {
+      "name": "hex prefix",
+      "input": "console.log(parseFloat('0x10'));",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

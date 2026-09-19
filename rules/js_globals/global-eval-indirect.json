@@ -1,0 +1,42 @@
+{
+  "id": "global.eval.indirect",
+  "category": "js_globals",
+  "summary": "Retain indirect intrinsic eval semantics: String source executes against the callee realm's global environment.",
+  "source": {
+    "pattern": "(0, eval)($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%eval%",
+      "builtin_not_replaced": true,
+      "indirect_eval": true,
+      "argument_may_be_string": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.IndirectEval",
+    "template": "JsRuntime.IndirectEval($source, $evalRealm)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "global environment of eval realm",
+    "caller_lexicals": "not visible",
+    "strictness": "source directive controls strict eval",
+    "host_gate": "HostEnsureCanCompileStrings"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "cannot see local",
+      "input": "globalThis.__g=7; function f(){let __g=3; return (0,eval)('__g')} console.log(f()); delete globalThis.__g;",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "global var",
+      "input": "(0,eval)('var __ie=5'); console.log(globalThis.__ie); delete globalThis.__ie;",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

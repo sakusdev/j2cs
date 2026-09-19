@@ -1,0 +1,43 @@
+{
+  "id": "uri.encode-uri.primitive",
+  "category": "js_globals",
+  "summary": "Coerce a non-String primitive with ECMAScript ToString before encodeURI.",
+  "source": {
+    "pattern": "encodeURI($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%encodeURI%",
+      "builtin_not_replaced": true,
+      "argument_is_primitive": true,
+      "argument_static_type_excludes": "String"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsUri.EncodeUriPrimitive",
+    "template": "JsUri.EncodeUriPrimitive($value)",
+    "notes": "Reuse JsCoercion.ToStringPrimitive."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "unescaped": "URI reserved characters plus unescaped marks remain literal; other scalar values use uppercase UTF-8 percent escapes",
+    "surrogates": "unpaired UTF-16 surrogate throws URIError",
+    "conversion": "ToString before URI operation",
+    "symbol": "TypeError during ToString"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "number stringified",
+      "input": "console.log(encodeURI(123));",
+      "expected_behavior": "operates on the string '123'"
+    },
+    {
+      "name": "symbol rejected",
+      "input": "try{encodeURI(Symbol())}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

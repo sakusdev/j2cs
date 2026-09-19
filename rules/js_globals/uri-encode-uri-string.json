@@ -1,0 +1,40 @@
+{
+  "id": "uri.encode-uri.string",
+  "category": "js_globals",
+  "summary": "Apply ECMAScript encodeURI to a valid String using its exact URI character/UTF-8 rules.",
+  "source": {
+    "pattern": "encodeURI($string)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%encodeURI%",
+      "builtin_not_replaced": true,
+      "argument_static_type": "String",
+      "input_proven_well_formed_for_operation": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsUri.EncodeUri",
+    "template": "JsUri.EncodeUri($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "unescaped": "URI reserved characters plus unescaped marks remain literal; other scalar values use uppercase UTF-8 percent escapes",
+    "surrogates": "unpaired UTF-16 surrogate throws URIError"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "representative",
+      "input": "console.log(encodeURI(\"https://a.example/x y?z=1#f\"));",
+      "expected_behavior": "prints https://a.example/x%20y?z=1#f"
+    },
+    {
+      "name": "unicode",
+      "input": "console.log(encodeURI('✓'));",
+      "expected_behavior": "uses UTF-8 percent encoding/decoding according to ECMAScript"
+    }
+  ]
+}

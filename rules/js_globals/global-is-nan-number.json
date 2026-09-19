@@ -1,0 +1,39 @@
+{
+  "id": "global.is-nan.number",
+  "category": "js_globals",
+  "summary": "Lower intrinsic global isNaN directly for an already-proven Number.",
+  "source": {
+    "pattern": "isNaN($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%isNaN%",
+      "builtin_not_replaced": true,
+      "argument_static_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "double.IsNaN($value)"
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToNumber is identity",
+    "nan": true,
+    "all_other_numbers": false
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "nan",
+      "input": "console.log(isNaN(NaN));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "zero",
+      "input": "console.log(isNaN(0));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "global.parse-float.dynamic",
+  "category": "js_globals",
+  "summary": "Use runtime parseFloat when ToString can execute arbitrary JavaScript.",
+  "source": {
+    "pattern": "parseFloat($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseFloat%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.GlobalParseFloat",
+    "template": "JsRuntime.GlobalParseFloat($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "observable ToString",
+    "exceptions": "propagate",
+    "parser": "same %parseFloat% intrinsic semantics"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "toString",
+      "input": "console.log(parseFloat({toString(){return '2.5x'}}));",
+      "expected_behavior": "prints 2.5"
+    },
+    {
+      "name": "throw",
+      "input": "try{parseFloat({toString(){throw 9}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints 9"
+    }
+  ]
+}

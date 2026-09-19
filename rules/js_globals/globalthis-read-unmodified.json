@@ -1,0 +1,43 @@
+{
+  "id": "globalthis.read-unmodified",
+  "category": "js_globals",
+  "summary": "Read the realm's intrinsic globalThis value when the globalThis property is proven unmodified.",
+  "source": {
+    "pattern": "globalThis",
+    "requirements": {
+      "identifier_resolves_to_global_property": true,
+      "globalthis_property_unmodified": true,
+      "realm_known": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRealm.GlobalThis",
+    "template": "JsRealm.GlobalThis($realm)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "realm.[[GlobalEnv]].[[GlobalThisValue]]",
+    "identity": "stable within realm",
+    "host_note": "may differ from the underlying global object (for example a host proxy)"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "stable identity",
+      "input": "console.log(globalThis===globalThis);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "global property access",
+      "input": "globalThis.__j2cs_x=3; console.log(globalThis.__j2cs_x); delete globalThis.__j2cs_x;",
+      "expected_behavior": "prints 3"
+    }
+  ],
+  "caveats": [
+    "Do not assume globalThis is literally the host's underlying global object."
+  ]
+}

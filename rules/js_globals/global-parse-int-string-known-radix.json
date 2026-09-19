@@ -1,0 +1,41 @@
+{
+  "id": "global.parse-int.string-known-radix",
+  "category": "js_globals",
+  "summary": "Parse a String with a statically lowerable radix using the existing Number.parseInt helper.",
+  "source": {
+    "pattern": "parseInt($string, $radix)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseInt%",
+      "builtin_not_replaced": true,
+      "argument_static_type": "String",
+      "radix_to_int32_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsNumber.ParseIntPrimitive",
+    "template": "JsNumber.ParseIntPrimitive($string, $radix)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "radix": "ToInt32; 0 infers, valid range 2..36",
+    "invalid_radix": "NaN",
+    "digit_scan": "longest valid prefix"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "binary",
+      "input": "console.log(parseInt('1012',2));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "invalid radix",
+      "input": "console.log(Number.isNaN(parseInt('10',1)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

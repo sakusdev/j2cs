@@ -1,0 +1,42 @@
+{
+  "id": "uri.decode-uri-component.object",
+  "category": "js_globals",
+  "summary": "Use runtime ToString + decodeURIComponent semantics for objects/Proxies.",
+  "source": {
+    "pattern": "decodeURIComponent($value)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%decodeURIComponent%",
+      "builtin_not_replaced": true,
+      "argument_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.UriDecodeUriComponent",
+    "template": "JsRuntime.UriDecodeUriComponent($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "decoding": "decode valid UTF-8 percent sequences including reserved delimiters",
+    "preserve": "no URI-reserved preserve set",
+    "errors": "malformed percent syntax or invalid UTF-8 scalar sequence throws URIError",
+    "conversion": "observable object ToString",
+    "exceptions": "conversion or URI errors propagate"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "custom toString",
+      "input": "console.log(decodeURIComponent({toString(){return \"a%2Fb%3Fc%3Dd\"}}));",
+      "expected_behavior": "prints a/b?c=d"
+    },
+    {
+      "name": "throwing conversion",
+      "input": "try{decodeURIComponent({toString(){throw 'x'}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

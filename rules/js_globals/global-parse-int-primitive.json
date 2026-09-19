@@ -1,0 +1,43 @@
+{
+  "id": "global.parse-int.primitive",
+  "category": "js_globals",
+  "summary": "Stringify a proven primitive then reuse canonical parseInt semantics.",
+  "source": {
+    "pattern": "parseInt($value, $radix)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%parseInt%",
+      "builtin_not_replaced": true,
+      "value_is_primitive": true,
+      "value_static_type_excludes": "String",
+      "radix_coercion_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsGlobals.ParseIntPrimitive",
+    "template": "JsGlobals.ParseIntPrimitive($value, $radix)",
+    "notes": "Reuse JsCoercion.ToStringPrimitive and JsNumber.ParseIntPrimitive."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion_order": "ToString(value), then ToInt32(radix)",
+    "symbol": "TypeError",
+    "bigint": "decimal string then Number result may lose precision"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/global-object.html"
+  ],
+  "tests": [
+    {
+      "name": "number stringified",
+      "input": "console.log(parseInt(15.9,10));",
+      "expected_behavior": "prints 15"
+    },
+    {
+      "name": "bigint accepted through string",
+      "input": "console.log(parseInt(10n,10));",
+      "expected_behavior": "prints 10"
+    }
+  ]
+}
