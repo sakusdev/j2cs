@@ -1,0 +1,39 @@
+{
+  "id": "web.stream.count-strategy.size",
+  "category": "web_streams",
+  "summary": "Count each chunk as size 1.",
+  "source": {
+    "pattern": "$strategy.size($chunk)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.CountStrategySize",
+    "template": "JsWebStreams.CountStrategySize(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns 1 independent of chunk value",
+    "edge": "does not inspect/coerce arbitrary chunk contents"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new CountQueuingStrategy({highWaterMark:1}).size('x')",
+      "expected_behavior": "returns 1 independent of chunk value"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new CountQueuingStrategy({highWaterMark:1}).size(undefined)",
+      "expected_behavior": "does not inspect/coerce arbitrary chunk contents"
+    }
+  ]
+}

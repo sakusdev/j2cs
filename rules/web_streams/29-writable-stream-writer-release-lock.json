@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.writer.release-lock",
+  "category": "web_streams",
+  "summary": "Release a writer without closing or aborting the stream.",
+  "source": {
+    "pattern": "$writer.releaseLock()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WriterReleaseLock",
+    "template": "JsWebStreams.WriterReleaseLock(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "unlocks the writable stream",
+    "edge": "writer ready/closed promises are replaced/rejected according to release semantics"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "(()=>{const s=new WritableStream();const w=s.getWriter();w.releaseLock();return s.locked})()",
+      "expected_behavior": "unlocks the writable stream"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const w=new WritableStream().getWriter();const p=w.ready;w.releaseLock();return p})()",
+      "expected_behavior": "writer ready/closed promises are replaced/rejected according to release semantics"
+    }
+  ]
+}

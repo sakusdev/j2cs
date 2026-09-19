@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.controller.enqueue",
+  "category": "web_streams",
+  "summary": "Enqueue a chunk into a default readable controller.",
+  "source": {
+    "pattern": "$controller.enqueue($chunk?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableControllerEnqueue",
+    "template": "JsWebStreams.ReadableControllerEnqueue(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "adds a chunk and can trigger pull/backpressure transitions",
+    "edge": "enqueue after close/error or on an invalid controller throws"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.enqueue(1);c.close()}})",
+      "expected_behavior": "adds a chunk and can trigger pull/backpressure transitions"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream({start(c){c.close();c.enqueue(1)}})",
+      "expected_behavior": "enqueue after close/error or on an invalid controller throws"
+    }
+  ]
+}

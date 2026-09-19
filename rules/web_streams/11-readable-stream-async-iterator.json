@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.async-iterator",
+  "category": "web_streams",
+  "summary": "Invoke the ReadableStream async iterator entry point.",
+  "source": {
+    "pattern": "$stream[Symbol.asyncIterator]($options?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableValues",
+    "template": "JsWebStreams.ReadableValues(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "same stream iterator semantics as values()",
+    "edge": "stream locking and preventCancel behavior remain observable"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream()[Symbol.asyncIterator]()",
+      "expected_behavior": "same stream iterator semantics as values()"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new ReadableStream();s.getReader();return s[Symbol.asyncIterator]()})()",
+      "expected_behavior": "stream locking and preventCancel behavior remain observable"
+    }
+  ]
+}

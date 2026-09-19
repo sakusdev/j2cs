@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.writer.write",
+  "category": "web_streams",
+  "summary": "Queue a write respecting strategy size, ordering and backpressure.",
+  "source": {
+    "pattern": "$writer.write($chunk?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WriterWrite",
+    "template": "JsWebStreams.WriterWrite(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise for the individual write",
+    "edge": "sink errors reject this and later writes and error the stream"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream({write(){}}).getWriter().write(1)",
+      "expected_behavior": "returns a promise for the individual write"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new WritableStream({write(){throw 'x'}}).getWriter().write(1)",
+      "expected_behavior": "sink errors reject this and later writes and error the stream"
+    }
+  ]
+}

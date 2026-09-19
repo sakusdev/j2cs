@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.from",
+  "category": "web_streams",
+  "summary": "Create a ReadableStream from an async or sync iterable.",
+  "source": {
+    "pattern": "ReadableStream.from($asyncIterable)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableFrom",
+    "template": "JsWebStreams.ReadableFrom(/* lowered operands */)",
+    "notes": "Reuse ITERATORS_GENERATORS for iterator acquisition/closing and ASYNC for promise adoption."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "iteration is adapted into stream pulls and completion",
+    "edge": "iterator failures error the stream and iterator closing semantics are preserved"
+  },
+  "caveats": [
+    "Reuse ITERATORS_GENERATORS for iterator acquisition/closing and ASYNC for promise adoption."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "ReadableStream.from([1,2,3])",
+      "expected_behavior": "iteration is adapted into stream pulls and completion"
+    },
+    {
+      "name": "edge semantics",
+      "input": "ReadableStream.from({[Symbol.iterator](){throw 1}})",
+      "expected_behavior": "iterator failures error the stream and iterator closing semantics are preserved"
+    }
+  ]
+}

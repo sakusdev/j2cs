@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.controller.error",
+  "category": "web_streams",
+  "summary": "Error a WritableStreamDefaultController.",
+  "source": {
+    "pattern": "$controller.error($error?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WritableControllerError",
+    "template": "JsWebStreams.WritableControllerError(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "transitions the stream toward errored and rejects queued/future operations",
+    "edge": "arbitrary JS error reasons are preserved"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream({start(c){c.error('x')}})",
+      "expected_behavior": "transitions the stream toward errored and rejects queued/future operations"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new WritableStream({start(c){c.error(null)}})",
+      "expected_behavior": "arbitrary JS error reasons are preserved"
+    }
+  ]
+}

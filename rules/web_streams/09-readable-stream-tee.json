@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.tee",
+  "category": "web_streams",
+  "summary": "Split a readable stream into two branches sharing one underlying source.",
+  "source": {
+    "pattern": "$stream.tee()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableTee",
+    "template": "JsWebStreams.ReadableTee(/* lowered operands */)",
+    "notes": "Tee does not simply duplicate buffered bytes; cancellation/backpressure coordination is observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns two branches receiving the same chunks",
+    "edge": "cancellation combines branch reasons and backpressure aggregates both branches"
+  },
+  "caveats": [
+    "Tee does not simply duplicate buffered bytes; cancellation/backpressure coordination is observable."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.enqueue(1);c.close()}}).tee()",
+      "expected_behavior": "returns two branches receiving the same chunks"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new ReadableStream();const [a,b]=s.tee();return [a.cancel('a'),b.cancel('b')]})()",
+      "expected_behavior": "cancellation combines branch reasons and backpressure aggregates both branches"
+    }
+  ]
+}

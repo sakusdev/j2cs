@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.pipe-through",
+  "category": "web_streams",
+  "summary": "Pipe through a readable/writable pair and return its readable side immediately.",
+  "source": {
+    "pattern": "$stream.pipeThrough($transform, $options?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.PipeThrough",
+    "template": "JsWebStreams.PipeThrough(/* lowered operands */)",
+    "notes": "The internal pipe promise is marked handled; returned value is the transform readable, not that promise."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "starts a pipe and returns transform.readable",
+    "edge": "throws synchronously if the source or transform writable is locked"
+  },
+  "caveats": [
+    "The internal pipe promise is marked handled; returned value is the transform readable, not that promise."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream().pipeThrough(new TransformStream())",
+      "expected_behavior": "starts a pipe and returns transform.readable"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new ReadableStream();s.getReader();return s.pipeThrough(new TransformStream())})()",
+      "expected_behavior": "throws synchronously if the source or transform writable is locked"
+    }
+  ]
+}

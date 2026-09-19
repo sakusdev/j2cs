@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.reader.closed",
+  "category": "web_streams",
+  "summary": "Read the reader.closed promise.",
+  "source": {
+    "pattern": "$reader.closed",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReaderClosed",
+    "template": "JsWebStreams.ReaderClosed(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "fulfills when the stream closes",
+    "edge": "rejects when the stream errors or the reader is released before closure"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.close()}}).getReader().closed",
+      "expected_behavior": "fulfills when the stream closes"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const r=new ReadableStream().getReader();r.releaseLock();return r.closed})()",
+      "expected_behavior": "rejects when the stream errors or the reader is released before closure"
+    }
+  ]
+}

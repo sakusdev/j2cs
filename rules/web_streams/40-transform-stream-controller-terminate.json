@@ -1,0 +1,39 @@
+{
+  "id": "web.transform-stream.controller.terminate",
+  "category": "web_streams",
+  "summary": "Terminate a transform stream by closing readable and erroring writable.",
+  "source": {
+    "pattern": "$controller.terminate()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.TransformTerminate",
+    "template": "JsWebStreams.TransformTerminate(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "readable closes while writable becomes errored",
+    "edge": "future writes fail rather than silently disappearing"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream({transform(x,c){c.terminate()}})",
+      "expected_behavior": "readable closes while writable becomes errored"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const t=new TransformStream({start(c){c.terminate()}});return t.writable.getWriter().write(1)})()",
+      "expected_behavior": "future writes fail rather than silently disappearing"
+    }
+  ]
+}

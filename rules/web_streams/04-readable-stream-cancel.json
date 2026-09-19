@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.cancel",
+  "category": "web_streams",
+  "summary": "Cancel an unlocked ReadableStream and run the underlying source cancel algorithm.",
+  "source": {
+    "pattern": "$stream.cancel($reason?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReadableCancel",
+    "template": "JsWebStreams.ReadableCancel(/* lowered operands */)",
+    "notes": "Cancellation reason is an arbitrary JS value and must not be coerced."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise that settles from the cancel algorithm",
+    "edge": "a locked stream returns a rejected promise with TypeError"
+  },
+  "caveats": [
+    "Cancellation reason is an arbitrary JS value and must not be coerced."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream().cancel('x')",
+      "expected_behavior": "returns a promise that settles from the cancel algorithm"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new ReadableStream();s.getReader();return s.cancel()})()",
+      "expected_behavior": "a locked stream returns a rejected promise with TypeError"
+    }
+  ]
+}

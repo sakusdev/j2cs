@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.reader.read",
+  "category": "web_streams",
+  "summary": "Read the next chunk from a default reader.",
+  "source": {
+    "pattern": "$reader.read()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.DefaultReaderRead",
+    "template": "JsWebStreams.DefaultReaderRead(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise for {value,done}",
+    "edge": "after releaseLock outstanding/future reads reject appropriately"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({start(c){c.enqueue(1);c.close()}}).getReader().read()",
+      "expected_behavior": "returns a promise for {value,done}"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const r=new ReadableStream().getReader();r.releaseLock();return r.read()})()",
+      "expected_behavior": "after releaseLock outstanding/future reads reject appropriately"
+    }
+  ]
+}

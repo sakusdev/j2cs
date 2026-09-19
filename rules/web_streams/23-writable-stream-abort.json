@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.abort",
+  "category": "web_streams",
+  "summary": "Abort an unlocked writable stream.",
+  "source": {
+    "pattern": "$stream.abort($reason?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WritableAbort",
+    "template": "JsWebStreams.WritableAbort(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise and runs the sink abort algorithm",
+    "edge": "locked streams return a rejected promise with TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().abort('x')",
+      "expected_behavior": "returns a promise and runs the sink abort algorithm"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const s=new WritableStream();s.getWriter();return s.abort()})()",
+      "expected_behavior": "locked streams return a rejected promise with TypeError"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "web.readable-stream.reader.cancel",
+  "category": "web_streams",
+  "summary": "Cancel through the reader while it owns the stream.",
+  "source": {
+    "pattern": "$reader.cancel($reason?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ReaderCancel",
+    "template": "JsWebStreams.ReaderCancel(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "forwards cancellation to the stream source and returns a promise",
+    "edge": "released readers reject with TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream().getReader().cancel('x')",
+      "expected_behavior": "forwards cancellation to the stream source and returns a promise"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const r=new ReadableStream().getReader();r.releaseLock();return r.cancel()})()",
+      "expected_behavior": "released readers reject with TypeError"
+    }
+  ]
+}

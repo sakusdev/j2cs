@@ -1,0 +1,42 @@
+{
+  "id": "web.stream.byte-length-strategy.size",
+  "category": "web_streams",
+  "summary": "Return chunk.byteLength using JavaScript property semantics.",
+  "source": {
+    "pattern": "$strategy.size($chunk)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ByteLengthStrategySize",
+    "template": "JsWebStreams.ByteLengthStrategySize(/* lowered operands */)",
+    "notes": "Property access can invoke user getters; use the JS object/property helper path."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns byteLength for buffers/views",
+    "edge": "property access/getter failures remain observable"
+  },
+  "caveats": [
+    "Property access can invoke user getters; use the JS object/property helper path."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ByteLengthQueuingStrategy({highWaterMark:8}).size(new Uint8Array(3))",
+      "expected_behavior": "returns byteLength for buffers/views"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ByteLengthQueuingStrategy({highWaterMark:8}).size({get byteLength(){throw 1}})",
+      "expected_behavior": "property access/getter failures remain observable"
+    }
+  ]
+}

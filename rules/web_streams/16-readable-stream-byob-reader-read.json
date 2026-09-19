@@ -1,0 +1,42 @@
+{
+  "id": "web.readable-stream.byob-reader.read",
+  "category": "web_streams",
+  "summary": "Read bytes into a caller-provided ArrayBufferView from a byte stream.",
+  "source": {
+    "pattern": "$reader.read($view, $options?)",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.ByobReaderRead",
+    "template": "JsWebStreams.ByobReaderRead(/* lowered operands */)",
+    "notes": "Reuse BINARY for ArrayBuffer/View identity and detachment."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise with a view and done flag while respecting minimum fill",
+    "edge": "detachment, zero-length, invalid min, or released-reader conditions follow Streams rules"
+  },
+  "caveats": [
+    "Reuse BINARY for ArrayBuffer/View identity and detachment."
+  ],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new ReadableStream({type:'bytes'}).getReader({mode:'byob'}).read(new Uint8Array(8))",
+      "expected_behavior": "returns a promise with a view and done flag while respecting minimum fill"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new ReadableStream({type:'bytes'}).getReader({mode:'byob'}).read(new Uint8Array(0))",
+      "expected_behavior": "detachment, zero-length, invalid min, or released-reader conditions follow Streams rules"
+    }
+  ]
+}

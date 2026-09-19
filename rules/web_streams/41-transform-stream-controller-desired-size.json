@@ -1,0 +1,39 @@
+{
+  "id": "web.transform-stream.controller.desired-size",
+  "category": "web_streams",
+  "summary": "Read desiredSize of the transform's readable side.",
+  "source": {
+    "pattern": "$controller.desiredSize",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.TransformDesiredSize",
+    "template": "JsWebStreams.TransformDesiredSize(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "tracks readable-side queue/backpressure",
+    "edge": "can be non-positive when downstream is not consuming"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new TransformStream({transform(x,c){void c.desiredSize}})",
+      "expected_behavior": "tracks readable-side queue/backpressure"
+    },
+    {
+      "name": "edge semantics",
+      "input": "new TransformStream(undefined,undefined,{highWaterMark:0})",
+      "expected_behavior": "can be non-positive when downstream is not consuming"
+    }
+  ]
+}

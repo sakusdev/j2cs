@@ -1,0 +1,39 @@
+{
+  "id": "web.writable-stream.writer.close",
+  "category": "web_streams",
+  "summary": "Close through the writer that owns the stream.",
+  "source": {
+    "pattern": "$writer.close()",
+    "requirements": {
+      "intrinsic_web_stream_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsWebStreams.WriterClose",
+    "template": "JsWebStreams.WriterClose(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "normal": "returns a promise for stream closure",
+    "edge": "released writers reject with TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://streams.spec.whatwg.org/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "new WritableStream().getWriter().close()",
+      "expected_behavior": "returns a promise for stream closure"
+    },
+    {
+      "name": "edge semantics",
+      "input": "(()=>{const w=new WritableStream().getWriter();w.releaseLock();return w.close()})()",
+      "expected_behavior": "released writers reject with TypeError"
+    }
+  ]
+}
