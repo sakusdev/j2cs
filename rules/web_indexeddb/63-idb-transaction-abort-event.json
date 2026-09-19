@@ -1,0 +1,41 @@
+{
+  "id": "web.idb.transaction.abort-event",
+  "category": "web_indexeddb",
+  "summary": "Dispatch abort after rollback",
+  "source": {
+    "pattern": "tx.onabort = listener",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsIndexedDb.TransactionAbortEvent(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tx.onabort = listener",
+      "expected_behavior": "Dispatch abort after rollback"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tx.onabort = listener",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

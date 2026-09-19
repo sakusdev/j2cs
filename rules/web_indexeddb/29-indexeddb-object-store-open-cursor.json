@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.object-store.open-cursor",
+  "category": "web_indexeddb",
+  "summary": "Open value cursor in key order",
+  "source": {
+    "pattern": "store.openCursor(query, direction)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.ObjectStoreOpenCursor",
+    "template": "JsIndexedDb.ObjectStoreOpenCursor(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "store.openCursor(query, direction)",
+      "expected_behavior": "Open value cursor in key order"
+    },
+    {
+      "name": "edge semantics",
+      "input": "store.openCursor(query, direction)",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

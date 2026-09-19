@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.cursor.update",
+  "category": "web_indexeddb",
+  "summary": "Update current record",
+  "source": {
+    "pattern": "cursor.update(value)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.CursorUpdate",
+    "template": "JsIndexedDb.CursorUpdate(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "cursor.update(value)",
+      "expected_behavior": "Update current record"
+    },
+    {
+      "name": "edge semantics",
+      "input": "cursor.update(value)",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

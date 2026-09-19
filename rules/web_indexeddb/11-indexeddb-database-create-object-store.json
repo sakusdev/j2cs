@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.database.create-object-store",
+  "category": "web_indexeddb",
+  "summary": "Create store during versionchange",
+  "source": {
+    "pattern": "db.createObjectStore(name, options)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.DatabaseCreateObjectStore",
+    "template": "JsIndexedDb.DatabaseCreateObjectStore(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Only legal in active versionchange transaction; duplicates throw ConstraintError."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "db.createObjectStore(name, options)",
+      "expected_behavior": "Create store during versionchange"
+    },
+    {
+      "name": "edge semantics",
+      "input": "db.createObjectStore(name, options)",
+      "expected_behavior": "Only legal in active versionchange transaction; duplicates throw ConstraintError."
+    }
+  ]
+}

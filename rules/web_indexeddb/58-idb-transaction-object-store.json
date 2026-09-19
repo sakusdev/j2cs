@@ -1,0 +1,42 @@
+{
+  "id": "web.idb.transaction.object-store",
+  "category": "web_indexeddb",
+  "summary": "Get store wrapper in scope",
+  "source": {
+    "pattern": "tx.objectStore(name)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.TransactionObjectStore",
+    "template": "JsIndexedDb.TransactionObjectStore(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Names outside fixed scope raise NotFoundError; same transaction/name returns same wrapper."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tx.objectStore(name)",
+      "expected_behavior": "Get store wrapper in scope"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tx.objectStore(name)",
+      "expected_behavior": "Names outside fixed scope raise NotFoundError; same transaction/name returns same wrapper."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.cmp",
+  "category": "web_indexeddb",
+  "summary": "Compare valid IndexedDB keys",
+  "source": {
+    "pattern": "indexedDB.cmp(a,b)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.Cmp",
+    "template": "JsIndexedDb.Cmp(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Invalid keys throw DataError; IndexedDB key order is not generic JS comparison."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "indexedDB.cmp(a,b)",
+      "expected_behavior": "Compare valid IndexedDB keys"
+    },
+    {
+      "name": "edge semantics",
+      "input": "indexedDB.cmp(a,b)",
+      "expected_behavior": "Invalid keys throw DataError; IndexedDB key order is not generic JS comparison."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.indexeddb.open",
+  "category": "web_indexeddb",
+  "summary": "Open database via IDBOpenDBRequest",
+  "source": {
+    "pattern": "indexedDB.open(name, version)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsIndexedDb.Open(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Open/upgrade/delete are event-driven, not Promise calls; version 0 is invalid."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "indexedDB.open(name, version)",
+      "expected_behavior": "Open database via IDBOpenDBRequest"
+    },
+    {
+      "name": "edge semantics",
+      "input": "indexedDB.open(name, version)",
+      "expected_behavior": "Open/upgrade/delete are event-driven, not Promise calls; version 0 is invalid."
+    }
+  ]
+}

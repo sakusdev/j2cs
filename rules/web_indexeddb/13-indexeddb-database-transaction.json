@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.database.transaction",
+  "category": "web_indexeddb",
+  "summary": "Start fixed-scope transaction immediately",
+  "source": {
+    "pattern": "db.transaction(stores, mode, options)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.DatabaseTransaction",
+    "template": "JsIndexedDb.DatabaseTransaction(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Transaction starts immediately; empty scope throws and activity is task-sensitive."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "db.transaction(stores, mode, options)",
+      "expected_behavior": "Start fixed-scope transaction immediately"
+    },
+    {
+      "name": "edge semantics",
+      "input": "db.transaction(stores, mode, options)",
+      "expected_behavior": "Transaction starts immediately; empty scope throws and activity is task-sensitive."
+    }
+  ]
+}

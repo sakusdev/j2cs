@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.object-store.get-all-keys",
+  "category": "web_indexeddb",
+  "summary": "Queue matching key retrieval",
+  "source": {
+    "pattern": "store.getAllKeys(query, count)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.ObjectStoreGetAllKeys",
+    "template": "JsIndexedDb.ObjectStoreGetAllKeys(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "store.getAllKeys(query, count)",
+      "expected_behavior": "Queue matching key retrieval"
+    },
+    {
+      "name": "edge semantics",
+      "input": "store.getAllKeys(query, count)",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

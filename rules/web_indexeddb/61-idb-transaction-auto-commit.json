@@ -1,0 +1,41 @@
+{
+  "id": "web.idb.transaction.auto-commit",
+  "category": "web_indexeddb",
+  "summary": "Preserve active/inactive task boundaries and auto-commit",
+  "source": {
+    "pattern": "setTimeout(()=>tx.objectStore('s').get(1),0)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsIndexedDb.TransactionAutoCommit(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Transactions become inactive across task boundaries and auto-commit when active work is exhausted."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "setTimeout(()=>tx.objectStore('s').get(1),0)",
+      "expected_behavior": "Preserve active/inactive task boundaries and auto-commit"
+    },
+    {
+      "name": "edge semantics",
+      "input": "setTimeout(()=>tx.objectStore('s').get(1),0)",
+      "expected_behavior": "Transactions become inactive across task boundaries and auto-commit when active work is exhausted."
+    }
+  ]
+}

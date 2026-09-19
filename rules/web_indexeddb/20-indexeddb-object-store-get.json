@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.object-store.get",
+  "category": "web_indexeddb",
+  "summary": "Queue structured-clone value lookup",
+  "source": {
+    "pattern": "store.get(key)",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.ObjectStoreGet",
+    "template": "JsIndexedDb.ObjectStoreGet(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "store.get(key)",
+      "expected_behavior": "Queue structured-clone value lookup"
+    },
+    {
+      "name": "edge semantics",
+      "input": "store.get(key)",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

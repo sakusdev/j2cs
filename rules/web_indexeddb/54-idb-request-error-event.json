@@ -1,0 +1,41 @@
+{
+  "id": "web.idb.request.error-event",
+  "category": "web_indexeddb",
+  "summary": "Dispatch error with bubbling/cancelation",
+  "source": {
+    "pattern": "req.onerror = listener",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.JsIndexedDb.RequestErrorEvent(/* lowered operands */)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Unprevented request errors can abort the owning transaction."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "req.onerror = listener",
+      "expected_behavior": "Dispatch error with bubbling/cancelation"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.onerror = listener",
+      "expected_behavior": "Unprevented request errors can abort the owning transaction."
+    }
+  ]
+}

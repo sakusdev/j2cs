@@ -1,0 +1,42 @@
+{
+  "id": "web.idb.transaction.durability",
+  "category": "web_indexeddb",
+  "summary": "Read durability hint",
+  "source": {
+    "pattern": "tx.durability",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.TransactionDurability",
+    "template": "JsIndexedDb.TransactionDurability(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "tx.durability",
+      "expected_behavior": "Read durability hint"
+    },
+    {
+      "name": "edge semantics",
+      "input": "tx.durability",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}

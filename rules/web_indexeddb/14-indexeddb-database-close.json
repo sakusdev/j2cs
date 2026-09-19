@@ -1,0 +1,42 @@
+{
+  "id": "web.indexeddb.database.close",
+  "category": "web_indexeddb",
+  "summary": "Close connection after active transactions",
+  "source": {
+    "pattern": "db.close()",
+    "requirements": {
+      "intrinsic_indexeddb_api": true,
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsIndexedDb.DatabaseClose",
+    "template": "JsIndexedDb.DatabaseClose(/* lowered operands */)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "request_model": "event-driven IDBRequest lifecycle",
+    "transaction_lifetime": "task-sensitive active/inactive state",
+    "structured_clone": "values preserve IndexedDB structured-clone behavior"
+  },
+  "caveats": [
+    "Operations remain bound to the originating IndexedDB transaction and origin."
+  ],
+  "references": [
+    "https://w3c.github.io/IndexedDB/"
+  ],
+  "tests": [
+    {
+      "name": "normal behavior",
+      "input": "db.close()",
+      "expected_behavior": "Close connection after active transactions"
+    },
+    {
+      "name": "edge semantics",
+      "input": "db.close()",
+      "expected_behavior": "Operations remain bound to the originating IndexedDB transaction and origin."
+    }
+  ]
+}
