@@ -1,0 +1,40 @@
+{
+  "id": "error.prototype.name-message-defaults",
+  "category": "errors",
+  "summary": "Preserve Error and NativeError prototype default name/message values without creating instance own properties.",
+  "source": {
+    "pattern": "$ErrorPrototype.name / $ErrorPrototype.message",
+    "requirements": {
+      "builtin_error_prototypes_unmodified": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.ErrorPrototypeDefaults",
+    "template": "JsRuntime.GetErrorPrototypeDefaults($kind)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "Error.prototype.name": "Error",
+    "Error.prototype.message": "",
+    "NativeError.prototype.name": "constructor-specific name",
+    "NativeError.prototype.message": "",
+    "inheritance": "instances without own message observe prototype empty message"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "Error defaults",
+      "input": "console.log(Error.prototype.name,JSON.stringify(Error.prototype.message))",
+      "expected_behavior": "prints Error \"\""
+    },
+    {
+      "name": "TypeError defaults",
+      "input": "console.log(TypeError.prototype.name,JSON.stringify(TypeError.prototype.message))",
+      "expected_behavior": "prints TypeError \"\""
+    }
+  ]
+}

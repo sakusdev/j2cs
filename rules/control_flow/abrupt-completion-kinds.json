@@ -1,0 +1,45 @@
+{
+  "id": "control.abrupt.completion-kinds",
+  "category": "control_flow",
+  "summary": "Represent ECMAScript abrupt completion kinds distinctly so throw/return/break/continue are not conflated.",
+  "source": {
+    "pattern": "[[Completion]]($statement)",
+    "requirements": {
+      "lowering_requires_explicit_completion_representation": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion",
+    "template": "JsCompletion.Evaluate($statement)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "types": [
+      "normal",
+      "throw",
+      "return",
+      "break",
+      "continue"
+    ],
+    "value": "completion may carry an ECMAScript value",
+    "target": "break/continue may carry a target label",
+    "dispatch": "surrounding syntax handles only the completion kinds specified by ECMAScript"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "catch distinguishes throw",
+      "input": "function f(){try{return 1}catch(e){return 2}} console.log(f())",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "finally can replace kind",
+      "input": "function f(){try{throw 1}finally{return 3}} console.log(f())",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

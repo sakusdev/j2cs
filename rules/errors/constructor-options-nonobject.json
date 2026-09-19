@@ -1,0 +1,39 @@
+{
+  "id": "error.constructor.options-nonobject",
+  "category": "errors",
+  "summary": "Ignore Error options values that are not objects instead of coercing them to objects.",
+  "source": {
+    "pattern": "Error($message, $options)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "options_proven_non_object": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.CreateError",
+    "template": "JsRuntime.CreateError($message, JsUndefined.Value, $newTarget)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "options": "non-object options are ignored by InstallErrorCause",
+    "cause": "not created",
+    "coercion": "no ToObject on options"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "numeric options ignored",
+      "input": "const e=Error('x',3); console.log(Object.hasOwn(e,'cause'))",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "null options ignored",
+      "input": "const e=Error('x',null); console.log(Object.hasOwn(e,'cause'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

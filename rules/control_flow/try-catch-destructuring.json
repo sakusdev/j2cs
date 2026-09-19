@@ -1,0 +1,38 @@
+{
+  "id": "control.try.catch-destructuring",
+  "category": "control_flow",
+  "summary": "Apply normal binding-pattern semantics to a catch parameter, including abrupt failures during destructuring.",
+  "source": {
+    "pattern": "try { $body } catch ($pattern) { $handler }",
+    "requirements": {
+      "catch_parameter_kind": "BindingPattern"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CatchBindingPattern",
+    "template": "JsRuntime.BindCatchPattern($pattern, $thrownValue)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "binding_initialization": "BindingInitialization(pattern, thrownValue, catchEnvironment)",
+    "abrupt_binding": "errors during destructuring replace the original handled throw",
+    "getters": "property access and iterator operations may execute user code"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "object destructuring",
+      "input": "try{throw {x:4}}catch({x}){console.log(x)}",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "destructuring null throws",
+      "input": "try { try{throw null}catch({x}){} } catch(e){ console.log(e instanceof TypeError) }",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

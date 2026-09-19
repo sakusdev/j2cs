@@ -1,0 +1,42 @@
+{
+  "id": "error.prototype.to-string-getter-order",
+  "category": "errors",
+  "summary": "Observe Error.prototype.toString property lookup and coercion in name-before-message order.",
+  "source": {
+    "pattern": "Error.prototype.toString.call($receiver)",
+    "requirements": {
+      "receiver_properties_may_have_getters_or_conversion_hooks": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ErrorToString",
+    "template": "JsRuntime.ErrorToString($receiver)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": [
+      "Get name",
+      "ToString name if needed",
+      "Get message",
+      "ToString message if needed"
+    ],
+    "abrupt": "an abrupt operation stops later lookups"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "getter order",
+      "input": "let s=[]; const o={get name(){s.push('n');return 'N'},get message(){s.push('m');return 'M'}}; Error.prototype.toString.call(o); console.log(s.join(','))",
+      "expected_behavior": "prints n,m"
+    },
+    {
+      "name": "name coercion throw skips message",
+      "input": "let hit=false; const o={name:{toString(){throw 1}},get message(){hit=true}}; try{Error.prototype.toString.call(o)}catch(e){} console.log(hit)",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

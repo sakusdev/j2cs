@@ -1,0 +1,38 @@
+{
+  "id": "control.throw.expression-abrupt",
+  "category": "control_flow",
+  "summary": "If evaluating the throw expression is itself abrupt, propagate that abrupt completion instead of creating a second throw.",
+  "source": {
+    "pattern": "throw $expression;",
+    "requirements": {
+      "throw_expression_may_have_side_effects_or_throw": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.EvaluateThrow",
+    "template": "JsRuntime.ThrowEvaluated(() => $expression)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "evaluate expression, GetValue, then throw that value",
+    "nested_abrupt": "an exception while evaluating/GetValue of the expression propagates unchanged",
+    "side_effects": "effects before the abrupt point remain observable"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-throw-statement"
+  ],
+  "tests": [
+    {
+      "name": "getter throws before outer throw",
+      "input": "const o={get x(){console.log('get'); throw 'inner';}}; try{throw o.x}catch(e){console.log(e)}",
+      "expected_behavior": "prints get then inner"
+    },
+    {
+      "name": "expression side effect precedes throw",
+      "input": "let x=0; try{throw (x=3)}catch(e){console.log(x,e)}",
+      "expected_behavior": "prints 3 3"
+    }
+  ]
+}

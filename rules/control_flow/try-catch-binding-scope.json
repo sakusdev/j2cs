@@ -1,0 +1,39 @@
+{
+  "id": "control.try.catch-binding-scope",
+  "category": "control_flow",
+  "summary": "Create the catch parameter in a fresh lexical environment that ends when the catch block exits.",
+  "source": {
+    "pattern": "try { $body } catch ($e) { $handler }",
+    "requirements": {
+      "catch_parameter_present": true,
+      "lexical_scope_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CatchEnvironment",
+    "template": "JsRuntime.RunCatchScope($thrownValue, $binding, $handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "fresh declarative environment for the catch parameter",
+    "shadowing": "outer bindings may be shadowed",
+    "restoration": "outer lexical environment is restored no matter how catch exits"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "catch shadows outer",
+      "input": "let e='outer'; try{throw 'inner'}catch(e){console.log(e)} console.log(e)",
+      "expected_behavior": "prints inner then outer"
+    },
+    {
+      "name": "catch binding unavailable after block",
+      "input": "try{throw 1}catch(err){} console.log(typeof err)",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

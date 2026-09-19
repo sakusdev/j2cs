@@ -1,0 +1,39 @@
+{
+  "id": "error.prototype.to-string",
+  "category": "errors",
+  "summary": "Preserve the generic Error.prototype.toString algorithm and its name/message defaults.",
+  "source": {
+    "pattern": "Error.prototype.toString.call($receiver)",
+    "requirements": {
+      "builtin_Error_prototype_toString_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ErrorToString",
+    "template": "JsRuntime.ErrorToString($receiver)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "must be an Object, but need not be Error-branded",
+    "name": "Get name; undefined defaults to 'Error'; otherwise ToString",
+    "message": "Get message; undefined defaults to empty string; otherwise ToString",
+    "format": "empty name -> message; empty message -> name; otherwise 'name: message'"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "generic object",
+      "input": "console.log(Error.prototype.toString.call({name:'X',message:'Y'}))",
+      "expected_behavior": "prints X: Y"
+    },
+    {
+      "name": "primitive receiver throws",
+      "input": "try{Error.prototype.toString.call(1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

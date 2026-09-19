@@ -1,0 +1,39 @@
+{
+  "id": "control.try.catch-finally-order",
+  "category": "control_flow",
+  "summary": "In try/catch/finally, handle a throw in catch first and then always execute finally.",
+  "source": {
+    "pattern": "try { $body } catch ($e) { $handler } finally { $finally }",
+    "requirements": {
+      "has_catch": true,
+      "has_finally": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion.TryCatchFinally",
+    "template": "JsCompletion.TryCatchFinally($body, $handler, $finally)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "throw_path": "try throw -> catch evaluation -> finally evaluation",
+    "nonthrow_path": "catch skipped -> finally evaluation",
+    "completion": "normal finally preserves catch/try completion; abrupt finally replaces it"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "catch before finally",
+      "input": "let s=[]; try{throw 1}catch(e){s.push('catch')}finally{s.push('finally')} console.log(s.join(','))",
+      "expected_behavior": "prints catch,finally"
+    },
+    {
+      "name": "finally after normal try",
+      "input": "let s=[]; try{s.push('try')}catch(e){s.push('catch')}finally{s.push('finally')} console.log(s.join(','))",
+      "expected_behavior": "prints try,finally"
+    }
+  ]
+}

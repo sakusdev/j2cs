@@ -1,0 +1,41 @@
+{
+  "id": "error.message-own-vs-inherited",
+  "category": "errors",
+  "summary": "Distinguish absence of an own Error message from the inherited empty prototype message.",
+  "source": {
+    "pattern": "$error.message",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "message_was_omitted_or_undefined": true,
+      "prototype_chain_unmodified": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.ErrorMessage",
+    "template": "JsRuntime.ReadErrorMessage($error)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "own_property": false,
+    "read_value": "",
+    "source": "inherited Error.prototype.message",
+    "enumeration": "no own key is created"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "no own but reads empty",
+      "input": "const e=new Error(); console.log(Object.hasOwn(e,'message'),JSON.stringify(e.message))",
+      "expected_behavior": "prints false \"\""
+    },
+    {
+      "name": "own empty string differs structurally",
+      "input": "const e=new Error(''); console.log(Object.hasOwn(e,'message'),JSON.stringify(e.message))",
+      "expected_behavior": "prints true \"\""
+    }
+  ]
+}

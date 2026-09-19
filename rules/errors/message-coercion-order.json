@@ -1,0 +1,41 @@
+{
+  "id": "error.message-coercion-order",
+  "category": "errors",
+  "summary": "Perform Error message ToString before consulting the options cause property.",
+  "source": {
+    "pattern": "Error($message, $options)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "message_and_options_may_execute_user_code": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateError",
+    "template": "JsRuntime.CreateError($message, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": [
+      "ToString(message) if message is not undefined",
+      "HasProperty/Get cause if options is Object"
+    ],
+    "abrupt": "message conversion failure prevents cause lookup"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "message before cause",
+      "input": "let s=[]; const m={toString(){s.push('m');return 'x'}}; const o={get cause(){s.push('c');return 1}}; Error(m,o); console.log(s.join(','))",
+      "expected_behavior": "prints m,c"
+    },
+    {
+      "name": "message throw skips cause",
+      "input": "let hit=false; const m={toString(){throw 1}}; const o={get cause(){hit=true}}; try{Error(m,o)}catch(e){} console.log(hit)",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

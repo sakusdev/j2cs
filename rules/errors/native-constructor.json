@@ -1,0 +1,48 @@
+{
+  "id": "error.native.constructor",
+  "category": "errors",
+  "summary": "Create EvalError, RangeError, ReferenceError, SyntaxError, TypeError, and URIError with NativeError semantics.",
+  "source": {
+    "pattern": "$NativeError($message, $options?)",
+    "requirements": {
+      "constructor_is_one_of": [
+        "EvalError",
+        "RangeError",
+        "ReferenceError",
+        "SyntaxError",
+        "TypeError",
+        "URIError"
+      ],
+      "builtin_constructor_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateNativeError",
+    "template": "JsRuntime.CreateNativeError($kind, $message, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "call_and_new": "equivalent for same arguments",
+    "message": "same own-property rules as Error",
+    "cause": "InstallErrorCause semantics",
+    "prototype": "corresponding NativeError.prototype",
+    "brand": "[[ErrorData]] present"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "TypeError construction",
+      "input": "const e=TypeError('bad'); console.log(e instanceof TypeError,e.name,e.message)",
+      "expected_behavior": "prints true TypeError bad"
+    },
+    {
+      "name": "RangeError cause",
+      "input": "const e=new RangeError('bad',{cause:5}); console.log(e.cause)",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "error.aggregate.iterator-side-effects",
+  "category": "errors",
+  "summary": "Consume AggregateError errors through the ECMAScript synchronous iterator protocol rather than array/list-specific enumeration.",
+  "source": {
+    "pattern": "AggregateError($iterable)",
+    "requirements": {
+      "errors_argument_not_proven_plain_array": true,
+      "builtin_AggregateError_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateAggregateError",
+    "template": "JsRuntime.CreateAggregateError($iterable, $message, $options, $newTarget)",
+    "notes": "This API-specific runtime contract must consume the errors argument through the ECMAScript synchronous iterator protocol; generic iterator protocol ownership remains with ITERATORS_GENERATORS."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "protocol": "GetIterator(errors, sync) then repeated IteratorStepValue",
+    "side_effects": "custom @@iterator/next code is observable",
+    "values": "collected without coercion"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "custom iterator",
+      "input": "let n=0; const it={[Symbol.iterator](){return {next(){return n<2?{value:++n,done:false}:{done:true}}}}}; console.log(new AggregateError(it).errors.join(','))",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "getter for iterator can throw",
+      "input": "const x={get [Symbol.iterator](){throw 'x'}}; try{new AggregateError(x)}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

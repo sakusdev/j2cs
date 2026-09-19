@@ -1,0 +1,38 @@
+{
+  "id": "control.try.finally-abrupt-overrides",
+  "category": "control_flow",
+  "summary": "An abrupt completion produced by finally replaces the prior completion from try or catch.",
+  "source": {
+    "pattern": "try { $body } finally { $finallyAbrupt }",
+    "requirements": {
+      "finally_may_complete_abruptly": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion.TryFinally",
+    "template": "JsCompletion.TryFinally($body, $finally)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "try/catch completion is obtained before finally runs",
+    "override": "throw, return, break, or continue from finally replaces the prior completion",
+    "normal_finally": "otherwise prior completion is preserved"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "finally return overrides return",
+      "input": "function f(){try{return 1}finally{return 2}} console.log(f())",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "finally throw overrides throw",
+      "input": "try{try{throw 'a'}finally{throw 'b'}}catch(e){console.log(e)}",
+      "expected_behavior": "prints b"
+    }
+  ]
+}

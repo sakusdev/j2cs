@@ -1,0 +1,40 @@
+{
+  "id": "error.error-data-brand",
+  "category": "errors",
+  "summary": "Model the [[ErrorData]] internal slot as a semantic brand distinct from ordinary Error-like properties.",
+  "source": {
+    "pattern": "[[ErrorData]]($object)",
+    "requirements": {
+      "operation_requires_Error_brand": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ErrorBrand",
+    "template": "JsRuntime.HasErrorData($object)",
+    "notes": "Object.prototype.toString surface behavior remains owned by OBJECT; this rule only defines the reusable error-brand semantic fact."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "creation": "installed on Error, NativeError, and AggregateError instances",
+    "ordinary_objects": "objects merely having name/message are not branded",
+    "prototypes": "Error.prototype and NativeError/AggregateError prototype objects are not branded",
+    "observable": "used by Error.isError and Object.prototype.toString builtin tag selection"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "lookalike is not branded",
+      "input": "console.log(Object.prototype.toString.call({name:'Error',message:'x'}))",
+      "expected_behavior": "prints [object Object]"
+    },
+    {
+      "name": "constructed Error is branded",
+      "input": "console.log(Object.prototype.toString.call(new Error()))",
+      "expected_behavior": "prints [object Error]"
+    }
+  ]
+}

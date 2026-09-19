@@ -1,0 +1,38 @@
+{
+  "id": "control.try.catch-only-throw-completion",
+  "category": "control_flow",
+  "summary": "A catch clause handles only throw completions; return, break, and continue completions bypass catch.",
+  "source": {
+    "pattern": "try { $body } catch ($e) { $handler }",
+    "requirements": {
+      "body_may_complete_abruptly": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion",
+    "template": "JsCompletion.TryCatch($body, $handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "catch_condition": "completion type is Throw",
+    "return_break_continue": "not intercepted by catch",
+    "normal": "catch skipped"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "return bypasses catch",
+      "input": "function f(){try{return 1}catch(e){return 2}} console.log(f())",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "break bypasses catch",
+      "input": "let x=0; while(true){try{x=1;break}catch(e){x=2}} console.log(x)",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

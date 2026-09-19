@@ -1,0 +1,37 @@
+{
+  "id": "control.try.nested-finally-order",
+  "category": "control_flow",
+  "summary": "Preserve inside-out execution order for nested finally blocks during abrupt propagation.",
+  "source": {
+    "pattern": "try { try { $body } finally { $inner } } finally { $outer }",
+    "requirements": {
+      "nested_finally": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsCompletion.TryFinally",
+    "template": "JsCompletion.TryFinally(JsCompletion.TryFinally($body, $inner), $outer)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "inner finally completes before outer finally",
+    "propagation": "the current completion after inner finally is the input to outer finally"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "nested throw order",
+      "input": "let s=[]; try{try{throw 1}finally{s.push('inner')}}catch(e){}finally{s.push('outer')} console.log(s.join(','))",
+      "expected_behavior": "prints inner,outer"
+    },
+    {
+      "name": "inner override reaches outer",
+      "input": "let s=[]; try{try{throw 'a'}finally{s.push('i');throw 'b'}}catch(e){s.push(e)}finally{s.push('o')} console.log(s.join(','))",
+      "expected_behavior": "prints i,b,o"
+    }
+  ]
+}

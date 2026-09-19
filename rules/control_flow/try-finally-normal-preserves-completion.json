@@ -1,0 +1,43 @@
+{
+  "id": "control.try.finally-normal-preserves-completion",
+  "category": "control_flow",
+  "summary": "When a finally block completes normally, preserve the prior try/catch completion including return or throw.",
+  "source": {
+    "pattern": "try { $body } finally { $finally }",
+    "requirements": {
+      "finally_proven_to_complete_normally": true,
+      "thrown_js_values_use_wrapper_exception_representation": true
+    }
+  },
+  "target": {
+    "kind": "csharp",
+    "template": "try { $body } finally { $finally }",
+    "notes": "Native only after analysis proves the finally body cannot produce throw/return/break/continue and JS thrown values already use the JsException wrapper representation."
+  },
+  "strategy": "native",
+  "confidence": "high",
+  "semantics": {
+    "finally": "always executes",
+    "prior_completion": "preserved when finally completion is normal",
+    "throw": "wrapped JS throw continues after finally",
+    "return": "return value continues after finally"
+  },
+  "caveats": [
+    "C# forbids control leaving a finally clause, while JavaScript permits abrupt completion from finally."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-try-statement"
+  ],
+  "tests": [
+    {
+      "name": "return survives normal finally",
+      "input": "function f(){try{return 7}finally{console.log('f')}} console.log(f())",
+      "expected_behavior": "prints f then 7"
+    },
+    {
+      "name": "throw survives normal finally",
+      "input": "try{try{throw 'x'}finally{console.log('f')}}catch(e){console.log(e)}",
+      "expected_behavior": "prints f then x"
+    }
+  ]
+}

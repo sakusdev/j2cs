@@ -1,0 +1,38 @@
+{
+  "id": "error.aggregate-message-undefined",
+  "category": "errors",
+  "summary": "AggregateError omits its own message when the message argument is undefined, while still consuming the errors iterable.",
+  "source": {
+    "pattern": "AggregateError($errors, undefined, $options?)",
+    "requirements": {
+      "builtin_AggregateError_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateAggregateError",
+    "template": "JsRuntime.CreateAggregateError($errors, JsUndefined.Value, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "own_message": false,
+    "errors": "iterable is still consumed",
+    "cause": "options cause is still processed"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "no own message",
+      "input": "const e=new AggregateError([1],undefined); console.log(Object.hasOwn(e,'message'),e.errors[0])",
+      "expected_behavior": "prints false 1"
+    },
+    {
+      "name": "cause still installed",
+      "input": "const e=new AggregateError([],undefined,{cause:2}); console.log(e.cause)",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

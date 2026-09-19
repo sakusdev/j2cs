@@ -1,0 +1,46 @@
+{
+  "id": "error.constructor.message",
+  "category": "errors",
+  "summary": "Convert a non-undefined Error message with JavaScript ToString and define it as a non-enumerable own property.",
+  "source": {
+    "pattern": "Error($message)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "message_not_undefined": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateError",
+    "template": "JsRuntime.CreateError($message, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "coercion": "ToString(message)",
+    "descriptor": {
+      "writable": true,
+      "enumerable": false,
+      "configurable": true
+    },
+    "order": "message conversion occurs before cause installation"
+  },
+  "caveats": [
+    "Do not use CLR Exception.Message formatting as the source of JavaScript message semantics."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "numeric message",
+      "input": "const e=Error(12); console.log(e.message,Object.keys(e).length)",
+      "expected_behavior": "prints 12 0"
+    },
+    {
+      "name": "message coercion can throw",
+      "input": "try{Error(Symbol())}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

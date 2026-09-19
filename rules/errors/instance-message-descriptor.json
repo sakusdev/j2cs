@@ -1,0 +1,40 @@
+{
+  "id": "error.instance.message-descriptor",
+  "category": "errors",
+  "summary": "Preserve the specified descriptor of an Error instance own message property.",
+  "source": {
+    "pattern": "Object.getOwnPropertyDescriptor(Error($message), 'message')",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "message_not_undefined": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.ErrorPropertyDescriptor",
+    "template": "JsRuntime.GetOwnErrorPropertyDescriptor($error, \"message\")"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "writable": true,
+    "enumerable": false,
+    "configurable": true,
+    "value": "ToString(message)"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "descriptor flags",
+      "input": "const d=Object.getOwnPropertyDescriptor(Error('x'),'message'); console.log(d.writable,d.enumerable,d.configurable)",
+      "expected_behavior": "prints true false true"
+    },
+    {
+      "name": "message writable",
+      "input": "const e=Error('x'); e.message='y'; console.log(e.message)",
+      "expected_behavior": "prints y"
+    }
+  ]
+}

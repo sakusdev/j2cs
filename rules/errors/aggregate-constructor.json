@@ -1,0 +1,41 @@
+{
+  "id": "error.aggregate.constructor",
+  "category": "errors",
+  "summary": "Construct AggregateError by converting message/cause and consuming the errors argument as a synchronous iterable.",
+  "source": {
+    "pattern": "AggregateError($errors, $message?, $options?)",
+    "requirements": {
+      "builtin_AggregateError_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.CreateAggregateError",
+    "template": "JsRuntime.CreateAggregateError($errors, $message, $options, $newTarget)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "call_and_new": "equivalent for same arguments",
+    "allocation": "AggregateError branded object",
+    "message": "ToString when not undefined",
+    "cause": "InstallErrorCause before consuming errors iterable",
+    "errors": "IteratorToList(GetIterator(errors, sync)) then CreateArrayFromList",
+    "descriptor": "errors is writable, non-enumerable, configurable"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "aggregate errors",
+      "input": "const e=AggregateError(new Set([1,2]),'m'); console.log(e.errors.join(','),e.message)",
+      "expected_behavior": "prints 1,2 m"
+    },
+    {
+      "name": "noniterable errors throws",
+      "input": "try{AggregateError(3)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

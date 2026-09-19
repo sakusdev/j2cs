@@ -1,0 +1,47 @@
+{
+  "id": "error.native.prototype-chain",
+  "category": "errors",
+  "summary": "Preserve NativeError constructor/prototype inheritance through Error.",
+  "source": {
+    "pattern": "$NativeError.prototype",
+    "requirements": {
+      "constructor_is_one_of": [
+        "EvalError",
+        "RangeError",
+        "ReferenceError",
+        "SyntaxError",
+        "TypeError",
+        "URIError"
+      ],
+      "builtin_prototypes_unmodified": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.NativeErrorPrototype",
+    "template": "JsRuntime.GetNativeErrorPrototype($kind)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "constructor_prototype": "NativeError constructor inherits from Error constructor",
+    "prototype_object": "NativeError.prototype inherits from Error.prototype",
+    "prototype_brand": "prototype object itself has no [[ErrorData]]",
+    "name": "prototype name is constructor name"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "prototype inheritance",
+      "input": "console.log(Object.getPrototypeOf(TypeError)===Error,Object.getPrototypeOf(TypeError.prototype)===Error.prototype)",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "prototype lacks Error brand",
+      "input": "console.log(Object.prototype.toString.call(TypeError.prototype),Object.prototype.toString.call(new TypeError()))",
+      "expected_behavior": "prints [object Object] [object Error]"
+    }
+  ]
+}

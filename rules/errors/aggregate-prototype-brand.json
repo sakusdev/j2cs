@@ -1,0 +1,40 @@
+{
+  "id": "error.aggregate.prototype-brand",
+  "category": "errors",
+  "summary": "Preserve AggregateError prototype inheritance and brand boundaries.",
+  "source": {
+    "pattern": "AggregateError.prototype / new AggregateError($errors)",
+    "requirements": {
+      "builtin_AggregateError_not_overridden": true,
+      "builtin_prototypes_unmodified": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsRuntime.AggregateErrorPrototype",
+    "template": "JsRuntime.GetAggregateErrorPrototype()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "constructor": "AggregateError constructor inherits from Error",
+    "prototype": "AggregateError.prototype inherits from Error.prototype",
+    "prototype_brand": "AggregateError.prototype itself is not Error-branded",
+    "instance_brand": "instances are Error-branded"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "prototype chain",
+      "input": "console.log(Object.getPrototypeOf(AggregateError)===Error,Object.getPrototypeOf(AggregateError.prototype)===Error.prototype)",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "brand split",
+      "input": "console.log(Object.prototype.toString.call(AggregateError.prototype),Object.prototype.toString.call(new AggregateError([])))",
+      "expected_behavior": "prints [object Object] [object Error]"
+    }
+  ]
+}

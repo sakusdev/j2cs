@@ -1,0 +1,39 @@
+{
+  "id": "error.constructor.cause-undefined-present",
+  "category": "errors",
+  "summary": "Distinguish an absent cause property from a present cause property whose value is undefined.",
+  "source": {
+    "pattern": "Error($message, $options)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "options_is_object": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.InstallErrorCause",
+    "template": "JsRuntime.InstallErrorCause($error, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "absent": "no own cause property on the Error",
+    "present_undefined": "creates an own cause property with value undefined",
+    "presence_test": "HasProperty rather than value comparison"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "present undefined cause",
+      "input": "const e=Error('m',{cause:undefined}); console.log(Object.hasOwn(e,'cause'),e.cause===undefined)",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "absent cause",
+      "input": "const e=Error('m',{}); console.log(Object.hasOwn(e,'cause'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

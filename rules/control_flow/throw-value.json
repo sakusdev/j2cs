@@ -1,0 +1,44 @@
+{
+  "id": "control.throw.value",
+  "category": "control_flow",
+  "summary": "Throw any JavaScript value without coercing it to a CLR Exception object.",
+  "source": {
+    "pattern": "throw $value;",
+    "requirements": {
+      "context": "synchronous ECMAScript control flow",
+      "value_is_arbitrary_js_value": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsException.Wrap",
+    "template": "throw JsException.Wrap($value);",
+    "notes": "Reuse the existing JsException wrapping representation used by ASYNC rules; a catch lowering must recover the original JS value."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "evaluation": "evaluate expression once, then create a throw completion carrying the exact value",
+    "identity": "object thrown values are preserved by identity",
+    "coercion": "none"
+  },
+  "caveats": [
+    "C# forbids throwing arbitrary primitives or null directly.",
+    "Do not use this rule for throws inside async functions; ASYNC owns promise rejection conversion."
+  ],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-throw-statement"
+  ],
+  "tests": [
+    {
+      "name": "primitive thrown value",
+      "input": "try { throw 17; } catch (e) { console.log(e, typeof e); }",
+      "expected_behavior": "prints 17 number"
+    },
+    {
+      "name": "object identity preserved",
+      "input": "const x={a:1}; try { throw x; } catch(e) { console.log(e===x); }",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

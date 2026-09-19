@@ -1,0 +1,39 @@
+{
+  "id": "error.cause-getter-abrupt",
+  "category": "errors",
+  "summary": "Propagate abrupt completion from HasProperty/Get while installing Error cause.",
+  "source": {
+    "pattern": "Error($message, $options)",
+    "requirements": {
+      "builtin_Error_not_overridden": true,
+      "options_property_access_may_execute_user_code": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.InstallErrorCause",
+    "template": "JsRuntime.InstallErrorCause($error, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "has_property": "prototype/proxy lookup may be observable",
+    "get": "cause getter may execute and throw",
+    "abrupt": "constructor propagates that thrown JS value and no Error object is returned"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-error-objects"
+  ],
+  "tests": [
+    {
+      "name": "cause getter throws",
+      "input": "const o={get cause(){throw 'boom'}}; try{Error('x',o)}catch(e){console.log(e)}",
+      "expected_behavior": "prints boom"
+    },
+    {
+      "name": "proxy has trap participates",
+      "input": "let s=[]; const o=new Proxy({}, {has(t,k){s.push(String(k)); return false}}); Error('x',o); console.log(s.join(','))",
+      "expected_behavior": "prints cause"
+    }
+  ]
+}
