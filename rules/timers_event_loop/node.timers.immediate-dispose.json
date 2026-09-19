@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.immediate-dispose",
+  "category": "timers",
+  "summary": "Cancel an Immediate through Symbol.dispose and return undefined.",
+  "source": {
+    "pattern": "$immediate[Symbol.dispose]()",
+    "requirements": {
+      "receiver": "Node.js Immediate handle",
+      "node_version": ">=24.2 for stable API",
+      "builtin_symbol_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.DisposeImmediate",
+    "template": "NodeTimers.DisposeImmediate($immediate)",
+    "notes": "Cancel pending Immediate similarly to clearImmediate."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "effect": "cancels pending Immediate"
+  },
+  "caveats": [
+    "The API was experimental in older supported releases; preserve host-version gating."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns undefined",
+      "input": "const i=setImmediate(()=>{}); console.log(i[Symbol.dispose]()===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "prevents callback",
+      "input": "const i=setImmediate(()=>console.log('bad')); i[Symbol.dispose](); setImmediate(()=>console.log('ok'));",
+      "expected_behavior": "prints ok but not bad"
+    }
+  ]
+}

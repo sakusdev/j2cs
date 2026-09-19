@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.timeout-close",
+  "category": "timers",
+  "summary": "Support legacy Timeout.close() cancellation while preserving receiver identity.",
+  "source": {
+    "pattern": "$timeout.close()",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.Close",
+    "template": "NodeTimers.Close($timeout)",
+    "notes": "Legacy alias-like cancellation behavior; cancel and return receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same Timeout object",
+    "effect": "cancels timer",
+    "stability": "legacy; clearTimeout is preferred"
+  },
+  "caveats": [
+    "Do not remove the method when Node compatibility includes legacy timer surfaces."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns same handle",
+      "input": "const t=setTimeout(()=>{},1000); console.log(t.close()===t);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "cancels callback",
+      "input": "const t=setTimeout(()=>console.log('bad'),5); t.close(); setTimeout(()=>console.log('ok'),10);",
+      "expected_behavior": "prints ok but not bad"
+    }
+  ]
+}

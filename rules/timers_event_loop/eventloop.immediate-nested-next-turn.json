@@ -1,0 +1,42 @@
+{
+  "id": "eventloop.immediate-nested-next-turn",
+  "category": "event_loop",
+  "summary": "Defer an Immediate queued from inside an executing Immediate until the next event-loop iteration.",
+  "source": {
+    "pattern": "setImmediate(()=>{ ... setImmediate($nested); ... })",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.EnqueueImmediateForNextCheckIteration($nested)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "nested_immediate": "not appended to the currently executing check-phase batch",
+    "ordering": "already queued peer Immediates run before nested Immediate",
+    "iteration": "nested Immediate becomes eligible on a later event-loop iteration"
+  },
+  "caveats": [
+    "Appending directly to the currently draining list would incorrectly run nested callbacks too early."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "nested immediate follows peer",
+      "input": "setImmediate(()=>{console.log('a');setImmediate(()=>console.log('c'))});setImmediate(()=>console.log('b'));",
+      "expected_behavior": "prints a, b, c"
+    },
+    {
+      "name": "nested callback is asynchronous again",
+      "input": "setImmediate(()=>{setImmediate(()=>console.log('nested'));console.log('outer')});",
+      "expected_behavior": "prints outer before nested"
+    }
+  ]
+}

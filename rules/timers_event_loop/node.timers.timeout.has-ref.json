@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.timeout.has-ref",
+  "category": "timers",
+  "summary": "Report whether a Node Timeout currently contributes a ref to event-loop liveness.",
+  "source": {
+    "pattern": "$timeout.hasRef()",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.HasRef",
+    "template": "NodeTimers.HasRef($timeout)",
+    "notes": "Read the handle's liveness state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "default_state": true,
+    "state_changes": "unref => false; ref => true"
+  },
+  "caveats": [
+    "hasRef() does not imply the timer is still pending."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "new timer is refed",
+      "input": "const t=setTimeout(()=>{},1000); console.log(t.hasRef()); clearTimeout(t);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "tracks unref and ref",
+      "input": "const t=setTimeout(()=>{},1000); t.unref(); console.log(t.hasRef()); t.ref(); console.log(t.hasRef()); clearTimeout(t);",
+      "expected_behavior": "prints false then true"
+    }
+  ]
+}

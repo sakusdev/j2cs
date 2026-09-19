@@ -1,0 +1,46 @@
+{
+  "id": "eventloop.nexttick-esm-top-level-after-microtasks",
+  "category": "event_loop",
+  "summary": "Preserve Node ESM top-level ordering where already-running module microtasks can run before process.nextTick callbacks.",
+  "source": {
+    "pattern": "/* ESM top level */ Promise.resolve().then($p); queueMicrotask($m); process.nextTick($t)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "module_kind": "ECMAScript module",
+      "location": "module top level",
+      "builtins_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.ScheduleEsmTopLevelJobs($p, $m, $t)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "Promise and queueMicrotask jobs queued during ESM top-level evaluation run before the newly queued nextTick callback",
+    "reason": "ESM evaluation is already executing as part of the microtask queue"
+  },
+  "caveats": [
+    "Do not apply CommonJS top-level nextTick precedence to ESM module evaluation.",
+    "Ordering after module evaluation enters later ordinary turns follows normal Node queue checkpoints."
+  ],
+  "references": [
+    "https://nodejs.org/api/process.html#processnexttickcallback-args",
+    "rules/async/queue-microtask.json",
+    "rules/async/promise-then.json"
+  ],
+  "tests": [
+    {
+      "name": "ESM order differs from CJS",
+      "input": "// .mjs\nPromise.resolve().then(()=>console.log('promise'));queueMicrotask(()=>console.log('micro'));process.nextTick(()=>console.log('tick'));",
+      "expected_behavior": "prints promise, micro, tick"
+    },
+    {
+      "name": "requires ESM top level",
+      "input": "// .cjs with the same three calls",
+      "expected_behavior": "this rule does not apply; ordinary CommonJS ordering is covered separately"
+    }
+  ]
+}

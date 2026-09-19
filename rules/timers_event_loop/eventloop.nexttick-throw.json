@@ -1,0 +1,44 @@
+{
+  "id": "eventloop.nexttick-throw",
+  "category": "event_loop",
+  "summary": "Route an exception thrown by a process.nextTick callback through Node's uncaught-exception path rather than Promise rejection.",
+  "source": {
+    "pattern": "process.nextTick(()=>{ throw $value; })",
+    "requirements": {
+      "host_profile": "Node.js",
+      "builtin_process_nextTick_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.EnqueueNextTickWithHostExceptionReporting($callback)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "throw_behavior": "thrown value escapes the nextTick callback as an uncaught synchronous callback exception",
+    "promise": "no Promise is created and no rejection is produced",
+    "host_hook": "process uncaughtException handling may observe the failure"
+  },
+  "caveats": [
+    "Do not reuse Promise rejection propagation for nextTick callback throws.",
+    "Process termination behavior depends on installed uncaughtException handlers and host policy."
+  ],
+  "references": [
+    "https://nodejs.org/api/process.html#processnexttickcallback-args",
+    "rules/async/function-throw-rejection.json"
+  ],
+  "tests": [
+    {
+      "name": "uncaughtException observes throw",
+      "input": "process.once('uncaughtException',e=>console.log(e.message));process.nextTick(()=>{throw new Error('x')});",
+      "expected_behavior": "prints x through uncaughtException handler"
+    },
+    {
+      "name": "not an unhandled rejection",
+      "input": "process.once('unhandledRejection',()=>console.log('rejection'));process.once('uncaughtException',()=>console.log('uncaught'));process.nextTick(()=>{throw new Error('x')});",
+      "expected_behavior": "prints uncaught, not rejection"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "eventloop.io-immediate-before-zero-timeout",
+  "category": "event_loop",
+  "summary": "Inside a completed I/O callback, preserve Node ordering where setImmediate runs before a newly scheduled zero-delay timeout.",
+  "source": {
+    "pattern": "$ioCallback(()=>{ setTimeout($timeout, 0); setImmediate($immediate); })",
+    "requirements": {
+      "host_profile": "Node.js",
+      "scheduling_context": "I/O callback running from poll phase",
+      "builtins_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.ScheduleFromIoCallback($timeout, $immediate)",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordering": "Immediate runs in the following check phase before the newly eligible zero-delay timeout",
+    "reason": "the callback is already in the poll phase; check follows before the next timers opportunity"
+  },
+  "caveats": [
+    "Do not generalize this deterministic I/O-callback ordering to top-level scheduling.",
+    "Node timer delays are thresholds and 0 is normalized to the minimum delay."
+  ],
+  "references": [
+    "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick",
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "I/O callback ordering",
+      "input": "const fs=require('node:fs');fs.readFile(__filename,()=>{setTimeout(()=>console.log('timeout'),0);setImmediate(()=>console.log('immediate'))});",
+      "expected_behavior": "prints immediate before timeout"
+    },
+    {
+      "name": "requires poll/I/O context",
+      "input": "setTimeout(()=>console.log('timeout'),0);setImmediate(()=>console.log('immediate'));",
+      "expected_behavior": "this rule does not fix an order at top level"
+    }
+  ]
+}

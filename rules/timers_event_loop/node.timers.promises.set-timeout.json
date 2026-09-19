@@ -1,0 +1,47 @@
+{
+  "id": "node.timers.promises.set-timeout",
+  "category": "timers",
+  "summary": "Model node:timers/promises setTimeout as a Node timer-backed Promise that fulfills with the supplied value.",
+  "source": {
+    "pattern": "timersPromises.setTimeout($delay, $value, $options)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "binding": "node:timers/promises setTimeout",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeTimersPromises.SetTimeout($delay, $value, $options)",
+    "notes": "Integrate with the Node-compatible timer scheduler and existing JsPromise/async-iteration semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Promise",
+    "fulfillment": "fulfills with value after timer becomes eligible",
+    "delay": "default 1 ms with Node timer normalization",
+    "options": "ref defaults true; signal may abort",
+    "ordering": "fulfillment enters normal Promise reaction/microtask semantics after timer completion"
+  },
+  "caveats": [
+    "Task.Delay alone is insufficient if Node ref/unref liveness and event-loop phase behavior are observable.",
+    "Promise chaining after fulfillment remains owned by ASYNC."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html#timers-promises-api",
+    "rules/async/promise-then.json"
+  ],
+  "tests": [
+    {
+      "name": "fulfills supplied value",
+      "input": "const {setTimeout}=require('node:timers/promises');setTimeout(1,'v').then(console.log);",
+      "expected_behavior": "prints v asynchronously"
+    },
+    {
+      "name": "ref false does not keep loop alive",
+      "input": "const {setTimeout}=require('node:timers/promises');setTimeout(100,'late',{ref:false});",
+      "expected_behavior": "the pending timer Promise alone does not require the Node process to stay alive"
+    }
+  ]
+}

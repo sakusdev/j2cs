@@ -1,0 +1,50 @@
+{
+  "id": "node.timers.set-interval",
+  "category": "timers",
+  "summary": "Schedule repeated Node.js timer callbacks using a Timeout handle and Node timer-phase semantics.",
+  "source": {
+    "pattern": "setInterval($callback, $delay, ...$args)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.SetInterval($callback, $delay, $args)",
+    "notes": "Preserve repeated scheduling, cancellation, Timeout identity, callback receiver, and event-loop liveness."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Timeout handle object",
+    "callback_validation": "non-callable callback throws TypeError synchronously",
+    "delay": "default 1 ms; numeric delay <1, NaN, or >2147483647 becomes 1; non-integer delays are truncated for scheduling",
+    "arguments": "extra arguments are passed on every invocation",
+    "callback_this": "ordinary function receives the Timeout handle as this",
+    "overlap": "callbacks execute serially on the JS event loop; no concurrent callback overlap",
+    "liveness": "handle is ref'ed by default",
+    "overflow_warning": "out-of-range delays may emit Node TimeoutOverflowWarning under the selected host profile"
+  },
+  "caveats": [
+    "Do not model an interval as a concurrent .NET periodic callback that can overlap JavaScript execution.",
+    "Elapsed wall-clock time does not guarantee exact callback count.",
+    "Preserve host-visible warning behavior when compatibility requires Node TimeoutOverflowWarning."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html",
+    "rules/functions/call-extra-arguments.json"
+  ],
+  "tests": [
+    {
+      "name": "repeats until cleared",
+      "input": "let n=0; const t=setInterval(()=>{if(++n===2){clearInterval(t);console.log(n)}},1);",
+      "expected_behavior": "prints 2 once and stops"
+    },
+    {
+      "name": "callback receiver is handle",
+      "input": "const t=setInterval(function(){console.log(this===t);clearInterval(t)},1);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

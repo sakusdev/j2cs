@@ -1,0 +1,47 @@
+{
+  "id": "node.timers.promises.set-interval",
+  "category": "timers",
+  "summary": "Model node:timers/promises setInterval as an async iterator yielding the supplied value at timer intervals.",
+  "source": {
+    "pattern": "timersPromises.setInterval($delay, $value, $options)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "binding": "node:timers/promises setInterval",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeTimersPromises.SetInterval($delay, $value, $options)",
+    "notes": "Integrate with the Node-compatible timer scheduler and existing JsPromise/async-iteration semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "async iterator",
+    "yield": "each successful interval iteration yields the same supplied value",
+    "delay": "default 1 ms with Node timer normalization",
+    "options": "ref defaults true; signal may abort",
+    "consumption": "next()/for-await controls observation; iterator integrates with generic async iteration semantics"
+  },
+  "caveats": [
+    "Do not translate to IEnumerable<T>; next() is asynchronous and cancellation/error behavior is observable.",
+    "for-await control flow remains owned by ASYNC."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html#timers-promises-api",
+    "rules/async/for-await-of.json"
+  ],
+  "tests": [
+    {
+      "name": "yields repeated values",
+      "input": "const {setInterval}=require('node:timers/promises');let n=0;for await(const v of setInterval(1,'x')){console.log(v);if(++n===2)break}",
+      "expected_behavior": "prints x twice then exits the loop"
+    },
+    {
+      "name": "is async not eager sequence",
+      "input": "const {setInterval}=require('node:timers/promises');const it=setInterval(10,'x');console.log(typeof it.next==='function');",
+      "expected_behavior": "prints true; values are produced through async next() operations"
+    }
+  ]
+}

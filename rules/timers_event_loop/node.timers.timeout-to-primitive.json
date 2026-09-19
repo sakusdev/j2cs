@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.timeout-to-primitive",
+  "category": "timers",
+  "summary": "Convert a Timeout to its same-thread numeric cancellation token.",
+  "source": {
+    "pattern": "$timeout[Symbol.toPrimitive]($hint)",
+    "requirements": {
+      "receiver": "Node.js Timeout handle",
+      "builtin_symbol_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.ToPrimitive",
+    "template": "NodeTimers.ToPrimitive($timeout, $hint)",
+    "notes": "Return the Node timer token bound to the creating thread."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "integer",
+    "use": "token can be passed to clearTimeout/clearInterval",
+    "thread_affinity": "token is only valid on the thread where the Timeout was created"
+  },
+  "caveats": [
+    "Do not treat the token as a process-global timer id across worker_threads."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns number usable for clear",
+      "input": "let fired=false; const t=setTimeout(()=>fired=true,5); const id=+t; clearTimeout(id); setTimeout(()=>console.log(typeof id,fired),10);",
+      "expected_behavior": "prints number false"
+    },
+    {
+      "name": "preserves thread affinity contract",
+      "input": "const t=setTimeout(()=>{},1000); console.log(Number.isInteger(+t)); clearTimeout(t);",
+      "expected_behavior": "prints true; cross-worker use is not guaranteed valid"
+    }
+  ]
+}

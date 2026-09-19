@@ -1,0 +1,46 @@
+{
+  "id": "eventloop.microtasks-after-nexttick-drain",
+  "category": "event_loop",
+  "summary": "At a Node queue checkpoint, drain V8 microtasks immediately after the next-tick queue finishes.",
+  "source": {
+    "pattern": "process.nextTick($tick); Promise.resolve().then($promiseJob); queueMicrotask($microJob)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "scheduling_context": "ordinary queue checkpoint",
+      "builtins_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.DrainNextTickThenMicrotasks()",
+    "notes": "Use the Node-compatible event-loop runtime; do not map ordering to arbitrary Task/ThreadPool scheduling."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "checkpoint_order": "fully drain next-tick queue, then drain V8 microtask queue",
+    "microtask_fifo": "Promise reactions and queueMicrotask share the microtask queue ordering established by ASYNC rules",
+    "continuation": "event-loop phases continue only after these queues are drained"
+  },
+  "caveats": [
+    "This rule coordinates queues; Promise reaction creation and queueMicrotask semantics remain owned by ASYNC.",
+    "When already inside microtask draining, newly queued microtasks can precede a nextTick queued from that microtask."
+  ],
+  "references": [
+    "https://nodejs.org/api/process.html#processnexttickcallback-args",
+    "rules/async/queue-microtask.json",
+    "rules/async/promise-then.json"
+  ],
+  "tests": [
+    {
+      "name": "ordinary checkpoint order",
+      "input": "process.nextTick(()=>console.log('tick'));Promise.resolve().then(()=>console.log('p'));queueMicrotask(()=>console.log('m'));",
+      "expected_behavior": "in an ordinary CommonJS turn prints tick, p, m"
+    },
+    {
+      "name": "nested nextTick drains before queued promise",
+      "input": "process.nextTick(()=>{process.nextTick(()=>console.log('t2'));Promise.resolve().then(()=>console.log('p'))});",
+      "expected_behavior": "prints t2 before p"
+    }
+  ]
+}

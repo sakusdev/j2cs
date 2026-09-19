@@ -1,0 +1,46 @@
+{
+  "id": "node.timers.set-immediate",
+  "category": "timers",
+  "summary": "Schedule a Node.js Immediate in the check phase after I/O callbacks, preserving FIFO queue semantics and handle identity.",
+  "source": {
+    "pattern": "setImmediate($callback, ...$args)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.SetImmediate($callback, $args)",
+    "notes": "Queue in the Node check-phase Immediate queue and return an Immediate handle."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Immediate handle object",
+    "callback_validation": "non-callable callback throws TypeError synchronously",
+    "arguments": "extra arguments are passed to callback",
+    "callback_this": "ordinary function receives the Immediate handle as this",
+    "phase": "check phase after I/O callbacks",
+    "liveness": "handle is ref'ed by default"
+  },
+  "caveats": [
+    "setImmediate is not equivalent to Task.Run or ThreadPool scheduling.",
+    "Relative ordering versus a top-level zero-delay setTimeout is context-dependent and must not be hard-coded."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "passes arguments and receiver",
+      "input": "const i=setImmediate(function(a){console.log(this===i,a)},8);",
+      "expected_behavior": "prints true 8 asynchronously"
+    },
+    {
+      "name": "invalid callback throws synchronously",
+      "input": "try{setImmediate(null)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

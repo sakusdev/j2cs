@@ -1,0 +1,44 @@
+{
+  "id": "node.timers.immediate.unref",
+  "category": "timers",
+  "summary": "Allow an active Immediate to stop keeping the event loop alive without cancelling it.",
+  "source": {
+    "pattern": "$immediate.unref()",
+    "requirements": {
+      "receiver": "Node.js Immediate handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.UnrefImmediate",
+    "template": "NodeTimers.UnrefImmediate($immediate)",
+    "notes": "Clear Immediate liveness ref state and return receiver."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "same Immediate object",
+    "effect": "Immediate alone no longer keeps loop alive",
+    "callback": "may not run if process has no other ref'ed work",
+    "idempotent": true
+  },
+  "caveats": [
+    "unref() is not cancellation."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "returns receiver and clears ref",
+      "input": "const i=setImmediate(()=>{}); console.log(i.unref()===i,i.hasRef());",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "can still run with other work",
+      "input": "const i=setImmediate(()=>console.log('ran')); i.unref(); setTimeout(()=>{},5);",
+      "expected_behavior": "ran can print because another ref'ed handle keeps process alive"
+    }
+  ]
+}

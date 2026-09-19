@@ -1,0 +1,49 @@
+{
+  "id": "node.timers.set-timeout",
+  "category": "timers",
+  "summary": "Schedule a one-shot Node.js timeout while preserving handle identity, delay normalization, callback receiver, and event-loop liveness.",
+  "source": {
+    "pattern": "setTimeout($callback, $delay, ...$args)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "NodeEventLoop.SetTimeout($callback, $delay, $args)",
+    "notes": "Return a Node Timeout handle; schedule through the Node-compatible timers phase rather than a generic Task scheduler."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "Timeout handle object",
+    "callback_validation": "non-callable callback throws TypeError synchronously",
+    "delay": "default 1 ms; numeric delay <1, NaN, or >2147483647 becomes 1; non-integer delays are truncated for scheduling; timers use a threshold rather than an exact execution time",
+    "arguments": "extra arguments are passed to callback",
+    "callback_this": "ordinary function receives the Timeout handle as this",
+    "liveness": "handle is ref'ed by default",
+    "overflow_warning": "out-of-range delays may emit Node TimeoutOverflowWarning under the selected host profile"
+  },
+  "caveats": [
+    "System.Threading.Timer/Task.Delay alone do not preserve Node event-loop phase ordering or ref/unref liveness.",
+    "Arrow-function this remains lexical under FUNCTIONS semantics.",
+    "Preserve host-visible warning behavior when compatibility requires Node TimeoutOverflowWarning."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html",
+    "rules/functions/call-extra-arguments.json"
+  ],
+  "tests": [
+    {
+      "name": "callback is asynchronous and receives args",
+      "input": "const t=setTimeout(function(a){console.log(this===t,a)},1,7); console.log('sync');",
+      "expected_behavior": "prints sync first, then true 7"
+    },
+    {
+      "name": "invalid callback throws before scheduling",
+      "input": "try{setTimeout(1,0)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true synchronously"
+    }
+  ]
+}

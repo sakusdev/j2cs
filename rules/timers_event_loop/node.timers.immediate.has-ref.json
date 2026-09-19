@@ -1,0 +1,43 @@
+{
+  "id": "node.timers.immediate.has-ref",
+  "category": "timers",
+  "summary": "Read whether an Immediate contributes to event-loop liveness.",
+  "source": {
+    "pattern": "$immediate.hasRef()",
+    "requirements": {
+      "receiver": "Node.js Immediate handle",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.ImmediateHasRef",
+    "template": "NodeTimers.ImmediateHasRef($immediate)",
+    "notes": "Return current Immediate liveness state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "boolean",
+    "default_state": true,
+    "state_changes": "unref => false; ref => true"
+  },
+  "caveats": [
+    "A true value does not by itself prove the callback is still pending."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "default true",
+      "input": "const i=setImmediate(()=>{}); console.log(i.hasRef()); clearImmediate(i);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "tracks unref",
+      "input": "const i=setImmediate(()=>{}); i.unref(); console.log(i.hasRef()); clearImmediate(i);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "node.timers.clear-interval",
+  "category": "timers",
+  "summary": "Cancel a Node interval Timeout handle, including cross-compatible timeout handles, and return undefined.",
+  "source": {
+    "pattern": "clearInterval($timeout)",
+    "requirements": {
+      "host_profile": "Node.js",
+      "global_builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeTimers.ClearInterval",
+    "template": "NodeTimers.ClearInterval($timeout)",
+    "notes": "Cancel the shared Timeout-handle scheduling state and return undefined."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "cancellation": "stops future interval invocations",
+    "accepted_handle": "Timeout from setInterval or setTimeout; same-thread primitive token is also accepted",
+    "cross_api": "can cancel a one-shot Timeout handle"
+  },
+  "caveats": [
+    "Node Timeout handles back both setTimeout and setInterval; do not enforce a C# type split that rejects cross-clear usage."
+  ],
+  "references": [
+    "https://nodejs.org/api/timers.html"
+  ],
+  "tests": [
+    {
+      "name": "stops repeated callbacks",
+      "input": "let n=0; const i=setInterval(()=>n++,1); setTimeout(()=>{clearInterval(i);console.log(n>0)},5);",
+      "expected_behavior": "prints true and no later interval callbacks occur"
+    },
+    {
+      "name": "also cancels timeout handle",
+      "input": "const t=setTimeout(()=>console.log('bad'),5); clearInterval(t); setTimeout(()=>console.log('ok'),10);",
+      "expected_behavior": "prints ok but not bad"
+    }
+  ]
+}
