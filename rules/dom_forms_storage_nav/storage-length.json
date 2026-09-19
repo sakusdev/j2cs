@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.length",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read the number of key/value pairs in a Storage area.",
+  "source": {
+    "pattern": "$storage.length",
+    "requirements": {
+      "receiver_inferred_as": "Storage",
+      "builtin_webidl_member_not_overridden": true,
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.GetLength",
+    "template": "WebStorage.GetLength($storage)",
+    "notes": "Return the current number of entries in the backing Storage map."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "unsigned long",
+    "counts_entries": true,
+    "live": true
+  },
+  "caveats": [
+    "Do not use object property count; Storage has named-property behavior in addition to interface members."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "counts entries",
+      "input": "localStorage.clear(); localStorage.setItem('a','1'); console.log(localStorage.length);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "overwrite does not change length",
+      "input": "localStorage.clear(); localStorage.setItem('a','1'); localStorage.setItem('a','2'); console.log(localStorage.length);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

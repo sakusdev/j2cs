@@ -1,0 +1,45 @@
+{
+  "id": "dom.input.default-checked.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set defaultChecked with boolean-attribute and dirty-checkedness synchronization semantics.",
+  "source": {
+    "pattern": "$input.defaultChecked = $value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetInputDefaultChecked",
+    "template": "NativeDom.SetInputDefaultChecked($input, $value)",
+    "notes": "Reflect to the checked content attribute; if dirty checkedness is false, current checkedness tracks the attribute."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reflection": "checked boolean content attribute",
+    "syncs_checkedness_only_if_not_dirty": true
+  },
+  "caveats": [
+    "Changing defaultChecked must not overwrite user/script checkedness after dirty checkedness becomes true."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "pristine checkedness follows default",
+      "input": "const i=document.createElement('input'); i.type='checkbox'; i.defaultChecked=true; console.log(i.checked);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "dirty checkedness is preserved",
+      "input": "const i=document.createElement('input'); i.type='checkbox'; i.checked=true; i.defaultChecked=false; console.log(i.checked,i.defaultChecked);",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

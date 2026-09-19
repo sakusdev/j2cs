@@ -1,0 +1,43 @@
+{
+  "id": "dom.custom-element.define",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain custom-elements runtime for registry definition, validation, lifecycle callback extraction, and upgrade enqueueing.",
+  "source": {
+    "pattern": "customElements.define($name, $constructor, $options)",
+    "requirements": {
+      "custom_element_registry_semantics_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.CustomElementsDefine($registry, $name, $constructor, $options)",
+    "notes": "Validate the custom-element name and constructor/registry uniqueness, build the definition including observed attributes/lifecycle callbacks, register it, resolve whenDefined promises, and enqueue upgrades for matching candidates."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "invalid_name": "SyntaxError",
+    "duplicate_name_or_constructor": "NotSupportedError",
+    "constructor": "must be constructible custom element constructor",
+    "upgrades_existing_candidates": true,
+    "when_defined_resolution": true
+  },
+  "caveats": [
+    "Definition can synchronously access static observedAttributes/disabledFeatures/formAssociated and can throw."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/custom-elements.html"
+  ],
+  "tests": [
+    {
+      "name": "defines and upgrades matching element",
+      "input": "const e=document.createElement('x-j2cs-a'); customElements.define('x-j2cs-a',class extends HTMLElement{}); console.log(e instanceof HTMLElement);",
+      "expected_behavior": "definition registers and eligible candidates can be upgraded according to reaction processing"
+    },
+    {
+      "name": "duplicate definition throws",
+      "input": "customElements.define('x-j2cs-b',class extends HTMLElement{}); try{customElements.define('x-j2cs-b',class extends HTMLElement{})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints NotSupportedError"
+    }
+  ]
+}

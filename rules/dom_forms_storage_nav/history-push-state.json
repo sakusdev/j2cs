@@ -1,0 +1,44 @@
+{
+  "id": "dom.history.push-state",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for pushState structured serialization, URL rewriting restrictions, and session-history mutation.",
+  "source": {
+    "pattern": "$history.pushState($data, $unused, $url)",
+    "requirements": {
+      "receiver_inferred_as": "History",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.HistoryPushState($history, $data, $unused, $url)",
+    "notes": "Structured-serialize data, validate that the document can rewrite to the supplied URL, then append a same-document session-history entry without fetching the URL."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "state_copy": "structured serialization",
+    "url": "optional; resolved against document URL",
+    "cross_origin_or_disallowed_url": "SecurityError",
+    "unserializable_state": "DataCloneError",
+    "network_fetch": false
+  },
+  "caveats": [
+    "Do not retain the original data object by reference."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "state is copied",
+      "input": "const x={n:1}; history.pushState(x,''); x.n=2; console.log(history.state.n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "uncloneable state throws",
+      "input": "try{history.pushState(()=>{},'')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints DataCloneError"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "dom.form.select.value.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read select.value as the value of the first selected option or the empty string.",
+  "source": {
+    "pattern": "$select.value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLSelectElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetSelectValue",
+    "template": "NativeDom.GetSelectValue($select)",
+    "notes": "Search options in tree order for the first selected option and return its option value; return empty string if none is selected."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "selection_order": "first selected option in tree order",
+    "none_selected": "empty string",
+    "option_value_fallback": "text when value attribute absent"
+  },
+  "caveats": [
+    "Multiple selects can have several selected options but value still reports the first."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "returns selected option value",
+      "input": "const s=document.createElement('select'); s.innerHTML='<option value=a>A</option><option value=b selected>B</option>'; console.log(s.value);",
+      "expected_behavior": "prints b"
+    },
+    {
+      "name": "no selection is empty string",
+      "input": "const s=document.createElement('select'); s.multiple=true; s.innerHTML='<option>a</option>'; s.options[0].selected=false; console.log(s.value==='');",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

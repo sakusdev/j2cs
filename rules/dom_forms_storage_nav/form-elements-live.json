@@ -1,0 +1,46 @@
+{
+  "id": "dom.form.elements.live",
+  "category": "dom_forms_storage_nav",
+  "summary": "Expose HTMLFormElement.elements as a live HTMLFormControlsCollection with named access semantics.",
+  "source": {
+    "pattern": "$form.elements",
+    "requirements": {
+      "receiver_inferred_as": "HTMLFormElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetFormElements",
+    "template": "NativeDom.GetFormElements($form)",
+    "notes": "Return a live collection of listed form-associated elements in tree/form-owner order, with HTMLFormControlsCollection named lookup behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "collection": "live HTMLFormControlsCollection",
+    "updates_after_dom_mutation": true,
+    "named_access": true,
+    "object_identity": "stable wrapper may be required"
+  },
+  "caveats": [
+    "Snapshot lists are incorrect; controls associated using form= can participate even outside the form subtree."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "collection is live",
+      "input": "const f=document.createElement('form'); const c=f.elements; const i=document.createElement('input'); f.append(i); console.log(c.length);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "named access finds controls",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.name='x'; f.append(i); console.log(f.elements.namedItem('x')===i);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

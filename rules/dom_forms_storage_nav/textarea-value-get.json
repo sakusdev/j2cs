@@ -1,0 +1,46 @@
+{
+  "id": "dom.form.textarea.value.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read a textarea's current value state, not its child text/defaultValue.",
+  "source": {
+    "pattern": "$textarea.value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLTextAreaElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetTextAreaValue",
+    "template": "NativeDom.GetTextAreaValue($textarea)",
+    "notes": "Return the raw current value; the dirty value flag permits divergence from defaultValue/text content."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "DOMString",
+    "state": "raw current value",
+    "dirty_value_flag": "observable indirectly"
+  },
+  "caveats": [
+    "Do not lower to textContent."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "reads live value",
+      "input": "const t=document.createElement('textarea'); t.value='live'; console.log(t.value);",
+      "expected_behavior": "prints live"
+    },
+    {
+      "name": "live and default can diverge",
+      "input": "const t=document.createElement('textarea'); t.defaultValue='default'; t.value='live'; console.log(t.value,t.defaultValue);",
+      "expected_behavior": "prints live default"
+    }
+  ]
+}

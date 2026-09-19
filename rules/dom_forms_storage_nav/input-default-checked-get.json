@@ -1,0 +1,46 @@
+{
+  "id": "dom.input.default-checked.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read HTMLInputElement.defaultChecked as reflection of the checked content attribute.",
+  "source": {
+    "pattern": "$input.defaultChecked",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetInputDefaultChecked",
+    "template": "NativeDom.GetInputDefaultChecked($input)",
+    "notes": "defaultChecked reflects presence of the boolean checked content attribute."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reflection": "checked boolean content attribute",
+    "return_type": "boolean",
+    "current_checkedness_may_differ": true
+  },
+  "caveats": [
+    "Presence, not textual attribute value, determines a boolean content attribute."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "attribute presence is true",
+      "input": "const i=document.createElement('input'); i.setAttribute('checked','false'); console.log(i.defaultChecked);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "current checkedness may differ",
+      "input": "const i=document.createElement('input'); i.defaultChecked=true; i.checked=false; console.log(i.defaultChecked,i.checked);",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

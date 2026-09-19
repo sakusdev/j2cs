@@ -1,0 +1,42 @@
+{
+  "id": "dom.custom-element.when-defined",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for CustomElementRegistry.whenDefined promise and name-validation behavior.",
+  "source": {
+    "pattern": "customElements.whenDefined($name)",
+    "requirements": {
+      "custom_element_registry_semantics_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.CustomElementsWhenDefined($registry, $name)",
+    "notes": "Validate the name; return a promise resolved with the constructor if already defined or resolved when a future definition is registered."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "Promise",
+    "already_defined": "fulfilled with constructor",
+    "future_definition": "fulfilled when defined",
+    "invalid_name": "rejected with SyntaxError"
+  },
+  "caveats": [
+    "Promise/microtask timing must reuse canonical ASYNC semantics."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/custom-elements.html"
+  ],
+  "tests": [
+    {
+      "name": "already defined resolves constructor",
+      "input": "class X extends HTMLElement{}; customElements.define('x-j2cs-d',X); customElements.whenDefined('x-j2cs-d').then(v=>console.log(v===X));",
+      "expected_behavior": "eventually prints true"
+    },
+    {
+      "name": "invalid name rejects",
+      "input": "customElements.whenDefined('notvalid').catch(e=>console.log(e.name));",
+      "expected_behavior": "eventually prints SyntaxError"
+    }
+  ]
+}

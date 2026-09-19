@@ -1,0 +1,42 @@
+{
+  "id": "dom.custom-element.upgrade",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for explicit custom-element upgrade over a shadow-including subtree.",
+  "source": {
+    "pattern": "customElements.upgrade($root)",
+    "requirements": {
+      "custom_element_registry_semantics_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.CustomElementsUpgrade($registry, $root)",
+    "notes": "Try to upgrade eligible custom elements in the root's shadow-including inclusive descendants using this registry and normal upgrade reactions."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "scope": "shadow-including subtree",
+    "constructor_reentrancy": "observable",
+    "failed_state": "preserved per upgrade algorithm"
+  },
+  "caveats": [
+    "Upgrade runs author constructors and can enqueue lifecycle callbacks; it is not a type cast."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/custom-elements.html"
+  ],
+  "tests": [
+    {
+      "name": "explicit upgrade runs constructor when eligible",
+      "input": "const e=document.createElement('x-j2cs-e'); let n=0; customElements.define('x-j2cs-e',class extends HTMLElement{constructor(){super();n++}}); customElements.upgrade(e); console.log(n>=1);",
+      "expected_behavior": "prints true when the element is upgraded"
+    },
+    {
+      "name": "already custom element is not constructed twice",
+      "input": "let n=0; customElements.define('x-j2cs-f',class extends HTMLElement{constructor(){super();n++}}); const e=document.createElement('x-j2cs-f'); const before=n; customElements.upgrade(e); console.log(n===before);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

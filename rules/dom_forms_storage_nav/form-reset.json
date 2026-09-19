@@ -1,0 +1,46 @@
+{
+  "id": "dom.form.reset",
+  "category": "dom_forms_storage_nav",
+  "summary": "Reset form controls through HTML reset algorithms and a cancelable reset event.",
+  "source": {
+    "pattern": "$form.reset()",
+    "requirements": {
+      "receiver_inferred_as": "HTMLFormElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.ResetForm",
+    "template": "NativeDom.ResetForm($form)",
+    "notes": "Fire a cancelable reset event; if not canceled, reset each resettable control including dirty value/checkedness and selectedness state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "event": "reset; cancelable",
+    "reentrancy_lock": true,
+    "resets_controls_to_defaults": true
+  },
+  "caveats": [
+    "Calling the JavaScript method can be shadowed by a form control named 'reset'; source analysis must resolve the builtin method."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "restores defaults",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.defaultValue='d'; f.append(i); i.value='x'; f.reset(); console.log(i.value);",
+      "expected_behavior": "prints d"
+    },
+    {
+      "name": "reset can be canceled",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.defaultValue='d'; f.append(i); i.value='x'; f.addEventListener('reset',e=>e.preventDefault()); f.reset(); console.log(i.value);",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "dom.form.textarea.value.set",
+  "category": "dom_forms_storage_nav",
+  "summary": "Set a textarea's current value and dirty value flag without changing its default value.",
+  "source": {
+    "pattern": "$textarea.value = $value",
+    "requirements": {
+      "receiver_inferred_as": "HTMLTextAreaElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.SetTextAreaValue",
+    "template": "NativeDom.SetTextAreaValue($textarea, $value)",
+    "notes": "Convert to DOMString, replace raw current value, set dirty value flag, and move the selection to the end as specified by textarea/input value-setting behavior."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "dirty_value_flag": "set",
+    "default_value_changed": false,
+    "selection_state_may_change": true
+  },
+  "caveats": [
+    "A backing Text node is not the current value store once dirty."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "sets live value",
+      "input": "const t=document.createElement('textarea'); t.value='x'; console.log(t.value);",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "default remains independent",
+      "input": "const t=document.createElement('textarea'); t.defaultValue='d'; t.value='x'; console.log(t.defaultValue);",
+      "expected_behavior": "prints d"
+    }
+  ]
+}

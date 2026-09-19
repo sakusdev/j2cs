@@ -1,0 +1,48 @@
+{
+  "id": "dom.custom-element.reactions",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain custom-element reaction stack/queue ordering for connected, disconnected, adopted, moved, and attributeChanged callbacks.",
+  "source": {
+    "pattern": "$domOperationAffectingCustomElement",
+    "requirements": {
+      "custom_element_registry_semantics_observable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.RunCustomElementReactions($operation)",
+    "notes": "Honor [CEReactions], enqueue upgrade/callback reactions in order, filter attributeChangedCallback by observedAttributes, invoke callbacks with element as this, and report callback exceptions per HTML rules."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callbacks": [
+      "connectedCallback",
+      "disconnectedCallback",
+      "connectedMoveCallback",
+      "adoptedCallback",
+      "attributeChangedCallback"
+    ],
+    "attribute_filter": "observedAttributes",
+    "ordering": "custom element reaction queues/stacks",
+    "author_code": true
+  },
+  "caveats": [
+    "Calling callbacks directly at mutation sites can produce wrong reentrancy and ordering."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/custom-elements.html"
+  ],
+  "tests": [
+    {
+      "name": "connected callback runs on connection",
+      "input": "let n=0; customElements.define('x-j2cs-g',class extends HTMLElement{connectedCallback(){n++}}); const e=document.createElement('x-j2cs-g'); document.body.append(e); console.log(n);",
+      "expected_behavior": "prints 1 after reactions are invoked"
+    },
+    {
+      "name": "only observed attributes trigger attribute callback",
+      "input": "let n=0; customElements.define('x-j2cs-h',class extends HTMLElement{static observedAttributes=['a']; attributeChangedCallback(){n++}}); const e=document.createElement('x-j2cs-h'); e.setAttribute('b','1'); e.setAttribute('a','1'); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

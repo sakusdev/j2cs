@@ -1,0 +1,43 @@
+{
+  "id": "dom.history.go",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain browser runtime for asynchronous session-history traversal.",
+  "source": {
+    "pattern": "$history.go($delta)",
+    "requirements": {
+      "receiver_inferred_as": "History",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.HistoryGo($history, $delta)",
+    "notes": "Web IDL-convert delta to long; zero requests reload, an in-range nonzero delta schedules traversal, and an out-of-range delta does nothing."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "delta_zero": "reload current page",
+    "out_of_range": "no-op",
+    "nonzero": "asynchronous history traversal",
+    "return_value": "undefined"
+  },
+  "caveats": [
+    "Traversal integrates with document activation, persisted user state, popstate/pageshow and navigation algorithms."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "out-of-range is no-op",
+      "input": "history.go(2147483647);",
+      "expected_behavior": "no traversal if no such entry exists"
+    },
+    {
+      "name": "zero means reload",
+      "input": "/* history.go(0) */",
+      "expected_behavior": "requests reload of the current page"
+    }
+  ]
+}

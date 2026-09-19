@@ -1,0 +1,43 @@
+{
+  "id": "dom.history.replace-state",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for replaceState structured serialization and active-entry replacement.",
+  "source": {
+    "pattern": "$history.replaceState($data, $unused, $url)",
+    "requirements": {
+      "receiver_inferred_as": "History",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.HistoryReplaceState($history, $data, $unused, $url)",
+    "notes": "Structured-serialize data and replace classic history API state/optional URL on the active session-history entry without creating a new entry."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "state_copy": "structured serialization",
+    "entry_count": "unchanged",
+    "invalid_url": "SecurityError",
+    "unserializable_state": "DataCloneError"
+  },
+  "caveats": [
+    "replaceState is not pushState followed by back; traversal/index behavior differs."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "replaces active state",
+      "input": "history.replaceState({x:2},''); console.log(history.state.x);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "uncloneable state throws",
+      "input": "try{history.replaceState(Symbol('x'),'')}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws DataCloneError for non-serializable state"
+    }
+  ]
+}

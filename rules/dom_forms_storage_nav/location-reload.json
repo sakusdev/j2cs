@@ -1,0 +1,43 @@
+{
+  "id": "dom.location.reload",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain browser runtime for reloading the active document.",
+  "source": {
+    "pattern": "$location.reload()",
+    "requirements": {
+      "receiver_inferred_as": "Location",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.LocationReload($location)",
+    "notes": "Invoke the HTML reload-navigation algorithm for the current navigable/document."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "navigation": "reload",
+    "document_lifecycle": true,
+    "network_cache_policy": "user-agent/navigation defined"
+  },
+  "caveats": [
+    "Do not map to re-reading a URL with HttpClient; document identity/lifecycle, history and cache semantics differ."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/nav-history-apis.html"
+  ],
+  "tests": [
+    {
+      "name": "reload is navigation",
+      "input": "/* location.reload() */",
+      "expected_behavior": "requests reload of the active document"
+    },
+    {
+      "name": "reload does not append arbitrary application state",
+      "input": "/* location.reload() */",
+      "expected_behavior": "uses the current navigation/session-history context rather than constructing a new unrelated request"
+    }
+  ]
+}

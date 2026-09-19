@@ -1,0 +1,43 @@
+{
+  "id": "dom.form.request-submit",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain web runtime for requestSubmit because it performs validation, submitter checks, submit event dispatch, and potentially navigation.",
+  "source": {
+    "pattern": "$form.requestSubmit($submitter)",
+    "requirements": {
+      "receiver_inferred_as": "HTMLFormElement",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomFormRequestSubmit($form, $submitter)",
+    "notes": "Runtime must validate the optional submitter, run interactive constraint validation unless bypassed, dispatch submit, and continue submission only if not canceled."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "submitter_validation": "TypeError if not submit button; NotFoundError if not owned by form",
+    "constraint_validation": true,
+    "submit_event": true,
+    "submission_pipeline": true
+  },
+  "caveats": [
+    "requestSubmit is not equivalent to calling submit()."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "fires submit event",
+      "input": "const f=document.createElement('form'); let n=0; f.addEventListener('submit',e=>{n++;e.preventDefault()}); f.requestSubmit(); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "foreign submitter throws",
+      "input": "const a=document.createElement('form'), b=document.createElement('form'), x=document.createElement('button'); b.append(x); try{a.requestSubmit(x)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints NotFoundError"
+    }
+  ]
+}

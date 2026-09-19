@@ -1,0 +1,42 @@
+{
+  "id": "dom.observer.intersection.constructor",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain web/layout runtime for IntersectionObserver construction and geometry threshold semantics.",
+  "source": {
+    "pattern": "new IntersectionObserver($callback, $options)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.CreateIntersectionObserver($callback, $options)",
+    "notes": "Runtime must parse margins, validate/sort thresholds, retain callback/root, and integrate with layout/rendering updates."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "threshold_range": "0..1 inclusive; otherwise RangeError",
+    "thresholds": "sorted; empty becomes [0]",
+    "invalid_margin": "SyntaxError",
+    "layout_dependency": true
+  },
+  "caveats": [
+    "Intersection computation depends on rendered geometry, clipping, transforms, scrolling, and cross-origin rules."
+  ],
+  "references": [
+    "https://www.w3.org/TR/intersection-observer/"
+  ],
+  "tests": [
+    {
+      "name": "thresholds are sorted",
+      "input": "const o=new IntersectionObserver(()=>{},{threshold:[1,.25,.5]}); console.log(o.thresholds.join(','));",
+      "expected_behavior": "prints 0.25,0.5,1"
+    },
+    {
+      "name": "invalid threshold throws",
+      "input": "try{new IntersectionObserver(()=>{},{threshold:2})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

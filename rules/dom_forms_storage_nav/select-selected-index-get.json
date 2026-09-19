@@ -1,0 +1,45 @@
+{
+  "id": "dom.form.select.selected-index.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read the index of the first selected option, or -1.",
+  "source": {
+    "pattern": "$select.selectedIndex",
+    "requirements": {
+      "receiver_inferred_as": "HTMLSelectElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetSelectedIndex",
+    "template": "NativeDom.GetSelectedIndex($select)",
+    "notes": "Return the index in the select's options collection of the first selected option, or -1 if none."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "long",
+    "none_selected": -1,
+    "order": "options collection order"
+  },
+  "caveats": [
+    "This is not necessarily the DOM child index because optgroup descendants participate in options."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/forms.html"
+  ],
+  "tests": [
+    {
+      "name": "first selected index",
+      "input": "const s=document.createElement('select'); s.innerHTML='<option>A</option><option selected>B</option>'; console.log(s.selectedIndex);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "empty select is minus one",
+      "input": "const s=document.createElement('select'); console.log(s.selectedIndex);",
+      "expected_behavior": "prints -1"
+    }
+  ]
+}

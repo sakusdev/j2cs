@@ -1,0 +1,46 @@
+{
+  "id": "dom.input.default-value.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read HTMLInputElement.defaultValue as the reflected value content attribute.",
+  "source": {
+    "pattern": "$input.defaultValue",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetInputDefaultValue",
+    "template": "NativeDom.GetInputDefaultValue($input)",
+    "notes": "defaultValue reflects the value content attribute and is distinct from the current value."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "reflection": "value content attribute",
+    "missing_attribute": "empty string",
+    "current_value_may_differ": true
+  },
+  "caveats": [
+    "Do not alias defaultValue and value after the dirty value flag is set."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "reflects value attribute",
+      "input": "const i=document.createElement('input'); i.setAttribute('value','d'); console.log(i.defaultValue);",
+      "expected_behavior": "prints d"
+    },
+    {
+      "name": "missing attribute is empty string",
+      "input": "const i=document.createElement('input'); console.log(i.defaultValue==='');",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

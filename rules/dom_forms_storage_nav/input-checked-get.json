@@ -1,0 +1,46 @@
+{
+  "id": "dom.input.checked.get",
+  "category": "dom_forms_storage_nav",
+  "summary": "Read an input element's current checkedness rather than its checked attribute.",
+  "source": {
+    "pattern": "$input.checked",
+    "requirements": {
+      "receiver_inferred_as": "HTMLInputElement",
+      "builtin_webidl_member_not_overridden": true,
+      "receiver_not_custom_element": true,
+      "native_dom_forms_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetInputChecked",
+    "template": "NativeDom.GetInputChecked($input)",
+    "notes": "Return current checkedness for checkbox/radio state."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "boolean",
+    "state": "checkedness",
+    "distinct_from_checked_attribute": true
+  },
+  "caveats": [
+    "For radio buttons, checkedness participates in a radio-button group."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/input.html",
+    "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html"
+  ],
+  "tests": [
+    {
+      "name": "checked attribute initializes checkedness",
+      "input": "const i=document.createElement('input'); i.type='checkbox'; i.setAttribute('checked',''); console.log(i.checked);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "current checkedness can diverge",
+      "input": "const i=document.createElement('input'); i.type='checkbox'; i.setAttribute('checked',''); i.checked=false; console.log(i.checked,i.hasAttribute('checked'));",
+      "expected_behavior": "prints false true"
+    }
+  ]
+}

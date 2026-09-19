@@ -1,0 +1,45 @@
+{
+  "id": "dom.observer.mutation.take-records",
+  "category": "dom_forms_storage_nav",
+  "summary": "Synchronously drain and return a MutationObserver's queued MutationRecord objects.",
+  "source": {
+    "pattern": "$observer.takeRecords()",
+    "requirements": {
+      "receiver_inferred_as": "MutationObserver",
+      "builtin_webidl_member_not_overridden": true,
+      "native_dom_mutation_observer_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.TakeMutationRecords",
+    "template": "NativeDom.TakeMutationRecords($observer)",
+    "notes": "Clone/return the current record queue in order and empty the observer's queue without invoking the callback."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "sequence<MutationRecord>",
+    "order": "queue order",
+    "queue_after": "empty",
+    "callback_invoked": false
+  },
+  "caveats": [
+    "Record objects must retain DOM node identity and oldValue semantics."
+  ],
+  "references": [
+    "https://dom.spec.whatwg.org/#mutation-observers"
+  ],
+  "tests": [
+    {
+      "name": "returns queued record",
+      "input": "const n=document.createElement('div'); const m=new MutationObserver(()=>{}); m.observe(n,{attributes:true}); n.setAttribute('x','1'); console.log(m.takeRecords().length);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "second take is empty",
+      "input": "const n=document.createElement('div'); const m=new MutationObserver(()=>{}); m.observe(n,{attributes:true}); n.setAttribute('x','1'); m.takeRecords(); console.log(m.takeRecords().length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

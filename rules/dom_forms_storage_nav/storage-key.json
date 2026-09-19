@@ -1,0 +1,44 @@
+{
+  "id": "dom.storage.key",
+  "category": "dom_forms_storage_nav",
+  "summary": "Return the nth Storage key or null when out of range.",
+  "source": {
+    "pattern": "$storage.key($index)",
+    "requirements": {
+      "receiver_inferred_as": "Storage",
+      "builtin_webidl_member_not_overridden": true,
+      "native_web_storage_backend": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebStorage.Key",
+    "template": "WebStorage.Key($storage, $index)",
+    "notes": "Apply Web IDL unsigned-long conversion and return the nth key in the Storage area's defined key order, or null if no such key exists."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_type": "DOMString or null",
+    "out_of_range": "null",
+    "ordering": "storage-area key order; compiler must not assume lexical sorting"
+  },
+  "caveats": [
+    "Do not sort keys in generated code."
+  ],
+  "references": [
+    "https://html.spec.whatwg.org/multipage/webstorage.html"
+  ],
+  "tests": [
+    {
+      "name": "out of range returns null",
+      "input": "localStorage.clear(); console.log(localStorage.key(0)===null);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "existing entry has a key",
+      "input": "localStorage.clear(); localStorage.setItem('a','1'); console.log(typeof localStorage.key(0));",
+      "expected_behavior": "prints string"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "dom.observer.intersection.disconnect",
+  "category": "dom_forms_storage_nav",
+  "summary": "Retain runtime for disconnecting an IntersectionObserver from all targets.",
+  "source": {
+    "pattern": "$observer.disconnect()",
+    "requirements": {
+      "receiver_inferred_as": "IntersectionObserver",
+      "builtin_method_resolved": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.IntersectionDisconnect($observer)",
+    "notes": "Remove all observation targets; the observer object can later observe again."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "undefined",
+    "targets_after": "none",
+    "reusable": true
+  },
+  "caveats": [
+    "Disconnect does not model a simple event subscription because observation state lives in the rendering pipeline."
+  ],
+  "references": [
+    "https://www.w3.org/TR/intersection-observer/"
+  ],
+  "tests": [
+    {
+      "name": "disconnect removes all targets",
+      "input": "const o=new IntersectionObserver(()=>{}); const e=document.createElement('div'); o.observe(e); o.disconnect();",
+      "expected_behavior": "no future entries arise for e unless observed again"
+    },
+    {
+      "name": "observer is reusable",
+      "input": "const o=new IntersectionObserver(()=>{}); const e=document.createElement('div'); o.disconnect(); o.observe(e);",
+      "expected_behavior": "e can be observed after disconnect"
+    }
+  ]
+}
