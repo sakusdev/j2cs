@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.unref",
+  "category": "node_process_workers",
+  "summary": "Unreference a Worker so it does not by itself keep the main event loop alive.",
+  "source": {
+    "pattern": "$worker.unref()",
+    "requirements": {
+      "receiver": "Worker",
+      "builtin_method": "unref"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_unref",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_unref($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_loop_reference": false,
+    "worker_may_continue": true,
+    "termination": false
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "unref",
+      "input": "// worker.unref()",
+      "expected_behavior": "main process may exit if no referenced work remains"
+    },
+    {
+      "name": "not terminate",
+      "input": "// worker.unref()",
+      "expected_behavior": "worker is not explicitly terminated"
+    }
+  ]
+}

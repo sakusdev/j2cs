@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.spawn-error-event",
+  "category": "node_process_workers",
+  "summary": "Emit ChildProcess error for spawn failures and certain send/kill failures using EventEmitter semantics.",
+  "source": {
+    "pattern": "$child.on('error',$listener)",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "event": "error"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_error_event",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_error_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_emitter": "reuse EVENTS_STREAMS",
+    "spawn_failure": "error can precede close",
+    "exit_event": "may not occur when process never spawned"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "missing command",
+      "input": "const {spawn}=require('node:child_process');spawn('definitely-no-such-command').once('error',e=>console.log(e.code));",
+      "expected_behavior": "emits ENOENT-like error"
+    },
+    {
+      "name": "not thrown from later async failure",
+      "input": "// const c=spawn(...); async OS failure",
+      "expected_behavior": "observed through error event rather than translated to synchronous constructor exception"
+    }
+  ]
+}

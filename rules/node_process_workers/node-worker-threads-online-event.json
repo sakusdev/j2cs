@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.online-event",
+  "category": "node_process_workers",
+  "summary": "Emit online when the Worker thread has started executing JavaScript.",
+  "source": {
+    "pattern": "$worker.on('online',$listener)",
+    "requirements": {
+      "receiver": "Worker",
+      "event": "online"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_online_event",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_online_event($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "timing": "worker started JS execution",
+    "event_emitter": "reuse EVENTS_STREAMS",
+    "before_exit": true
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "online",
+      "input": "const {Worker}=require('node:worker_threads');const w=new Worker('0',{eval:true});w.once('online',()=>console.log('online'));",
+      "expected_behavior": "prints online"
+    },
+    {
+      "name": "not message readiness guarantee",
+      "input": "// online event",
+      "expected_behavior": "does not itself mean user worker code has posted any application message"
+    }
+  ]
+}

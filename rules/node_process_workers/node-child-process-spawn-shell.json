@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.spawn-shell",
+  "category": "node_process_workers",
+  "summary": "Preserve spawn shell option semantics and platform shell parsing instead of treating args as direct executable argv.",
+  "source": {
+    "pattern": "spawn($command,$args,{shell:$shell})",
+    "requirements": {
+      "binding": "node:child_process.spawn",
+      "shell_enabled": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_shell",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_shell($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "shell": "platform/configured shell",
+    "quoting": "shell-specific",
+    "security": "unsanitized input can become command injection",
+    "platform": "Windows/Unix behavior differs"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "shell command",
+      "input": "const {spawn}=require('node:child_process');const c=spawn('echo shell',{shell:true});c.stdout.once('data',d=>console.log(String(d).trim()));",
+      "expected_behavior": "prints shell on a shell-capable host"
+    },
+    {
+      "name": "not direct argv",
+      "input": "// spawn('echo $HOME',{shell:true})",
+      "expected_behavior": "shell expansion can occur; direct-exec lowering is not equivalent"
+    }
+  ]
+}

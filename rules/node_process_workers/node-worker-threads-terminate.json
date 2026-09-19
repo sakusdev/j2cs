@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.terminate",
+  "category": "node_process_workers",
+  "summary": "Terminate a Worker thread and resolve the returned Promise with its exit code after termination.",
+  "source": {
+    "pattern": "$worker.terminate()",
+    "requirements": {
+      "receiver": "node:worker_threads.Worker",
+      "builtin_method": "terminate"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_terminate",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_terminate($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<number>",
+    "termination": "stops worker as soon as possible per Node",
+    "exit": "exit event still final lifecycle event"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "promise",
+      "input": "const {Worker}=require('node:worker_threads');const w=new Worker('setInterval(()=>{},1000)',{eval:true});console.log(w.terminate() instanceof Promise);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "exit lifecycle",
+      "input": "// await worker.terminate()",
+      "expected_behavior": "resolves after worker termination with exit code semantics"
+    }
+  ]
+}

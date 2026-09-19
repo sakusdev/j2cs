@@ -1,0 +1,40 @@
+{
+  "id": "node.worker-threads.post-message",
+  "category": "node_process_workers",
+  "summary": "Send Worker-thread messages using Node MessagePort serialization/transfer semantics without redefining structured clone.",
+  "source": {
+    "pattern": "$worker.postMessage($value,$transferList?)",
+    "requirements": {
+      "receiver": "node:worker_threads.Worker",
+      "builtin_method": "postMessage"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_post_message",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_post_message($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "delivery": "parentPort message",
+    "serialization": "Node worker message cloning",
+    "transfer": "ArrayBuffer/MessagePort etc. per Node",
+    "owner_note": "reuse WORKERS_MESSAGING/BINARY contracts where semantically aligned"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "message",
+      "input": "// worker.postMessage({x:1})",
+      "expected_behavior": "worker parentPort later receives cloned value"
+    },
+    {
+      "name": "transfer",
+      "input": "const {Worker}=require('node:worker_threads');const b=new ArrayBuffer(4);const w=new Worker(`const {parentPort}=require('node:worker_threads');parentPort.once('message',x=>parentPort.postMessage(x.byteLength))`,{eval:true});w.on('message',n=>{console.log(b.byteLength,n);w.terminate()});w.postMessage(b,[b]);",
+      "expected_behavior": "prints 0 4"
+    }
+  ]
+}

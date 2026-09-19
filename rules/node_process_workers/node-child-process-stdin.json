@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.stdin",
+  "category": "node_process_workers",
+  "summary": "Expose child.stdin as the configured Writable pipe or null according to stdio mapping.",
+  "source": {
+    "pattern": "$child.stdin",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_property": "stdin"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_child_process_stdin",
+    "template": "NodeProcessWorkers.node_child_process_stdin($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "pipe": "Writable stream",
+    "non_pipe": "null or mapped handle per stdio config",
+    "owner": "EVENTS_STREAMS for stream semantics"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "default pipe",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','']);console.log(c.stdin!==null);c.kill();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "ignore",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e',''],{stdio:'ignore'});console.log(c.stdin===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

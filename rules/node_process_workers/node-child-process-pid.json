@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.pid",
+  "category": "node_process_workers",
+  "summary": "Expose the OS process identifier when process creation succeeded without fabricating one before spawn.",
+  "source": {
+    "pattern": "$child.pid",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_property": "pid"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_child_process_pid",
+    "template": "NodeProcessWorkers.node_child_process_pid($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "integer when spawned",
+    "failure": "undefined possible when spawn fails",
+    "os_identity": true
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "pid",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','']);console.log(Number.isInteger(c.pid));c.kill();",
+      "expected_behavior": "prints true when spawned"
+    },
+    {
+      "name": "not thread id",
+      "input": "// child.pid",
+      "expected_behavior": "represents OS process identity, not worker threadId"
+    }
+  ]
+}

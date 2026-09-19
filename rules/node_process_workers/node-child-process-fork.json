@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.fork",
+  "category": "node_process_workers",
+  "summary": "Spawn a new Node.js process running a module with an IPC channel; this is not POSIX fork memory cloning.",
+  "source": {
+    "pattern": "fork($modulePath,$args?,$options?)",
+    "requirements": {
+      "binding": "node:child_process.fork"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_fork",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_fork($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "process": "new Node.js instance",
+    "memory": "independent V8 heap",
+    "ipc": "one built-in channel",
+    "execPath": "defaults to parent process.execPath",
+    "shell": "not supported as spawn shell"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "independent process",
+      "input": "// fork('./child.js')",
+      "expected_behavior": "returns ChildProcess with IPC and separate memory"
+    },
+    {
+      "name": "not POSIX fork",
+      "input": "// mutate parent JS object after fork",
+      "expected_behavior": "child does not share object identity or copied live JS heap"
+    }
+  ]
+}

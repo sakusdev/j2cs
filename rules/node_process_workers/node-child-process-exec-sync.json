@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.exec-sync",
+  "category": "node_process_workers",
+  "summary": "Run a shell command synchronously and return buffered stdout or throw on nonzero/other failure.",
+  "source": {
+    "pattern": "execSync($command,$options?)",
+    "requirements": {
+      "binding": "node:child_process.execSync"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_exec_sync",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_exec_sync($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "blocking": true,
+    "shell": true,
+    "return": "Buffer|string according to encoding",
+    "failure": "throws Error carrying status/stdout/stderr"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "success",
+      "input": "const {execSync}=require('node:child_process');console.log(String(execSync('printf x')));",
+      "expected_behavior": "prints x on compatible shell"
+    },
+    {
+      "name": "failure",
+      "input": "const {execSync}=require('node:child_process');try{execSync(process.platform==='win32'?'exit 3':'exit 3')}catch(e){console.log(typeof e.status)}",
+      "expected_behavior": "prints number on ordinary shell failure"
+    }
+  ]
+}

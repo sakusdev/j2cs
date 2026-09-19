@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.spawn-stdio-pipe",
+  "category": "node_process_workers",
+  "summary": "Create default stdin/stdout/stderr pipes with bounded OS pipe capacity and Node stream semantics.",
+  "source": {
+    "pattern": "spawn($command,$args)",
+    "requirements": {
+      "binding": "node:child_process.spawn",
+      "stdio": "default pipes"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_stdio_pipe",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_stdio_pipe($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "stdin": "Writable stream",
+    "stdout_stderr": "Readable streams",
+    "backpressure": "OS/stream bounded",
+    "deadlock_risk": "child can block if output pipes are not consumed"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "stdout stream",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','process.stdout.write(\"x\")']);console.log(!!c.stdout,!!c.stderr,!!c.stdin);c.kill();",
+      "expected_behavior": "prints true true true"
+    },
+    {
+      "name": "not unbounded buffer",
+      "input": "// child writes indefinitely while parent never reads stdout",
+      "expected_behavior": "must preserve pipe/backpressure behavior rather than accumulate unbounded memory"
+    }
+  ]
+}

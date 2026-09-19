@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.spawn",
+  "category": "node_process_workers",
+  "summary": "Spawn a subprocess asynchronously without blocking the Node event loop.",
+  "source": {
+    "pattern": "spawn($command,$args?,$options?)",
+    "requirements": {
+      "binding": "node:child_process.spawn",
+      "host_process_creation_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "ChildProcess immediately",
+    "blocking": false,
+    "args": "separate argv unless shell enabled",
+    "failure": "often error event rather than synchronous command-not-found throw"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "spawn node",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','process.stdout.write(\"x\")']);c.stdout.once('data',d=>console.log(String(d)));",
+      "expected_behavior": "prints x asynchronously"
+    },
+    {
+      "name": "missing command",
+      "input": "const {spawn}=require('node:child_process');spawn('definitely-no-such-command').once('error',e=>console.log(e.code));",
+      "expected_behavior": "emits error with ENOENT on typical Unix/Windows hosts"
+    }
+  ]
+}

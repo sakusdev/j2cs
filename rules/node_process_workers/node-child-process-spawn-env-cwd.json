@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.spawn-env-cwd",
+  "category": "node_process_workers",
+  "summary": "Apply child cwd and environment options with platform-specific executable lookup/environment handling.",
+  "source": {
+    "pattern": "spawn($command,$args,{cwd:$cwd,env:$env})",
+    "requirements": {
+      "binding": "node:child_process.spawn"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_env_cwd",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_spawn_env_cwd($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cwd": "child working directory",
+    "env": "provided environment replaces default inheritance set",
+    "path_lookup": "uses options.env.PATH or platform fallback",
+    "windows_env_keys": "case-insensitive handling"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "env visible",
+      "input": "const {spawnSync}=require('node:child_process');const r=spawnSync(process.execPath,['-e','process.stdout.write(process.env.X||\"\")'],{env:{...process.env,X:'v'},encoding:'utf8'});console.log(r.stdout);",
+      "expected_behavior": "prints v"
+    },
+    {
+      "name": "bad cwd",
+      "input": "const {spawn}=require('node:child_process');spawn(process.execPath,[],{cwd:'__definitely_missing__'}).once('error',e=>console.log(e.code));",
+      "expected_behavior": "reports ENOENT-like spawn error"
+    }
+  ]
+}

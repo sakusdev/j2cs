@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.stderr",
+  "category": "node_process_workers",
+  "summary": "Expose child.stderr as the configured Readable pipe or null, reusing stream semantics.",
+  "source": {
+    "pattern": "$child.stderr",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_property": "stderr"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_child_process_stderr",
+    "template": "NodeProcessWorkers.node_child_process_stderr($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "pipe": "Readable stream",
+    "non_pipe": "null or mapped handle",
+    "owner": "EVENTS_STREAMS"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "default",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','']);console.log(c.stderr!==null);c.kill();",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "ignore",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e',''],{stdio:'ignore'});console.log(c.stderr===null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

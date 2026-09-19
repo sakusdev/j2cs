@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.exec-max-buffer",
+  "category": "node_process_workers",
+  "summary": "Enforce exec/execFile maxBuffer in bytes and terminate the child if stdout/stderr exceeds it.",
+  "source": {
+    "pattern": "exec($command,{maxBuffer:$n},$callback)",
+    "requirements": {
+      "binding": "node:child_process.exec|execFile",
+      "maxBuffer_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_exec_max_buffer",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_exec_max_buffer($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "unit": "bytes",
+    "overflow": "child terminated and error reported",
+    "unicode": "byte count can differ from character count",
+    "partial_output": "observable"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "small limit",
+      "input": "// exec(commandProducingLargeOutput,{maxBuffer:1},cb)",
+      "expected_behavior": "reports maxBuffer error and terminates child"
+    },
+    {
+      "name": "unicode bytes",
+      "input": "// output contains multibyte UTF-8 text",
+      "expected_behavior": "limit applies to encoded bytes, not JavaScript string length"
+    }
+  ]
+}

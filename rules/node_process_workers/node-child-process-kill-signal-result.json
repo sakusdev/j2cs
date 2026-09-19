@@ -1,0 +1,40 @@
+{
+  "id": "node.child-process.kill-signal-result",
+  "category": "node_process_workers",
+  "summary": "Preserve ChildProcess signalCode/exitCode terminal metadata rather than collapsing all termination into one managed exception.",
+  "source": {
+    "pattern": "$child.exitCode /* and signalCode */",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_properties": "exitCode,signalCode"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeProcessWorkers.node_child_process_kill_signal_result",
+    "template": "NodeProcessWorkers.node_child_process_kill_signal_result($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "running": "values may be null",
+    "normal_exit": "exitCode set",
+    "signal_exit": "signalCode set according to platform/Node",
+    "ordering": "finalized with lifecycle"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "normal exit",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','process.exit(2)']);c.on('exit',()=>console.log(c.exitCode,c.signalCode));",
+      "expected_behavior": "prints 2 null"
+    },
+    {
+      "name": "before exit",
+      "input": "const {spawn}=require('node:child_process');const c=spawn(process.execPath,['-e','setTimeout(()=>{},100)']);console.log(c.exitCode===null);c.kill();",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

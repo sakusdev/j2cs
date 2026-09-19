@@ -1,0 +1,39 @@
+{
+  "id": "node.child-process.ref",
+  "category": "node_process_workers",
+  "summary": "Reference the child process handle so it can keep the parent event loop alive, separate from OS detached state.",
+  "source": {
+    "pattern": "$child.ref()",
+    "requirements": {
+      "receiver": "ChildProcess",
+      "builtin_method": "ref"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_child_process_ref",
+    "template": "JsRuntime.NodeProcessWorkers.node_child_process_ref($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "event_loop_reference": true,
+    "idempotent": true,
+    "detached": "orthogonal"
+  },
+  "references": [
+    "https://nodejs.org/api/child_process.html"
+  ],
+  "tests": [
+    {
+      "name": "ref after unref",
+      "input": "// child.unref(); child.ref()",
+      "expected_behavior": "child handle can again keep the event loop alive"
+    },
+    {
+      "name": "not OS attach",
+      "input": "// detached child.ref()",
+      "expected_behavior": "does not undo OS process-group/session detachment"
+    }
+  ]
+}

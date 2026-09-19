@@ -1,0 +1,41 @@
+{
+  "id": "node.worker-threads.constructor",
+  "category": "node_process_workers",
+  "summary": "Create a Node Worker thread with its own JavaScript environment while remaining in the same OS process.",
+  "source": {
+    "pattern": "new Worker($filenameOrCode,$options?)",
+    "requirements": {
+      "binding": "node:worker_threads.Worker",
+      "host_threads_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_constructor",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_constructor($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "same_process": true,
+    "separate_js_environment": true,
+    "workerData": "cloned into worker",
+    "resource_limits": "runtime constraints",
+    "stdio": "Node worker stream options"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "eval worker",
+      "input": "const {Worker}=require('node:worker_threads');const w=new Worker('0',{eval:true});w.on('exit',c=>console.log(c));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "not child process",
+      "input": "// new Worker(...)",
+      "expected_behavior": "does not create an independent OS process/PID like child_process.spawn"
+    }
+  ]
+}

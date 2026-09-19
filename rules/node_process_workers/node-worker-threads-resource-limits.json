@@ -1,0 +1,39 @@
+{
+  "id": "node.worker-threads.resource-limits",
+  "category": "node_process_workers",
+  "summary": "Expose/establish Worker V8 resourceLimits without treating them as hard OS memory guarantees.",
+  "source": {
+    "pattern": "$worker.resourceLimits",
+    "requirements": {
+      "receiver": "Worker",
+      "builtin_property": "resourceLimits"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeProcessWorkers.node_worker_threads_resource_limits",
+    "template": "JsRuntime.NodeProcessWorkers.node_worker_threads_resource_limits($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "fields": "V8 young/old/code/stack limits where configured",
+    "os_limits": "not a substitute",
+    "termination": "exceeding some limits can terminate worker"
+  },
+  "references": [
+    "https://nodejs.org/api/worker_threads.html"
+  ],
+  "tests": [
+    {
+      "name": "object",
+      "input": "const {Worker}=require('node:worker_threads');const w=new Worker('0',{eval:true});console.log(typeof w.resourceLimits);w.terminate();",
+      "expected_behavior": "prints object"
+    },
+    {
+      "name": "not process quota",
+      "input": "// maxOldGenerationSizeMb",
+      "expected_behavior": "limits Worker V8 heap setting, not arbitrary native/process allocations"
+    }
+  ]
+}
