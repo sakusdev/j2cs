@@ -1,0 +1,40 @@
+{
+  "id": "web.performance-observer.entry-list-get-by-type",
+  "category": "web_performance",
+  "summary": "Filter a PerformanceObserverEntryList snapshot by exact entryType.",
+  "source": {
+    "pattern": "$list.getEntriesByType($type)",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserverEntryList",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ObserverEntryListGetByType($args)",
+    "helper": "WebPerformance.ObserverEntryListGetByType"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source": "observer entry-list snapshot",
+    "matching": "exact entryType",
+    "global_timeline": "not consulted"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "type filter",
+      "input": "const o=new PerformanceObserver(list=>console.log(list.getEntriesByType('mark').every(e=>e.entryType==='mark'))); o.observe({entryTypes:['mark','measure']}); performance.mark('x');",
+      "expected_behavior": "prints true when callback runs"
+    },
+    {
+      "name": "unknown type empty",
+      "input": "// semantic IR: ObserverEntryList(entries).getEntriesByType('unknown')",
+      "expected_behavior": "returns empty sequence"
+    }
+  ]
+}

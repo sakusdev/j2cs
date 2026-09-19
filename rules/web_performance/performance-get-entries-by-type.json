@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.get-entries-by-type",
+  "category": "web_performance",
+  "summary": "Filter timeline-visible entries by exact entryType and sort them by startTime.",
+  "source": {
+    "pattern": "performance.getEntriesByType($type)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.GetEntriesByType($args)",
+    "helper": "WebPerformance.GetEntriesByType"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type_conversion": "WebIDL DOMString",
+    "matching": "exact entryType",
+    "unsupported_type": "empty list",
+    "ordering": "chronological by startTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "mark type filter",
+      "input": "performance.clearMarks(); performance.mark('x'); console.log(performance.getEntriesByType('mark').some(e=>e.name==='x'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "unknown type",
+      "input": "console.log(performance.getEntriesByType('definitely-unknown').length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

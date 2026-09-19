@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.constructor",
+  "category": "web_performance",
+  "summary": "Create a PerformanceObserver with an initially empty observer buffer and callback; callback invocation remains host-task scheduled.",
+  "source": {
+    "pattern": "new PerformanceObserver($callback)",
+    "requirements": {
+      "binding": "intrinsic PerformanceObserver",
+      "callback_webidl_callable": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.CreateObserver($args)",
+    "helper": "JsRuntime.WebPerformance.CreateObserver"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "observer_buffer": "initially empty",
+    "observer_type": "undefined",
+    "callback": "stored as PerformanceObserverCallback",
+    "callback_timing": "not invoked by construction"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "construction does not call callback",
+      "input": "let n=0; const o=new PerformanceObserver(()=>n++); console.log(n);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "non-callable rejected",
+      "input": "try{new PerformanceObserver(1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws TypeError via WebIDL callback conversion"
+    }
+  ]
+}

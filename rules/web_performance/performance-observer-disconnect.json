@@ -1,0 +1,42 @@
+{
+  "id": "web.performance-observer.disconnect",
+  "category": "web_performance",
+  "summary": "Unregister a PerformanceObserver and clear its observer buffer and options list.",
+  "source": {
+    "pattern": "$observer.disconnect()",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.ObserverDisconnect($args)",
+    "helper": "JsRuntime.WebPerformance.ObserverDisconnect"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "registration": "removed",
+    "observer_buffer": "emptied",
+    "options": "emptied",
+    "future_entries": "not queued until observed again"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "records cleared",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({type:'mark'}); performance.mark('x'); o.disconnect(); console.log(o.takeRecords().length);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "can observe again",
+      "input": "const o=new PerformanceObserver(()=>{}); o.disconnect(); o.observe({type:'mark'}); console.log('ok');",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

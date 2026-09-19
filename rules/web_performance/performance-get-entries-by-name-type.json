@@ -1,0 +1,41 @@
+{
+  "id": "web.performance.get-entries-by-name-type",
+  "category": "web_performance",
+  "summary": "Filter timeline-visible entries by both exact name and entryType.",
+  "source": {
+    "pattern": "performance.getEntriesByName($name,$type)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.GetEntriesByNameAndType($args)",
+    "helper": "WebPerformance.GetEntriesByNameAndType"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "name_conversion": "WebIDL DOMString",
+    "type_conversion": "WebIDL DOMString",
+    "matching": "both exact name and exact entryType",
+    "ordering": "chronological by startTime"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "select mark only",
+      "input": "performance.mark('x',{startTime:1});performance.measure('x',{start:0,end:2});console.log(performance.getEntriesByName('x','mark').every(e=>e.entryType==='mark'));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "wrong type empty",
+      "input": "performance.mark('x'); console.log(performance.getEntriesByName('x','measure').length);",
+      "expected_behavior": "prints 0 when no matching measure exists"
+    }
+  ]
+}

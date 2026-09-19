@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.entry-list-get-by-name",
+  "category": "web_performance",
+  "summary": "Filter a PerformanceObserverEntryList snapshot by exact name and optional exact type.",
+  "source": {
+    "pattern": "$list.getEntriesByName($name,$type?)",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserverEntryList",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ObserverEntryListGetByName($args)",
+    "helper": "WebPerformance.ObserverEntryListGetByName"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source": "observer entry-list snapshot",
+    "name": "exact match",
+    "optional_type": "exact entryType match",
+    "global_timeline": "not consulted"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "name filter",
+      "input": "const o=new PerformanceObserver(list=>console.log(list.getEntriesByName('x').length)); o.observe({type:'mark'}); performance.mark('x');",
+      "expected_behavior": "prints at least 1 when callback runs for x"
+    },
+    {
+      "name": "name plus type",
+      "input": "// semantic IR: ObserverEntryList([mark x, measure x]).getEntriesByName('x','measure')",
+      "expected_behavior": "returns only the measure entry"
+    }
+  ]
+}

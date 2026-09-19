@@ -1,0 +1,42 @@
+{
+  "id": "web.performance.measure-detail",
+  "category": "web_performance",
+  "summary": "Structured-clone PerformanceMeasureOptions.detail into the created PerformanceMeasure.",
+  "source": {
+    "pattern": "performance.measure($name,{detail:$detail,$timing})",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "detail_may_be_arbitrary_js_value": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.MeasureWithDetail($args)",
+    "helper": "JsRuntime.WebPerformance.MeasureWithDetail"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "detail": "structured clone into current realm",
+    "clone_failure": "DataCloneError",
+    "timing": "compute start/end according to User Timing",
+    "buffer": "successful measure is queued and buffered"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "object detail cloned",
+      "input": "const d={x:1}; const m=performance.measure('m',{start:0,end:1,detail:d}); d.x=2; console.log(m.detail.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "function detail rejected",
+      "input": "try{performance.measure('m',{start:0,end:1,detail:()=>{}})}catch(e){console.log(e.name)}",
+      "expected_behavior": "throws DataCloneError"
+    }
+  ]
+}

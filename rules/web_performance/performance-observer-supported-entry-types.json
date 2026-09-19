@@ -1,0 +1,42 @@
+{
+  "id": "web.performance-observer.supported-entry-types",
+  "category": "web_performance",
+  "summary": "Expose the relevant global's same-object frozen, alphabetically sorted list of supported observer entry types.",
+  "source": {
+    "pattern": "PerformanceObserver.supportedEntryTypes",
+    "requirements": {
+      "binding": "intrinsic PerformanceObserver",
+      "builtin_getter_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.SupportedEntryTypes($args)",
+    "helper": "JsRuntime.WebPerformance.SupportedEntryTypes"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "per relevant global",
+    "same_object": true,
+    "frozen": true,
+    "ordering": "alphabetical",
+    "contents": "host-supported registered entry types"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "array value",
+      "input": "console.log(Array.isArray(PerformanceObserver.supportedEntryTypes));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "stable identity",
+      "input": "console.log(PerformanceObserver.supportedEntryTypes===PerformanceObserver.supportedEntryTypes);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

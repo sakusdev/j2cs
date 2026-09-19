@@ -1,0 +1,40 @@
+{
+  "id": "web.performance.entry-to-json",
+  "category": "web_performance",
+  "summary": "Run WebIDL default toJSON semantics for PerformanceEntry rather than exposing implementation-private fields.",
+  "source": {
+    "pattern": "$entry.toJSON()",
+    "requirements": {
+      "receiver": "proven PerformanceEntry",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.EntryToJson($args)",
+    "helper": "WebPerformance.EntryToJson"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "ordinary object containing WebIDL-exposed serializable attributes",
+    "private_slots": "not exposed",
+    "concrete_interface": "default WebIDL toJSON includes the appropriate exposed attributes"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "base fields present",
+      "input": "const j=performance.mark('x',{startTime:1}).toJSON(); console.log(j.name,j.entryType,j.startTime,j.duration);",
+      "expected_behavior": "prints x mark 1 0"
+    },
+    {
+      "name": "private state not a requirement",
+      "input": "const j=performance.mark('x').toJSON(); console.log('name' in j);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.performance.now",
+  "category": "web_performance",
+  "summary": "Read a high-resolution timestamp relative to the relevant global's time origin using its shared monotonic clock.",
+  "source": {
+    "pattern": "performance.now()",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.Now($args)",
+    "helper": "WebPerformance.Now"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "result": "DOMHighResTimeStamp Number",
+    "origin": "relevant global time origin",
+    "clock": "shared monotonic clock",
+    "nondecreasing": "chronologically later reads in the same time origin do not decrease",
+    "privacy": "host may reduce precision/coarsen timestamps"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/2026/WD-hr-time-3-20260225/"
+  ],
+  "tests": [
+    {
+      "name": "relative monotonic time",
+      "input": "const a=performance.now(); const b=performance.now(); console.log(b>=a);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "not Date.now wall clock",
+      "input": "console.log(performance.now() < Date.now());",
+      "expected_behavior": "normally prints true because performance.now is relative rather than Unix-epoch wall time"
+    }
+  ]
+}

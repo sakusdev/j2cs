@@ -1,0 +1,43 @@
+{
+  "id": "web.performance.measure-options-duration",
+  "category": "web_performance",
+  "summary": "Resolve valid start+duration and duration+end PerformanceMeasure option forms.",
+  "source": {
+    "pattern": "performance.measure($name,$options)",
+    "requirements": {
+      "binding": "intrinsic performance",
+      "builtin_not_overridden": true,
+      "options_contains_duration": true,
+      "detail_absent_or_null": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.MeasureWithDuration($args)",
+    "helper": "WebPerformance.MeasureWithDuration"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "start_plus_duration": "end=start+duration",
+    "duration_plus_end": "start=end-duration",
+    "all_three": "TypeError",
+    "missing_start_and_end": "TypeError for nonempty timing options"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/user-timing/"
+  ],
+  "tests": [
+    {
+      "name": "start plus duration",
+      "input": "const m=performance.measure('m',{start:3,duration:4}); console.log(m.startTime,m.duration);",
+      "expected_behavior": "prints 3 4"
+    },
+    {
+      "name": "duration plus end",
+      "input": "const m=performance.measure('m',{duration:4,end:10}); console.log(m.startTime,m.duration);",
+      "expected_behavior": "prints 6 4"
+    }
+  ]
+}

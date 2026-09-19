@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.observe-mode-mixing",
+  "category": "web_performance",
+  "summary": "Reject switching one observer between entryTypes/multiple mode and type/single mode.",
+  "source": {
+    "pattern": "$observer.observe($optionsAfterPriorObserve)",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "prior_observer_mode_known": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ValidateObserverMode($args)",
+    "helper": "WebPerformance.ValidateObserverMode"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "single_then_multiple": "InvalidModificationError",
+    "multiple_then_single": "InvalidModificationError",
+    "same_mode": "allowed under mode-specific replacement/stacking rules"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "multiple then single",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({entryTypes:['mark']}); try{o.observe({type:'measure'})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints InvalidModificationError"
+    },
+    {
+      "name": "single then multiple",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({type:'mark'}); try{o.observe({entryTypes:['measure']})}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints InvalidModificationError"
+    }
+  ]
+}

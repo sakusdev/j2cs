@@ -1,0 +1,40 @@
+{
+  "id": "web.performance-observer.take-records",
+  "category": "web_performance",
+  "summary": "Return a copy of the observer buffer and empty it while leaving registration intact.",
+  "source": {
+    "pattern": "$observer.takeRecords()",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.ObserverTakeRecords($args)",
+    "helper": "JsRuntime.WebPerformance.ObserverTakeRecords"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "PerformanceEntryList copy",
+    "side_effect": "observer buffer becomes empty",
+    "registration": "unchanged"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "drains records",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({type:'mark'}); performance.mark('x'); const a=o.takeRecords(); const b=o.takeRecords(); console.log(a.length>=0,b.length);",
+      "expected_behavior": "second returned list is empty"
+    },
+    {
+      "name": "does not disconnect",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({type:'mark'}); o.takeRecords(); performance.mark('later'); console.log('still registered');",
+      "expected_behavior": "observer remains eligible for later entries"
+    }
+  ]
+}

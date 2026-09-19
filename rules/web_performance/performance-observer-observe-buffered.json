@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.observe-buffered",
+  "category": "web_performance",
+  "summary": "When single-type observe uses buffered:true, enqueue matching previously buffered entries and queue observer delivery.",
+  "source": {
+    "pattern": "$observer.observe({type:$type,buffered:true})",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.ObserverObserveBuffered($args)",
+    "helper": "JsRuntime.WebPerformance.ObserverObserveBuffered"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "source": "entry type's relevant performance-entry buffer",
+    "filter": "should-add-entry predicate",
+    "delivery": "append matches then queue PerformanceObserver task",
+    "bounded": "buffering is entry-type-defined and not universally unbounded"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "buffered delivery",
+      "input": "performance.mark('before'); const o=new PerformanceObserver(list=>console.log(list.getEntriesByName('before').length)); o.observe({type:'mark',buffered:true});",
+      "expected_behavior": "queued callback can receive matching pre-existing buffered entries where that type supports buffering"
+    },
+    {
+      "name": "not synchronous",
+      "input": "let called=false; performance.mark('before'); const o=new PerformanceObserver(()=>called=true); o.observe({type:'mark',buffered:true}); console.log(called);",
+      "expected_behavior": "prints false before queued observer task runs"
+    }
+  ]
+}

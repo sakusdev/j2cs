@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.dropped-entries-count",
+  "category": "web_performance",
+  "summary": "Expose droppedEntriesCount in observer callback options when dropped-entry reporting is required.",
+  "source": {
+    "pattern": "[[PerformanceObserverCallbackOptions]].droppedEntriesCount",
+    "requirements": {
+      "semantic_operation": "PerformanceObserver callback options",
+      "observer_requires_dropped_entries": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.ObserverDroppedEntriesCount($args)",
+    "helper": "JsRuntime.WebPerformance.ObserverDroppedEntriesCount"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "count defined by observed entry-type buffers at delivery",
+    "type": "unsigned long long",
+    "host_buffer_limits": "entry-type specific",
+    "zero": "valid when nothing was dropped"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "number count",
+      "input": "const o=new PerformanceObserver((list,obs,opts)=>console.log(typeof opts.droppedEntriesCount)); o.observe({type:'mark'}); performance.mark('x');",
+      "expected_behavior": "callback options expose a numeric droppedEntriesCount where supported by the current spec profile"
+    },
+    {
+      "name": "not derived from list size",
+      "input": "// semantic IR: callback(entries, observer, {droppedEntriesCount:n})",
+      "expected_behavior": "n comes from performance-entry buffer accounting, not entries.length"
+    }
+  ]
+}

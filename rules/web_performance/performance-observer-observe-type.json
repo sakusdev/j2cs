@@ -1,0 +1,42 @@
+{
+  "id": "web.performance-observer.observe-type",
+  "category": "web_performance",
+  "summary": "Register one entry type in single-type mode; distinct types stack while repeated type replaces that type's options.",
+  "source": {
+    "pattern": "$observer.observe({type:$type,$options?})",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserver",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebPerformance.ObserverObserveType($args)",
+    "helper": "JsRuntime.WebPerformance.ObserverObserveType"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mode": "single",
+    "unsupported_type": "registration step aborts",
+    "distinct_types": "options stack",
+    "repeated_type": "replace existing options for that type",
+    "return": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "single supported type",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({type:'mark'}); console.log('ok');",
+      "expected_behavior": "prints ok"
+    },
+    {
+      "name": "repeated type allowed",
+      "input": "const o=new PerformanceObserver(()=>{}); o.observe({type:'mark'}); o.observe({type:'mark',buffered:true}); console.log('ok');",
+      "expected_behavior": "prints ok"
+    }
+  ]
+}

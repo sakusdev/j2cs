@@ -1,0 +1,41 @@
+{
+  "id": "web.performance-observer.entry-list-get-entries",
+  "category": "web_performance",
+  "summary": "Return all entries in a PerformanceObserverEntryList snapshot without consulting the global timeline.",
+  "source": {
+    "pattern": "$list.getEntries()",
+    "requirements": {
+      "receiver": "intrinsic PerformanceObserverEntryList",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "template": "WebPerformance.ObserverEntryListGetEntries($args)",
+    "helper": "WebPerformance.ObserverEntryListGetEntries"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source": "observer entry-list snapshot",
+    "filter": "none",
+    "global_timeline": "not consulted",
+    "result": "new PerformanceEntryList sequence"
+  },
+  "caveats": [],
+  "references": [
+    "https://www.w3.org/TR/performance-timeline/"
+  ],
+  "tests": [
+    {
+      "name": "callback list entries",
+      "input": "const o=new PerformanceObserver(list=>console.log(list.getEntries().every(e=>e.entryType==='mark'))); o.observe({type:'mark'}); performance.mark('x');",
+      "expected_behavior": "prints true when callback runs"
+    },
+    {
+      "name": "empty snapshot",
+      "input": "// semantic IR: ObserverEntryList([]).getEntries()",
+      "expected_behavior": "returns an empty sequence"
+    }
+  ]
+}
