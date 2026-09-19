@@ -55,6 +55,8 @@ sakusdev/j2cs の自律Workerとして prompts/worker.md に従い、未担当�
 
 Use `prompts/workstream-issue-template.md` when adding new workstream tasks.
 
+For large queues, `prompts/batch-worker.md` processes up to five READY Issues sequentially in one worker run, creating an independent PR for each Issue. This reduces a 30-Issue wave to roughly six worker launches while preserving per-Issue branch locking.
+
 ## Coverage gap automation
 
 `tools/coverage_gap.py` measures the current rule corpus against the planning
