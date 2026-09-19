@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.register.target-eligibility",
+  "category": "weakref_finalization",
+  "summary": "register requires a weakly-holdable target.",
+  "source": {
+    "pattern": "$registry.register($target,$held)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_register_target_eligibility($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "eligible": "objects and non-registered Symbols",
+    "ineligible": "other primitives and registered Symbols",
+    "error": "TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "object target",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; console.log(f.register(x,'h'))",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "primitive rejected",
+      "input": "const f=new FinalizationRegistry(()=>{}); try{f.register(1,'h')}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

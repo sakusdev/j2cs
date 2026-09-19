@@ -1,0 +1,38 @@
+{
+  "id": "weakref.constructor.subclass-newtarget",
+  "category": "weakref_finalization",
+  "summary": "WeakRef construction honors NewTarget for subclasses while installing the WeakRef internal slot.",
+  "source": {
+    "pattern": "super($target) in class $Sub extends WeakRef",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_constructor_subclass_newtarget($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "prototype": "derived from NewTarget.prototype",
+    "internal_slot": "[[WeakRefTarget]] installed"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "subclass",
+      "input": "class R extends WeakRef{} const x={}; const r=new R(x); console.log(r instanceof R,r.deref()===x)",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "derived method works",
+      "input": "class R extends WeakRef{get(){return this.deref()}} const x={}; console.log(new R(x).get()===x)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

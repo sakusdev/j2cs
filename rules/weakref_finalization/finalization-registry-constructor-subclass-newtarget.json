@@ -1,0 +1,42 @@
+{
+  "id": "finalization-registry.constructor.subclass-newtarget",
+  "category": "weakref_finalization",
+  "summary": "FinalizationRegistry honors NewTarget for subclasses and installs registry internal slots.",
+  "source": {
+    "pattern": "super($callback) in class $Sub extends FinalizationRegistry",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_constructor_subclass_newtarget($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "prototype": "derived from NewTarget.prototype",
+    "slots": [
+      "[[Realm]]",
+      "[[CleanupCallback]]",
+      "[[Cells]]"
+    ]
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "subclass",
+      "input": "class F extends FinalizationRegistry{}; console.log(new F(()=>{}) instanceof F)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "subclass register usable",
+      "input": "class F extends FinalizationRegistry{}; const f=new F(()=>{}),x={}; console.log(f.register(x,1))",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

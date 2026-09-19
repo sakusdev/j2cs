@@ -1,0 +1,39 @@
+{
+  "id": "weakref.deref.cleared-target",
+  "category": "weakref_finalization",
+  "summary": "deref returns undefined after the implementation has cleared a dead weak target.",
+  "source": {
+    "pattern": "$weakRef.deref()",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_deref_cleared_target($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cleared_internal_slot": "empty",
+    "result": "undefined",
+    "gc_timing": "not guaranteed"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "result domain",
+      "input": "let x={}; const r=new WeakRef(x); const v=r.deref(); console.log(v===undefined||v===x)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "no deterministic gc assertion",
+      "input": "const x={}; const r=new WeakRef(x); console.log(typeof r.deref()==='object')",
+      "expected_behavior": "prints true while strong reference x is live"
+    }
+  ]
+}

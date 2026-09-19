@@ -1,0 +1,38 @@
+{
+  "id": "weakref.constructor.object-target",
+  "category": "weakref_finalization",
+  "summary": "WeakRef accepts object targets and stores them weakly.",
+  "source": {
+    "pattern": "new WeakRef($object)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_constructor_object_target($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "object is eligible via CanBeHeldWeakly",
+    "identity": "deref returns exact object while live"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "object target",
+      "input": "const x={a:1}; const r=new WeakRef(x); console.log(r.deref()===x)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "function target",
+      "input": "function f(){} const r=new WeakRef(f); console.log(r.deref()===f)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

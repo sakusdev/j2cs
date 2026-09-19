@@ -1,0 +1,37 @@
+{
+  "id": "finalization-registry.constructor.requires-new",
+  "category": "weakref_finalization",
+  "summary": "FinalizationRegistry requires construction with new.",
+  "source": {
+    "pattern": "FinalizationRegistry($callback)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_constructor_requires_new($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "new_target": "undefined throws TypeError"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "call rejected",
+      "input": "try{FinalizationRegistry(()=>{})}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "new works",
+      "input": "console.log(new FinalizationRegistry(()=>{}) instanceof FinalizationRegistry)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

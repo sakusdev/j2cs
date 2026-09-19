@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.target-token.weak-liveness",
+  "category": "weakref_finalization",
+  "summary": "Registration does not keep target or unregisterToken alive merely because they appear in a cell.",
+  "source": {
+    "pattern": "$registry.register($target,$held,$token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_target_token_weak_liveness($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "weakly held",
+    "unregister_token": "weakly held",
+    "held_value": "strongly held"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "target can equal token",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; console.log(f.register(x,1,x)===undefined)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "held cannot equal target despite token allowance",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; try{f.register(x,x,x)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

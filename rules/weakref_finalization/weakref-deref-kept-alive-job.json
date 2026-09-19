@@ -1,0 +1,39 @@
+{
+  "id": "weakref.deref.kept-alive-job",
+  "category": "weakref_finalization",
+  "summary": "A successful deref adds the target to the kept-alive set until the current synchronous execution completes.",
+  "source": {
+    "pattern": "$weakRef.deref(); ...; $weakRef.deref()",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.weakref_deref_kept_alive_job($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "first_success": "AddToKeptObjects(target)",
+    "same_sync_execution": "subsequent deref cannot observe target collected solely between the calls",
+    "clear": "host clears kept objects after synchronous sequence"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "two derefs stable",
+      "input": "const x={}; const r=new WeakRef(x); const a=r.deref(); const b=r.deref(); console.log(a===b)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "constructor also keeps target",
+      "input": "const x={}; const r=new WeakRef(x); console.log(r.deref()===x)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

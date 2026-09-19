@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.register.undefined-token",
+  "category": "weakref_finalization",
+  "summary": "Omitted and explicit undefined unregisterToken both create a registration with no token.",
+  "source": {
+    "pattern": "$registry.register($target,$held,undefined?)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_register_undefined_token($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "token": "empty internal token, not a token equal to undefined",
+    "unregister": "cannot remove tokenless registration by passing undefined because unregister(undefined) itself is invalid"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "omitted accepted",
+      "input": "const f=new FinalizationRegistry(()=>{}),x={}; console.log(f.register(x,1))",
+      "expected_behavior": "prints undefined"
+    },
+    {
+      "name": "unregister undefined rejected",
+      "input": "const f=new FinalizationRegistry(()=>{}); try{f.unregister(undefined)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

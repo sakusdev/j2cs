@@ -1,0 +1,39 @@
+{
+  "id": "finalization-registry.unregister.removes-all-token",
+  "category": "weakref_finalization",
+  "summary": "unregister removes every registration carrying the SameValue token and reports whether any were removed.",
+  "source": {
+    "pattern": "$registry.unregister($token)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_unregister_removes_all_token($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "matching": "SameValue on non-empty token",
+    "effect": "remove all matching cells",
+    "return": "true iff at least one removed"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "two registrations one token",
+      "input": "const f=new FinalizationRegistry(()=>{}),t={},a={},b={}; f.register(a,1,t); f.register(b,2,t); console.log(f.unregister(t),f.unregister(t))",
+      "expected_behavior": "prints true false"
+    },
+    {
+      "name": "different token unaffected",
+      "input": "const f=new FinalizationRegistry(()=>{}),t1={},t2={},a={}; f.register(a,1,t1); console.log(f.unregister(t2),f.unregister(t1))",
+      "expected_behavior": "prints false true"
+    }
+  ]
+}

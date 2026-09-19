@@ -1,0 +1,38 @@
+{
+  "id": "finalization-registry.register.brand-check",
+  "category": "weakref_finalization",
+  "summary": "register requires a receiver with FinalizationRegistry internal slots.",
+  "source": {
+    "pattern": "FinalizationRegistry.prototype.register.call($receiver,...)",
+    "requirements": {
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WeakMemory",
+    "template": "JsRuntime.WeakMemory.finalization_registry_register_brand_check($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "ordinary_object": "TypeError",
+    "proxy": "target slots do not transfer to Proxy"
+  },
+  "caveats": [],
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/managing-memory.html"
+  ],
+  "tests": [
+    {
+      "name": "plain object rejected",
+      "input": "try{FinalizationRegistry.prototype.register.call({}, {}, 1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "proxy rejected",
+      "input": "const p=new Proxy(new FinalizationRegistry(()=>{}),{}); try{FinalizationRegistry.prototype.register.call(p,{},1)}catch(e){console.log(e instanceof TypeError)}",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
