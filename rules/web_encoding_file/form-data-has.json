@@ -1,0 +1,39 @@
+{
+  "id": "web.form-data.has",
+  "category": "web_encoding_file",
+  "summary": "Test whether FormData has an entry with the converted name.",
+  "source": {
+    "pattern": "$fd.has($name)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Has",
+    "template": "WebFormData.Has($fd, $name)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "name": "USVString"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "present",
+      "input": "const f=new FormData();f.append('x','');console.log(f.has('x'))",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "missing",
+      "input": "console.log(new FormData().has('x'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

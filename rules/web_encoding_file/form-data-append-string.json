@@ -1,0 +1,43 @@
+{
+  "id": "web.form-data.append.string",
+  "category": "web_encoding_file",
+  "summary": "Append a string FormData entry with USVString conversion and preserved order.",
+  "source": {
+    "pattern": "$fd.append($name, $value)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true,
+      "value_inferred_not_blob": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.AppendString",
+    "template": "WebFormData.AppendString($fd, $name, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "name": "USVString",
+    "value": "USVString",
+    "order": "append after existing entries",
+    "duplicates": "preserved",
+    "return": "undefined"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "duplicates",
+      "input": "const f=new FormData(); f.append('x','1');f.append('x','2');console.log(f.getAll('x').join(','))",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "coercion",
+      "input": "const f=new FormData();f.append('x',42);console.log(f.get('x'))",
+      "expected_behavior": "prints 42"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.text-encoder.lone-surrogate",
+  "category": "web_encoding_file",
+  "summary": "Encode lone UTF-16 surrogates via USVString replacement.",
+  "source": {
+    "pattern": "$encoder.encode($input)",
+    "requirements": {
+      "receiver_inferred_as": "TextEncoder",
+      "builtin_webidl_member_not_overridden": true,
+      "input_may_contain_lone_surrogates": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.EncodeUtf8",
+    "template": "WebEncoding.EncodeUtf8($input)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "lone_surrogate": "U+FFFD",
+    "replacement_bytes": "EF BF BD"
+  },
+  "caveats": [
+    ".NET replacement fallback must be configured to match Web IDL USVString conversion."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "lone high surrogate",
+      "input": "console.log([...new TextEncoder().encode('\\ud800')].join(','))",
+      "expected_behavior": "prints 239,191,189"
+    },
+    {
+      "name": "valid pair preserved",
+      "input": "console.log(new TextEncoder().encode('\\ud83d\\udca9').length)",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

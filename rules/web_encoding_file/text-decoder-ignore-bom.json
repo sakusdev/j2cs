@@ -1,0 +1,42 @@
+{
+  "id": "web.text-decoder.ignore-bom",
+  "category": "web_encoding_file",
+  "summary": "Preserve BOM as U+FEFF when ignoreBOM is true.",
+  "source": {
+    "pattern": "$decoder.decode($input)",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true,
+      "ignoreBOM_is_true": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.Decode",
+    "template": "WebEncoding.Decode($decoder, $input, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "BOM": "decoded as ordinary U+FEFF",
+    "property_name_note": "ignoreBOM=true means ignore BOM semantics, not ignore the character"
+  },
+  "caveats": [
+    "The option name is easy to invert semantically."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "bom preserved",
+      "input": "console.log(new TextDecoder('utf-8',{ignoreBOM:true}).decode(new Uint8Array([0xef,0xbb,0xbf])).codePointAt(0).toString(16))",
+      "expected_behavior": "prints feff"
+    },
+    {
+      "name": "default strips",
+      "input": "console.log(new TextDecoder().decode(new Uint8Array([0xef,0xbb,0xbf])).length)",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

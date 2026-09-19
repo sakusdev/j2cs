@@ -1,0 +1,41 @@
+{
+  "id": "web.blob.buffer-source-copy",
+  "category": "web_encoding_file",
+  "summary": "Copy BufferSource bytes when constructing Blob.",
+  "source": {
+    "pattern": "new Blob([$bufferSource])",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true,
+      "part_inferred_as": "ArrayBuffer or ArrayBufferView"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Create",
+    "template": "WebBlob.Create([$bufferSource], undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "byte_range": "view's exposed bytes only",
+    "snapshot": "copied at construction"
+  },
+  "caveats": [
+    "Later mutation/detachment of the source must not change Blob bytes."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "copies typed array",
+      "input": "const a=new Uint8Array([1]); const b=new Blob([a]); a[0]=9; b.arrayBuffer().then(x=>console.log(new Uint8Array(x)[0]))",
+      "expected_behavior": "eventually prints 1"
+    },
+    {
+      "name": "view range",
+      "input": "const a=new Uint8Array([1,2,3]); console.log(new Blob([a.subarray(1,2)]).size)",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

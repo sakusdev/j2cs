@@ -1,0 +1,42 @@
+{
+  "id": "web.file.constructor",
+  "category": "web_encoding_file",
+  "summary": "Construct File as Blob plus name and lastModified metadata.",
+  "source": {
+    "pattern": "new File($parts, $name, $options)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFile.Create",
+    "template": "WebFile.Create($parts, $name, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inherits": "Blob byte/type processing",
+    "name_conversion": "USVString",
+    "lastModified": "options value or current time",
+    "type_endings": "BlobPropertyBag semantics"
+  },
+  "caveats": [
+    "A File is not necessarily an open filesystem handle."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "metadata",
+      "input": "const f=new File(['x'],'a.txt',{type:'Text/PLAIN',lastModified:7}); console.log(f.name,f.type,f.lastModified,f.size)",
+      "expected_behavior": "prints a.txt text/plain 7 1"
+    },
+    {
+      "name": "is Blob",
+      "input": "console.log(new File([],'a') instanceof Blob)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "web.text-decoder.properties",
+  "category": "web_encoding_file",
+  "summary": "Expose canonical encoding, fatal, and ignoreBOM properties.",
+  "source": {
+    "pattern": "$decoder.$property",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.GetTextDecoderProperty",
+    "template": "WebEncoding.GetTextDecoderProperty($decoder, $property)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "encoding": "canonical lower-case name",
+    "fatal": "constructor option boolean",
+    "ignoreBOM": "constructor option boolean"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "options",
+      "input": "const d=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}); console.log(d.encoding,d.fatal,d.ignoreBOM)",
+      "expected_behavior": "prints utf-8 true true"
+    },
+    {
+      "name": "defaults",
+      "input": "const d=new TextDecoder(); console.log(d.fatal,d.ignoreBOM)",
+      "expected_behavior": "prints false false"
+    }
+  ]
+}

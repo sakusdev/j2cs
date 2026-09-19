@@ -1,0 +1,40 @@
+{
+  "id": "web.text-encoder.constructor",
+  "category": "web_encoding_file",
+  "summary": "Construct the UTF-8-only TextEncoder.",
+  "source": {
+    "pattern": "new TextEncoder()",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.CreateTextEncoder",
+    "template": "WebEncoding.CreateTextEncoder()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "encoding": "utf-8 only",
+    "state": "stateless"
+  },
+  "caveats": [
+    "TextEncoder does not accept an encoding label."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "constructs",
+      "input": "console.log(new TextEncoder().encoding)",
+      "expected_behavior": "prints utf-8"
+    },
+    {
+      "name": "arguments ignored by Web IDL constructor shape",
+      "input": "console.log(new TextEncoder('utf-16').encoding)",
+      "expected_behavior": "prints utf-8"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.form-data.constructor.form",
+  "category": "web_encoding_file",
+  "summary": "Construct FormData from a form using successful-controls and formdata-event semantics.",
+  "source": {
+    "pattern": "new FormData($form, $submitter)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true,
+      "form_argument_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.WebFormDataFromForm($form, $submitter)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "controls": "successful form controls in HTML-defined order",
+    "submitter": "validated optional submit button",
+    "event": "formdata event can mutate result",
+    "files": "File entries retained"
+  },
+  "caveats": [
+    "Requires live HTML form state; do not duplicate DOM_FORMS ownership."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData",
+    "WHATWG HTML forms"
+  ],
+  "tests": [
+    {
+      "name": "form values",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.name='x';i.value='y';f.append(i); console.log(new FormData(f).get('x'))",
+      "expected_behavior": "prints y"
+    },
+    {
+      "name": "disabled omitted",
+      "input": "const f=document.createElement('form'); const i=document.createElement('input'); i.name='x';i.value='y';i.disabled=true;f.append(i); console.log(new FormData(f).has('x'))",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "web.blob.text",
+  "category": "web_encoding_file",
+  "summary": "Read Blob bytes as UTF-8 and fulfill a Promise with decoded text.",
+  "source": {
+    "pattern": "$blob.text()",
+    "requirements": {
+      "receiver_inferred_as": "Blob",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.TextAsync",
+    "template": "WebBlob.TextAsync($blob)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<string>",
+    "encoding": "UTF-8 decode with replacement",
+    "async": "promise settlement",
+    "bytes": "immutable snapshot"
+  },
+  "caveats": [
+    "This is Blob-specific reading, not Response body ownership."
+  ],
+  "references": [
+    "W3C File API",
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "text",
+      "input": "new Blob(['x']).text().then(console.log)",
+      "expected_behavior": "eventually prints x"
+    },
+    {
+      "name": "invalid utf8 replaces",
+      "input": "new Blob([new Uint8Array([255])]).text().then(x=>console.log(x.codePointAt(0).toString(16)))",
+      "expected_behavior": "eventually prints fffd"
+    }
+  ]
+}

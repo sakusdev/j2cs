@@ -1,0 +1,44 @@
+{
+  "id": "web.form-data.set.string",
+  "category": "web_encoding_file",
+  "summary": "Set a string FormData entry, replacing all same-name entries while preserving first-match position.",
+  "source": {
+    "pattern": "$fd.set($name, $value)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true,
+      "value_inferred_not_blob": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.SetString",
+    "template": "WebFormData.SetString($fd, $name, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "if_present": "replace first matching entry then remove later matches",
+    "position": "first matching entry position retained",
+    "if_absent": "append",
+    "duplicates_after": "one for that name"
+  },
+  "caveats": [
+    "Clear-and-append can reorder relative entries incorrectly."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "replace duplicates",
+      "input": "const f=new FormData();f.append('x','1');f.append('y','a');f.append('x','2');f.set('x','9');console.log([...f].map(([k,v])=>k+v).join(','))",
+      "expected_behavior": "prints x9,ya"
+    },
+    {
+      "name": "absent appends",
+      "input": "const f=new FormData();f.append('a','1');f.set('b','2');console.log([...f.keys()].join(','))",
+      "expected_behavior": "prints a,b"
+    }
+  ]
+}

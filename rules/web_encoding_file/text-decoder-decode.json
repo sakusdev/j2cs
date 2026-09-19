@@ -1,0 +1,44 @@
+{
+  "id": "web.text-decoder.decode",
+  "category": "web_encoding_file",
+  "summary": "Decode BufferSource bytes with selected encoding and replacement error mode.",
+  "source": {
+    "pattern": "$decoder.decode($input, $options)",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true,
+      "fatal_is_false": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.Decode",
+    "template": "WebEncoding.Decode($decoder, $input, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "input": "AllowSharedBufferSource or undefined",
+    "default_input": "empty bytes",
+    "default_error_mode": "replacement",
+    "stream_option": "controls decoder state retention"
+  },
+  "caveats": [
+    "Decoder state must persist only across decode calls with stream:true."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "utf8",
+      "input": "console.log(new TextDecoder().decode(new Uint8Array([0xE2,0x82,0xAC])))",
+      "expected_behavior": "prints €"
+    },
+    {
+      "name": "invalid replacement",
+      "input": "console.log(new TextDecoder().decode(new Uint8Array([0xff])).codePointAt(0).toString(16))",
+      "expected_behavior": "prints fffd"
+    }
+  ]
+}

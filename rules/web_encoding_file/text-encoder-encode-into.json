@@ -1,0 +1,46 @@
+{
+  "id": "web.text-encoder.encode-into",
+  "category": "web_encoding_file",
+  "summary": "Encode into an existing Uint8Array and return read/written counts.",
+  "source": {
+    "pattern": "$encoder.encodeInto($source, $destination)",
+    "requirements": {
+      "receiver_inferred_as": "TextEncoder",
+      "builtin_webidl_member_not_overridden": true,
+      "destination_inferred_as": "Uint8Array"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.EncodeInto",
+    "template": "WebEncoding.EncodeInto($source, $destination)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "input_conversion": "USVString",
+    "destination": "mutated in place",
+    "return_object": "{read,written}",
+    "read_units": "UTF-16 code units",
+    "written_units": "bytes",
+    "partial_write": true
+  },
+  "caveats": [
+    "read counts UTF-16 code units, not Unicode scalar values."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "counts",
+      "input": "const d=new Uint8Array(4); console.log(JSON.stringify(new TextEncoder().encodeInto('💩',d)),[...d].join(','))",
+      "expected_behavior": "prints {read:2,written:4} and UTF-8 bytes"
+    },
+    {
+      "name": "zero capacity",
+      "input": "console.log(JSON.stringify(new TextEncoder().encodeInto('a',new Uint8Array(0))))",
+      "expected_behavior": "prints {\"read\":0,\"written\":0}"
+    }
+  ]
+}

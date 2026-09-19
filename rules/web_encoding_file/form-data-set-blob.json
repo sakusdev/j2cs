@@ -1,0 +1,40 @@
+{
+  "id": "web.form-data.set.blob",
+  "category": "web_encoding_file",
+  "summary": "Set a Blob/File FormData entry with filename semantics and same-name replacement ordering.",
+  "source": {
+    "pattern": "$fd.set($name, $blob, $filename)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true,
+      "value_inferred_as": "Blob"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.SetBlob",
+    "template": "WebFormData.SetBlob($fd, $name, $blob, $filename)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "replacement_order": "first match position retained; later matches removed",
+    "filename": "explicit override else File.name/'blob'"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "filename override",
+      "input": "const f=new FormData();f.set('x',new Blob(['a']),'z.bin');console.log(f.get('x').name)",
+      "expected_behavior": "prints z.bin"
+    },
+    {
+      "name": "file default",
+      "input": "const f=new FormData();f.set('x',new File([],'a.txt'));console.log(f.get('x').name)",
+      "expected_behavior": "prints a.txt"
+    }
+  ]
+}

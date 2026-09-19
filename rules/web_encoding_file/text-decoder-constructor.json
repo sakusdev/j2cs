@@ -1,0 +1,45 @@
+{
+  "id": "web.text-decoder.constructor",
+  "category": "web_encoding_file",
+  "summary": "Construct TextDecoder using the Encoding label table and options.",
+  "source": {
+    "pattern": "new TextDecoder($label, $options)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.CreateTextDecoder",
+    "template": "WebEncoding.CreateTextDecoder($label, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "label": "trim ASCII whitespace then canonical label lookup",
+    "default_label": "utf-8",
+    "options": [
+      "fatal",
+      "ignoreBOM"
+    ],
+    "unknown_label": "RangeError"
+  },
+  "caveats": [
+    "Encoding labels are WHATWG-defined aliases, not arbitrary .NET Encoding names."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "default utf8",
+      "input": "console.log(new TextDecoder().encoding)",
+      "expected_behavior": "prints utf-8"
+    },
+    {
+      "name": "alias canonicalizes",
+      "input": "console.log(new TextDecoder('UTF8').encoding)",
+      "expected_behavior": "prints utf-8"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "web.text-decoder.bom",
+  "category": "web_encoding_file",
+  "summary": "Strip an initial encoding BOM when ignoreBOM is false.",
+  "source": {
+    "pattern": "$decoder.decode($input)",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true,
+      "ignoreBOM_is_false": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.Decode",
+    "template": "WebEncoding.Decode($decoder, $input, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "BOM": "UTF-8/UTF-16 matching BOM is consumed at start",
+    "BOM_seen_state": "tracked across streaming calls"
+  },
+  "caveats": [
+    "BOM handling is wrapper behavior, not merely decoder-byte behavior."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "utf8 bom stripped",
+      "input": "console.log(new TextDecoder().decode(new Uint8Array([0xef,0xbb,0xbf,65])))",
+      "expected_behavior": "prints A"
+    },
+    {
+      "name": "later bom is data",
+      "input": "console.log(new TextDecoder().decode(new Uint8Array([65,0xef,0xbb,0xbf,66])).length)",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

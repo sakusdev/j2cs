@@ -1,0 +1,40 @@
+{
+  "id": "web.blob.slice.type",
+  "category": "web_encoding_file",
+  "summary": "Normalize Blob.slice contentType independently of source type.",
+  "source": {
+    "pattern": "$blob.slice($start, $end, $contentType)",
+    "requirements": {
+      "receiver_inferred_as": "Blob",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Slice",
+    "template": "WebBlob.Slice($blob, $start, $end, $contentType)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default_type": "empty string",
+    "normalization": "ASCII lowercase if all chars U+0020..U+007E; otherwise empty",
+    "source_type": "not inherited unless passed"
+  },
+  "caveats": [],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "default empty",
+      "input": "console.log(new Blob(['a'],{type:'text/plain'}).slice().type==='')",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "lowercase",
+      "input": "console.log(new Blob().slice(0,0,'Text/X').type)",
+      "expected_behavior": "prints text/x"
+    }
+  ]
+}

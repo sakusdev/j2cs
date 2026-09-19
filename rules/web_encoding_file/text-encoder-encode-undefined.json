@@ -1,0 +1,41 @@
+{
+  "id": "web.text-encoder.encode.undefined",
+  "category": "web_encoding_file",
+  "summary": "Preserve omitted/undefined TextEncoder.encode input conversion.",
+  "source": {
+    "pattern": "$encoder.encode()",
+    "requirements": {
+      "receiver_inferred_as": "TextEncoder",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.EncodeUtf8",
+    "template": "WebEncoding.EncodeUtf8(\"\")"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "omitted_input": "empty string by default argument",
+    "result": "empty Uint8Array"
+  },
+  "caveats": [
+    "Do not coerce omitted input to the literal string 'undefined'."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "omitted",
+      "input": "console.log(new TextEncoder().encode().length)",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "explicit undefined",
+      "input": "console.log(new TextEncoder().encode(undefined).length)",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

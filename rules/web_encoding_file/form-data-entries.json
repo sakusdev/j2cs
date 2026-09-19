@@ -1,0 +1,42 @@
+{
+  "id": "web.form-data.entries",
+  "category": "web_encoding_file",
+  "summary": "Iterate FormData name/value pairs in insertion-list order.",
+  "source": {
+    "pattern": "$fd.entries()",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Entries",
+    "template": "WebFormData.Entries($fd)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "iterator": "live-ish iterator over entry list per Web IDL iterable semantics",
+    "order": "entry-list order",
+    "duplicates": "included"
+  },
+  "caveats": [
+    "Do not sort names or collapse duplicates."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "order",
+      "input": "const f=new FormData();f.append('b','1');f.append('a','2');console.log([...f.entries()].map(x=>x[0]).join(','))",
+      "expected_behavior": "prints b,a"
+    },
+    {
+      "name": "duplicates",
+      "input": "const f=new FormData();f.append('x','1');f.append('x','2');console.log([...f.entries()].length)",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

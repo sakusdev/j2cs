@@ -1,0 +1,39 @@
+{
+  "id": "web.form-data.iterator",
+  "category": "web_encoding_file",
+  "summary": "Use entries semantics for FormData default iteration.",
+  "source": {
+    "pattern": "$fd[Symbol.iterator]()",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Entries",
+    "template": "WebFormData.Entries($fd)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "alias": "entries iterator semantics",
+    "order": "entry-list order"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "spread pairs",
+      "input": "const f=new FormData();f.append('x','1');console.log([...f][0][0])",
+      "expected_behavior": "prints x"
+    },
+    {
+      "name": "symbol iterator",
+      "input": "const f=new FormData();console.log(f[Symbol.iterator]===f.entries)",
+      "expected_behavior": "prints true in conforming implementations"
+    }
+  ]
+}

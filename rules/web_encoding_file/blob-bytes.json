@@ -1,0 +1,42 @@
+{
+  "id": "web.blob.bytes",
+  "category": "web_encoding_file",
+  "summary": "Fulfill a Promise with a fresh Uint8Array containing Blob bytes.",
+  "source": {
+    "pattern": "$blob.bytes()",
+    "requirements": {
+      "receiver_inferred_as": "Blob",
+      "builtin_webidl_member_not_overridden": true,
+      "host_supports_blob_bytes": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.BytesAsync",
+    "template": "WebBlob.BytesAsync($blob)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<Uint8Array>",
+    "copy": "fresh byte array"
+  },
+  "caveats": [
+    "Feature availability is platform/runtime-version dependent; only apply when the Blob.bytes surface exists."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "bytes",
+      "input": "new Blob([new Uint8Array([1,2])]).bytes().then(b=>console.log([...b].join(',')))",
+      "expected_behavior": "eventually prints 1,2"
+    },
+    {
+      "name": "fresh",
+      "input": "const b=new Blob(['x']); Promise.all([b.bytes(),b.bytes()]).then(([x,y])=>console.log(x===y))",
+      "expected_behavior": "eventually prints false"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "web.form-data.for-each",
+  "category": "web_encoding_file",
+  "summary": "Invoke callback for each FormData entry in order with value, name, and FormData.",
+  "source": {
+    "pattern": "$fd.forEach($callback, $thisArg)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.ForEach",
+    "template": "WebFormData.ForEach($fd, $callback, $thisArg)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "arguments": "value, name, FormData",
+    "this_binding": "thisArg through Web IDL callback semantics",
+    "order": "entry-list order",
+    "mutation": "iteration follows platform iterable mutation semantics"
+  },
+  "caveats": [
+    "Reuse FUNCTIONS for callable invocation; do not map blindly to Dictionary.ForEach."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "arguments",
+      "input": "const f=new FormData();f.append('x','1');f.forEach((v,k,o)=>console.log(v,k,o===f))",
+      "expected_behavior": "prints 1 x true"
+    },
+    {
+      "name": "order",
+      "input": "const f=new FormData();f.append('b','1');f.append('a','2');let x='';f.forEach((v,k)=>x+=k);console.log(x)",
+      "expected_behavior": "prints ba"
+    }
+  ]
+}

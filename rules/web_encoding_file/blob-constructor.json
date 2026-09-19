@@ -1,0 +1,44 @@
+{
+  "id": "web.blob.constructor",
+  "category": "web_encoding_file",
+  "summary": "Construct an immutable Blob by processing BlobPart values in order.",
+  "source": {
+    "pattern": "new Blob($parts, $options)",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Create",
+    "template": "WebBlob.Create($parts, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "parts_order": "concatenate processed byte sequences",
+    "immutability": "snapshot/copy semantics",
+    "options": [
+      "type",
+      "endings"
+    ]
+  },
+  "caveats": [
+    "Do not keep mutable ArrayBuffer/TypedArray views as backing aliases."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "concat",
+      "input": "new Blob(['a','b']).text().then(x=>console.log(x))",
+      "expected_behavior": "eventually prints ab"
+    },
+    {
+      "name": "empty",
+      "input": "console.log(new Blob().size)",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

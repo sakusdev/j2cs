@@ -1,0 +1,41 @@
+{
+  "id": "web.file.webkit-relative-path",
+  "category": "web_encoding_file",
+  "summary": "Expose File.webkitRelativePath supplied by selection APIs; constructed Files normally have empty path.",
+  "source": {
+    "pattern": "$file.webkitRelativePath",
+    "requirements": {
+      "receiver_inferred_as": "File",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFile.GetWebkitRelativePath",
+    "template": "WebFile.GetWebkitRelativePath($file)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "constructed_file": "empty string",
+    "selected_directory_file": "host-provided relative path"
+  },
+  "caveats": [
+    "This is not an absolute native filesystem path."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "constructed empty",
+      "input": "console.log(new File([],'x').webkitRelativePath==='')",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "type string",
+      "input": "console.log(typeof new File([],'x').webkitRelativePath)",
+      "expected_behavior": "prints string"
+    }
+  ]
+}

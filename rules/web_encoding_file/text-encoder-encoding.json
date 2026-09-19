@@ -1,0 +1,39 @@
+{
+  "id": "web.text-encoder.encoding",
+  "category": "web_encoding_file",
+  "summary": "Read TextEncoder.encoding.",
+  "source": {
+    "pattern": "$encoder.encoding",
+    "requirements": {
+      "receiver_inferred_as": "TextEncoder",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.TextEncoderEncoding",
+    "template": "WebEncoding.TextEncoderEncoding($encoder)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return_value": "utf-8",
+    "readonly": true
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "fixed encoding",
+      "input": "console.log(new TextEncoder().encoding)",
+      "expected_behavior": "prints utf-8"
+    },
+    {
+      "name": "lowercase canonical name",
+      "input": "console.log(new TextEncoder().encoding==='utf-8')",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

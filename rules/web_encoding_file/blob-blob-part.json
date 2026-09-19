@@ -1,0 +1,41 @@
+{
+  "id": "web.blob.blob-part",
+  "category": "web_encoding_file",
+  "summary": "Append another Blob's immutable bytes without string coercion.",
+  "source": {
+    "pattern": "new Blob([$blob])",
+    "requirements": {
+      "global_constructor_resolves_to_builtin": true,
+      "part_inferred_as": "Blob"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebBlob.Create",
+    "template": "WebBlob.Create([$blob], undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "bytes": "source Blob byte sequence",
+    "source_type": "does not automatically become result type"
+  },
+  "caveats": [
+    "The nested Blob's MIME type is not concatenated into the outer type."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "bytes reused logically",
+      "input": "const x=new Blob(['a'],{type:'text/plain'}); const y=new Blob([x]); console.log(y.size,y.type==='')",
+      "expected_behavior": "prints 1 true"
+    },
+    {
+      "name": "order",
+      "input": "new Blob([new Blob(['a']),'b']).text().then(console.log)",
+      "expected_behavior": "eventually prints ab"
+    }
+  ]
+}

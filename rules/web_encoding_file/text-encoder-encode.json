@@ -1,0 +1,43 @@
+{
+  "id": "web.text-encoder.encode",
+  "category": "web_encoding_file",
+  "summary": "Encode a USVString to a fresh Uint8Array using UTF-8.",
+  "source": {
+    "pattern": "$encoder.encode($input)",
+    "requirements": {
+      "receiver_inferred_as": "TextEncoder",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.EncodeUtf8",
+    "template": "WebEncoding.EncodeUtf8($input)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "input_conversion": "USVString",
+    "result": "fresh Uint8Array",
+    "encoding": "UTF-8",
+    "lone_surrogates": "converted to U+FFFD before encoding"
+  },
+  "caveats": [
+    "Do not use UTF-16 code units directly as bytes."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "ascii",
+      "input": "console.log([...new TextEncoder().encode('A')])",
+      "expected_behavior": "prints 65"
+    },
+    {
+      "name": "astral",
+      "input": "console.log([...new TextEncoder().encode('💩')].join(','))",
+      "expected_behavior": "prints 240,159,146,169"
+    }
+  ]
+}

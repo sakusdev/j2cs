@@ -1,0 +1,43 @@
+{
+  "id": "web.text-decoder.fatal",
+  "category": "web_encoding_file",
+  "summary": "Throw TypeError on decoding errors when fatal is true.",
+  "source": {
+    "pattern": "$decoder.decode($input, $options)",
+    "requirements": {
+      "receiver_inferred_as": "TextDecoder",
+      "builtin_webidl_member_not_overridden": true,
+      "fatal_is_true": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebEncoding.Decode",
+    "template": "WebEncoding.Decode($decoder, $input, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "error_mode": "fatal",
+    "decode_error": "TypeError",
+    "state_reset_after_non_streaming_decode": true
+  },
+  "caveats": [
+    "Do not surface DecoderFallbackException directly as a JavaScript-visible type."
+  ],
+  "references": [
+    "WHATWG Encoding Standard"
+  ],
+  "tests": [
+    {
+      "name": "invalid throws",
+      "input": "try{new TextDecoder('utf-8',{fatal:true}).decode(new Uint8Array([0xff]))}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "valid works",
+      "input": "console.log(new TextDecoder('utf-8',{fatal:true}).decode(new Uint8Array([65])))",
+      "expected_behavior": "prints A"
+    }
+  ]
+}

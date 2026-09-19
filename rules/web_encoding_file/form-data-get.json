@@ -1,0 +1,42 @@
+{
+  "id": "web.form-data.get",
+  "category": "web_encoding_file",
+  "summary": "Return the first same-name FormData value or null.",
+  "source": {
+    "pattern": "$fd.get($name)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.Get",
+    "template": "WebFormData.Get($fd, $name)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "name": "USVString",
+    "return": "first string or File value",
+    "missing": "null"
+  },
+  "caveats": [
+    "Missing is null, not undefined."
+  ],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "first",
+      "input": "const f=new FormData();f.append('x','1');f.append('x','2');console.log(f.get('x'))",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "missing",
+      "input": "console.log(new FormData().get('x')===null)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

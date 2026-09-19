@@ -1,0 +1,40 @@
+{
+  "id": "web.form-data.get-all",
+  "category": "web_encoding_file",
+  "summary": "Return all same-name FormData values in entry-list order.",
+  "source": {
+    "pattern": "$fd.getAll($name)",
+    "requirements": {
+      "receiver_inferred_as": "FormData",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFormData.GetAll",
+    "template": "WebFormData.GetAll($fd, $name)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "new sequence of matching values",
+    "order": "entry-list order",
+    "missing": "empty array"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG XMLHttpRequest Standard — FormData"
+  ],
+  "tests": [
+    {
+      "name": "all",
+      "input": "const f=new FormData();f.append('x','1');f.append('x','2');console.log(f.getAll('x').join(','))",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "empty",
+      "input": "console.log(new FormData().getAll('x').length)",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

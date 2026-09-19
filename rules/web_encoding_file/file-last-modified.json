@@ -1,0 +1,41 @@
+{
+  "id": "web.file.last-modified",
+  "category": "web_encoding_file",
+  "summary": "Expose File.lastModified milliseconds since Unix epoch.",
+  "source": {
+    "pattern": "$file.lastModified",
+    "requirements": {
+      "receiver_inferred_as": "File",
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebFile.GetLastModified",
+    "template": "WebFile.GetLastModified($file)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "long long milliseconds since Unix epoch",
+    "readonly": true
+  },
+  "caveats": [
+    "Filesystem-originated File timestamp quality is host-defined; constructed File uses provided/default timestamp."
+  ],
+  "references": [
+    "W3C File API"
+  ],
+  "tests": [
+    {
+      "name": "explicit",
+      "input": "console.log(new File([],'x',{lastModified:123}).lastModified)",
+      "expected_behavior": "prints 123"
+    },
+    {
+      "name": "integer conversion",
+      "input": "console.log(Number.isInteger(new File([],'x').lastModified))",
+      "expected_behavior": "prints true"
+    }
+  ]
+}
