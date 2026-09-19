@@ -1,0 +1,41 @@
+{
+  "id": "array.prototype.entries.holes",
+  "category": "array",
+  "summary": "Array entries iterators read holes with Get and therefore yield present pair values containing undefined.",
+  "source": {
+    "pattern": "$array.entries()",
+    "requirements": {
+      "method_resolution_intrinsic": true,
+      "receiver_inferred_as_builtin_array": true,
+      "receiver_not_proxy": true,
+      "builtin_method_not_overridden": true,
+      "holes_may_be_present": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Entries",
+    "template": "JsArray.Entries($array)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "holes": "yield [index, undefined], do not skip",
+    "property_get": "current value at visit time"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "hole yielded",
+      "input": "const v=[,].entries().next().value; console.log(v[0],v[1],v.length);",
+      "expected_behavior": "prints 0 undefined 2"
+    },
+    {
+      "name": "fill before visit",
+      "input": "const a=[,]; const it=a.entries(); a[0]=3; console.log(it.next().value[1]);",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

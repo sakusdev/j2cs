@@ -1,0 +1,41 @@
+{
+  "id": "array.from.dynamic-iterable",
+  "category": "array",
+  "summary": "Use runtime iterator acquisition when Array.from source @@iterator lookup/call is dynamic.",
+  "source": {
+    "pattern": "Array.from($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_iterator_lookup_or_callable_may_be_dynamic": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFrom",
+    "template": "JsRuntime.ArrayFrom($source, undefined, undefined)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "lookup": "GetMethod(source, Symbol.iterator) is observable",
+    "fallback": "only if iterator method is undefined/null use array-like path",
+    "iterator_close": "preserve on abrupt completion"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "iterator getter",
+      "input": "let n=0; const x={length:0,get [Symbol.iterator](){n++; return function*(){yield 1}}}; Array.from(x); console.log(n);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "bad iterator result",
+      "input": "const x={[Symbol.iterator](){return 1}}; try{Array.from(x)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

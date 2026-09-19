@@ -1,0 +1,48 @@
+{
+  "id": "array.prototype.flatmap.array-only",
+  "category": "array",
+  "summary": "flatMap flattens only actual Arrays; iterable or @@isConcatSpreadable non-Arrays stay as single values.",
+  "source": {
+    "pattern": "$array.flatMap($callback)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true,
+      "array_species_is_builtin_array": true,
+      "callback_statically_callable_and_lowerable": true,
+      "mapped_result_not_dynamic_proxy": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FlatMap",
+    "template": "JsArray.FlatMap($array, $callback, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "flatten_condition": "IsArray(mappedValue)",
+    "symbol_is_concat_spreadable": "ignored",
+    "generic_iterables": "not flattened"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "iterable not flattened",
+      "input": "const s=new Set([2,3]); const r=[1].flatMap(()=>s); console.log(r.length,r[0]===s);",
+      "expected_behavior": "prints 1 true"
+    },
+    {
+      "name": "spreadable object not flattened",
+      "input": "const o={0:'x',length:1,[Symbol.isConcatSpreadable]:true}; const r=[1].flatMap(()=>o); console.log(r[0]===o);",
+      "expected_behavior": "prints true"
+    }
+  ],
+  "caveats": [
+    "Custom Symbol.species remains owned by the existing array.custom-species.runtime rule."
+  ]
+}

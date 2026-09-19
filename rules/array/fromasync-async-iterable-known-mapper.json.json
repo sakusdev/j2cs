@@ -1,0 +1,45 @@
+{
+  "id": "array.fromasync.async-iterable-known-mapper",
+  "category": "array",
+  "summary": "Map async-iterator values with a known mapper and Await each mapper result.",
+  "source": {
+    "pattern": "Array.fromAsync($asyncIterable, $mapper, $thisArg)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "source_has_known_async_iterator": true,
+      "mapper_statically_callable_and_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromAsyncIterableMap",
+    "template": "JsAsyncArray.FromAsyncIterableMap($asyncIterable, $mapper, $thisArg)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mapper_arguments": [
+      "nextValue",
+      "index"
+    ],
+    "mapper_this": "thisArg",
+    "mapper_result": "Await before property creation",
+    "iterator_close": "on abrupt mapper/await/property write"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "async mapper",
+      "input": "(async()=>console.log((await Array.fromAsync([1,2],async x=>x*2)).join(',')))();",
+      "expected_behavior": "prints 2,4"
+    },
+    {
+      "name": "mapper index",
+      "input": "(async()=>console.log((await Array.fromAsync([2,2],(v,i)=>v+i)).join(',')))();",
+      "expected_behavior": "prints 2,3"
+    }
+  ]
+}

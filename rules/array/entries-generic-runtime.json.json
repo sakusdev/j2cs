@@ -1,0 +1,40 @@
+{
+  "id": "array.prototype.entries.generic",
+  "category": "array",
+  "summary": "Use runtime object-model semantics for Array.prototype.entries borrowed onto a generic array-like.",
+  "source": {
+    "pattern": "Array.prototype.entries.call($object)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.prototype.entries%",
+      "receiver_may_be_generic_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayEntries",
+    "template": "JsRuntime.ArrayEntries($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "to_object": true,
+    "length": "LengthOfArrayLike on every iterator next",
+    "value": "Get(object,index) each step",
+    "entry": "fresh [index,value] Array"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "generic",
+      "input": "const o={0:'x',length:1}; console.log(Array.prototype.entries.call(o).next().value.join(','));",
+      "expected_behavior": "prints 0,x"
+    },
+    {
+      "name": "length getter observable",
+      "input": "let n=0; const o={0:'x',get length(){n++;return 1}}; const it=Array.prototype.entries.call(o); it.next(); it.next(); console.log(n>=2);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

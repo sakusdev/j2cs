@@ -1,0 +1,41 @@
+{
+  "id": "array.prototype.flat.generic-arraylike",
+  "category": "array",
+  "summary": "Use runtime property semantics when flat is borrowed onto a generic array-like object.",
+  "source": {
+    "pattern": "Array.prototype.flat.call($object, $depth)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.prototype.flat%",
+      "receiver_may_be_generic_object_or_proxy": true,
+      "array_species_handled_by_runtime": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFlatGeneric",
+    "template": "JsRuntime.ArrayFlatGeneric($object, $depth)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ToObject then LengthOfArrayLike",
+    "properties": "HasProperty/Get may execute getters, proxy traps, or prototype lookup",
+    "flatten_condition": "IsArray only",
+    "holes": "absent properties skipped"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "array-like",
+      "input": "console.log(Array.prototype.flat.call({0:[1,2],length:1}).join(','));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "getter observable",
+      "input": "let n=0; const o={length:1,get 0(){n++;return [1]}}; Array.prototype.flat.call(o); console.log(n);",
+      "expected_behavior": "prints 1"
+    }
+  ]
+}

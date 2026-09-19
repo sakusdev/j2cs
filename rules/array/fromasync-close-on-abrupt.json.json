@@ -1,0 +1,42 @@
+{
+  "id": "array.fromasync.iterator-close-on-abrupt",
+  "category": "array",
+  "summary": "Perform AsyncIteratorClose when known Array.fromAsync iteration/map processing fails after iterator acquisition.",
+  "source": {
+    "pattern": "Array.fromAsync($items, $mapper)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "iterator_protocol_lowerable": true,
+      "mapper_statically_callable_and_lowerable": true,
+      "iterator_return_semantics_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromAsyncIterableMap",
+    "template": "JsAsyncArray.FromAsyncIterableMap($items, $mapper, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "close": "AsyncIteratorClose",
+    "triggers": "mapper throw/rejection, invalid awaited IteratorResult, result property failure, index overflow",
+    "completion": "propagate/reject per close precedence"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "mapper reject closes",
+      "input": "let closed=false; const x={async *[Symbol.asyncIterator](){try{yield 1;yield 2}finally{closed=true}}}; Array.fromAsync(x,()=>Promise.reject('x')).catch(()=>setTimeout(()=>console.log(closed),0));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "mapper throw rejects",
+      "input": "Array.fromAsync([1],()=>{throw 'x'}).catch(e=>console.log(e));",
+      "expected_behavior": "prints x"
+    }
+  ]
+}

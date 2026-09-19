@@ -1,0 +1,41 @@
+{
+  "id": "array.fromasync.dynamic-mapper",
+  "category": "array",
+  "summary": "Use runtime callability/Proxy semantics for a dynamic Array.fromAsync mapper.",
+  "source": {
+    "pattern": "Array.fromAsync($items, $mapper, $thisArg)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "mapper_may_be_dynamic_callable_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFromAsync",
+    "template": "JsRuntime.ArrayFromAsync($items, $mapper, $thisArg)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callability": "validated before source iteration",
+    "call": "canonical JS [[Call]]",
+    "result": "Await mapper result",
+    "error": "reject Promise and close iterator if acquired"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "noncallable",
+      "input": "Array.fromAsync([1],3).catch(e=>console.log(e.name));",
+      "expected_behavior": "prints TypeError"
+    },
+    {
+      "name": "proxy mapper",
+      "input": "const f=new Proxy(x=>x,{apply(t,th,a){return a[0]+2}}); Array.fromAsync([1],f).then(r=>console.log(r[0]));",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

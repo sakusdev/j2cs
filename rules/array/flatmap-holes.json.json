@@ -1,0 +1,48 @@
+{
+  "id": "array.prototype.flatmap.holes",
+  "category": "array",
+  "summary": "Preserve flatMap's source-hole skipping and mapped-array-hole skipping semantics.",
+  "source": {
+    "pattern": "$array.flatMap($callback)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true,
+      "array_species_is_builtin_array": true,
+      "callback_statically_callable_and_lowerable": true,
+      "holes_may_be_present": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FlatMap",
+    "template": "JsArray.FlatMap($array, $callback, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source_holes": "callback not invoked",
+    "mapped_array_holes": "skipped by FlattenIntoArray",
+    "result": "dense at positions contributed by present mapped values"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "source and result holes skipped",
+      "input": "const r=[1,,2].flatMap(x=>x===1?[,10]:[20]); console.log(r.length,r.join(','));",
+      "expected_behavior": "prints 2 10,20"
+    },
+    {
+      "name": "deleted future item skipped",
+      "input": "const a=[1,2]; let n=0; const r=a.flatMap((x,i)=>{n++; if(i===0)delete a[1]; return [x]}); console.log(n,r.join(','));",
+      "expected_behavior": "prints 1 1"
+    }
+  ],
+  "caveats": [
+    "Custom Symbol.species remains owned by the existing array.custom-species.runtime rule."
+  ]
+}

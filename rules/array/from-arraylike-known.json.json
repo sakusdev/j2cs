@@ -1,0 +1,44 @@
+{
+  "id": "array.from.arraylike-known",
+  "category": "array",
+  "summary": "Create a dense Array from a known non-iterable array-like using Get on every index.",
+  "source": {
+    "pattern": "Array.from($arrayLike)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_proven_non_iterable_array_like": true,
+      "length_of_array_like_lowerable": true,
+      "indexed_gets_lowerable": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromArrayLike",
+    "template": "JsArray.FromArrayLike($arrayLike)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length": "LengthOfArrayLike",
+    "index_access": "Get for every k from 0 to len-1",
+    "holes": "missing properties read as undefined and become present properties",
+    "result_length": "len"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "array-like",
+      "input": "console.log(Array.from({0:'a',1:'b',length:2}).join(','));",
+      "expected_behavior": "prints a,b"
+    },
+    {
+      "name": "missing property becomes present undefined",
+      "input": "const r=Array.from({length:2,1:'x'}); console.log(0 in r,r[0],r.length);",
+      "expected_behavior": "prints true undefined 2"
+    }
+  ]
+}

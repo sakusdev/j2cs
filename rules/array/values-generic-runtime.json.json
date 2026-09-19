@@ -1,0 +1,39 @@
+{
+  "id": "array.prototype.values.generic",
+  "category": "array",
+  "summary": "Use runtime Get/LengthOfArrayLike semantics when Array values is borrowed onto generic object.",
+  "source": {
+    "pattern": "Array.prototype.values.call($object)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.prototype.values%",
+      "receiver_may_be_generic_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayValues",
+    "template": "JsRuntime.ArrayValues($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "to_object": true,
+    "length": "re-read each next",
+    "value": "Get(object,index), including prototype/getter/proxy behavior"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "generic values",
+      "input": "console.log([...Array.prototype.values.call({0:'a',length:1})][0]);",
+      "expected_behavior": "prints a"
+    },
+    {
+      "name": "getter observed",
+      "input": "let n=0; const o={length:1,get 0(){n++;return 4}}; console.log(Array.prototype.values.call(o).next().value,n);",
+      "expected_behavior": "prints 4 1"
+    }
+  ]
+}

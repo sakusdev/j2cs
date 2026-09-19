@@ -1,0 +1,42 @@
+{
+  "id": "array.from.string-no-mapper",
+  "category": "array",
+  "summary": "Create an Array from String iteration by Unicode code points rather than UTF-16 code units.",
+  "source": {
+    "pattern": "Array.from($string)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_static_type": "String",
+      "mapper_omitted": true,
+      "intrinsic_string_iterator": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromStringIterable",
+    "template": "JsArray.FromStringIterable($string)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "path": "iterable",
+    "iteration": "String @@iterator yields code-point strings",
+    "result_elements": "Strings"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "astral character",
+      "input": "const r=Array.from('A😀B'); console.log(r.length,r[1]);",
+      "expected_behavior": "prints 3 😀"
+    },
+    {
+      "name": "empty string",
+      "input": "console.log(Array.from('').length);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

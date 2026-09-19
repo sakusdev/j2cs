@@ -1,0 +1,43 @@
+{
+  "id": "array.from.known-iterable",
+  "category": "array",
+  "summary": "Consume a statically lowerable synchronous iterable and create a dense intrinsic Array.",
+  "source": {
+    "pattern": "Array.from($iterable)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_has_known_sync_iterator": true,
+      "iterator_protocol_lowerable": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromIterable",
+    "template": "JsArray.FromIterable($iterable)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "iterator_method": "GetMethod(@@iterator) selected before array-like path",
+    "next": "zero-argument IteratorStepValue semantics",
+    "iterator_close": "on abrupt property creation/overflow",
+    "max_index": "2^53-1"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "custom known iterable",
+      "input": "const x={*[Symbol.iterator](){yield 2;yield 4}}; console.log(Array.from(x).join(','));",
+      "expected_behavior": "prints 2,4"
+    },
+    {
+      "name": "iterable precedence",
+      "input": "const x={0:'arraylike',length:1,*[Symbol.iterator](){yield 'iter'}}; console.log(Array.from(x)[0]);",
+      "expected_behavior": "prints iter"
+    }
+  ]
+}

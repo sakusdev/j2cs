@@ -1,0 +1,49 @@
+{
+  "id": "array.prototype.flat.default-depth-builtin",
+  "category": "array",
+  "summary": "Flatten a proven builtin Array by the default depth of 1 while skipping holes.",
+  "source": {
+    "pattern": "$array.flat()",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true,
+      "array_species_is_builtin_array": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Flat",
+    "template": "JsArray.Flat($array, 1)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "depth": 1,
+    "source_length": "snapshotted before flattening each source level",
+    "holes": "skipped rather than materialized",
+    "flatten_condition": "IsArray(element) only",
+    "mutates_receiver": false,
+    "result": "new intrinsic Array"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "default depth",
+      "input": "console.log([1,[2,[3]]].flat().join(','));",
+      "expected_behavior": "prints 1,2,3 (last element is nested array stringified by join)"
+    },
+    {
+      "name": "holes removed",
+      "input": "const r=[1,,3].flat(); console.log(r.length,0 in r,1 in r,r.join(','));",
+      "expected_behavior": "prints 2 true true 1,3"
+    }
+  ],
+  "caveats": [
+    "Custom Symbol.species remains owned by the existing array.custom-species.runtime rule."
+  ]
+}

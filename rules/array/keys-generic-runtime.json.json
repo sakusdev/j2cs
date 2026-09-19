@@ -1,0 +1,39 @@
+{
+  "id": "array.prototype.keys.generic",
+  "category": "array",
+  "summary": "Use runtime LengthOfArrayLike semantics for a borrowed Array keys iterator.",
+  "source": {
+    "pattern": "Array.prototype.keys.call($object)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.prototype.keys%",
+      "receiver_may_be_generic_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayKeys",
+    "template": "JsRuntime.ArrayKeys($object)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "to_object": true,
+    "length": "re-read each step",
+    "values": "numeric indices only; indexed properties are not read"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "generic keys",
+      "input": "console.log([...Array.prototype.keys.call({length:3})].join(','));",
+      "expected_behavior": "prints 0,1,2"
+    },
+    {
+      "name": "no indexed getter read",
+      "input": "let n=0; const o={length:1,get 0(){n++;return 1}}; Array.prototype.keys.call(o).next(); console.log(n);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

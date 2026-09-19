@@ -1,0 +1,42 @@
+{
+  "id": "array.from.iterator-close-on-abrupt",
+  "category": "array",
+  "summary": "Close the source iterator if a known Array.from mapper or result write completes abruptly.",
+  "source": {
+    "pattern": "Array.from($iterable, $mapper)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_has_known_sync_iterator": true,
+      "mapper_statically_callable_and_lowerable": true,
+      "iterator_return_semantics_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromIterableMap",
+    "template": "JsArray.FromIterableMap($iterable, $mapper, undefined)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "abrupt_mapper": "IteratorClose before propagation",
+    "close_method": "dynamic return lookup per canonical iterator contract where applicable",
+    "original_error_precedence": "per IteratorClose"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "mapper throw closes",
+      "input": "let closed=false; const x={*[Symbol.iterator](){try{yield 1;yield 2}finally{closed=true}}}; try{Array.from(x,()=>{throw 'x'})}catch{} console.log(closed);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "success exhausts normally",
+      "input": "let closed=false; const x={*[Symbol.iterator](){try{yield 1}finally{closed=true}}}; Array.from(x,x=>x); console.log(closed);",
+      "expected_behavior": "prints true after normal generator exhaustion"
+    }
+  ]
+}
