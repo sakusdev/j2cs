@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.constructor",
+  "category": "dom_shadow_selection",
+  "summary": "Create a collapsed Range at the associated realm Document.",
+  "source": {
+    "pattern": "new Range()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.CreateRange",
+    "template": "NativeDom.CreateRange()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "initial_start": "document,0",
+    "initial_end": "document,0",
+    "live": true
+  },
+  "caveats": [
+    "Range boundary points are live under DOM mutation."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=new Range();console.log(r.collapsed)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mutate nodes around live range */",
+      "expected_behavior": "boundary points update per DOM mutation algorithms"
+    }
+  ]
+}

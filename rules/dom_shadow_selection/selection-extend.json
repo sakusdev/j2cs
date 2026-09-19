@@ -1,0 +1,42 @@
+{
+  "id": "dom.selection.extend",
+  "category": "dom_shadow_selection",
+  "summary": "Move focus while preserving anchor and derive backward/forward direction.",
+  "source": {
+    "pattern": "$selection.extend($node, $offset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.Extend",
+    "template": "NativeDomSelection.Extend($selection, $node, $offset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "InvalidStateError",
+    "new_range": true,
+    "anchor_preserved": true,
+    "cross_root": "collapse to new focus per spec case"
+  },
+  "caveats": [
+    "Normalized Range ordering can invert while anchor remains fixed."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* forward selection then extend beyond */",
+      "expected_behavior": "focus changes and direction updates"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* extend before anchor */",
+      "expected_behavior": "Range start becomes focus but anchor remains original anchor; direction backward"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.document-get-selection",
+  "category": "dom_shadow_selection",
+  "summary": "Return Document-associated Selection or null without browsing context.",
+  "source": {
+    "pattern": "$document.getSelection()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.GetForDocument",
+    "template": "NativeDomSelection.GetForDocument($document)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "document-associated selection object",
+    "no_browsing_context": "null"
+  },
+  "caveats": [
+    "Detached/implementation Document without browsing context can return null."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(document.getSelection()===window.getSelection())",
+      "expected_behavior": "normally prints true for same Document"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* Document without browsing context */",
+      "expected_behavior": "returns null"
+    }
+  ]
+}

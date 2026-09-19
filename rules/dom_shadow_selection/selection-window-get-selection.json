@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.window-get-selection",
+  "category": "dom_shadow_selection",
+  "summary": "Return Selection associated with Window document.",
+  "source": {
+    "pattern": "$window.getSelection()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.GetForWindow",
+    "template": "NativeDomSelection.GetForWindow($window)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Selection|null",
+    "alias_relation": "document selection"
+  },
+  "caveats": [
+    "Selection belongs to document/window context, not global singleton."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "console.log(window.getSelection()===document.getSelection())",
+      "expected_behavior": "normally prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* different browsing context */",
+      "expected_behavior": "has distinct Selection state"
+    }
+  ]
+}

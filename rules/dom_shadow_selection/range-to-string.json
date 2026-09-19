@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.to-string",
+  "category": "dom_shadow_selection",
+  "summary": "Concatenate selected Text descendant data portions in tree order.",
+  "source": {
+    "pattern": "$range.toString()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeToString",
+    "template": "NativeDom.RangeToString($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "DOMString",
+    "text_only": true,
+    "utf16_boundaries": true
+  },
+  "caveats": [
+    "Markup is excluded; this is not innerHTML."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* range over <b>a</b>c */",
+      "expected_behavior": "returns selected textual data"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* selected element markup */",
+      "expected_behavior": "does not include tags"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.get-composed-ranges",
+  "category": "dom_shadow_selection",
+  "summary": "Return StaticRanges adjusted across shadow roots according to supplied shadowRoots.",
+  "source": {
+    "pattern": "$selection.getComposedRanges($options)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomSelectionGetComposedRanges($selection, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "sequence<StaticRange>",
+    "shadowRoots_option": "controls exposure/adjustment",
+    "snapshot": true
+  },
+  "caveats": [
+    "Shadow-boundary composition/closed-root exposure cannot be modeled as plain live Range copies."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* selection crossing shadow with allowed root */",
+      "expected_behavior": "returns composed StaticRange boundaries"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* omitted closed shadow root */",
+      "expected_behavior": "range endpoints are adjusted outside that root as specified"
+    }
+  ]
+}

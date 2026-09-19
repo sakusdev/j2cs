@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.event-retargeting",
+  "category": "dom_shadow_selection",
+  "summary": "Apply DOM retargeting across shadow boundaries.",
+  "source": {
+    "pattern": "$event crossing shadow boundary",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomRetargetEvent($event)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "target": "retargeted relative to listener context",
+    "relatedTarget": "retargeted with suppression rules",
+    "closed_roots": "encapsulation preserved"
+  },
+  "caveats": [
+    "Event.target is context-dependent across shadow boundaries."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* composed event from shadow child observed outside */",
+      "expected_behavior": "outside listener can see host as retargeted target"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* listener inside same shadow */",
+      "expected_behavior": "can observe internal target"
+    }
+  ]
+}

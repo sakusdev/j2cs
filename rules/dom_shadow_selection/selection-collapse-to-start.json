@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.collapse-to-start",
+  "category": "dom_shadow_selection",
+  "summary": "Replace with new collapsed Range at old start.",
+  "source": {
+    "pattern": "$selection.collapseToStart()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.CollapseToStart",
+    "template": "NativeDomSelection.CollapseToStart($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "InvalidStateError",
+    "new_range": true,
+    "direction": "none"
+  },
+  "caveats": [
+    "Old Range object is left unchanged; Selection associates a new Range."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* nonempty */ s.collapseToStart()",
+      "expected_behavior": "selection becomes caret at old start"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* empty */",
+      "expected_behavior": "throws InvalidStateError"
+    }
+  ]
+}

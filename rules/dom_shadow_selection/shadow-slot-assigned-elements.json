@@ -1,0 +1,41 @@
+{
+  "id": "dom.shadow.slot.assigned-elements",
+  "category": "dom_shadow_selection",
+  "summary": "Return assigned element nodes, optionally flattened.",
+  "source": {
+    "pattern": "$slot.assignedElements($options)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetAssignedElements",
+    "template": "NativeDom.GetAssignedElements($slot, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "filter": "Element only",
+    "flatten_option": true,
+    "order": "assigned order"
+  },
+  "caveats": [
+    "Text nodes are excluded even though assignedNodes includes them."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* assigned text and element */ slot.assignedElements()",
+      "expected_behavior": "returns only Element entries"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* flatten:true */",
+      "expected_behavior": "flattening follows slot assignment before element filtering"
+    }
+  ]
+}

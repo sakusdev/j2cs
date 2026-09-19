@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.add-range",
+  "category": "dom_shadow_selection",
+  "summary": "Associate Range by strong reference only when compatible and Selection empty.",
+  "source": {
+    "pattern": "$selection.addRange($range)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.AddRange",
+    "template": "NativeDomSelection.AddRange($selection, $range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "copy": false,
+    "existing_range": "no-op",
+    "wrong_document_root": "no-op"
+  },
+  "caveats": [
+    "addRange stores reference rather than cloning it."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* empty selection */ s.addRange(r)",
+      "expected_behavior": "getRangeAt(0) is r"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mutate r afterward */",
+      "expected_behavior": "Selection reflects r mutation"
+    }
+  ]
+}

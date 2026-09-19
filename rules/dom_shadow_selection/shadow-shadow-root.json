@@ -1,0 +1,41 @@
+{
+  "id": "dom.shadow.shadow-root",
+  "category": "dom_shadow_selection",
+  "summary": "Expose only open ShadowRoot through Element.shadowRoot.",
+  "source": {
+    "pattern": "$element.shadowRoot",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetShadowRoot",
+    "template": "NativeDom.GetShadowRoot($element)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "open": "returns root",
+    "closed": "null",
+    "none": "null"
+  },
+  "caveats": [
+    "Closed roots exist but shadowRoot must return null."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const h=document.createElement('div');const s=h.attachShadow({mode:'open'});console.log(h.shadowRoot===s)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "const h=document.createElement('div');h.attachShadow({mode:'closed'});console.log(h.shadowRoot===null)",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

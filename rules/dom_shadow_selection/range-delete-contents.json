@@ -1,0 +1,42 @@
+{
+  "id": "dom.range.delete-contents",
+  "category": "dom_shadow_selection",
+  "summary": "Delete selected contents using DOM Range mutation algorithm.",
+  "source": {
+    "pattern": "$range.deleteContents()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeDeleteContents",
+    "template": "NativeDom.RangeDeleteContents($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "partial_character_data": "substring deletion",
+    "fully_contained_nodes": "removed",
+    "post_range": "collapsed to algorithm-defined boundary",
+    "custom_element_reactions": "reuse DOM mutation semantics"
+  },
+  "caveats": [
+    "Not equivalent to replacing commonAncestor.textContent."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* range over part text and nodes */ r.deleteContents()",
+      "expected_behavior": "only selected content is removed"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* partially selected Text nodes */",
+      "expected_behavior": "only selected substrings are deleted"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.surround-contents",
+  "category": "dom_shadow_selection",
+  "summary": "Extract selected contents, insert new parent, append fragment, and select new parent.",
+  "source": {
+    "pattern": "$range.surroundContents($newParent)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeSurroundContents",
+    "template": "NativeDom.RangeSurroundContents($range, $newParent)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "precondition": "no partially-contained non-Text node",
+    "new_parent_children": "replaced",
+    "final_range": "selects new parent"
+  },
+  "caveats": [
+    "Throws InvalidStateError before mutation if partially containing a non-Text node."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* fully selected text */ r.surroundContents(span)",
+      "expected_behavior": "selected content becomes child of span"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* partially selected element */",
+      "expected_behavior": "throws InvalidStateError"
+    }
+  ]
+}

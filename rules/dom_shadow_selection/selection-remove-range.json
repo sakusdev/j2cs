@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.remove-range",
+  "category": "dom_shadow_selection",
+  "summary": "Remove exact associated Range or throw NotFoundError.",
+  "source": {
+    "pattern": "$selection.removeRange($range)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.RemoveRange",
+    "template": "NativeDomSelection.RemoveRange($selection, $range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity_match": true,
+    "missing": "NotFoundError"
+  },
+  "caveats": [
+    "Equivalent boundaries on a different Range object do not count as same associated range."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* s associated with r */ s.removeRange(r)",
+      "expected_behavior": "selection becomes empty"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* different Range same boundaries */",
+      "expected_behavior": "throws NotFoundError"
+    }
+  ]
+}

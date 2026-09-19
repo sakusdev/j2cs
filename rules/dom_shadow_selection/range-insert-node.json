@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.insert-node",
+  "category": "dom_shadow_selection",
+  "summary": "Insert node at Range start, splitting Text start container when needed.",
+  "source": {
+    "pattern": "$range.insertNode($node)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeInsertNode",
+    "template": "NativeDom.RangeInsertNode($range, $node)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "text_start": "splitText",
+    "document_fragment": "children inserted",
+    "range_end_may_adjust": true
+  },
+  "caveats": [
+    "Inserting into a Text boundary can create a new Text node and shift boundary points."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* collapsed range in element */ r.insertNode(n)",
+      "expected_behavior": "node inserted at start boundary"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* start inside Text */",
+      "expected_behavior": "Text is split before insertion"
+    }
+  ]
+}

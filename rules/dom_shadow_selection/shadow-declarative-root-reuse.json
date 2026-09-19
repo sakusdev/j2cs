@@ -1,0 +1,41 @@
+{
+  "id": "dom.shadow.declarative-root-reuse",
+  "category": "dom_shadow_selection",
+  "summary": "Reuse/clear matching declarative ShadowRoot when attachShadow is allowed to attach to declarative root.",
+  "source": {
+    "pattern": "$element.attachShadow($init) on declarative shadow host",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomAttachShadowDeclarativeReuse($element, $init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "declarative_root": true,
+    "mode_match_required": true,
+    "children_cleared": true,
+    "returns_existing_root": true
+  },
+  "caveats": [
+    "A declarative ShadowRoot can make repeated attachShadow behave differently from ordinary duplicate attachment."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* host parsed with declarative shadow root then attachShadow matching mode */",
+      "expected_behavior": "returns existing root after clearing it per algorithm"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* mode mismatch */",
+      "expected_behavior": "throws NotSupportedError"
+    }
+  ]
+}

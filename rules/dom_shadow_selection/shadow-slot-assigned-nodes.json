@@ -1,0 +1,42 @@
+{
+  "id": "dom.shadow.slot.assigned-nodes",
+  "category": "dom_shadow_selection",
+  "summary": "Return assigned nodes with optional recursive flattening.",
+  "source": {
+    "pattern": "$slot.assignedNodes($options)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetAssignedNodes",
+    "template": "NativeDom.GetAssignedNodes($slot, $options)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "sequence<Node>",
+    "default_flatten": false,
+    "flatten": "recurses fallback/slots as specified",
+    "order": "slot assignment order"
+  },
+  "caveats": [
+    "flatten:true is not the same as direct assigned-node list."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* slot with assigned text/element */ slot.assignedNodes()",
+      "expected_behavior": "returns directly assigned nodes in order"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* nested slots + flatten:true */",
+      "expected_behavior": "returns flattened assigned nodes"
+    }
+  ]
+}

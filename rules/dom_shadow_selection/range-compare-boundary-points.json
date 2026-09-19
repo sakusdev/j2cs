@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.compare-boundary-points",
+  "category": "dom_shadow_selection",
+  "summary": "Compare selected Range boundary pairs with root validation.",
+  "source": {
+    "pattern": "$range.compareBoundaryPoints($how, $sourceRange)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeCompareBoundaryPoints",
+    "template": "NativeDom.RangeCompareBoundaryPoints($range, $how, $sourceRange)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "-1|0|1",
+    "how": "START_TO_START etc",
+    "different_roots": "WrongDocumentError"
+  },
+  "caveats": [
+    "The historical constant names do not all map intuitively; preserve spec pair selection."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* two ranges in same text */",
+      "expected_behavior": "comparison reflects boundary order"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* ranges with different roots */",
+      "expected_behavior": "throws WrongDocumentError"
+    }
+  ]
+}

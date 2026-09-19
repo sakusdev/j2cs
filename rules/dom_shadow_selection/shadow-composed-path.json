@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.composed-path",
+  "category": "dom_shadow_selection",
+  "summary": "Return event path respecting shadow roots, closed-tree visibility, and invocation targets.",
+  "source": {
+    "pattern": "$event.composedPath()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.DomComposedPath($event)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Node/EventTarget path",
+    "closed_tree": "hidden portions depending currentTarget context",
+    "dispatch_path_snapshot": true
+  },
+  "caveats": [
+    "Cannot be reconstructed as parentNode chain after dispatch."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* composed event in open shadow */ e.composedPath()",
+      "expected_behavior": "includes shadow path and host according to context"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* closed shadow observed outside */",
+      "expected_behavior": "closed-tree internal nodes are hidden as specified"
+    }
+  ]
+}

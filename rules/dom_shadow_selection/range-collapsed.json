@@ -1,0 +1,40 @@
+{
+  "id": "dom.range.collapsed",
+  "category": "dom_shadow_selection",
+  "summary": "Report whether Range start and end boundary points are equal.",
+  "source": {
+    "pattern": "$range.collapsed",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeCollapsed",
+    "template": "NativeDom.RangeCollapsed($range)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "definition": "same container and offset"
+  },
+  "caveats": [
+    "A zero-length visible layout is not the criterion."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=document.createRange();console.log(r.collapsed)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* same visual point but different DOM boundaries */",
+      "expected_behavior": "collapsed depends on boundary-point equality"
+    }
+  ]
+}

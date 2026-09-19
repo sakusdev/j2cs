@@ -1,0 +1,45 @@
+{
+  "id": "dom.range.boundary-properties",
+  "category": "dom_shadow_selection",
+  "summary": "Expose start/end containers and offsets.",
+  "source": {
+    "pattern": "$range.$property",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetRangeBoundaryProperty",
+    "template": "NativeDom.GetRangeBoundaryProperty($range, $property)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "properties": [
+      "startContainer",
+      "startOffset",
+      "endContainer",
+      "endOffset"
+    ],
+    "live": true
+  },
+  "caveats": [
+    "Offsets are child indices for nodes and UTF-16 offsets for CharacterData."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const r=document.createRange();const t=document.createTextNode('abc');r.setStart(t,1);console.log(r.startOffset)",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* Element container */",
+      "expected_behavior": "offset denotes child boundary rather than character index"
+    }
+  ]
+}

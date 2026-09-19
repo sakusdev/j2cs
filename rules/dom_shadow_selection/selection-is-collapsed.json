@@ -1,0 +1,40 @@
+{
+  "id": "dom.selection.is-collapsed",
+  "category": "dom_shadow_selection",
+  "summary": "Report anchor/focus equality, including empty Selection.",
+  "source": {
+    "pattern": "$selection.isCollapsed",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.IsCollapsed",
+    "template": "NativeDomSelection.IsCollapsed($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "true",
+    "same_endpoint": "true"
+  },
+  "caveats": [
+    "Empty Selection isCollapsed is true even though rangeCount is 0."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const s=getSelection();s.removeAllRanges();console.log(s.isCollapsed)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* empty selection */",
+      "expected_behavior": "rangeCount is 0 while isCollapsed is true"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.root.mode",
+  "category": "dom_shadow_selection",
+  "summary": "Expose ShadowRoot mode.",
+  "source": {
+    "pattern": "$shadow.mode",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetShadowMode",
+    "template": "NativeDom.GetShadowMode($shadow)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "open|closed",
+    "readonly": true
+  },
+  "caveats": [
+    "Mode is fixed at root creation."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const h=document.createElement('div');console.log(h.attachShadow({mode:'closed'}).mode)",
+      "expected_behavior": "prints closed"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* later mutations */",
+      "expected_behavior": "mode never changes"
+    }
+  ]
+}

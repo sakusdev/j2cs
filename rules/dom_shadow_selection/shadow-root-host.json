@@ -1,0 +1,40 @@
+{
+  "id": "dom.shadow.root.host",
+  "category": "dom_shadow_selection",
+  "summary": "Return ShadowRoot host identity.",
+  "source": {
+    "pattern": "$shadow.host",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.GetShadowHost",
+    "template": "NativeDom.GetShadowHost($shadow)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "exact host Element",
+    "readonly": true
+  },
+  "caveats": [
+    "Host identity must not be copied/wrapped inconsistently."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const h=document.createElement('div');const s=h.attachShadow({mode:'open'});console.log(s.host===h)",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* move host in document */",
+      "expected_behavior": "shadow.host remains same Element object"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "dom.selection.collapse-to-end",
+  "category": "dom_shadow_selection",
+  "summary": "Replace with new collapsed Range at old end.",
+  "source": {
+    "pattern": "$selection.collapseToEnd()",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.CollapseToEnd",
+    "template": "NativeDomSelection.CollapseToEnd($selection)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "empty": "InvalidStateError",
+    "new_range": true,
+    "direction": "none"
+  },
+  "caveats": [
+    "Old Range remains independently usable."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* nonempty */ s.collapseToEnd()",
+      "expected_behavior": "selection becomes caret at old end"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* empty */",
+      "expected_behavior": "throws InvalidStateError"
+    }
+  ]
+}

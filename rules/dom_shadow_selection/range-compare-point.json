@@ -1,0 +1,41 @@
+{
+  "id": "dom.range.compare-point",
+  "category": "dom_shadow_selection",
+  "summary": "Compare point to Range as before/inside/after.",
+  "source": {
+    "pattern": "$range.comparePoint($node, $offset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDom.RangeComparePoint",
+    "template": "NativeDom.RangeComparePoint($range, $node, $offset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "-1|0|1",
+    "different_root": "WrongDocumentError",
+    "offset_validation": true
+  },
+  "caveats": [
+    "Unlike isPointInRange, a different root throws."
+  ],
+  "references": [
+    "WHATWG DOM Standard"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* point inside */",
+      "expected_behavior": "returns 0"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* point in different root */",
+      "expected_behavior": "throws WrongDocumentError"
+    }
+  ]
+}

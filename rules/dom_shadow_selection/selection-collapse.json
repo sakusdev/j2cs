@@ -1,0 +1,42 @@
+{
+  "id": "dom.selection.collapse",
+  "category": "dom_shadow_selection",
+  "summary": "Replace Selection with collapsed Range at node/offset, or clear when node is null.",
+  "source": {
+    "pattern": "$selection.collapse($node, $offset)",
+    "requirements": {
+      "builtin_webidl_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NativeDomSelection.Collapse",
+    "template": "NativeDomSelection.Collapse($selection, $node, $offset)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "node_null": "empty selection",
+    "offset_validation": "IndexSizeError",
+    "new_range_identity": true,
+    "direction": "none"
+  },
+  "caveats": [
+    "collapse creates/replaces associated Range rather than mutating arbitrary old Range in place."
+  ],
+  "references": [
+    "W3C Selection API 2026"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* collapse(text,1) */",
+      "expected_behavior": "anchor and focus equal text,1"
+    },
+    {
+      "name": "semantic trap",
+      "input": "s.collapse(null)",
+      "expected_behavior": "selection becomes empty"
+    }
+  ]
+}
