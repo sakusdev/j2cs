@@ -1,0 +1,41 @@
+{
+  "id": "atomics.wait-int32",
+  "category": "atomics_shared_memory",
+  "summary": "Synchronously wait on a SharedArrayBuffer-backed Int32Array location until notification or timeout.",
+  "source": {
+    "pattern": "Atomics.wait($int32,$index,$expected,$timeout?)",
+    "requirements": {
+      "typed_array": "Int32Array",
+      "backing": "SharedArrayBuffer",
+      "agent_may_suspend": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.wait_int32",
+    "template": "JsRuntime.Atomics.wait_int32($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "expected": "ToInt32",
+    "timeout": "ToNumber; NaN/+Infinity become infinite, negative clamps to zero",
+    "result": "ok|not-equal|timed-out",
+    "waiter_list": "per shared block and byte index"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "not equal",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=1;console.log(Atomics.wait(a,0,0,0));",
+      "expected_behavior": "prints not-equal"
+    },
+    {
+      "name": "zero timeout",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));console.log(Atomics.wait(a,0,0,0));",
+      "expected_behavior": "prints timed-out on an agent that may suspend"
+    }
+  ]
+}

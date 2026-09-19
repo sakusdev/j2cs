@@ -1,0 +1,38 @@
+{
+  "id": "atomics.and-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically bitwise-AND Number integer storage and return the old value.",
+  "source": {
+    "pattern": "Atomics.and($ta,$index,$value)",
+    "requirements": {
+      "content_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.and_number",
+    "template": "JsAtomics.and_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToIntegerOrInfinity then element bytes",
+    "return": "old element",
+    "update": "bytewise atomic AND"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "and",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));a[0]=15;console.log(Atomics.and(a,0,6),a[0]);",
+      "expected_behavior": "prints 15 6"
+    },
+    {
+      "name": "old returned",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=7;console.log(Atomics.and(a,0,0));",
+      "expected_behavior": "prints 7"
+    }
+  ]
+}

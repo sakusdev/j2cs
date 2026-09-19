@@ -1,0 +1,38 @@
+{
+  "id": "atomics.store-returns-coerced-value",
+  "category": "atomics_shared_memory",
+  "summary": "Atomics.store returns its coerced numeric value, which can differ from the element value after width conversion.",
+  "source": {
+    "pattern": "[[AtomicsStoreReturn]]($ta,$value)",
+    "requirements": {
+      "semantic_operation": "Atomics.store return value"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.store_returns_coerced_value",
+    "template": "JsAtomics.store_returns_coerced_value($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "number": "ToIntegerOrInfinity result",
+    "bigint": "ToBigInt result",
+    "element_truncation": "does not change return value"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "Uint8 truncation",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));console.log(Atomics.store(a,0,257),a[0]);",
+      "expected_behavior": "prints 257 1"
+    },
+    {
+      "name": "negative Uint8",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));console.log(Atomics.store(a,0,-1),a[0]);",
+      "expected_behavior": "prints -1 255"
+    }
+  ]
+}

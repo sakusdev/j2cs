@@ -1,0 +1,40 @@
+{
+  "id": "atomics.add-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically add a BigInt operand to BigInt typed storage and return the old BigInt element value.",
+  "source": {
+    "pattern": "Atomics.add($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt",
+      "typed_array": "BigInt64Array|BigUint64Array"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.add_bigint",
+    "template": "JsAtomics.add_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToBigInt",
+    "return": "old BigInt element",
+    "update": "atomic width-wrapped BigInt addition",
+    "ordering": "seq-cst"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "BigInt add",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=3n;console.log(Atomics.add(a,0,2n),a[0]);",
+      "expected_behavior": "prints 3n 5n"
+    },
+    {
+      "name": "Number rejected",
+      "input": "try{Atomics.add(new BigInt64Array(new SharedArrayBuffer(8)),0,1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

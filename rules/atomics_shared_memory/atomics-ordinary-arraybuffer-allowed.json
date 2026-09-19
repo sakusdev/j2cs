@@ -1,0 +1,39 @@
+{
+  "id": "atomics.ordinary-arraybuffer-allowed",
+  "category": "atomics_shared_memory",
+  "summary": "Allow non-wait Atomics operations on integer TypedArrays backed by ordinary ArrayBuffer in modern ECMAScript.",
+  "source": {
+    "pattern": "Atomics.$op($integerTypedArray,$index,$value?)",
+    "requirements": {
+      "operation": "load/store/exchange/compareExchange/add/sub/and/or/xor",
+      "backing_buffer": "ArrayBuffer allowed"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.ordinary_arraybuffer_allowed",
+    "template": "JsAtomics.ordinary_arraybuffer_allowed($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "shared_required": false,
+    "atomic_operation": "still follows Atomics algorithm",
+    "waiting": "wait/waitAsync have stricter SAB rule"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "ordinary load",
+      "input": "console.log(Atomics.load(new Int32Array(new ArrayBuffer(4)),0));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "ordinary store",
+      "input": "const a=new Int32Array(new ArrayBuffer(4));console.log(Atomics.store(a,0,5),a[0]);",
+      "expected_behavior": "prints 5 5"
+    }
+  ]
+}

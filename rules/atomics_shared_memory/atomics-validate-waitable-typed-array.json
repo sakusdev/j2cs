@@ -1,0 +1,39 @@
+{
+  "id": "atomics.validate-waitable-typed-array",
+  "category": "atomics_shared_memory",
+  "summary": "Validate waitable Atomics arrays as Int32Array or BigInt64Array.",
+  "source": {
+    "pattern": "[[ValidateIntegerTypedArray]]($ta,true)",
+    "requirements": {
+      "semantic_operation": "ValidateIntegerTypedArray",
+      "waitable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.validate_waitable_typed_array",
+    "template": "JsAtomics.validate_waitable_typed_array($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "accepted": "Int32Array or BigInt64Array",
+    "other_integer_arrays": "TypeError",
+    "shared_check": "performed by DoWait for wait/waitAsync"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "Int32 waitable",
+      "input": "console.log(Atomics.notify(new Int32Array(new SharedArrayBuffer(4)),0));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "Uint8 rejected for wait",
+      "input": "try{Atomics.wait(new Uint8Array(new SharedArrayBuffer(1)),0,0,0)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

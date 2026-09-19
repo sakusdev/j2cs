@@ -1,0 +1,38 @@
+{
+  "id": "atomics.sub-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically subtract a BigInt operand from BigInt typed storage and return the old element.",
+  "source": {
+    "pattern": "Atomics.sub($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.sub_bigint",
+    "template": "JsAtomics.sub_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToBigInt",
+    "return": "old BigInt element",
+    "update": "width-wrapped BigInt subtraction"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "subtract bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=5n;console.log(Atomics.sub(a,0,2n),a[0]);",
+      "expected_behavior": "prints 5n 3n"
+    },
+    {
+      "name": "bad number",
+      "input": "try{Atomics.sub(new BigInt64Array(new SharedArrayBuffer(8)),0,1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

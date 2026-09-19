@@ -1,0 +1,39 @@
+{
+  "id": "atomics.wait-async-bigint64",
+  "category": "atomics_shared_memory",
+  "summary": "Atomics.waitAsync supports BigInt64Array with ToBigInt64 expected-value conversion.",
+  "source": {
+    "pattern": "Atomics.waitAsync($bigint64,$index,$expected,$timeout?)",
+    "requirements": {
+      "typed_array": "BigInt64Array",
+      "backing": "SharedArrayBuffer"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.wait_async_bigint64",
+    "template": "JsRuntime.Atomics.wait_async_bigint64($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "expected": "ToBigInt64",
+    "return": "sync result object or async Promise wrapper",
+    "caller_suspend": false
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "not equal bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=1n;console.log(Atomics.waitAsync(a,0,0n,100).value);",
+      "expected_behavior": "prints not-equal"
+    },
+    {
+      "name": "Number rejected",
+      "input": "try{Atomics.waitAsync(new BigInt64Array(new SharedArrayBuffer(8)),0,0,1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

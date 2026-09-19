@@ -1,0 +1,39 @@
+{
+  "id": "atomics.wait-async-not-equal-sync",
+  "category": "atomics_shared_memory",
+  "summary": "waitAsync returns {async:false,value:'not-equal'} immediately rather than allocating a waiting Promise when the location mismatches.",
+  "source": {
+    "pattern": "Atomics.waitAsync($ta,$index,$expected,$timeout?)",
+    "requirements": {
+      "waitable_shared_typed_array": true,
+      "current_value_differs": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.wait_async_not_equal_sync",
+    "template": "JsAtomics.wait_async_not_equal_sync($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "async": false,
+    "value": "not-equal",
+    "promise": "none"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "shape",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=1;const r=Atomics.waitAsync(a,0,0,100);console.log(r.async,r.value);",
+      "expected_behavior": "prints false not-equal"
+    },
+    {
+      "name": "value is string",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=1;console.log(typeof Atomics.waitAsync(a,0,0,100).value);",
+      "expected_behavior": "prints string"
+    }
+  ]
+}

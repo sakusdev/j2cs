@@ -1,0 +1,38 @@
+{
+  "id": "atomics.is-lock-free",
+  "category": "atomics_shared_memory",
+  "summary": "Implement Atomics.isLockFree as an optimization query after ToIntegerOrInfinity, without weakening atomicity when false.",
+  "source": {
+    "pattern": "Atomics.isLockFree($size)",
+    "requirements": {
+      "binding": "intrinsic Atomics.isLockFree"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.is_lock_free",
+    "template": "JsAtomics.is_lock_free($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToIntegerOrInfinity",
+    "sizes": "1,2,8 agent-dependent; 4 guaranteed true; others false",
+    "atomicity": "all Atomics operations remain atomic regardless"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "size three",
+      "input": "console.log(Atomics.isLockFree(3));",
+      "expected_behavior": "prints false"
+    },
+    {
+      "name": "coercion",
+      "input": "console.log(Atomics.isLockFree('4'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

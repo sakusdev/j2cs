@@ -1,0 +1,38 @@
+{
+  "id": "atomics.xor-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically XOR Number integer storage and return the old value.",
+  "source": {
+    "pattern": "Atomics.xor($ta,$index,$value)",
+    "requirements": {
+      "content_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.xor_number",
+    "template": "JsAtomics.xor_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToIntegerOrInfinity",
+    "return": "old element",
+    "update": "bytewise atomic XOR"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "xor",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));a[0]=10;console.log(Atomics.xor(a,0,3),a[0]);",
+      "expected_behavior": "prints 10 9"
+    },
+    {
+      "name": "self xor zero",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=7;Atomics.xor(a,0,7);console.log(a[0]);",
+      "expected_behavior": "prints 0"
+    }
+  ]
+}

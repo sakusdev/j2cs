@@ -1,0 +1,38 @@
+{
+  "id": "atomics.revalidate-atomic-access",
+  "category": "atomics_shared_memory",
+  "summary": "Revalidate a previously computed atomic byte index after argument coercions that may resize or grow backing storage.",
+  "source": {
+    "pattern": "[[RevalidateAtomicAccess]]($ta,$byteIndex)",
+    "requirements": {
+      "semantic_operation": "RevalidateAtomicAccess"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.revalidate_atomic_access",
+    "template": "JsAtomics.revalidate_atomic_access($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "purpose": "coercions can execute arbitrary user code and change bounds",
+    "required_after_coercion": true,
+    "failure": "throws if access is no longer valid"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "coercion side effect considered",
+      "input": "// semantic IR: compute atomic index; value coercion changes backing-store bounds; revalidate before access",
+      "expected_behavior": "rechecks current bounds after coercion"
+    },
+    {
+      "name": "no stale bounds",
+      "input": "// semantic IR: stale byte index is not blindly reused after observable value coercion",
+      "expected_behavior": "must not access out-of-bounds memory"
+    }
+  ]
+}

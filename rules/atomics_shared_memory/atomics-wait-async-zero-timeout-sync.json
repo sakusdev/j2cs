@@ -1,0 +1,39 @@
+{
+  "id": "atomics.wait-async-zero-timeout-sync",
+  "category": "atomics_shared_memory",
+  "summary": "waitAsync matching value with timeout zero returns {async:false,value:'timed-out'} immediately.",
+  "source": {
+    "pattern": "Atomics.waitAsync($ta,$index,$expected,0)",
+    "requirements": {
+      "waitable_shared_typed_array": true,
+      "current_value_matches": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.wait_async_zero_timeout_sync",
+    "template": "JsAtomics.wait_async_zero_timeout_sync($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "async": false,
+    "value": "timed-out",
+    "waiter_added": false
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "shape",
+      "input": "const r=Atomics.waitAsync(new Int32Array(new SharedArrayBuffer(4)),0,0,0);console.log(r.async,r.value);",
+      "expected_behavior": "prints false timed-out"
+    },
+    {
+      "name": "negative clamps zero",
+      "input": "const r=Atomics.waitAsync(new Int32Array(new SharedArrayBuffer(4)),0,0,-1);console.log(r.async,r.value);",
+      "expected_behavior": "prints false timed-out"
+    }
+  ]
+}

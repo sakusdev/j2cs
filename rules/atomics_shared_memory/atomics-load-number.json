@@ -1,0 +1,39 @@
+{
+  "id": "atomics.load-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically load a Number integer element using sequentially-consistent memory ordering.",
+  "source": {
+    "pattern": "Atomics.load($ta,$index)",
+    "requirements": {
+      "content_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.load_number",
+    "template": "JsAtomics.load_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "current integer Number element",
+    "coercion": "index only",
+    "ordering": "seq-cst",
+    "no_tearing": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "load",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=7;console.log(Atomics.load(a,0));",
+      "expected_behavior": "prints 7"
+    },
+    {
+      "name": "ordinary backing allowed",
+      "input": "const a=new Int32Array(new ArrayBuffer(4));a[0]=2;console.log(Atomics.load(a,0));",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

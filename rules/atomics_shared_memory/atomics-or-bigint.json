@@ -1,0 +1,38 @@
+{
+  "id": "atomics.or-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically bitwise-OR BigInt storage and return the old BigInt value.",
+  "source": {
+    "pattern": "Atomics.or($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.or_bigint",
+    "template": "JsAtomics.or_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToBigInt",
+    "return": "old BigInt element",
+    "update": "bytewise atomic OR"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "or bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=8n;console.log(Atomics.or(a,0,3n),a[0]);",
+      "expected_behavior": "prints 8n 11n"
+    },
+    {
+      "name": "type error",
+      "input": "try{Atomics.or(new BigInt64Array(new SharedArrayBuffer(8)),0,3)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

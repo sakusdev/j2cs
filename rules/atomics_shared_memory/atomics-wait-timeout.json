@@ -1,0 +1,41 @@
+{
+  "id": "atomics.wait-timeout",
+  "category": "atomics_shared_memory",
+  "summary": "Return timed-out when a synchronous waiter reaches its timeout without notification.",
+  "source": {
+    "pattern": "Atomics.wait($ta,$index,$expected,$timeout)",
+    "requirements": {
+      "waitable_shared_typed_array": true,
+      "current_value_matches": true,
+      "agent_may_suspend": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.wait_timeout",
+    "template": "JsRuntime.Atomics.wait_timeout($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "negative_timeout": "clamped to zero",
+    "zero_timeout": "timed-out",
+    "positive_timeout": "host may pad/coarsen timeout",
+    "result": "timed-out unless notified first"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "zero",
+      "input": "console.log(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,0));",
+      "expected_behavior": "prints timed-out"
+    },
+    {
+      "name": "negative",
+      "input": "console.log(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,-1));",
+      "expected_behavior": "prints timed-out"
+    }
+  ]
+}

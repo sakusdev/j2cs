@@ -1,0 +1,40 @@
+{
+  "id": "atomics.to-string-tag",
+  "category": "atomics_shared_memory",
+  "summary": "Expose intrinsic Atomics @@toStringTag as 'Atomics' with the specified property attributes.",
+  "source": {
+    "pattern": "Atomics[Symbol.toStringTag]",
+    "requirements": {
+      "binding": "intrinsic Atomics",
+      "builtin_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.to_string_tag",
+    "template": "JsAtomics.to_string_tag($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value": "Atomics",
+    "writable": false,
+    "enumerable": false,
+    "configurable": true
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "object tag",
+      "input": "console.log(Object.prototype.toString.call(Atomics));",
+      "expected_behavior": "prints [object Atomics]"
+    },
+    {
+      "name": "value",
+      "input": "console.log(Atomics[Symbol.toStringTag]);",
+      "expected_behavior": "prints Atomics"
+    }
+  ]
+}

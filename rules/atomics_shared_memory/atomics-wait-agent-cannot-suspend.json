@@ -1,0 +1,40 @@
+{
+  "id": "atomics.wait-agent-cannot-suspend",
+  "category": "atomics_shared_memory",
+  "summary": "Synchronous Atomics.wait throws TypeError when the current ECMAScript agent cannot suspend, such as browser-main-thread profiles.",
+  "source": {
+    "pattern": "Atomics.wait($ta,$index,$expected,$timeout?)",
+    "requirements": {
+      "agent_may_suspend": false,
+      "backing": "SharedArrayBuffer",
+      "waitable_typed_array": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.wait_agent_cannot_suspend",
+    "template": "JsRuntime.Atomics.wait_agent_cannot_suspend($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "exception": "TypeError",
+    "check": "AgentCanSuspend after argument conversions",
+    "wait_queue": "not entered"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "host restriction",
+      "input": "// browser main thread profile: Atomics.wait(sharedInt32,0,0)",
+      "expected_behavior": "throws TypeError when AgentCanSuspend() is false"
+    },
+    {
+      "name": "worker contrast",
+      "input": "// worker/agent profile with AgentCanSuspend true",
+      "expected_behavior": "may return not-equal, timed-out, or ok instead of this host restriction"
+    }
+  ]
+}

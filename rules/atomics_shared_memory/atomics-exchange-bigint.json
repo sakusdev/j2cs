@@ -1,0 +1,38 @@
+{
+  "id": "atomics.exchange-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically replace a BigInt element and return its old BigInt value.",
+  "source": {
+    "pattern": "Atomics.exchange($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.exchange_bigint",
+    "template": "JsAtomics.exchange_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToBigInt",
+    "return": "old BigInt element",
+    "update": "atomic exchange"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "exchange bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=3n;console.log(Atomics.exchange(a,0,9n),a[0]);",
+      "expected_behavior": "prints 3n 9n"
+    },
+    {
+      "name": "number rejected",
+      "input": "try{Atomics.exchange(new BigInt64Array(new SharedArrayBuffer(8)),0,9)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

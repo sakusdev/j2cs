@@ -1,0 +1,39 @@
+{
+  "id": "atomics.validate-integer-typed-array",
+  "category": "atomics_shared_memory",
+  "summary": "Validate Atomics receiver as an integer TypedArray; Float and Uint8Clamped are rejected.",
+  "source": {
+    "pattern": "[[ValidateIntegerTypedArray]]($ta,false)",
+    "requirements": {
+      "semantic_operation": "ValidateIntegerTypedArray",
+      "waitable": false
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.validate_integer_typed_array",
+    "template": "JsAtomics.validate_integer_typed_array($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "accepted": "unclamped integer and BigInt TypedArrays",
+    "rejected": "Float32/Float64/Uint8Clamped and non-TypedArray",
+    "shared_backing": "not required"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "Int32 accepted",
+      "input": "console.log(Atomics.load(new Int32Array(new ArrayBuffer(4)),0));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "float rejected",
+      "input": "try{Atomics.load(new Float32Array(new SharedArrayBuffer(4)),0)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

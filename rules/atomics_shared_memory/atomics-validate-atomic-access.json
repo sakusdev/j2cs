@@ -1,0 +1,38 @@
+{
+  "id": "atomics.validate-atomic-access",
+  "category": "atomics_shared_memory",
+  "summary": "Convert Atomics index with ToIndex and throw RangeError when outside the current typed-array length.",
+  "source": {
+    "pattern": "[[ValidateAtomicAccess]]($taRecord,$index)",
+    "requirements": {
+      "semantic_operation": "ValidateAtomicAccess"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.validate_atomic_access",
+    "template": "JsAtomics.validate_atomic_access($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "index": "ToIndex",
+    "out_of_bounds": "RangeError",
+    "result": "byte index in viewed buffer"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "index coercion",
+      "input": "const a=new Int32Array(new ArrayBuffer(8));console.log(Atomics.load(a,'1'));",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "out of range",
+      "input": "try{Atomics.load(new Int32Array(1),1)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

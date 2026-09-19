@@ -1,0 +1,38 @@
+{
+  "id": "atomics.compare-exchange-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically compare a BigInt element and conditionally replace it, returning the old BigInt value.",
+  "source": {
+    "pattern": "Atomics.compareExchange($ta,$index,$expected,$replacement)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.compare_exchange_bigint",
+    "template": "JsAtomics.compare_exchange_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "expected_replacement": "ToBigInt",
+    "return": "old BigInt element",
+    "replacement": "only when equal"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "match bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=3n;console.log(Atomics.compareExchange(a,0,3n,9n),a[0]);",
+      "expected_behavior": "prints 3n 9n"
+    },
+    {
+      "name": "wrong type",
+      "input": "try{Atomics.compareExchange(new BigInt64Array(new SharedArrayBuffer(8)),0,0,1n)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

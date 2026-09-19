@@ -1,0 +1,39 @@
+{
+  "id": "atomics.exchange-number",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically replace a Number integer element and return its old value.",
+  "source": {
+    "pattern": "Atomics.exchange($ta,$index,$value)",
+    "requirements": {
+      "content_type": "Number"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.exchange_number",
+    "template": "JsAtomics.exchange_number($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToIntegerOrInfinity then element-width conversion",
+    "return": "old element",
+    "update": "atomic exchange",
+    "ordering": "seq-cst"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "exchange",
+      "input": "const a=new Int32Array(new SharedArrayBuffer(4));a[0]=3;console.log(Atomics.exchange(a,0,9),a[0]);",
+      "expected_behavior": "prints 3 9"
+    },
+    {
+      "name": "narrow conversion",
+      "input": "const a=new Uint8Array(new SharedArrayBuffer(1));console.log(Atomics.exchange(a,0,257),a[0]);",
+      "expected_behavior": "prints 0 1"
+    }
+  ]
+}

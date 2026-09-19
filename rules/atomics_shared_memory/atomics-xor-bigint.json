@@ -1,0 +1,38 @@
+{
+  "id": "atomics.xor-bigint",
+  "category": "atomics_shared_memory",
+  "summary": "Atomically XOR BigInt storage and return the old BigInt value.",
+  "source": {
+    "pattern": "Atomics.xor($ta,$index,$value)",
+    "requirements": {
+      "content_type": "BigInt"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAtomics.xor_bigint",
+    "template": "JsAtomics.xor_bigint($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "value_conversion": "ToBigInt",
+    "return": "old BigInt element",
+    "update": "bytewise atomic XOR"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "xor bigint",
+      "input": "const a=new BigInt64Array(new SharedArrayBuffer(8));a[0]=10n;console.log(Atomics.xor(a,0,3n),a[0]);",
+      "expected_behavior": "prints 10n 9n"
+    },
+    {
+      "name": "type mismatch",
+      "input": "try{Atomics.xor(new BigInt64Array(new SharedArrayBuffer(8)),0,3)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

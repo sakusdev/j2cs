@@ -1,0 +1,41 @@
+{
+  "id": "atomics.wait-async-promise",
+  "category": "atomics_shared_memory",
+  "summary": "For a matching location and nonzero timeout, waitAsync returns {async:true,value:Promise} and resolves that Promise with ok or timed-out.",
+  "source": {
+    "pattern": "Atomics.waitAsync($ta,$index,$expected,$timeout)",
+    "requirements": {
+      "waitable_shared_typed_array": true,
+      "current_value_matches": true,
+      "timeout_nonzero": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.Atomics.wait_async_promise",
+    "template": "JsRuntime.Atomics.wait_async_promise($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "async": true,
+    "value": "Promise",
+    "resolution": "ok when notified or timed-out when timeout job wins",
+    "job_queue": "host generic/timeout jobs"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/structured-data.html"
+  ],
+  "tests": [
+    {
+      "name": "promise shape",
+      "input": "const r=Atomics.waitAsync(new Int32Array(new SharedArrayBuffer(4)),0,0,10);console.log(r.async,r.value instanceof Promise);",
+      "expected_behavior": "prints true true"
+    },
+    {
+      "name": "timeout resolution",
+      "input": "// await Atomics.waitAsync(sharedInt32,0,0,smallPositive).value",
+      "expected_behavior": "resolves to timed-out unless a notify removes the waiter first"
+    }
+  ]
+}
