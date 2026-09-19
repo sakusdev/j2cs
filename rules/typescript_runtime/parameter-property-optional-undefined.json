@@ -1,0 +1,40 @@
+{
+  "id": "typescript.parameter-property.optional-undefined",
+  "category": "typescript_runtime",
+  "summary": "Store undefined for omitted optional parameter property without default.",
+  "source": {
+    "pattern": "constructor(public x?:T){}",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.ParameterPropertyAssign(this,\"x\",x)",
+    "helper": "TsLowering.ParameterPropertyAssign"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "missing": "parameter is undefined",
+    "property": "own property still initialized in standard emit"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "undefined",
+      "input": "class C { constructor(public x?:number){} }; const c=new C(); console.log(c.x===undefined);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "own",
+      "input": "class C { constructor(public x?:number){} }; console.log(Object.hasOwn(new C(),'x'));",
+      "expected_behavior": "prints true under standard emit"
+    }
+  ]
+}

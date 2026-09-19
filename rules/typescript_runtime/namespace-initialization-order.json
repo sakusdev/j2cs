@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.initialization-order",
+  "category": "typescript_runtime",
+  "summary": "Execute namespace bodies in source order.",
+  "source": {
+    "pattern": "namespace N { $body1 } namespace N { $body2 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.InitializeNamespaceInOrder(N)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "source order",
+    "side_effects": "earlier effects before later body",
+    "module": "subject to MODULES evaluation"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "order",
+      "input": "let a:number[]=[]; namespace N { a.push(1) }; namespace N { a.push(2) }; console.log(a.join(','));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "sequential augmentation",
+      "input": "namespace N { export const a=1 }; namespace N { export const b=N.a+1 }; console.log(N.b);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

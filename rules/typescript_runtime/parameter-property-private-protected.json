@@ -1,0 +1,40 @@
+{
+  "id": "typescript.parameter-property.private-protected",
+  "category": "typescript_runtime",
+  "summary": "Treat TS private/protected parameter properties as ordinary runtime properties.",
+  "source": {
+    "pattern": "constructor(private x:T, protected y:U){}",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.ParameterPropertyAssign(this,$name,$value)",
+    "helper": "TsLowering.ParameterPropertyAssign"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "runtime": "ordinary properties",
+    "access": "checker-only for TS private/protected"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "private via any",
+      "input": "class C { constructor(private x:number){} }; console.log((new C(3) as any).x);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "protected via any",
+      "input": "class C { constructor(protected y:number){} }; console.log((new C(4) as any).y);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

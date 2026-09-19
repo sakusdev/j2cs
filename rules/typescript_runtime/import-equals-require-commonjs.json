@@ -1,0 +1,41 @@
+{
+  "id": "typescript.import-equals.require-commonjs",
+  "category": "typescript_runtime",
+  "summary": "Lower import-equals require form to CommonJS loader in compatible module profile.",
+  "source": {
+    "pattern": "import x = require(\"m\")",
+    "requirements": {
+      "typescript_ast": true,
+      "module_kind": "commonjs-compatible"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "JsModules.Require(\"m\")"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "emit": "require(moduleSpecifier)",
+    "identity": "MODULES cache/exports semantics",
+    "evaluation": "module evaluation position"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "require shape",
+      "input": "import fs = require('node:fs'); console.log(typeof fs.readFile);",
+      "expected_behavior": "CommonJS emit uses require('node:fs')"
+    },
+    {
+      "name": "delegate module behavior",
+      "input": "import x = require('./x');",
+      "expected_behavior": "resolution/cache/cycles use existing MODULES rules"
+    }
+  ]
+}

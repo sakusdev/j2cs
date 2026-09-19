@@ -1,0 +1,40 @@
+{
+  "id": "typescript.enum.numeric-reverse-mapping",
+  "category": "typescript_runtime",
+  "summary": "Preserve numeric reverse lookup as enumerable own property.",
+  "source": {
+    "pattern": "enum E { A=$number }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",$number)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "forward": "E.A -> number",
+    "reverse": "E[number] -> name",
+    "descriptor": "ordinary assignment attributes"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "reverse lookup",
+      "input": "enum E { A=5 }; console.log(E[5]);",
+      "expected_behavior": "prints A"
+    },
+    {
+      "name": "enumerable",
+      "input": "enum E { A=5 }; console.log(Object.keys(E).includes('5'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

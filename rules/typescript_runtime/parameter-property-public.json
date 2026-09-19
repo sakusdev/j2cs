@@ -1,0 +1,41 @@
+{
+  "id": "typescript.parameter-property.public",
+  "category": "typescript_runtime",
+  "summary": "Initialize public parameter property before user body.",
+  "source": {
+    "pattern": "constructor(public x:T){ $body }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.ParameterPropertyAssign(this,\"x\",x)",
+    "helper": "TsLowering.ParameterPropertyAssign"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "assignment": "profile-specific own property init",
+    "order": "after this exists, before body",
+    "modifier": "public no runtime access control"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "stored",
+      "input": "class C { constructor(public x:number){} }; console.log(new C(3).x);",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "before body",
+      "input": "class C { constructor(public x:number){ console.log(this.x) } }; new C(4);",
+      "expected_behavior": "prints 4"
+    }
+  ]
+}

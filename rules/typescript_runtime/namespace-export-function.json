@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.export-function",
+  "category": "typescript_runtime",
+  "summary": "Assign exported function object to namespace.",
+  "source": {
+    "pattern": "namespace N { export function f(){...} }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.NamespaceExport(N,\"f\",f)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "function": "ordinary JS function",
+    "export": "same function object assigned to N.f",
+    "call": "FUNCTIONS owns call semantics"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "call",
+      "input": "namespace N { export function f(){return 3} }; console.log(N.f());",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "enumerable",
+      "input": "namespace N { export function f(){} }; console.log(Object.keys(N).includes('f'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

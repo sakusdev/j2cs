@@ -1,0 +1,40 @@
+{
+  "id": "typescript.enum.heterogeneous",
+  "category": "typescript_runtime",
+  "summary": "Preserve per-member numeric/string mapping semantics in heterogeneous enums.",
+  "source": {
+    "pattern": "enum E { A=1, B=\"b\" }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumMixed(E)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "numeric": "reverse mapping",
+    "string": "forward only",
+    "object": "single enum object"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "mixed",
+      "input": "enum E { A=1,B='b' }; console.log(E.A,E[1],E.B,(E as any)['b']);",
+      "expected_behavior": "prints 1 A b undefined"
+    },
+    {
+      "name": "object",
+      "input": "enum E { A=1,B='b' }; console.log(typeof E);",
+      "expected_behavior": "prints object"
+    }
+  ]
+}

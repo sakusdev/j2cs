@@ -1,0 +1,41 @@
+{
+  "id": "typescript.import-equals.export-assignment",
+  "category": "typescript_runtime",
+  "summary": "Lower export = to CommonJS single-export assignment, not ESM default.",
+  "source": {
+    "pattern": "export = $value",
+    "requirements": {
+      "typescript_ast": true,
+      "module_kind": "commonjs-compatible"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "JsModules.CommonJsExportAssignment($value)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "commonjs": "module.exports = value",
+    "identity": "exact value",
+    "interop": "MODULES owns CJS/ESM interop"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "object",
+      "input": "const x={a:1}; export = x;",
+      "expected_behavior": "CommonJS emit assigns module.exports = x"
+    },
+    {
+      "name": "function",
+      "input": "function f(){}; export = f;",
+      "expected_behavior": "exports function object itself"
+    }
+  ]
+}

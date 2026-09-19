@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.merge-function",
+  "category": "typescript_runtime",
+  "summary": "Augment preceding function object with namespace exports.",
+  "source": {
+    "pattern": "function F(){} namespace F { export const x=1 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.AugmentValue(F)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity": "same function object",
+    "effect": "exports are properties",
+    "callability": "remains callable"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "function property",
+      "input": "function F(){return 2}; namespace F { export const x=1 }; console.log(F(),F.x);",
+      "expected_behavior": "prints 2 1"
+    },
+    {
+      "name": "identity",
+      "input": "function F(){}; const r=F; namespace F { export const x=1 }; console.log(r===F);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

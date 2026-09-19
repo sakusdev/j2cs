@@ -1,0 +1,41 @@
+{
+  "id": "typescript.parameter-property.derived-after-super",
+  "category": "typescript_runtime",
+  "summary": "Initialize derived parameter property only after super establishes this.",
+  "source": {
+    "pattern": "class D extends B { constructor(public x:T){ super(); $body } }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.ParameterPropertyAfterSuper(this,\"x\",x)",
+    "helper": "TsLowering.ParameterPropertyAfterSuper"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "this_tdz": "no this before super",
+    "order": "after super before following body",
+    "base": "CLASSES owns derived constructor semantics"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "derived",
+      "input": "class B{}; class D extends B { constructor(public x:number){ super(); console.log(this.x) } }; new D(2);",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "own property",
+      "input": "class B{}; class D extends B { constructor(public x:number){ super() } }; console.log(Object.hasOwn(new D(1),'x'));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

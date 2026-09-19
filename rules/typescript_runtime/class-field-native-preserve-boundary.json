@@ -1,0 +1,42 @@
+{
+  "id": "typescript.class-field.native-preserve-boundary",
+  "category": "typescript_runtime",
+  "summary": "Hand preserved native class fields to canonical JS class-field rules.",
+  "source": {
+    "pattern": "class C { x=$init } with native field emit",
+    "requirements": {
+      "typescript_ast": true,
+      "native_class_fields_preserved": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsLowering.PreserveClassFieldAst()",
+    "helper": "TsLowering.PreserveClassFieldAst"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "profile": "native fields preserved",
+    "semantics": "CLASSES owns field ordering/define behavior",
+    "types": "TS annotations/modifiers erased"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "preserved",
+      "input": "class C { x=1 }",
+      "expected_behavior": "high target may preserve class field syntax"
+    },
+    {
+      "name": "type erased",
+      "input": "class C { x:number=1 }",
+      "expected_behavior": "type annotation erased while runtime field remains"
+    }
+  ]
+}

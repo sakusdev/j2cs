@@ -1,0 +1,39 @@
+{
+  "id": "typescript.enum.initializer-order",
+  "category": "typescript_runtime",
+  "summary": "Preserve left-to-right member initializer effects.",
+  "source": {
+    "pattern": "enum E { A=$a, B=$b }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.InitializeEnumInOrder(E)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "order": "declaration order",
+    "partial_effects": "earlier effects/writes precede later abrupt completion"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "order",
+      "input": "let a:number[]=[];const f=(x:number)=>(a.push(x),x); enum E { A=f(1),B=f(2) }; console.log(a.join(','));",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "side effect model",
+      "input": "enum E { A=1,B=2 };",
+      "expected_behavior": "emitted assignments execute A then B"
+    }
+  ]
+}

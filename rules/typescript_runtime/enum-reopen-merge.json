@@ -1,0 +1,40 @@
+{
+  "id": "typescript.enum.reopen-merge",
+  "category": "typescript_runtime",
+  "summary": "Merge repeated enum declarations into same runtime object.",
+  "source": {
+    "pattern": "enum E { A=1 } ... enum E { B=2 }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.GetOrCreateEnum(\"E\")"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "identity": "same object",
+    "writes": "later IIFE augments prior object",
+    "order": "source/module order"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "merged",
+      "input": "enum E { A=1 }; enum E { B=2 }; console.log(E.A,E.B);",
+      "expected_behavior": "prints 1 2"
+    },
+    {
+      "name": "reverse merged",
+      "input": "enum E { A=1 }; enum E { B=2 }; console.log(E[1],E[2]);",
+      "expected_behavior": "prints A B"
+    }
+  ]
+}

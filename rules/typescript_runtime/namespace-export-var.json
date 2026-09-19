@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.export-var",
+  "category": "typescript_runtime",
+  "summary": "Export namespace variable as namespace-object property with rewritten live accesses.",
+  "source": {
+    "pattern": "namespace N { export let x=$init }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.NamespaceExportBinding(N,\"x\",$init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "initialization": "N.x assigned",
+    "mutation": "emitted accesses preserve mutations",
+    "descriptor": "ordinary property assignment"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "initial",
+      "input": "namespace N { export let x=1 }; console.log(N.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "mutation",
+      "input": "namespace N { export let x=1; export function inc(){x++} }; N.inc(); console.log(N.x);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

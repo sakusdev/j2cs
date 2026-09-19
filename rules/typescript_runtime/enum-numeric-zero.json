@@ -1,0 +1,40 @@
+{
+  "id": "typescript.enum.numeric-zero",
+  "category": "typescript_runtime",
+  "summary": "Lower first uninitialized numeric enum member to 0 with forward/reverse properties.",
+  "source": {
+    "pattern": "enum E { A }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.EnumNumericMember(E,\"A\",0)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "value": "E.A is 0",
+    "reverse": "E[0] is A",
+    "object": "mutable JS enum object"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "first zero",
+      "input": "enum E { A }; console.log(E.A,E[0]);",
+      "expected_behavior": "prints 0 A after TypeScript emit"
+    },
+    {
+      "name": "own properties",
+      "input": "enum E { A }; console.log(Object.keys(E).join(','));",
+      "expected_behavior": "contains 0,A"
+    }
+  ]
+}

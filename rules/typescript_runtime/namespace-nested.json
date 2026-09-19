@@ -1,0 +1,40 @@
+{
+  "id": "typescript.namespace.nested",
+  "category": "typescript_runtime",
+  "summary": "Create nested exported namespace object as outer property.",
+  "source": {
+    "pattern": "namespace A { export namespace B {...} }",
+    "requirements": {
+      "typescript_ast": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "notes": "Model observable JavaScript emitted by TypeScript first, then reuse canonical JS class/module/object semantics.",
+    "template": "TsRuntime.GetOrCreateNestedNamespace(A,\"B\")"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "outer": "A object",
+    "inner": "A.B object",
+    "identity": "reused across nested reopenings"
+  },
+  "caveats": [],
+  "references": [
+    "TypeScript Handbook: Enums / Namespaces",
+    "TypeScript compiler emit semantics (profile-dependent)"
+  ],
+  "tests": [
+    {
+      "name": "nested",
+      "input": "namespace A { export namespace B { export const x=1 } }; console.log(A.B.x);",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "object",
+      "input": "namespace A { export namespace B {} }; console.log(typeof A.B);",
+      "expected_behavior": "prints object"
+    }
+  ]
+}
