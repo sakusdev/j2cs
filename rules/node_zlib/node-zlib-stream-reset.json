@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.stream.reset",
+  "category": "node_zlib",
+  "summary": "reset returns inflate/deflate engines to factory defaults without creating a new JS stream object.",
+  "source": {
+    "pattern": "$zlibStream.reset()",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeZlib.Reset",
+    "template": "NodeZlib.Reset($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "applicability": "inflate/deflate algorithms",
+    "identity": "same stream object",
+    "state": "codec state reset"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const s=z.createDeflate(); console.log(s.reset(),typeof s.write);",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const s=z.createBrotliCompress(); console.log(typeof s.reset);",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

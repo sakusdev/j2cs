@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.create-brotli-compress",
+  "category": "node_zlib",
+  "summary": "createBrotliCompress creates a stateful Node Transform stream implementing BrotliCompress.",
+  "source": {
+    "pattern": "zlib.createBrotliCompress($options?)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeZlib.CreateBrotliCompress",
+    "template": "NodeZlib.CreateBrotliCompress($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "BrotliCompress Transform stream",
+    "stream_semantics": "reuse EVENTS_STREAMS/Node stream backpressure and event ordering",
+    "options": "algorithm-specific"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const s=z.createBrotliCompress(); console.log(typeof s.write==='function',typeof s.pipe==='function');",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const s=z.createBrotliCompress(); console.log(s===z.createBrotliCompress());",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

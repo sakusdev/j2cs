@@ -1,0 +1,43 @@
+{
+  "id": "node.zlib.stream.params",
+  "category": "node_zlib",
+  "summary": "params dynamically updates deflate compression level and strategy; its specified applicability is deflate-family compression rather than Brotli.",
+  "source": {
+    "pattern": "$zlibStream.params($level,$strategy,$callback)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeZlib.Params",
+    "template": "NodeZlib.Params($args)",
+    "notes": "Preserve Node stream/error behavior. Do not infer applicability merely from JavaScript property presence on a stream object."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "specified_applicability": "deflate compression streams",
+    "arguments": "integer compression level and strategy",
+    "callback": "invoked after parameter transition is processed",
+    "brotli": "Brotli uses its own parameter model; generic method presence is not evidence of compatible semantics"
+  },
+  "caveats": [
+    "Calling inherited surface methods on incompatible codec objects may fail through stream/codec error behavior; do not compile them as valid Brotli parameter changes."
+  ],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "deflate params",
+      "input": "const z=require('node:zlib'); const s=z.createDeflate(); s.params(z.constants.Z_BEST_SPEED,z.constants.Z_DEFAULT_STRATEGY,()=>console.log('ok')); s.end('x');",
+      "expected_behavior": "callback runs after valid deflate parameter update"
+    },
+    {
+      "name": "brotli boundary",
+      "input": "const z=require('node:zlib'); const s=z.createBrotliCompress(); console.log(typeof s.params);",
+      "expected_behavior": "surface presence does not make zlib level/strategy semantics valid for Brotli"
+    }
+  ]
+}

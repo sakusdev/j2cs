@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.stream.close",
+  "category": "node_zlib",
+  "summary": "close releases the underlying zlib handle and optionally invokes a callback.",
+  "source": {
+    "pattern": "$zlibStream.close($callback?)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeZlib.Close",
+    "template": "NodeZlib.Close($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "effect": "close codec handle",
+    "callback": "optional completion callback",
+    "stream": "subsequent use follows Node stream/handle lifecycle"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const s=z.createGzip(); s.close(()=>console.log('closed'));",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const s=z.createGzip(); s.close();",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

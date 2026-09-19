@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.options.info",
+  "category": "node_zlib",
+  "summary": "The info option changes convenience-method success shape to an object containing buffer and engine.",
+  "source": {
+    "pattern": "zlib.$op($input,{info:true})",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeZlib.Options",
+    "template": "NodeZlib.Options($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "true": "{buffer, engine}",
+    "false": "Buffer",
+    "engine": "codec instance/state object exposed by Node"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const r=z.gzipSync('x',{info:true}); console.log(Buffer.isBuffer(r.buffer),!!r.engine);",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); console.log(Buffer.isBuffer(z.gzipSync('x')));",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

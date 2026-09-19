@@ -1,0 +1,40 @@
+{
+  "id": "node.zlib.create-deflate-raw",
+  "category": "node_zlib",
+  "summary": "createDeflateRaw creates a stateful Node Transform stream implementing DeflateRaw.",
+  "source": {
+    "pattern": "zlib.createDeflateRaw($options?)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeZlib.CreateDeflateRaw",
+    "template": "NodeZlib.CreateDeflateRaw($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "DeflateRaw Transform stream",
+    "stream_semantics": "reuse EVENTS_STREAMS/Node stream backpressure and event ordering",
+    "options": "algorithm-specific"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); const s=z.createDeflateRaw(); console.log(typeof s.write==='function',typeof s.pipe==='function');",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); const s=z.createDeflateRaw(); console.log(s===z.createDeflateRaw());",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}

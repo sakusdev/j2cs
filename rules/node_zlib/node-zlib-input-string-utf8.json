@@ -1,0 +1,39 @@
+{
+  "id": "node.zlib.input.string-utf8",
+  "category": "node_zlib",
+  "summary": "String inputs to zlib convenience APIs are converted using Node Buffer/string encoding semantics (UTF-8 by default).",
+  "source": {
+    "pattern": "zlib.$op($string,...)",
+    "requirements": {
+      "node_builtin_zlib_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeZlib.Input",
+    "template": "NodeZlib.Input($args)",
+    "notes": "Preserve Node Buffer/options/error semantics; platform compression libraries are usable only behind this compatibility contract."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "string": "encoded as UTF-8 bytes by default",
+    "ownership": "reuse BINARY/Buffer encoding semantics"
+  },
+  "caveats": [],
+  "references": [
+    "https://nodejs.org/api/zlib.html"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "const z=require('node:zlib'); console.log(z.gunzipSync(z.gzipSync('✓')).toString()==='✓');",
+      "expected_behavior": "matches Node.js zlib behavior"
+    },
+    {
+      "name": "edge",
+      "input": "const z=require('node:zlib'); console.log(z.gunzipSync(z.gzipSync('')).length===0);",
+      "expected_behavior": "matches Node.js zlib edge/error behavior"
+    }
+  ]
+}
