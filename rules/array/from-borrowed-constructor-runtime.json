@@ -1,0 +1,39 @@
+{
+  "id": "array.from.borrowed-constructor",
+  "category": "array",
+  "summary": "Retain runtime construction semantics when Array.from is borrowed with an arbitrary constructor/nonconstructor this value.",
+  "source": {
+    "pattern": "Array.from.call($C, $items, $mapper, $thisArg)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.from%",
+      "this_value_not_proven_intrinsic_array_constructor": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFromWithConstructor",
+    "template": "JsRuntime.ArrayFromWithConstructor($C, $items, $mapper, $thisArg)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "constructor_choice": "if IsConstructor(C), iterable path Construct(C) with zero args and array-like path Construct(C,[len]); otherwise intrinsic Array",
+    "result_need_not_be_array": true,
+    "property_creation": "CreateDataPropertyOrThrow"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "custom constructor iterable",
+      "input": "function C(){this.tag=1} const r=Array.from.call(C,new Set([2])); console.log(r instanceof C,r[0],r.length);",
+      "expected_behavior": "prints true 2 1"
+    },
+    {
+      "name": "nonconstructor falls back Array",
+      "input": "const r=Array.from.call({},[1]); console.log(Array.isArray(r),r[0]);",
+      "expected_behavior": "prints true 1"
+    }
+  ]
+}

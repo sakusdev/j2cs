@@ -1,0 +1,45 @@
+{
+  "id": "array.fromasync.arraylike-known",
+  "category": "array",
+  "summary": "Use the array-like path when neither async nor sync iterator method exists.",
+  "source": {
+    "pattern": "Array.fromAsync($arrayLike)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "async_iterator_absent": true,
+      "sync_iterator_absent": true,
+      "source_proven_array_like": true,
+      "length_and_index_gets_lowerable": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromArrayLike",
+    "template": "JsAsyncArray.FromArrayLike($arrayLike)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "length": "LengthOfArrayLike",
+    "index": "Get each property",
+    "await_value": "Await each retrieved value before creating result property",
+    "holes": "missing becomes undefined then present result property"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "array-like",
+      "input": "(async()=>console.log((await Array.fromAsync({0:1,length:1}))[0]))();",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "missing materialized",
+      "input": "(async()=>{const r=await Array.fromAsync({length:1}); console.log(0 in r,r[0])})();",
+      "expected_behavior": "prints true undefined"
+    }
+  ]
+}

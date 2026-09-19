@@ -1,0 +1,42 @@
+{
+  "id": "array.from.iterable-dynamic-mapper",
+  "category": "array",
+  "summary": "Use runtime [[Call]] and IteratorClose semantics when Array.from mapper is dynamically callable.",
+  "source": {
+    "pattern": "Array.from($iterable, $mapper, $thisArg)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_may_be_iterable": true,
+      "mapper_may_be_dynamic_callable_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFrom",
+    "template": "JsRuntime.ArrayFrom($iterable, $mapper, $thisArg)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callability": "checked before iterator consumption",
+    "call": "canonical JS [[Call]]",
+    "iterator_close": "mapper throw triggers IteratorClose",
+    "evaluation": "no intermediate mapped array"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "noncallable before consumption",
+      "input": "let n=0; const x={*[Symbol.iterator](){n++;yield 1}}; try{Array.from(x,3)}catch(e){console.log(e.name,n)}",
+      "expected_behavior": "prints TypeError 0"
+    },
+    {
+      "name": "proxy mapper",
+      "input": "const f=new Proxy(x=>x,{apply(t,th,a){return a[0]+1}}); console.log(Array.from([1],f)[0]);",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

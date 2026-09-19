@@ -1,0 +1,40 @@
+{
+  "id": "array.prototype.flatmap.generic-arraylike",
+  "category": "array",
+  "summary": "Use runtime object-model semantics when flatMap is borrowed onto a generic array-like.",
+  "source": {
+    "pattern": "Array.prototype.flatMap.call($object, $callback, $thisArg)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.prototype.flatMap%",
+      "receiver_may_be_generic_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFlatMapGeneric",
+    "template": "JsRuntime.ArrayFlatMapGeneric($object, $callback, $thisArg)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "receiver": "ToObject and LengthOfArrayLike",
+    "presence": "HasProperty before Get",
+    "callback": "canonical JS call",
+    "result": "ArraySpeciesCreate on receiver rules"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "generic",
+      "input": "console.log(Array.prototype.flatMap.call({0:2,length:1},x=>[x,3]).join(','));",
+      "expected_behavior": "prints 2,3"
+    },
+    {
+      "name": "prototype property visited",
+      "input": "const p={0:5}; const o=Object.create(p); o.length=1; console.log(Array.prototype.flatMap.call(o,x=>[x])[0]);",
+      "expected_behavior": "prints 5"
+    }
+  ]
+}

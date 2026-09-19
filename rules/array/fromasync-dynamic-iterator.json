@@ -1,0 +1,42 @@
+{
+  "id": "array.fromasync.dynamic-iterator",
+  "category": "array",
+  "summary": "Use runtime async/sync iterator lookup when Array.fromAsync protocol hooks are dynamic.",
+  "source": {
+    "pattern": "Array.fromAsync($source)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "async_or_sync_iterator_lookup_may_be_dynamic": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFromAsync",
+    "template": "JsRuntime.ArrayFromAsync($source, undefined, undefined)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "lookup_order": "GetMethod(@@asyncIterator), otherwise GetMethod(@@iterator)",
+    "callability_and_getters": "observable",
+    "return": "Promise",
+    "iterator_close": "async close on abrupt"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "async getter first",
+      "input": "let log=[]; const x={get [Symbol.asyncIterator](){log.push('a');return undefined},get [Symbol.iterator](){log.push('s');return function*(){}}}; Array.fromAsync(x).then(()=>console.log(log.join('')));",
+      "expected_behavior": "prints as"
+    },
+    {
+      "name": "bad async iterator",
+      "input": "Array.fromAsync({[Symbol.asyncIterator](){return 1}}).catch(e=>console.log(e.name));",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

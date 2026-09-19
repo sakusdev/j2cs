@@ -1,0 +1,43 @@
+{
+  "id": "array.fromasync.sync-iterable-fallback",
+  "category": "array",
+  "summary": "Use Async-from-Sync Iterator when Array.fromAsync has no async iterator but has a known sync iterator.",
+  "source": {
+    "pattern": "Array.fromAsync($syncIterable)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "async_iterator_absent": true,
+      "source_has_known_sync_iterator": true,
+      "sync_iterator_protocol_lowerable": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromSyncIterable",
+    "template": "JsAsyncArray.FromSyncIterable($syncIterable)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "fallback": "CreateAsyncFromSyncIterator",
+    "sync_yielded_promises": "unwrapped by async-from-sync continuation semantics",
+    "return": "Promise<Array>"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "array fallback",
+      "input": "(async()=>console.log((await Array.fromAsync([1,2])).join(',')))();",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "sync yielded promise unwrapped",
+      "input": "(async()=>{function* g(){yield Promise.resolve(3)} console.log((await Array.fromAsync(g()))[0])})();",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

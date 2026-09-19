@@ -1,0 +1,46 @@
+{
+  "id": "array.from.iterable-known-mapper",
+  "category": "array",
+  "summary": "Map each iterator value during Array.from without constructing an intermediate Array.",
+  "source": {
+    "pattern": "Array.from($iterable, $mapper, $thisArg)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_has_known_sync_iterator": true,
+      "iterator_protocol_lowerable": true,
+      "mapper_statically_callable_and_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromIterableMap",
+    "template": "JsArray.FromIterableMap($iterable, $mapper, $thisArg)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "callback_arguments": [
+      "value",
+      "index"
+    ],
+    "callback_this": "thisArg",
+    "order": "get next value then call mapper then create result property",
+    "iterator_close": "mapper abrupt or result creation abrupt closes iterator"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "mapper args",
+      "input": "console.log(Array.from(new Set([2,4]),(v,i)=>v+i).join(','));",
+      "expected_behavior": "prints 2,5"
+    },
+    {
+      "name": "thisArg",
+      "input": "console.log(Array.from([2],function(v){return v*this.m},{m:3})[0]);",
+      "expected_behavior": "prints 6"
+    }
+  ]
+}

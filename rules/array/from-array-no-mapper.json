@@ -1,0 +1,43 @@
+{
+  "id": "array.from.array-no-mapper",
+  "category": "array",
+  "summary": "Create an intrinsic Array from a proven builtin Array through its iterable path.",
+  "source": {
+    "pattern": "Array.from($array)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_inferred_builtin_array": true,
+      "mapper_omitted": true,
+      "array_iterator_intrinsic": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromIterable",
+    "template": "JsArray.FromIterable($array)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "path": "iterable path wins over array-like length path",
+    "holes": "Array iterator yields undefined, so holes become present undefined",
+    "result": "new Array",
+    "order": "iterator order"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "copy",
+      "input": "const a=[1,2]; const b=Array.from(a); console.log(b.join(','),a!==b);",
+      "expected_behavior": "prints 1,2 true"
+    },
+    {
+      "name": "hole materialized",
+      "input": "const r=Array.from([,1]); console.log(r.length,0 in r,r[0]);",
+      "expected_behavior": "prints 2 true undefined"
+    }
+  ]
+}

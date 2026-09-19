@@ -1,0 +1,45 @@
+{
+  "id": "array.fromasync.known-async-iterable",
+  "category": "array",
+  "summary": "Consume a statically lowerable async iterable into a Promise for a dense Array.",
+  "source": {
+    "pattern": "Array.fromAsync($asyncIterable)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "source_has_known_async_iterator": true,
+      "async_iterator_protocol_lowerable": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromAsyncIterable",
+    "template": "JsAsyncArray.FromAsyncIterable($asyncIterable)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise",
+    "iterator": "prefer @@asyncIterator",
+    "next": "Call next then Await the next-result promise",
+    "next_result": "must be Object",
+    "value": "for true async iterator, use IteratorValue without an extra Await",
+    "microtasks": "reuse ASYNC Promise/Await semantics"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "async iterable",
+      "input": "(async()=>{const x={async *[Symbol.asyncIterator](){yield 1;yield 2}}; console.log((await Array.fromAsync(x)).join(','))})();",
+      "expected_behavior": "prints 1,2"
+    },
+    {
+      "name": "returns promise",
+      "input": "console.log(Array.fromAsync([1]) instanceof Promise);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

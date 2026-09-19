@@ -1,0 +1,44 @@
+{
+  "id": "array.from.arraylike-holes-materialize",
+  "category": "array",
+  "summary": "Record the deliberate difference between Array.from array-like Get semantics and hole-preserving array methods.",
+  "source": {
+    "pattern": "Array.from($arrayLike)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.from%",
+      "source_proven_non_iterable_array_like": true,
+      "array_like_may_have_missing_indices": true,
+      "indexed_gets_lowerable": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.FromArrayLike",
+    "template": "JsArray.FromArrayLike($arrayLike)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "presence_check": "none; Get is performed unconditionally",
+    "missing": "undefined",
+    "result_property": "created and present",
+    "difference": "unlike map/slice hole-preserving paths"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "all missing",
+      "input": "const r=Array.from({length:2}); console.log(r.length,0 in r,1 in r);",
+      "expected_behavior": "prints 2 true true"
+    },
+    {
+      "name": "prototype value read",
+      "input": "const p={0:'p'}; const o=Object.create(p); o.length=1; console.log(Array.from(o)[0]);",
+      "expected_behavior": "prints p"
+    }
+  ]
+}

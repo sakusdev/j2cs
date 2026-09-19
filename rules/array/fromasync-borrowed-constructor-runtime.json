@@ -1,0 +1,38 @@
+{
+  "id": "array.fromasync.borrowed-constructor",
+  "category": "array",
+  "summary": "Retain constructor-dependent result creation when Array.fromAsync is borrowed with arbitrary this.",
+  "source": {
+    "pattern": "Array.fromAsync.call($C, $items, $mapper, $thisArg)",
+    "requirements": {
+      "method_resolves_to_intrinsic": "%Array.fromAsync%",
+      "this_value_not_proven_intrinsic_array_constructor": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFromAsyncWithConstructor",
+    "template": "JsRuntime.ArrayFromAsyncWithConstructor($C, $items, $mapper, $thisArg)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "constructor": "if IsConstructor(C), iterable paths Construct(C) with no args and array-like path Construct(C,[len]); otherwise ArrayCreate",
+    "return": "Promise resolving to constructed result"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "custom constructor",
+      "input": "function C(){this.tag=1} Array.fromAsync.call(C,[2]).then(r=>console.log(r instanceof C,r[0]));",
+      "expected_behavior": "prints true 2"
+    },
+    {
+      "name": "nonconstructor fallback",
+      "input": "Array.fromAsync.call({},[2]).then(r=>console.log(Array.isArray(r)));",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

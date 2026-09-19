@@ -1,0 +1,43 @@
+{
+  "id": "array.fromasync.sync-iterable-known-mapper",
+  "category": "array",
+  "summary": "Map values from Async-from-Sync fallback and Await mapper results.",
+  "source": {
+    "pattern": "Array.fromAsync($syncIterable, $mapper, $thisArg)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "async_iterator_absent": true,
+      "source_has_known_sync_iterator": true,
+      "mapper_statically_callable_and_lowerable": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromSyncIterableMap",
+    "template": "JsAsyncArray.FromSyncIterableMap($syncIterable, $mapper, $thisArg)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "source_value": "async-from-sync unwraps yielded promise values",
+    "mapper": "called after source value resolution",
+    "mapper_result": "Await",
+    "close": "AsyncIteratorClose on abrupt completion"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "sync values plus async mapper",
+      "input": "(async()=>console.log((await Array.fromAsync([1],async x=>x+1))[0]))();",
+      "expected_behavior": "prints 2"
+    },
+    {
+      "name": "promise yielded before mapper",
+      "input": "(async()=>{function* g(){yield Promise.resolve(2)} console.log((await Array.fromAsync(g(),x=>x+1))[0])})();",
+      "expected_behavior": "prints 3"
+    }
+  ]
+}

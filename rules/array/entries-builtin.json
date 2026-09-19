@@ -1,0 +1,43 @@
+{
+  "id": "array.prototype.entries.builtin",
+  "category": "array",
+  "summary": "Create the builtin Array entries iterator without snapshotting the array length.",
+  "source": {
+    "pattern": "$array.entries()",
+    "requirements": {
+      "method_resolution_intrinsic": true,
+      "receiver_inferred_as_builtin_array": true,
+      "receiver_not_proxy": true,
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsArray.Entries",
+    "template": "JsArray.Entries($array)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "iterator_object": "array iterator",
+    "next_index": 0,
+    "length": "read on each next step rather than snapshotted",
+    "mutation": "appends before completion can be visited",
+    "done": "once completed, remains completed"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "order",
+      "input": "console.log([...['a','b'].entries()].map(String).join('|'));",
+      "expected_behavior": "yields entries in ascending index order"
+    },
+    {
+      "name": "append observed",
+      "input": "const a=[1]; const it=a.entries(); console.log(String(it.next().value)); a.push(2); console.log(String(it.next().value));",
+      "expected_behavior": "second next observes the appended index/value before iterator completion"
+    }
+  ]
+}

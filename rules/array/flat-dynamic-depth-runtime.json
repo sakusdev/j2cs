@@ -1,0 +1,46 @@
+{
+  "id": "array.prototype.flat.dynamic-depth",
+  "category": "array",
+  "summary": "Use runtime coercion when flat depth may be an object/Proxy with observable ToIntegerOrInfinity conversion.",
+  "source": {
+    "pattern": "$array.flat($depth)",
+    "requirements": {
+      "receiver_inferred_as_builtin_array": true,
+      "builtin_method_not_overridden": true,
+      "receiver_not_proxy": true,
+      "no_indexed_accessors_or_nonconfigurable_elements": true,
+      "no_indexed_prototype_properties": true,
+      "array_species_is_builtin_array": true,
+      "depth_may_be_object_or_proxy": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.ArrayFlat",
+    "template": "JsRuntime.ArrayFlat($array, $depth)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "conversion": "ToIntegerOrInfinity can execute user code before ArraySpeciesCreate/flattening",
+    "exceptions": "propagate without flattening after abrupt conversion"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "valueOf depth",
+      "input": "let n=0; console.log([1,[2]].flat({valueOf(){n++;return 1}}).join(','),n);",
+      "expected_behavior": "prints 1,2 1"
+    },
+    {
+      "name": "throwing depth",
+      "input": "try{[1].flat({valueOf(){throw 'x'}})}catch(e){console.log(e)}",
+      "expected_behavior": "prints x"
+    }
+  ],
+  "caveats": [
+    "Custom Symbol.species remains owned by the existing array.custom-species.runtime rule."
+  ]
+}

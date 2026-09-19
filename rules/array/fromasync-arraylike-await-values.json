@@ -1,0 +1,44 @@
+{
+  "id": "array.fromasync.arraylike-await-values",
+  "category": "array",
+  "summary": "Await array-like element values before optional mapping in Array.fromAsync.",
+  "source": {
+    "pattern": "Array.fromAsync($arrayLike)",
+    "requirements": {
+      "binding_resolves_to_intrinsic": "%Array%",
+      "method_resolution_intrinsic": "%Array.fromAsync%",
+      "async_iterator_absent": true,
+      "sync_iterator_absent": true,
+      "source_proven_array_like": true,
+      "element_values_may_be_promises": true,
+      "mapper_omitted": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "JsAsyncArray.FromArrayLike",
+    "template": "JsAsyncArray.FromArrayLike($arrayLike)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "order": "Get index k, Await value, create result property, then k+1",
+    "sequential": true,
+    "rejection": "reject returned Promise and stop"
+  },
+  "references": [
+    "https://tc39.es/ecma262/2026/multipage/indexed-collections.html"
+  ],
+  "tests": [
+    {
+      "name": "promise element",
+      "input": "(async()=>console.log((await Array.fromAsync({0:Promise.resolve(4),length:1}))[0]))();",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "rejection",
+      "input": "Array.fromAsync({0:Promise.reject('x'),length:1}).catch(e=>console.log(e));",
+      "expected_behavior": "prints x"
+    }
+  ]
+}
