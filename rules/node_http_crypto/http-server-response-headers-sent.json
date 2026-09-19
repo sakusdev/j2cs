@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.headers-sent",
+  "category": "node_http_crypto",
+  "summary": "Read whether response headers are committed.",
+  "source": {
+    "pattern": "$response.headersSent",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.ResponseHeadersSent",
+    "template": "NodeHttp.ResponseHeadersSent($response)",
+    "notes": "False before commit; true after writeHead, flushHeaders, first write, or end commits the header block."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "False before commit; true after writeHead, flushHeaders, first write, or end commits the header block."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "res.headersSent",
+      "expected_behavior": "false initially"
+    },
+    {
+      "name": "edge semantics",
+      "input": "res.write('x'); res.headersSent",
+      "expected_behavior": "true"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.get-raw-header-names",
+  "category": "node_http_crypto",
+  "summary": "Return unique outgoing header names with tracked raw casing.",
+  "source": {
+    "pattern": "$request.getRawHeaderNames()",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.GetRawHeaderNames",
+    "template": "NodeHttp.GetRawHeaderNames($request)",
+    "notes": "Logical lookup stays case-insensitive while raw name spelling remains observable."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Logical lookup stays case-insensitive while raw name spelling remains observable."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.setHeader('X-AbC','v'); req.getRawHeaderNames().includes('X-AbC')",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.setHeader('X-A','1'); req.setHeader('x-a','2')",
+      "expected_behavior": "raw casing reflects stored replacement semantics"
+    }
+  ]
+}

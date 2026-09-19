@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.write",
+  "category": "node_http_crypto",
+  "summary": "Write response body data with HTTP commit and Writable backpressure semantics.",
+  "source": {
+    "pattern": "$response.write($chunk, $encoding?, $callback?)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.ResponseWrite",
+    "template": "NodeHttp.ResponseWrite($response, $chunk, $encoding, $callback)",
+    "notes": "Returns boolean backpressure signal; first write commits headers; Buffer/TypedArray bytes and callback timing reuse Node stream semantics."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns boolean backpressure signal; first write commits headers; Buffer/TypedArray bytes and callback timing reuse Node stream semantics."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "typeof res.write('x')",
+      "expected_behavior": "boolean"
+    },
+    {
+      "name": "edge semantics",
+      "input": "res.write(Buffer.alloc(1024*1024))",
+      "expected_behavior": "false is possible and must not be discarded"
+    }
+  ]
+}

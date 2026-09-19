@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server.listen",
+  "category": "node_http_crypto",
+  "summary": "Start listening with Node net.Server timing and overload semantics.",
+  "source": {
+    "pattern": "$server.listen($args)",
+    "requirements": {
+      "receiver_inferred_as": "node:http Server",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.Listen",
+    "template": "NodeHttp.Listen($server, $args)",
+    "notes": "Returns the same Server; successful bind completion is asynchronous and reported by callback/listening event; bind errors preserve Node behavior."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns the same Server; successful bind completion is asynchronous and reported by callback/listening event; bind errors preserve Node behavior."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "server.listen(0, cb) === server",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let sync=true; server.listen(0,()=>console.log(sync)); sync=false",
+      "expected_behavior": "callback observes false"
+    }
+  ]
+}

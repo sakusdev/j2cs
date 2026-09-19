@@ -1,0 +1,42 @@
+{
+  "id": "node.http.request",
+  "category": "node_http_crypto",
+  "summary": "Create a ClientRequest without automatically ending it.",
+  "source": {
+    "pattern": "$http.request($urlOrOptions, $options?, $callback?)",
+    "requirements": {
+      "module_binding": "node:http builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.Request",
+    "template": "NodeHttp.Request($urlOrOptions, $options, $callback)",
+    "notes": "Returns ClientRequest immediately; request is Writable/EventEmitter; callback is response listener; body/headers remain mutable until committed."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns ClientRequest immediately; request is Writable/EventEmitter; callback is response listener; body/headers remain mutable until committed."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "const r=http.request(opts); r.writableEnded",
+      "expected_behavior": "false before end()"
+    },
+    {
+      "name": "edge semantics",
+      "input": "http.request(opts)",
+      "expected_behavior": "does not auto-call end()"
+    }
+  ]
+}

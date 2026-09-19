@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.get-header",
+  "category": "node_http_crypto",
+  "summary": "Read a queued implicit response header.",
+  "source": {
+    "pattern": "$response.getHeader($name)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.ResponseGetHeader",
+    "template": "NodeHttp.ResponseGetHeader($response, $name)",
+    "notes": "Case-insensitive lookup returns number/string/string[]/undefined without eager stringification."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Case-insensitive lookup returns number/string/string[]/undefined without eager stringification."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "res.setHeader('Content-Length',7); res.getHeader('content-length')",
+      "expected_behavior": "7"
+    },
+    {
+      "name": "edge semantics",
+      "input": "res.getHeader('missing')",
+      "expected_behavior": "undefined"
+    }
+  ]
+}

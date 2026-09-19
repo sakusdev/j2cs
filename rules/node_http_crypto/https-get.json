@@ -1,0 +1,42 @@
+{
+  "id": "node.https.get",
+  "category": "node_http_crypto",
+  "summary": "Create an HTTPS ClientRequest and automatically end it.",
+  "source": {
+    "pattern": "$https.get($urlOrOptions, $options?, $callback?)",
+    "requirements": {
+      "module_binding": "node:https builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.HttpsGet",
+    "template": "NodeHttp.HttpsGet($urlOrOptions, $options, $callback)",
+    "notes": "Returns ClientRequest; auto-end distinction from https.request is observable; TLS behavior remains runtime-hosted."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns ClientRequest; auto-end distinction from https.request is observable; TLS behavior remains runtime-hosted."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/https.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "https.get(url) instanceof http.ClientRequest",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "setImmediate(()=>console.log(req.writableEnded))",
+      "expected_behavior": "true for request returned by https.get"
+    }
+  ]
+}

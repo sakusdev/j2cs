@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.get-ciphers",
+  "category": "node_http_crypto",
+  "summary": "Return cipher algorithms exposed by current Node/OpenSSL configuration.",
+  "source": {
+    "pattern": "$crypto.getCiphers()",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.GetCiphers",
+    "template": "NodeCrypto.GetCiphers()",
+    "notes": "Runtime-dependent string array with provider/version-specific names and aliases."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Runtime-dependent string array with provider/version-specific names and aliases."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Array.isArray(crypto.getCiphers())",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.getCiphers().length>0",
+      "expected_behavior": "normally true; exact list is runtime-dependent"
+    }
+  ]
+}

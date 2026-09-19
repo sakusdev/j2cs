@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.scrypt-async",
+  "category": "node_http_crypto",
+  "summary": "Derive a scrypt key asynchronously.",
+  "source": {
+    "pattern": "$crypto.scrypt($password, $salt, $keylen, $options?, $callback)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.ScryptAsync",
+    "template": "NodeCrypto.ScryptAsync($password, $salt, $keylen, $options, $callback)",
+    "notes": "Returns undefined; callback gets (err, Buffer) later; validation and thread-pool completion ordering are observable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; callback gets (err, Buffer) later; validation and thread-pool completion ordering are observable."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.scrypt('p','s',8,(e,b)=>console.log(b.length))",
+      "expected_behavior": "prints 8"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let s=true; crypto.scrypt('p','s',1,()=>console.log(s)); s=false",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

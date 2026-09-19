@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server-response.get-headers",
+  "category": "node_http_crypto",
+  "summary": "Return a shallow null-prototype snapshot of implicit response headers.",
+  "source": {
+    "pattern": "$response.getHeaders()",
+    "requirements": {
+      "receiver_inferred_as": "node:http ServerResponse",
+      "builtin_method_or_property_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.ResponseGetHeaders",
+    "template": "NodeHttp.ResponseGetHeaders($response)",
+    "notes": "Keys are lowercase, object prototype is null, and array values are shallow shared."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Keys are lowercase, object prototype is null, and array values are shallow shared."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Object.getPrototypeOf(res.getHeaders())===null",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "mutate array value from getHeaders()",
+      "expected_behavior": "queued array header observes shallow mutation"
+    }
+  ]
+}

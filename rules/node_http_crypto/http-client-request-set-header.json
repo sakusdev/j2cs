@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.set-header",
+  "category": "node_http_crypto",
+  "summary": "Set or replace an outgoing request header.",
+  "source": {
+    "pattern": "$request.setHeader($name, $value)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.SetHeader",
+    "template": "NodeHttp.SetHeader($request, $name, $value)",
+    "notes": "Lookup is case-insensitive; raw casing is tracked; numbers/arrays remain observable until transmission; invalid names/values throw."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Lookup is case-insensitive; raw casing is tracked; numbers/arrays remain observable until transmission; invalid names/values throw."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.setHeader('X-N',7); req.getHeader('x-n')",
+      "expected_behavior": "7"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.setHeader('X','bad\\nvalue')",
+      "expected_behavior": "throws TypeError"
+    }
+  ]
+}

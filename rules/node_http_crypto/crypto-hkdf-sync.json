@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hkdf-sync",
+  "category": "node_http_crypto",
+  "summary": "Derive HKDF output synchronously.",
+  "source": {
+    "pattern": "$crypto.hkdfSync($digest, $ikm, $salt, $info, $keylen)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.HkdfSync",
+    "template": "NodeCrypto.HkdfSync($digest, $ikm, $salt, $info, $keylen)",
+    "notes": "Returns ArrayBuffer, not Buffer; zero-length inputs allowed; info <=1024 bytes; keylen <=255*digest-size with Node provider validation."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns ArrayBuffer, not Buffer; zero-length inputs allowed; info <=1024 bytes; keylen <=255*digest-size with Node provider validation."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.hkdfSync('sha256','i','s','n',16) instanceof ArrayBuffer",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.hkdfSync('sha256','i','s',Buffer.alloc(1025),16)",
+      "expected_behavior": "throws range/value error"
+    }
+  ]
+}

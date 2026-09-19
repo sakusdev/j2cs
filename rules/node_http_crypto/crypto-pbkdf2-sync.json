@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.pbkdf2-sync",
+  "category": "node_http_crypto",
+  "summary": "Derive a PBKDF2 key synchronously.",
+  "source": {
+    "pattern": "$crypto.pbkdf2Sync($password, $salt, $iterations, $keylen, $digest)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.Pbkdf2Sync",
+    "template": "NodeCrypto.Pbkdf2Sync($password, $salt, $iterations, $keylen, $digest)",
+    "notes": "Returns Buffer of keylen bytes; password/salt string/binary rules and digest/HMAC provider availability must match Node; invalid inputs throw."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns Buffer of keylen bytes; password/salt string/binary rules and digest/HMAC provider availability must match Node; invalid inputs throw."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.pbkdf2Sync('p','s',1,16,'sha256').length",
+      "expected_behavior": "16"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.pbkdf2Sync('p','s',1,16)",
+      "expected_behavior": "throws because digest is required"
+    }
+  ]
+}

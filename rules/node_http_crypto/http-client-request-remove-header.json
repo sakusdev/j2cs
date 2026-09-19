@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.remove-header",
+  "category": "node_http_crypto",
+  "summary": "Remove a queued outgoing request header before commit.",
+  "source": {
+    "pattern": "$request.removeHeader($name)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.RemoveHeader",
+    "template": "NodeHttp.RemoveHeader($request, $name)",
+    "notes": "Returns undefined; matching is case-insensitive; cannot retroactively alter already-sent headers."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; matching is case-insensitive; cannot retroactively alter already-sent headers."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.setHeader('X','v'); req.removeHeader('x'); req.hasHeader('X')",
+      "expected_behavior": "false"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.removeHeader('missing')",
+      "expected_behavior": "returns undefined"
+    }
+  ]
+}

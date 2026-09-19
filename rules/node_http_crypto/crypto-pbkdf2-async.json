@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.pbkdf2-async",
+  "category": "node_http_crypto",
+  "summary": "Derive a PBKDF2 key asynchronously.",
+  "source": {
+    "pattern": "$crypto.pbkdf2($password, $salt, $iterations, $keylen, $digest, $callback)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.Pbkdf2Async",
+    "template": "NodeCrypto.Pbkdf2Async($password, $salt, $iterations, $keylen, $digest, $callback)",
+    "notes": "Returns undefined; callback receives (err, Buffer) via Node thread-pool/event-loop ordering; invalid arguments may throw before queueing."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; callback receives (err, Buffer) via Node thread-pool/event-loop ordering; invalid arguments may throw before queueing."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.pbkdf2('p','s',1,8,'sha256',(e,b)=>console.log(b.length))",
+      "expected_behavior": "prints 8"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let s=true; crypto.pbkdf2('p','s',1,1,'sha256',()=>console.log(s)); s=false",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

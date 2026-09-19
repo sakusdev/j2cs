@@ -1,0 +1,42 @@
+{
+  "id": "node.http.server.close",
+  "category": "node_http_crypto",
+  "summary": "Stop accepting new connections while preserving asynchronous close completion.",
+  "source": {
+    "pattern": "$server.close($callback?)",
+    "requirements": {
+      "receiver_inferred_as": "node:http Server",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.CloseServer",
+    "template": "NodeHttp.CloseServer($server, $callback)",
+    "notes": "Returns the same Server and completes only according to Node connection lifecycle; not equivalent to immediate socket disposal."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns the same Server and completes only according to Node connection lifecycle; not equivalent to immediate socket disposal."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "server.close() === server",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "server.close(()=>console.log('closed'))",
+      "expected_behavior": "callback occurs when close completes"
+    }
+  ]
+}

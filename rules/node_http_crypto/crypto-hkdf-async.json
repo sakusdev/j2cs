@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hkdf-async",
+  "category": "node_http_crypto",
+  "summary": "Derive HKDF output asynchronously.",
+  "source": {
+    "pattern": "$crypto.hkdf($digest, $ikm, $salt, $info, $keylen, $callback)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.HkdfAsync",
+    "template": "NodeCrypto.HkdfAsync($digest, $ikm, $salt, $info, $keylen, $callback)",
+    "notes": "Returns undefined; callback receives (err, ArrayBuffer) later with same size/provider validation as sync form."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns undefined; callback receives (err, ArrayBuffer) later with same size/provider validation as sync form."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "crypto.hkdf('sha256','i','s','n',4,(e,x)=>console.log(x.byteLength))",
+      "expected_behavior": "prints 4"
+    },
+    {
+      "name": "edge semantics",
+      "input": "let s=true; crypto.hkdf('sha256','i','s','n',1,()=>console.log(s)); s=false",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

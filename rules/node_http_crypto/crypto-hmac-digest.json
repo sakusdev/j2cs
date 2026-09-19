@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hmac.digest",
+  "category": "node_http_crypto",
+  "summary": "Finalize Hmac output.",
+  "source": {
+    "pattern": "$hmac.digest($encoding?)",
+    "requirements": {
+      "receiver_inferred_as": "node:crypto Hmac",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.HmacDigest",
+    "template": "NodeCrypto.HmacDigest($hmac, $encoding)",
+    "notes": "Returns Buffer or encoded string and finalizes Hmac; exact repeated-digest behavior follows selected Node baseline, not .NET object-reset semantics."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns Buffer or encoded string and finalizes Hmac; exact repeated-digest behavior follows selected Node baseline, not .NET object-reset semantics."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Buffer.isBuffer(hmac.digest())",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "typeof hmac.digest('hex')",
+      "expected_behavior": "string"
+    }
+  ]
+}

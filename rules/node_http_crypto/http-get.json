@@ -1,0 +1,42 @@
+{
+  "id": "node.http.get",
+  "category": "node_http_crypto",
+  "summary": "Create a ClientRequest and automatically end it.",
+  "source": {
+    "pattern": "$http.get($urlOrOptions, $options?, $callback?)",
+    "requirements": {
+      "module_binding": "node:http builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.Get",
+    "template": "NodeHttp.Get($urlOrOptions, $options, $callback)",
+    "notes": "Equivalent to request creation plus automatic end for request-body purposes, while still returning the observable ClientRequest."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Equivalent to request creation plus automatic end for request-body purposes, while still returning the observable ClientRequest."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "http.get(opts) instanceof http.ClientRequest",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "setImmediate(()=>console.log(req.writableEnded))",
+      "expected_behavior": "true for request returned by http.get"
+    }
+  ]
+}

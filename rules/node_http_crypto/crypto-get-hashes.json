@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.get-hashes",
+  "category": "node_http_crypto",
+  "summary": "Return hash algorithms exposed by current Node/OpenSSL configuration.",
+  "source": {
+    "pattern": "$crypto.getHashes()",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeCrypto.GetHashes",
+    "template": "NodeCrypto.GetHashes()",
+    "notes": "Runtime-dependent string array; provider/FIPS/default property query affects contents; must not be replaced by fixed .NET list."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Runtime-dependent string array; provider/FIPS/default property query affects contents; must not be replaced by fixed .NET list."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Array.isArray(crypto.getHashes())",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.getHashes().includes('sha256')",
+      "expected_behavior": "commonly true, but exact inventory is runtime-dependent"
+    }
+  ]
+}

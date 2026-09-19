@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.random-uuid",
+  "category": "node_http_crypto",
+  "summary": "Generate a cryptographically random UUID v4 string.",
+  "source": {
+    "pattern": "$crypto.randomUUID($options?)",
+    "requirements": {
+      "module_binding": "node:crypto builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.RandomUuid",
+    "template": "NodeCrypto.RandomUuid($options)",
+    "notes": "Returns lowercase canonical UUID; version/variant bits fixed; disableEntropyCache affects entropy caching, not format."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns lowercase canonical UUID; version/variant bits fixed; disableEntropyCache affects entropy caching, not format."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "/^[0-9a-f-]{36}$/.test(crypto.randomUUID())",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "crypto.randomUUID({disableEntropyCache:true})",
+      "expected_behavior": "returns same canonical v4 format"
+    }
+  ]
+}

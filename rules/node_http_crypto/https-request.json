@@ -1,0 +1,42 @@
+{
+  "id": "node.https.request",
+  "category": "node_http_crypto",
+  "summary": "Create an HTTPS ClientRequest with Node TLS/socket semantics.",
+  "source": {
+    "pattern": "$https.request($urlOrOptions, $options?, $callback?)",
+    "requirements": {
+      "module_binding": "node:https builtin",
+      "builtin_not_shadowed": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.HttpsRequest",
+    "template": "NodeHttp.HttpsRequest($urlOrOptions, $options, $callback)",
+    "notes": "Same ClientRequest stream model as http.request plus TLS certificate/SNI/ALPN/session behavior at a host/runtime boundary."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Same ClientRequest stream model as http.request plus TLS certificate/SNI/ALPN/session behavior at a host/runtime boundary."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/https.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "https.request('https://example.invalid').writableEnded",
+      "expected_behavior": "false before end/destroy"
+    },
+    {
+      "name": "edge semantics",
+      "input": "https.request(url, tlsOptions)",
+      "expected_behavior": "TLS options are preserved, not mapped to ambient defaults"
+    }
+  ]
+}

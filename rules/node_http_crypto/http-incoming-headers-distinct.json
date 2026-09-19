@@ -1,0 +1,42 @@
+{
+  "id": "node.http.incoming-message.headers-distinct",
+  "category": "node_http_crypto",
+  "summary": "Expose incoming headers without duplicate joining.",
+  "source": {
+    "pattern": "$message.headersDistinct",
+    "requirements": {
+      "receiver_inferred_as": "node:http IncomingMessage",
+      "builtin_property_or_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.IncomingHeadersDistinct",
+    "template": "NodeHttp.IncomingHeadersDistinct($message)",
+    "notes": "Keys are lowercase and every value is an array of strings, including singletons."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Keys are lowercase and every value is an array of strings, including singletons."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "Array.isArray(req.headersDistinct.host)",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "two X-A field lines",
+      "expected_behavior": "headersDistinct['x-a'] preserves two elements"
+    }
+  ]
+}

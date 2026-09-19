@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.get-header-names",
+  "category": "node_http_crypto",
+  "summary": "Return unique lowercase outgoing header names.",
+  "source": {
+    "pattern": "$request.getHeaderNames()",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.GetHeaderNames",
+    "template": "NodeHttp.GetHeaderNames($request)",
+    "notes": "One entry per logical header; names are lowercase regardless of raw casing."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "One entry per logical header; names are lowercase regardless of raw casing."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.setHeader('X-AbC','v'); req.getHeaderNames().includes('x-abc')",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.setHeader('X','a'); req.setHeader('x','b')",
+      "expected_behavior": "only one logical x header name"
+    }
+  ]
+}

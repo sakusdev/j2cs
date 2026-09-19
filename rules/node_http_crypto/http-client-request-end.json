@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.end",
+  "category": "node_http_crypto",
+  "summary": "Finish a ClientRequest body using Writable.end semantics.",
+  "source": {
+    "pattern": "$request.end($chunk?, $encoding?, $callback?)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.EndRequest",
+    "template": "NodeHttp.EndRequest($request, $chunk, $encoding, $callback)",
+    "notes": "Returns receiver, commits headers/body, sets writableEnded, and reuses Node stream callback/error rules."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns receiver, commits headers/body, sets writableEnded, and reuses Node stream callback/error rules."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.end()===req",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.end(); req.write('late')",
+      "expected_behavior": "write-after-end follows Node stream error semantics"
+    }
+  ]
+}

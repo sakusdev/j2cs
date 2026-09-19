@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.flush-headers",
+  "category": "node_http_crypto",
+  "summary": "Force request headers onto the transport before request end.",
+  "source": {
+    "pattern": "$request.flushHeaders()",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "NodeHttp.FlushRequestHeaders",
+    "template": "NodeHttp.FlushRequestHeaders($request)",
+    "notes": "Commits/sends headers early; late header mutation is constrained; network timing is observable."
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Commits/sends headers early; late header mutation is constrained; network timing is observable."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.flushHeaders()",
+      "expected_behavior": "headers are committed before end()"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.flushHeaders(); req.setHeader('X-Late','v')",
+      "expected_behavior": "late mutation fails after headers are sent"
+    }
+  ]
+}

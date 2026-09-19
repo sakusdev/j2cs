@@ -1,0 +1,42 @@
+{
+  "id": "node.http.client-request.get-header",
+  "category": "node_http_crypto",
+  "summary": "Read a queued outgoing request header.",
+  "source": {
+    "pattern": "$request.getHeader($name)",
+    "requirements": {
+      "receiver_inferred_as": "node:http ClientRequest",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.GetHeader",
+    "template": "NodeHttp.GetHeader($request, $name)",
+    "notes": "Case-insensitive lookup returns the stored value without eager string coercion, or undefined when absent."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Case-insensitive lookup returns the stored value without eager string coercion, or undefined when absent."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.setHeader('X',7); req.getHeader('x')",
+      "expected_behavior": "7"
+    },
+    {
+      "name": "edge semantics",
+      "input": "req.getHeader('missing')",
+      "expected_behavior": "undefined"
+    }
+  ]
+}

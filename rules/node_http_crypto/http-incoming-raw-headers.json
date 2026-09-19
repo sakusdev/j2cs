@@ -1,0 +1,42 @@
+{
+  "id": "node.http.incoming-message.raw-headers",
+  "category": "node_http_crypto",
+  "summary": "Expose exact received header pairs.",
+  "source": {
+    "pattern": "$message.rawHeaders",
+    "requirements": {
+      "receiver_inferred_as": "node:http IncomingMessage",
+      "builtin_property_or_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeHttp.IncomingRawHeaders",
+    "template": "NodeHttp.IncomingRawHeaders($message)",
+    "notes": "Flat [name,value,...] array preserves parser order, original casing, and duplicates."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Flat [name,value,...] array preserves parser order, original casing, and duplicates."
+  },
+  "caveats": [
+    "Preserve Node stream/EventEmitter, host ordering, header state, and network/TLS behavior rather than substituting unrelated .NET HTTP defaults."
+  ],
+  "references": [
+    "https://nodejs.org/api/http.html",
+    "rules/events_streams/writable-write.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "req.rawHeaders.length % 2 === 0",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "receive X-CaSe twice",
+      "expected_behavior": "rawHeaders preserves casing and both entries"
+    }
+  ]
+}

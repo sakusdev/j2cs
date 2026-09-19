@@ -1,0 +1,42 @@
+{
+  "id": "node.crypto.hmac.update",
+  "category": "node_http_crypto",
+  "summary": "Feed data into Hmac.",
+  "source": {
+    "pattern": "$hmac.update($data, $inputEncoding?)",
+    "requirements": {
+      "receiver_inferred_as": "node:crypto Hmac",
+      "builtin_method_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeCrypto.HmacUpdate",
+    "template": "NodeCrypto.HmacUpdate($hmac, $data, $inputEncoding)",
+    "notes": "Returns receiver; string default encoding is UTF-8; binary inputs use raw bytes; repeated updates accumulate before digest."
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "notes": "Returns receiver; string default encoding is UTF-8; binary inputs use raw bytes; repeated updates accumulate before digest."
+  },
+  "caveats": [
+    "Preserve Node Buffer/ArrayBuffer, encoding, validation, provider, and callback semantics rather than only cryptographic mathematical output."
+  ],
+  "references": [
+    "https://nodejs.org/api/crypto.html",
+    "rules/binary/buffer-from.json"
+  ],
+  "tests": [
+    {
+      "name": "normal semantics",
+      "input": "hmac.update('a')===hmac",
+      "expected_behavior": "true"
+    },
+    {
+      "name": "edge semantics",
+      "input": "update('a').update('b')",
+      "expected_behavior": "same message bytes as update('ab')"
+    }
+  ]
+}
