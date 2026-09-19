@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.handle-forward-net-fetch",
+  "category": "electron_net_protocol",
+  "summary": "Forward custom/intercepted protocol request through Electron net.fetch while preserving Request/Response semantics.",
+  "source": {
+    "pattern": "$protocol.handle($scheme, $request => net.fetch($target, $init))",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolHandleForwardFetch($protocol, $scheme, $handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "forwarding": "Chromium network stack",
+    "request_fields": "method/headers/body can be forwarded",
+    "custom_protocol_recursion": "requires bypass when forwarding same intercepted built-in scheme"
+  },
+  "caveats": [
+    "Forwarding an intercepted URL to net.fetch without bypass can recurse into the same custom handler."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* app protocol handler returns net.fetch(fileURL) */",
+      "expected_behavior": "Response from fetch can service custom scheme"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* https handler calls net.fetch(req) without bypass */",
+      "expected_behavior": "can recurse; bypassCustomProtocolHandlers is required for built-in forwarding"
+    }
+  ]
+}

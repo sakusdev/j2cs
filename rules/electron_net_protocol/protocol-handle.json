@@ -1,0 +1,42 @@
+{
+  "id": "electron.protocol.handle",
+  "category": "electron_net_protocol",
+  "summary": "Register or intercept scheme requests with modern Response-based Electron handler.",
+  "source": {
+    "pattern": "$protocol.handle($scheme, $handler)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolHandle($protocol, $scheme, $handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "handler_argument": "GlobalRequest",
+    "handler_return": "GlobalResponse or Promise<GlobalResponse>",
+    "session_scoped": true,
+    "scheme": "valid RFC-style scheme"
+  },
+  "caveats": [
+    "protocol.handle is host integration; it is not just an application router callback."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* protocol.handle('app', req=>new Response('ok')) */",
+      "expected_behavior": "matching requests delegate to handler"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* existing scheme such as https */",
+      "expected_behavior": "handle can intercept it subject to Electron protocol semantics"
+    }
+  ]
+}

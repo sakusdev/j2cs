@@ -1,0 +1,55 @@
+{
+  "id": "electron.net.resolve-host-source",
+  "category": "electron_net_protocol",
+  "summary": "Preserve Chromium resolver source/cache/Secure DNS options.",
+  "source": {
+    "pattern": "net.resolveHost($host, {source:$source, cacheUsage:$cache, secureDnsPolicy:$secure, ...$options})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetResolveHost($host, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "source": [
+      "any",
+      "system",
+      "dns",
+      "mdns",
+      "localOnly"
+    ],
+    "cacheUsage": [
+      "allowed",
+      "staleAllowed",
+      "disallowed"
+    ],
+    "secureDnsPolicy": [
+      "allow",
+      "disable"
+    ],
+    "local_fast_sources": "may still satisfy despite source setting"
+  },
+  "caveats": [
+    "Specifying source does not imply every result must come from that external source; cache/literal/localhost rules can bypass it."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* source:'system' */",
+      "expected_behavior": "external resolution is constrained to system/OS source"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* IP literal or localhost */",
+      "expected_behavior": "fast local resolution can still satisfy according to Electron docs"
+    }
+  ]
+}

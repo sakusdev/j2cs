@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-referrer-policy",
+  "category": "electron_net_protocol",
+  "summary": "Apply Chromium referrer policy semantics for ClientRequest.",
+  "source": {
+    "pattern": "net.request({referrerPolicy:$policy, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default": "strict-origin-when-cross-origin",
+    "policy_values": "Fetch-compatible referrer policies",
+    "network_stack": "Chromium"
+  },
+  "caveats": [
+    "Do not substitute a static Referer header; redirect/origin policy is contextual."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* referrerPolicy:'no-referrer' */",
+      "expected_behavior": "Chromium omits referrer according to policy"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* cross-origin redirect */",
+      "expected_behavior": "referrer processing remains Chromium policy-driven"
+    }
+  ]
+}

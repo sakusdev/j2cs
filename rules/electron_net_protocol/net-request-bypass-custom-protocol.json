@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-bypass-custom-protocol",
+  "category": "electron_net_protocol",
+  "summary": "Bypass custom protocol handlers while still allowing webRequest observation.",
+  "source": {
+    "pattern": "net.request({bypassCustomProtocolHandlers:true, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequestBypassCustomProtocol($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "custom_protocol_handler": "bypassed",
+    "webRequest": "still triggered",
+    "built_in_handler": "used when available"
+  },
+  "caveats": [
+    "Bypass does not bypass session.webRequest handlers."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* custom https handler + bypassCustomProtocolHandlers:true */",
+      "expected_behavior": "request can reach built-in handler instead of protocol.handle"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* webRequest listener installed */",
+      "expected_behavior": "webRequest still observes the request"
+    }
+  ]
+}

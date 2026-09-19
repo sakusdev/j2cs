@@ -1,0 +1,40 @@
+{
+  "id": "electron.net.incoming-aborted",
+  "category": "electron_net_protocol",
+  "summary": "Emit response aborted when request is cancelled during ongoing transaction.",
+  "source": {
+    "pattern": "$response 'aborted' event",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronIncomingMessageAborted($response)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "trigger": "ongoing request cancellation",
+    "body": "terminates before normal end"
+  },
+  "caveats": [
+    "aborted is distinct from normal end."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* request.abort while response active */",
+      "expected_behavior": "response emits aborted"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* normal complete response */",
+      "expected_behavior": "ends without an aborted event"
+    }
+  ]
+}

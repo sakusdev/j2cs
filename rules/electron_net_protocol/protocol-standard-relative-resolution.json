@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.standard-relative-resolution",
+  "category": "electron_net_protocol",
+  "summary": "Preserve generic URI relative-resource resolution for standard custom schemes.",
+  "source": {
+    "pattern": "resource resolution within standard custom scheme",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolResolveStandardUrl($base, $relative)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "requires_standard": true,
+    "relative_paths": "resolved against hierarchical URL",
+    "origin_model": "Chromium standard-scheme behavior"
+  },
+  "caveats": [
+    "Non-standard custom schemes behave differently and cannot resolve HTTP-like relative URLs."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* app://bundle/index.html + ./x.png, standard:true */",
+      "expected_behavior": "relative URL resolves within hierarchical custom URL"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* same without standard:true */",
+      "expected_behavior": "must not assume relative resource resolution works"
+    }
+  ]
+}

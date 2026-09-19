@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.request-upload-progress",
+  "category": "electron_net_protocol",
+  "summary": "Expose Electron upload progress object.",
+  "source": {
+    "pattern": "$request.getUploadProgress()",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.GetUploadProgress",
+    "template": "ElectronCompat.Net.GetUploadProgress($request)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "inactive": "{active:false} with no required other fields",
+    "not_started": "current=0,total=0",
+    "active_started": "current/total byte counts"
+  },
+  "caveats": [
+    "Inactive result shape may omit fields rather than return zero-filled fixed record."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* request.getUploadProgress() */",
+      "expected_behavior": "returns object with active boolean"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* inactive */",
+      "expected_behavior": "other progress properties are not required to be present"
+    }
+  ]
+}

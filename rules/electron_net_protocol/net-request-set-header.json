@@ -1,0 +1,52 @@
+{
+  "id": "electron.net.request-set-header",
+  "category": "electron_net_protocol",
+  "summary": "Set extra Chromium request header before first write with Electron restrictions.",
+  "source": {
+    "pattern": "$request.setHeader($name, $value)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.SetRequestHeader",
+    "template": "ElectronCompat.Net.SetRequestHeader($request, $name, $value)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "name": "preserved as supplied",
+    "value": "toString when non-string",
+    "timing": "before first write only",
+    "restricted_headers": [
+      "content-length",
+      "host",
+      "trailer/te",
+      "upgrade",
+      "cookie2",
+      "keep-alive",
+      "transfer-encoding",
+      "connection: upgrade"
+    ]
+  },
+  "caveats": [
+    "Electron does not expose unrestricted raw header mutation."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* r.setHeader('X-Test', 42) */",
+      "expected_behavior": "stores header value '42' with supplied name semantics"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* set restricted Host header or set after first write */",
+      "expected_behavior": "operation is rejected/throws according to Electron"
+    }
+  ]
+}

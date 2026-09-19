@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.handle-response",
+  "category": "electron_net_protocol",
+  "summary": "Convert handler Response or Promise<Response> into Chromium custom-protocol response.",
+  "source": {
+    "pattern": "$protocol.handle($scheme, $handlerReturningResponse)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolHandle($protocol, $scheme, $handler)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "accepted": "GlobalResponse|Promise<GlobalResponse>",
+    "status_headers_body": "Fetch Response semantics reused",
+    "async_handler": true
+  },
+  "caveats": [
+    "Do not use deprecated ProtocolResponse object semantics for modern handle unless explicitly on legacy APIs."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* handler returns new Response('x',{status:201}) */",
+      "expected_behavior": "Chromium receives status/body/headers from Response"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* handler returns Promise<Response> */",
+      "expected_behavior": "Electron awaits it as protocol response"
+    }
+  ]
+}

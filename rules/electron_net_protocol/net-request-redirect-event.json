@@ -1,0 +1,45 @@
+{
+  "id": "electron.net.request-redirect-event",
+  "category": "electron_net_protocol",
+  "summary": "Expose redirect status/method/url/headers with synchronous manual continuation point.",
+  "source": {
+    "pattern": "$request 'redirect' event",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestRedirectEvent($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "payload": [
+      "statusCode",
+      "method",
+      "redirectUrl",
+      "responseHeaders"
+    ],
+    "manual_follow": "synchronous followRedirect"
+  },
+  "caveats": [
+    "When redirect event is handled in manual mode, failing to follow synchronously cancels."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* redirect listener */",
+      "expected_behavior": "receives redirect metadata"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* listener returns without followRedirect in manual mode */",
+      "expected_behavior": "redirect is cancelled"
+    }
+  ]
+}

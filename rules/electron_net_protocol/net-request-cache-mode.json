@@ -1,0 +1,47 @@
+{
+  "id": "electron.net.request-cache-mode",
+  "category": "electron_net_protocol",
+  "summary": "Use Chromium HTTP cache mode in selected Session.",
+  "source": {
+    "pattern": "net.request({cache:$cache, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "modes": [
+      "default",
+      "no-store",
+      "reload",
+      "no-cache",
+      "force-cache",
+      "only-if-cached"
+    ],
+    "session_cache": true
+  },
+  "caveats": [
+    "Electron Session cache semantics are not Node http socket caching."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* cache:'no-store' */",
+      "expected_behavior": "Chromium request uses no-store cache mode"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* different session */",
+      "expected_behavior": "cache state belongs to selected Session"
+    }
+  ]
+}

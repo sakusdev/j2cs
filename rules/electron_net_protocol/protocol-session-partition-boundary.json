@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.session-partition-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Require custom protocol handler registration on the same Session used by the target WebContents.",
+  "source": {
+    "pattern": "BrowserWindow({webPreferences:{partition:$partition}}) with custom protocol",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolPartitionBoundary($partition, $scheme)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "partition": "selects Session",
+    "handler_lookup": "Session.protocol registry",
+    "default_protocol": "not inherited"
+  },
+  "caveats": [
+    "Registering on electron.protocol is insufficient for a custom partition."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* ses.protocol.handle + window using same partition */",
+      "expected_behavior": "window custom-scheme request reaches handler"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* handler only on default protocol */",
+      "expected_behavior": "custom-partition window does not see it"
+    }
+  ]
+}

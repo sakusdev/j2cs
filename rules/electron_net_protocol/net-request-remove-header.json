@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.request-remove-header",
+  "category": "electron_net_protocol",
+  "summary": "Remove extra ClientRequest header only before first write.",
+  "source": {
+    "pattern": "$request.removeHeader($name)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.RemoveRequestHeader",
+    "template": "ElectronCompat.Net.RemoveRequestHeader($request, $name)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "undefined",
+    "timing": "before first write",
+    "missing": "no matching custom header removed"
+  },
+  "caveats": [
+    "After first write headers are committed enough that removal throws."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* set then remove custom header */",
+      "expected_behavior": "header is removed before send"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* write then removeHeader */",
+      "expected_behavior": "throws"
+    }
+  ]
+}

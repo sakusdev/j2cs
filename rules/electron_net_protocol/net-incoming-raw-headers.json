@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.incoming-raw-headers",
+  "category": "electron_net_protocol",
+  "summary": "Expose exact received header name/value sequence.",
+  "source": {
+    "pattern": "$response.rawHeaders",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.GetRawResponseHeaders",
+    "template": "ElectronCompat.Net.GetRawResponseHeaders($response)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "string[] alternating name,value",
+    "casing": "preserved",
+    "duplicates": "preserved"
+  },
+  "caveats": [
+    "rawHeaders is not an array of tuples and is not normalized."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* rawHeaders */",
+      "expected_behavior": "even indices are names and odd indices values"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* duplicate/case variants */",
+      "expected_behavior": "duplicates and original header casing remain"
+    }
+  ]
+}

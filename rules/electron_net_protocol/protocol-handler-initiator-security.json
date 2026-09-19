@@ -1,0 +1,42 @@
+{
+  "id": "electron.protocol.handler-initiator-security",
+  "category": "electron_net_protocol",
+  "summary": "Use Electron initiatorOrigin for protocol-handler authorization decisions.",
+  "source": {
+    "pattern": "$handler checks $request.initiatorOrigin",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.GetInitiatorOrigin",
+    "template": "ElectronCompat.Protocol.GetInitiatorOrigin($request)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "web_content": "origin string or null for opaque origin",
+    "browser_started": "absent",
+    "referrer": "page-controlled and less suitable for trust"
+  },
+  "caveats": [
+    "Do not substitute request.referrer as authoritative request initiator."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* web content request */",
+      "expected_behavior": "initiatorOrigin identifies issuing origin when available"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* browser-initiated request */",
+      "expected_behavior": "initiatorOrigin can be absent"
+    }
+  ]
+}

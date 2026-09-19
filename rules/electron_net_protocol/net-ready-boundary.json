@@ -1,0 +1,44 @@
+{
+  "id": "electron.net.ready-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Enforce Electron app-ready lifecycle before net APIs are used.",
+  "source": {
+    "pattern": "electron.net API use",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequireReady($operation)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "availability": "after app ready",
+    "early_use": "throws",
+    "process": [
+      "main",
+      "utility"
+    ]
+  },
+  "caveats": [
+    "Do not treat electron.net as an always-available Node networking namespace."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* app.whenReady().then(()=>net.isOnline()) */",
+      "expected_behavior": "net operation is valid after ready"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* call net API before app ready */",
+      "expected_behavior": "Electron throws rather than silently queueing"
+    }
+  ]
+}

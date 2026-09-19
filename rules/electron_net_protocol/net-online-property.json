@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.online-property",
+  "category": "electron_net_protocol",
+  "summary": "Expose readonly Electron network connectivity heuristic property.",
+  "source": {
+    "pattern": "net.online",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.IsOnline",
+    "template": "ElectronCompat.Net.IsOnline()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "readonly": true,
+    "equivalent_surface": "connectivity heuristic"
+  },
+  "caveats": [
+    "This is host network-state observation, not cached compile-time constant."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* typeof net.online */",
+      "expected_behavior": "is boolean"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* network changes */",
+      "expected_behavior": "subsequent reads may change"
+    }
+  ]
+}

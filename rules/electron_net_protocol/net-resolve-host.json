@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.resolve-host",
+  "category": "electron_net_protocol",
+  "summary": "Resolve host through Chromium HostResolver using default Session.",
+  "source": {
+    "pattern": "net.resolveHost($host, $options)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetResolveHost($host, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise<ResolvedHost>",
+    "addresses": "array of strings",
+    "session": "default",
+    "sources": "cache/hosts/system/DNS/mDNS according to options"
+  },
+  "caveats": [
+    "This is not Node dns.lookup or dns.resolve; Chromium HostResolver policy/cache participates."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* await net.resolveHost('localhost') */",
+      "expected_behavior": "resolves object containing IP addresses"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* default source */",
+      "expected_behavior": "result may come from local/cache/system/DNS sources"
+    }
+  ]
+}

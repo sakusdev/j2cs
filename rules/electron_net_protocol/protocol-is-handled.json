@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.is-handled",
+  "category": "electron_net_protocol",
+  "summary": "Report whether scheme currently has a modern protocol.handle handler.",
+  "source": {
+    "pattern": "$protocol.isProtocolHandled($scheme)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.IsHandled",
+    "template": "ElectronCompat.Protocol.IsHandled($protocol, $scheme)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "session_scoped": true
+  },
+  "caveats": [
+    "Do not conflate with OS default-protocol-client registration or deprecated registration state."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* handle('app',...) then isProtocolHandled('app') */",
+      "expected_behavior": "returns true"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* app.setAsDefaultProtocolClient */",
+      "expected_behavior": "does not by itself make protocol.isProtocolHandled true"
+    }
+  ]
+}

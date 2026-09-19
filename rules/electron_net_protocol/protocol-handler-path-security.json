@@ -1,0 +1,42 @@
+{
+  "id": "electron.protocol.handler-path-security",
+  "category": "electron_net_protocol",
+  "summary": "Require explicit path-containment policy when mapping custom-protocol URLs to local files.",
+  "source": {
+    "pattern": "protocol.handle($scheme, handler serving local path)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RequireSafePathResolution",
+    "template": "ElectronCompat.Protocol.RequireSafePathResolution($base, $requestUrl)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "security": "application policy",
+    "url_path": "must be resolved/normalized before local file exposure",
+    "traversal": "reject escape"
+  },
+  "caveats": [
+    "Electron protocol.handle does not automatically make arbitrary path concatenation safe."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* resolve bundle path then check relative containment */",
+      "expected_behavior": "in-bundle file can be served"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* ../../secret path */",
+      "expected_behavior": "application rejects path escape rather than exposing host file"
+    }
+  ]
+}

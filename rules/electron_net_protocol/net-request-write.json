@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.request-write",
+  "category": "electron_net_protocol",
+  "summary": "Deliver ClientRequest body chunk to Chromium networking with Electron callback timing.",
+  "source": {
+    "pattern": "$request.write($chunk, $encoding, $callback)",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestWrite($request, $chunk, $encoding, $callback)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "chunk": "string|Buffer",
+    "default_encoding": "utf-8",
+    "first_write": "may commit headers",
+    "callback": "next tick after delivery to Chromium layer; not guaranteed wire flush"
+  },
+  "caveats": [
+    "Node http write callback/flush semantics cannot be assumed equivalent."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* r.write('x','utf8',cb) */",
+      "expected_behavior": "chunk enters Electron Chromium request body pipeline"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* callback fires */",
+      "expected_behavior": "does not prove bytes were flushed on wire"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "electron.net.request-abort",
+  "category": "electron_net_protocol",
+  "summary": "Cancel ongoing Electron HTTP transaction with abort/close/response-aborted event rules.",
+  "source": {
+    "pattern": "$request.abort()",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestAbort($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "closed_request": "no-op",
+    "active_request_events": [
+      "abort",
+      "close"
+    ],
+    "active_response": "response emits aborted"
+  },
+  "caveats": [
+    "Abort event is not fired after request is already closed."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* active r.abort() */",
+      "expected_behavior": "request emits abort then eventually close"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* response object already active */",
+      "expected_behavior": "response also emits aborted"
+    }
+  ]
+}

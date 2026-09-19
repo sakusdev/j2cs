@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.privilege-stream",
+  "category": "electron_net_protocol",
+  "summary": "Mark custom scheme responses as stream-oriented for media expectations.",
+  "source": {
+    "pattern": "protocol.registerSchemesAsPrivileged([{scheme:$scheme, privileges:{stream:true,...$p}}])",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Protocol.RegisterStreamingScheme",
+    "template": "ElectronCompat.Protocol.RegisterStreamingScheme($scheme, $p)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "stream": true,
+    "media": "audio/video expect streaming response behavior"
+  },
+  "caveats": [
+    "Without stream privilege Chromium may buffer custom-protocol media differently."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* stream:true custom media scheme */",
+      "expected_behavior": "media pipeline expects streaming responses"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* stream omitted */",
+      "expected_behavior": "must not assume identical media buffering behavior"
+    }
+  ]
+}

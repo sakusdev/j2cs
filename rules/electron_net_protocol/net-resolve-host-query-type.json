@@ -1,0 +1,43 @@
+{
+  "id": "electron.net.resolve-host-query-type",
+  "category": "electron_net_protocol",
+  "summary": "Restrict Chromium host resolution to A or AAAA query type.",
+  "source": {
+    "pattern": "net.resolveHost($host, {queryType:$queryType, ...$options})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetResolveHost($host, $options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "queryType": [
+      "A",
+      "AAAA"
+    ],
+    "omitted": "resolver chooses A/AAAA according to environment"
+  },
+  "caveats": [
+    "Query type affects requested address family but local/cache sources can still participate."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* queryType:'A' */",
+      "expected_behavior": "requests IPv4 A resolution semantics"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* omitted */",
+      "expected_behavior": "resolver may return IPv4 and/or IPv6 based on configuration"
+    }
+  ]
+}

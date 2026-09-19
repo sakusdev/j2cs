@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-session-cookies",
+  "category": "electron_net_protocol",
+  "summary": "Control use of Session cookies when credentials option is absent.",
+  "source": {
+    "pattern": "net.request({useSessionCookies:$value, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "default": false,
+    "ignored_when_credentials_present": true,
+    "cookies": "session cookie store"
+  },
+  "caveats": [
+    "Authentication data and cookies have different defaults in ClientRequest."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* useSessionCookies:true */",
+      "expected_behavior": "session cookies may be included"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* credentials explicitly set */",
+      "expected_behavior": "credentials setting takes precedence over useSessionCookies"
+    }
+  ]
+}

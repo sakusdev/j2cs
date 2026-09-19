@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.deprecated-register-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Keep deprecated callback-based protocol APIs distinct from modern protocol.handle.",
+  "source": {
+    "pattern": "protocol.register*Protocol / intercept*Protocol legacy API",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolLegacy($operation)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "deprecated_since_25": true,
+    "response_contract": "ProtocolResponse/callback specific to legacy method",
+    "migration": "protocol.handle"
+  },
+  "caveats": [
+    "Legacy ProtocolResponse string/Buffer/file/stream objects are not modern Response semantics."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* registerFileProtocol(...) */",
+      "expected_behavior": "uses deprecated callback/file response contract"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* blindly replace callback object with Response assumptions */",
+      "expected_behavior": "changes API contract; migration requires modern handle semantics"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.request-redirect-mode",
+  "category": "electron_net_protocol",
+  "summary": "Preserve Electron ClientRequest follow/error/manual redirect modes.",
+  "source": {
+    "pattern": "net.request({redirect:$mode, ...$rest})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetRequest($options)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "follow": "automatic",
+    "error": "abort on redirect",
+    "manual": "redirect event requires synchronous followRedirect",
+    "default": "follow"
+  },
+  "caveats": [
+    "Manual redirect continuation is synchronous-event scoped."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* redirect:'follow' */",
+      "expected_behavior": "redirects are followed automatically"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* redirect:'manual', handler does not synchronously followRedirect */",
+      "expected_behavior": "redirect is cancelled"
+    }
+  ]
+}

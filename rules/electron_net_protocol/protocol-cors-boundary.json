@@ -1,0 +1,41 @@
+{
+  "id": "electron.protocol.cors-boundary",
+  "category": "electron_net_protocol",
+  "summary": "Apply Chromium CORS/origin behavior for CORS-enabled custom schemes.",
+  "source": {
+    "pattern": "cross-origin fetch to custom protocol",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronProtocolCors($request, $response)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "corsEnabled": "enables CORS processing",
+    "headers": "Fetch CORS response policy",
+    "opaque_no_cors": "Chromium response filtering where applicable"
+  },
+  "caveats": [
+    "corsEnabled does not bypass CORS checks."
+  ],
+  "references": [
+    "Electron latest protocol documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* CORS-enabled custom scheme with allowed origin response */",
+      "expected_behavior": "Fetch can expose permitted response"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* no-cors cross-origin response */",
+      "expected_behavior": "response filtering/opaque behavior follows Chromium rather than unrestricted data exposure"
+    }
+  ]
+}

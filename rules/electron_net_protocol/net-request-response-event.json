@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.request-response-event",
+  "category": "electron_net_protocol",
+  "summary": "Deliver Electron IncomingMessage on response event.",
+  "source": {
+    "pattern": "$request 'response' event",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronClientRequestResponseEvent($request)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "payload": "IncomingMessage",
+    "body": "Readable stream events",
+    "request_close": "transaction terminal event occurs later"
+  },
+  "caveats": [
+    "Receiving response headers is not the same as completing response body."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* request.on('response', r=>...) */",
+      "expected_behavior": "callback receives IncomingMessage when response begins"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* response then data/end */",
+      "expected_behavior": "body continues asynchronously after response event"
+    }
+  ]
+}

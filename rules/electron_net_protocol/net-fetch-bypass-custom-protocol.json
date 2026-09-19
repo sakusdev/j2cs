@@ -1,0 +1,41 @@
+{
+  "id": "electron.net.fetch-bypass-custom-protocol",
+  "category": "electron_net_protocol",
+  "summary": "Bypass custom protocol handler while retaining webRequest hooks.",
+  "source": {
+    "pattern": "net.fetch($input, {...$init, bypassCustomProtocolHandlers:true})",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "template": "JsRuntime.ElectronNetFetchBypassCustomProtocol($input, $init)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "custom_protocol": "bypassed",
+    "built_in_handler": "used where applicable",
+    "webRequest": "still triggered"
+  },
+  "caveats": [
+    "Used to forward from an intercepted handler without recursive self-interception."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* https handler forwards with bypassCustomProtocolHandlers:true */",
+      "expected_behavior": "built-in Chromium handling can proceed"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* webRequest installed */",
+      "expected_behavior": "webRequest is still invoked"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "electron.net.is-online",
+  "category": "electron_net_protocol",
+  "summary": "Return Chromium network connectivity heuristic.",
+  "source": {
+    "pattern": "net.isOnline()",
+    "requirements": {
+      "electron_app_profile": "current Electron",
+      "builtin_electron_member_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "ElectronCompat.Net.IsOnline",
+    "template": "ElectronCompat.Net.IsOnline()"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "false": "strong evidence offline",
+    "true": "inconclusive for specific reachability"
+  },
+  "caveats": [
+    "true is not a guarantee that a target host is reachable."
+  ],
+  "references": [
+    "Electron latest net / ClientRequest / IncomingMessage documentation"
+  ],
+  "tests": [
+    {
+      "name": "normal",
+      "input": "/* net.isOnline() */",
+      "expected_behavior": "returns boolean"
+    },
+    {
+      "name": "semantic trap",
+      "input": "/* returns true */",
+      "expected_behavior": "must not be compiled into assumption that arbitrary remote request succeeds"
+    }
+  ]
+}
