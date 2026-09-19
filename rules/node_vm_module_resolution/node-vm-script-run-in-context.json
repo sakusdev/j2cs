@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.script-run-in-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Execute a compiled Script inside a previously contextified object and return the last expression result.",
+  "source": {
+    "pattern": "$script.runInContext($context,$options?)",
+    "requirements": {
+      "receiver": "vm.Script",
+      "context": "vm context"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.script_run_in_context",
+    "template": "JsRuntime.NodeVm.script_run_in_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "global": "contextified object",
+    "local_caller_scope": "not accessible",
+    "return": "last statement/expression result",
+    "side_effects": "persist in context"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "state persists",
+      "input": "const vm=require('node:vm'),c=vm.createContext({x:2}),s=new vm.Script('x*=3;x');console.log(s.runInContext(c),c.x);",
+      "expected_behavior": "prints 6 6"
+    },
+    {
+      "name": "bad context",
+      "input": "const vm=require('node:vm'),s=new vm.Script('1');try{s.runInContext({})}catch(e){console.log(e.code||e.name)}",
+      "expected_behavior": "throws for non-contextified object"
+    }
+  ]
+}

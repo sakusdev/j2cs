@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.source-text-module-evaluate",
+  "category": "node_vm_module_resolution",
+  "summary": "Evaluate a linked vm module graph and preserve asynchronous/TLA module evaluation behavior.",
+  "source": {
+    "pattern": "$module.evaluate($options?)",
+    "requirements": {
+      "receiver": "vm.SourceTextModule",
+      "linked": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.source_text_module_evaluate",
+    "template": "JsRuntime.NodeVm.source_text_module_evaluate($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise",
+    "evaluation": "reuse MODULES ESM graph/evaluate-once semantics",
+    "top_level_await": "asynchronous graph semantics",
+    "timeout_breakOnSigint": "Node vm options where supported"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "export after eval",
+      "input": "// await m.link(...); await m.evaluate(); m.namespace.x",
+      "expected_behavior": "namespace exposes evaluated export"
+    },
+    {
+      "name": "TLA",
+      "input": "// SourceTextModule('await Promise.resolve(); export const x=1')",
+      "expected_behavior": "evaluate Promise settles after top-level await"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.package-exports-subpath",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve explicit package subpath exports and reject unlisted subpaths when exports encapsulation applies.",
+  "source": {
+    "pattern": "import 'pkg/$subpath'",
+    "requirements": {
+      "package_exports_present": true,
+      "package_subpath": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_exports_subpath",
+    "template": "JsRuntime.NodeModuleResolution.package_exports_subpath($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "mapping": "exports './subpath' key/pattern",
+    "unlisted": "ERR_PACKAGE_PATH_NOT_EXPORTED",
+    "public_interface": "exports-defined"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "listed",
+      "input": "// exports {'./feature':'./feature.js'}; import 'pkg/feature'",
+      "expected_behavior": "resolves feature.js"
+    },
+    {
+      "name": "unlisted",
+      "input": "// same package: import 'pkg/private.js'",
+      "expected_behavior": "throws ERR_PACKAGE_PATH_NOT_EXPORTED"
+    }
+  ]
+}

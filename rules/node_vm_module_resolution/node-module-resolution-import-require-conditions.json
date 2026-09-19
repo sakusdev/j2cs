@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.import-require-conditions",
+  "category": "node_vm_module_resolution",
+  "summary": "Distinguish Node package export conditions for import versus require while sharing broader node/default conditions.",
+  "source": {
+    "pattern": "[[PackageConditions]]($requestKind)",
+    "requirements": {
+      "request_kind": "import|require"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.import_require_conditions",
+    "template": "JsRuntime.NodeModuleResolution.import_require_conditions($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "import": "includes import condition",
+    "require": "includes require condition",
+    "mutual_use": "packages may map to different files",
+    "module_sync": "current Node condition/version boundary may apply"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "dual package",
+      "input": "// exports {import:'./esm.mjs',require:'./cjs.cjs'}",
+      "expected_behavior": "import and require resolve different targets"
+    },
+    {
+      "name": "do not collapse",
+      "input": "// compiler pre-resolves all package requests to one file",
+      "expected_behavior": "unsafe when conditional exports distinguish request kind"
+    }
+  ]
+}

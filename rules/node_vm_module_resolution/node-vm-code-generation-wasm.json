@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.code-generation-wasm",
+  "category": "node_vm_module_resolution",
+  "summary": "Honor context codeGeneration.wasm policy for WebAssembly compilation in a vm context.",
+  "source": {
+    "pattern": "vm.createContext($object,{codeGeneration:{wasm:$allowed}})",
+    "requirements": {
+      "binding": "node:vm.createContext",
+      "codeGeneration_wasm_configured": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.code_generation_wasm",
+    "template": "JsRuntime.NodeVm.code_generation_wasm($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "allowed_false": "WebAssembly code generation rejected",
+    "host_v8_boundary": true,
+    "security": "policy is context code generation control"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "policy exists",
+      "input": "// createContext({}, {codeGeneration:{wasm:false}}) then compile wasm in context",
+      "expected_behavior": "WebAssembly code generation is rejected according to Node vm policy"
+    },
+    {
+      "name": "not strings policy",
+      "input": "// codeGeneration:{strings:true,wasm:false}",
+      "expected_behavior": "JavaScript string compilation and Wasm compilation are controlled independently"
+    }
+  ]
+}

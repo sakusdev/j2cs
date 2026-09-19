@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.create-require-input",
+  "category": "node_vm_module_resolution",
+  "summary": "Validate module.createRequire base as a file URL object/string or absolute path string.",
+  "source": {
+    "pattern": "module.createRequire($base)",
+    "requirements": {
+      "binding": "node:module.createRequire"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeModuleResolution.create_require_input",
+    "template": "NodeModuleResolution.create_require_input($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "accepted": "file URL object, file URL string, absolute path string",
+    "relative_path": "invalid",
+    "non_file_url": "invalid"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "file URL",
+      "input": "// createRequire(import.meta.url)",
+      "expected_behavior": "returns require"
+    },
+    {
+      "name": "relative rejected",
+      "input": "const {createRequire}=require('node:module');try{createRequire('./x.js')}catch(e){console.log(e.code||e.name)}",
+      "expected_behavior": "throws invalid-argument style error"
+    }
+  ]
+}

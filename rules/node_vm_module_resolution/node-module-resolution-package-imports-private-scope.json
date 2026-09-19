@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.package-imports-private-scope",
+  "category": "node_vm_module_resolution",
+  "summary": "Keep package imports mappings private to modules inside the package scope and disambiguated by '#' specifiers.",
+  "source": {
+    "pattern": "[[PACKAGE_IMPORTS_RESOLVE]]($specifier,$parentURL,$conditions)",
+    "requirements": {
+      "specifier_starts_hash": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_imports_private_scope",
+    "template": "JsRuntime.NodeModuleResolution.package_imports_private_scope($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "visibility": "only current package imports map",
+    "syntax": "hash-prefixed internal specifier",
+    "outside_scope": "does not become globally resolvable package alias"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "inside",
+      "input": "// package module imports '#dep' defined by its own package.json",
+      "expected_behavior": "mapping participates"
+    },
+    {
+      "name": "outside",
+      "input": "// unrelated package imports '#dep'",
+      "expected_behavior": "does not inherit another package's imports mapping"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.synthetic-set-export",
+  "category": "node_vm_module_resolution",
+  "summary": "Set a declared SyntheticModule export binding with current Node lifecycle/version semantics.",
+  "source": {
+    "pattern": "$module.setExport($name,$value)",
+    "requirements": {
+      "receiver": "vm.SyntheticModule",
+      "builtin_method": "setExport"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.synthetic_set_export",
+    "template": "JsRuntime.NodeVm.synthetic_set_export($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "binding": "updates named synthetic export slot",
+    "declared_name_required": true,
+    "version_boundary": "recent Node no longer requires prior link()",
+    "live_namespace": "importers observe updated binding as module semantics allow"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "set declared",
+      "input": "// SyntheticModule(['x'],()=>m.setExport('x',1))",
+      "expected_behavior": "sets x binding"
+    },
+    {
+      "name": "name missing",
+      "input": "// setExport('y',1) when y not declared",
+      "expected_behavior": "throws"
+    }
+  ]
+}

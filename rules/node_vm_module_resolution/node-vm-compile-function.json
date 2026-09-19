@@ -1,0 +1,41 @@
+{
+  "id": "node.vm.compile-function",
+  "category": "node_vm_module_resolution",
+  "summary": "Compile source as a function with explicit parameter names and optional parsing context rather than using Function/eval semantics blindly.",
+  "source": {
+    "pattern": "vm.compileFunction($code,$params?,$options?)",
+    "requirements": {
+      "binding": "node:vm.compileFunction",
+      "source_may_be_dynamic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.compile_function",
+    "template": "JsRuntime.NodeVm.compile_function($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Function",
+    "params": "explicit names",
+    "parsingContext": "controls compilation realm/context",
+    "cachedData": "optional V8 cache",
+    "dynamic_import": "option boundary"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "parameters",
+      "input": "const vm=require('node:vm'),f=vm.compileFunction('return a+b',['a','b']);console.log(f(2,3));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "syntax error",
+      "input": "const vm=require('node:vm');try{vm.compileFunction('return )')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints SyntaxError"
+    }
+  ]
+}

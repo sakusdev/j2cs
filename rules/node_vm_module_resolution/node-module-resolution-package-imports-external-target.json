@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.package-imports-external-target",
+  "category": "node_vm_module_resolution",
+  "summary": "Allow package imports targets to redirect to an external package, then resolve that external package normally.",
+  "source": {
+    "pattern": "[[PACKAGE_TARGET_RESOLVE]]($packageURL,$target,$subpath,true,$conditions)",
+    "requirements": {
+      "imports_target_external_package": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_imports_external_target",
+    "template": "JsRuntime.NodeModuleResolution.package_imports_external_target($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "allowed_for_imports": true,
+    "external_package": "continues Node package resolution including its exports",
+    "contrast": "exports local targets use package-relative rules"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "external alias",
+      "input": "// imports {'#dep':'dep-node-native'}",
+      "expected_behavior": "resolves external dependency according to Node rules"
+    },
+    {
+      "name": "exports contrast",
+      "input": "// exports mapping directly to bare external package",
+      "expected_behavior": "does not use the same imports external-target allowance"
+    }
+  ]
+}

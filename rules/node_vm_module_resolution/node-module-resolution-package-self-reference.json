@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.package-self-reference",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve a package's own name/subpaths as a self-reference when package name and exports permit it.",
+  "source": {
+    "pattern": "import '$packageName/$subpath?'",
+    "requirements": {
+      "inside_named_package": true,
+      "self_reference": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_self_reference",
+    "template": "JsRuntime.NodeModuleResolution.package_self_reference($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "requires": "package name plus exports support",
+    "resolution": "same exports rules as external consumer",
+    "encapsulation": "unexported self subpaths rejected"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "self root",
+      "input": "// package name 'pkg', exports '.'; import 'pkg' inside pkg",
+      "expected_behavior": "resolves own exported root"
+    },
+    {
+      "name": "private self subpath",
+      "input": "// import 'pkg/private' not exported",
+      "expected_behavior": "throws package path not exported"
+    }
+  ]
+}

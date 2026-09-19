@@ -1,0 +1,38 @@
+{
+  "id": "node.vm.is-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Report whether an object has been contextified by node:vm.",
+  "source": {
+    "pattern": "vm.isContext($object)",
+    "requirements": {
+      "binding": "node:vm.isContext"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeVm.is_context",
+    "template": "NodeVm.is_context($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "Boolean",
+    "ordinary_object": false,
+    "created_context": true
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "context true",
+      "input": "const vm=require('node:vm'),c=vm.createContext({});console.log(vm.isContext(c));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "plain false",
+      "input": "const vm=require('node:vm');console.log(vm.isContext({}));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

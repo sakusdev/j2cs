@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.package-imports",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve package.json imports mappings for internal '#' specifiers from within the defining package.",
+  "source": {
+    "pattern": "import '#$name'",
+    "requirements": {
+      "specifier_starts_hash": true,
+      "inside_package_scope": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.package_imports",
+    "template": "JsRuntime.NodeModuleResolution.package_imports($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "scope": "current package private mapping",
+    "mapping": "imports field",
+    "conditions": "same conditional machinery",
+    "external_targets": "permitted unlike exports"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "internal map",
+      "input": "// imports {'#dep':'./dep.js'}; import '#dep' inside package",
+      "expected_behavior": "resolves ./dep.js"
+    },
+    {
+      "name": "missing mapping",
+      "input": "// import '#missing'",
+      "expected_behavior": "throws package import not defined style error"
+    }
+  ]
+}

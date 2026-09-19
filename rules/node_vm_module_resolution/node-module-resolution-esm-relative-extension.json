@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.esm-relative-extension",
+  "category": "node_vm_module_resolution",
+  "summary": "Require explicit file extensions for relative/absolute ESM import specifiers under Node's default ESM resolver.",
+  "source": {
+    "pattern": "import './$relative'",
+    "requirements": {
+      "module_kind": "ESM",
+      "relative_or_absolute_file_specifier": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.esm_relative_extension",
+    "template": "JsRuntime.NodeModuleResolution.esm_relative_extension($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "extension": "must be fully specified like browser URL semantics",
+    "directory_index": "not automatically implied by ESM default resolver",
+    "resolution_error": "invalid/missing target fails"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "explicit",
+      "input": "// import './dep.js'",
+      "expected_behavior": "resolves according to file URL rules"
+    },
+    {
+      "name": "extensionless",
+      "input": "// only dep.js exists; import './dep'",
+      "expected_behavior": "does not use CommonJS-style extension searching under default ESM resolver"
+    }
+  ]
+}

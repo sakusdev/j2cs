@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.require-resolve-bridge",
+  "category": "node_vm_module_resolution",
+  "summary": "When module.createRequire is used, require.resolve follows CommonJS resolution relative to the constructed base rather than import.meta.resolve semantics.",
+  "source": {
+    "pattern": "$createdRequire.resolve($specifier,$options?)",
+    "requirements": {
+      "require_created_by": "module.createRequire"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.require_resolve_bridge",
+    "template": "JsRuntime.NodeModuleResolution.require_resolve_bridge($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "algorithm": "CommonJS require.resolve machinery",
+    "return": "resolved filename/string",
+    "missing": "MODULE_NOT_FOUND",
+    "paths_option": "CJS lookup starts"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "builtin",
+      "input": "// const r=createRequire(import.meta.url); r.resolve('node:fs')",
+      "expected_behavior": "returns node:fs"
+    },
+    {
+      "name": "missing",
+      "input": "// r.resolve('definitely-missing')",
+      "expected_behavior": "throws MODULE_NOT_FOUND"
+    }
+  ]
+}

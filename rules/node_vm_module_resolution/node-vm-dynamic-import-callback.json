@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.dynamic-import-callback",
+  "category": "node_vm_module_resolution",
+  "summary": "Invoke a custom importModuleDynamically callback with specifier, referrer, and import attributes; preserve experimental/version boundaries.",
+  "source": {
+    "pattern": "import($specifier,$attributes?) /* vm custom callback */",
+    "requirements": {
+      "vm_compilation_api": true,
+      "importModuleDynamically": "function"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.dynamic_import_callback",
+    "template": "JsRuntime.NodeVm.dynamic_import_callback($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "callback_args": "specifier, referrer, importAttributes",
+    "return": "module/namespace-compatible loader result per Node contract",
+    "experimental_vm_modules": "version/flag sensitive",
+    "failure": "Promise rejection propagates"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "callback boundary",
+      "input": "// new Script('import(\"x\")',{importModuleDynamically:(s,ref,attrs)=>...})",
+      "expected_behavior": "callback runs when import() executes"
+    },
+    {
+      "name": "throw/reject",
+      "input": "// callback rejects Error('x')",
+      "expected_behavior": "dynamic import Promise rejects; do not turn into synchronous compile error"
+    }
+  ]
+}

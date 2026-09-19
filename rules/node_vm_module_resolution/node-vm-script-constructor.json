@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.script-constructor",
+  "category": "node_vm_module_resolution",
+  "summary": "Compile JavaScript source into a vm.Script without executing it; parse errors occur during construction.",
+  "source": {
+    "pattern": "new vm.Script($code,$options?)",
+    "requirements": {
+      "binding": "node:vm.Script",
+      "source_may_be_dynamic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.script_constructor",
+    "template": "JsRuntime.NodeVm.script_constructor($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "compile_only": true,
+    "execution": "deferred until runIn* call",
+    "syntax_error": "thrown during construction",
+    "local_scope": "not captured as closure"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "compile only",
+      "input": "let x=0;const s=new (require('node:vm').Script)('x=1');console.log(x);",
+      "expected_behavior": "prints 0"
+    },
+    {
+      "name": "syntax error",
+      "input": "const vm=require('node:vm');try{new vm.Script('let =')}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints SyntaxError"
+    }
+  ]
+}

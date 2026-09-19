@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.code-generation-strings",
+  "category": "node_vm_module_resolution",
+  "summary": "Honor context codeGeneration.strings policy for eval/Function-family dynamic string compilation.",
+  "source": {
+    "pattern": "vm.createContext($object,{codeGeneration:{strings:$allowed}})",
+    "requirements": {
+      "binding": "node:vm.createContext",
+      "codeGeneration_strings_configured": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.code_generation_strings",
+    "template": "JsRuntime.NodeVm.code_generation_strings($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "allowed_false": "eval/Function string compilation throws EvalError",
+    "ordinary_precompiled_script": "still runnable",
+    "security": "not a complete sandbox guarantee"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "eval disabled",
+      "input": "const vm=require('node:vm'),c=vm.createContext({}, {codeGeneration:{strings:false}});try{vm.runInContext('eval(\"1\")',c)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints EvalError"
+    },
+    {
+      "name": "script still executes",
+      "input": "const vm=require('node:vm'),c=vm.createContext({}, {codeGeneration:{strings:false}});console.log(vm.runInContext('1+1',c));",
+      "expected_behavior": "prints 2"
+    }
+  ]
+}

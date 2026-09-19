@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.dynamic-import-missing-callback",
+  "category": "node_vm_module_resolution",
+  "summary": "Allow import() syntax to compile in vm code but reject at execution when no dynamic-import callback/default loader is configured.",
+  "source": {
+    "pattern": "import($specifier) /* inside vm-compiled code */",
+    "requirements": {
+      "vm_compilation_api": true,
+      "importModuleDynamically": "missing"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.dynamic_import_missing_callback",
+    "template": "JsRuntime.NodeVm.dynamic_import_missing_callback($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "compile": "can succeed",
+    "execution": "returns/rejects Promise",
+    "error": "ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING when import() is reached"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "missing callback",
+      "input": "const vm=require('node:vm');new vm.Script('import(\"node:fs\")').runInThisContext().catch(e=>console.log(e.code));",
+      "expected_behavior": "prints ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING"
+    },
+    {
+      "name": "unreached import",
+      "input": "const vm=require('node:vm');console.log(new vm.Script('false && import(\"node:fs\"); 1').runInThisContext());",
+      "expected_behavior": "prints 1; missing callback matters when import() executes"
+    }
+  ]
+}

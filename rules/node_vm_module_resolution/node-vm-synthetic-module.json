@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.synthetic-module",
+  "category": "node_vm_module_resolution",
+  "summary": "Create vm.SyntheticModule with declared export names and an evaluation callback.",
+  "source": {
+    "pattern": "new vm.SyntheticModule($exportNames,$evaluateCallback,$options?)",
+    "requirements": {
+      "binding": "node:vm.SyntheticModule",
+      "experimental_vm_modules_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.synthetic_module",
+    "template": "JsRuntime.NodeVm.synthetic_module($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "exports": "declared binding slots",
+    "evaluation_callback": "runs at module evaluation",
+    "context": "optional vm context",
+    "namespace": "ESM namespace semantics"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "synthetic export",
+      "input": "// const m=new vm.SyntheticModule(['x'],()=>m.setExport('x',1)); await m.evaluate();",
+      "expected_behavior": "namespace.x becomes 1"
+    },
+    {
+      "name": "undeclared export",
+      "input": "// m.setExport('missing',1)",
+      "expected_behavior": "throws because export name was not declared"
+    }
+  ]
+}

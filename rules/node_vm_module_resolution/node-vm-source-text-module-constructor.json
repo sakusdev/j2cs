@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.source-text-module-constructor",
+  "category": "node_vm_module_resolution",
+  "summary": "Compile an ES module as vm.SourceTextModule in a specified context, with Node's experimental vm-module lifecycle.",
+  "source": {
+    "pattern": "new vm.SourceTextModule($code,$options?)",
+    "requirements": {
+      "binding": "node:vm.SourceTextModule",
+      "experimental_vm_modules_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.source_text_module_constructor",
+    "template": "JsRuntime.NodeVm.source_text_module_constructor($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "compile": "module source parsed but not evaluated",
+    "context": "option selects vm context",
+    "identifier": "diagnostic/resolution identity",
+    "esm_semantics": "reuse MODULES for bindings/evaluation"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "compile module",
+      "input": "// --experimental-vm-modules: new vm.SourceTextModule('export const x=1')",
+      "expected_behavior": "creates an unlinked module without evaluating body"
+    },
+    {
+      "name": "syntax error",
+      "input": "// new vm.SourceTextModule('export {')",
+      "expected_behavior": "throws SyntaxError during construction"
+    }
+  ]
+}

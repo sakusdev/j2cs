@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.create-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Contextify an object as a distinct V8 context/global with standard globals available inside the context.",
+  "source": {
+    "pattern": "vm.createContext($contextObject?,$options?)",
+    "requirements": {
+      "binding": "node:vm.createContext"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.create_context",
+    "template": "JsRuntime.NodeVm.create_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "contextified object reference",
+    "realm": "distinct built-in identities",
+    "properties": "input object exposed through context global",
+    "host_v8_boundary": true
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "is context",
+      "input": "const vm=require('node:vm'),c={x:1};console.log(vm.isContext(vm.createContext(c)),c.x);",
+      "expected_behavior": "prints true 1"
+    },
+    {
+      "name": "distinct Array",
+      "input": "const vm=require('node:vm'),c=vm.createContext({});console.log(vm.runInContext('Array',c)===Array);",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

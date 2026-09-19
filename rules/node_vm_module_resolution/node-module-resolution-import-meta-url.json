@@ -1,0 +1,42 @@
+{
+  "id": "node.module-resolution.import-meta-url",
+  "category": "node_vm_module_resolution",
+  "summary": "Expose import.meta.url as the absolute URL string identifying the current ES module.",
+  "source": {
+    "pattern": "import.meta.url",
+    "requirements": {
+      "module_kind": "ESM",
+      "host": "Node.js"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeModuleResolution.import_meta_url",
+    "template": "NodeModuleResolution.import_meta_url($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "String",
+    "value": "absolute module URL",
+    "file_module": "usually file: URL",
+    "identity": "module-specific"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "file URL",
+      "input": "// ESM: console.log(import.meta.url.startsWith('file:'))",
+      "expected_behavior": "prints true for local file module"
+    },
+    {
+      "name": "not path",
+      "input": "// import.meta.url",
+      "expected_behavior": "is URL text; path conversion requires fileURLToPath for file: modules"
+    }
+  ]
+}

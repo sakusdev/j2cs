@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.source-text-module-link",
+  "category": "node_vm_module_resolution",
+  "summary": "Link SourceTextModule dependencies through the provided linker without redefining ESM live-binding semantics.",
+  "source": {
+    "pattern": "$module.link($linker)",
+    "requirements": {
+      "receiver": "vm.SourceTextModule",
+      "experimental_vm_modules_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.source_text_module_link",
+    "template": "JsRuntime.NodeVm.source_text_module_link($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "return": "Promise",
+    "linker": "called for dependency specifiers",
+    "module_graph": "reuses MODULES link semantics",
+    "context_constraints": "linked vm modules must satisfy Node context rules"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "linker",
+      "input": "// await module.link((specifier,referencingModule)=>dependencyModule)",
+      "expected_behavior": "resolves requested dependencies through callback"
+    },
+    {
+      "name": "link failure",
+      "input": "// linker throws/rejects for dependency",
+      "expected_behavior": "link Promise rejects and module is not successfully linked"
+    }
+  ]
+}

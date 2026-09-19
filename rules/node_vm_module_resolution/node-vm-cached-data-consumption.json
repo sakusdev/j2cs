@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.cached-data-consumption",
+  "category": "node_vm_module_resolution",
+  "summary": "Use optional V8 cachedData only as compilation cache input; rejection must not change JavaScript source semantics.",
+  "source": {
+    "pattern": "new vm.Script($code,{cachedData:$bytes})",
+    "requirements": {
+      "binding": "node:vm.Script",
+      "cachedData_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.cached_data_consumption",
+    "template": "JsRuntime.NodeVm.cached_data_consumption($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "cache": "V8/version/flags dependent",
+    "cachedDataRejected": "observable Boolean on Script",
+    "source_semantics": "authoritative source remains code",
+    "portability": "cache bytes not portable contract"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "valid or rejected",
+      "input": "// construct Script with cachedData produced for same source/runtime",
+      "expected_behavior": "script may accept cache and execute source normally"
+    },
+    {
+      "name": "stale cache",
+      "input": "// provide incompatible cachedData",
+      "expected_behavior": "cachedDataRejected can be true; translator must not execute cache as source"
+    }
+  ]
+}

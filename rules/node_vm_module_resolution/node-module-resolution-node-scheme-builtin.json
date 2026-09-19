@@ -1,0 +1,41 @@
+{
+  "id": "node.module-resolution.node-scheme-builtin",
+  "category": "node_vm_module_resolution",
+  "summary": "Resolve node: specifiers as Node builtin modules without filesystem package lookup.",
+  "source": {
+    "pattern": "import 'node:$builtin'",
+    "requirements": {
+      "specifier_prefix": "node:"
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "NodeModuleResolution.node_scheme_builtin",
+    "template": "NodeModuleResolution.node_scheme_builtin($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "resolution": "builtin module",
+    "filesystem_lookup": false,
+    "url_like_identity": "node: specifier retained by ESM loader",
+    "exports": "builtin namespace/interoperability rules elsewhere"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "fs",
+      "input": "// ESM: import('node:fs').then(m=>console.log(typeof m.readFile))",
+      "expected_behavior": "prints function"
+    },
+    {
+      "name": "resolve",
+      "input": "// ESM: import.meta.resolve('node:fs')",
+      "expected_behavior": "returns node:fs"
+    }
+  ]
+}

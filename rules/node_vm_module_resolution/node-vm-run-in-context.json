@@ -1,0 +1,40 @@
+{
+  "id": "node.vm.run-in-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Compile and execute dynamic code inside a supplied vm context, equivalent in broad lifecycle to Script plus runInContext.",
+  "source": {
+    "pattern": "vm.runInContext($code,$context,$options?)",
+    "requirements": {
+      "binding": "node:vm.runInContext",
+      "source_may_be_dynamic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.run_in_context",
+    "template": "JsRuntime.NodeVm.run_in_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "compile_then_execute": true,
+    "context_required": true,
+    "return": "last result",
+    "local_scope": "not caller lexical scope"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "mutate context",
+      "input": "const vm=require('node:vm'),c=vm.createContext({x:1});console.log(vm.runInContext('x++;x',c),c.x);",
+      "expected_behavior": "prints 2 2"
+    },
+    {
+      "name": "dynamic syntax error",
+      "input": "const vm=require('node:vm'),c=vm.createContext({});try{vm.runInContext('let =',c)}catch(e){console.log(e.name)}",
+      "expected_behavior": "prints SyntaxError"
+    }
+  ]
+}

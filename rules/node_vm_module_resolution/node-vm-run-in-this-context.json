@@ -1,0 +1,39 @@
+{
+  "id": "node.vm.run-in-this-context",
+  "category": "node_vm_module_resolution",
+  "summary": "Compile and execute dynamic code in current global context without access to caller lexical variables.",
+  "source": {
+    "pattern": "vm.runInThisContext($code,$options?)",
+    "requirements": {
+      "binding": "node:vm.runInThisContext",
+      "source_may_be_dynamic": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeVm.run_in_this_context",
+    "template": "JsRuntime.NodeVm.run_in_this_context($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "global": "current global",
+    "caller_local_scope": "not visible",
+    "return": "last result"
+  },
+  "references": [
+    "https://nodejs.org/api/vm.html"
+  ],
+  "tests": [
+    {
+      "name": "result",
+      "input": "const vm=require('node:vm');console.log(vm.runInThisContext('2+3'));",
+      "expected_behavior": "prints 5"
+    },
+    {
+      "name": "scope",
+      "input": "const vm=require('node:vm');const x=9;console.log(vm.runInThisContext('typeof x'));",
+      "expected_behavior": "prints undefined"
+    }
+  ]
+}

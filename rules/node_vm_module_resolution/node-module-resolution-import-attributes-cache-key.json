@@ -1,0 +1,40 @@
+{
+  "id": "node.module-resolution.import-attributes-cache-key",
+  "category": "node_vm_module_resolution",
+  "summary": "Include relevant import attributes in loader resolution/cache identity according to Node's loader contract.",
+  "source": {
+    "pattern": "import($specifier,{with:$attributes})",
+    "requirements": {
+      "import_attributes_present": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.NodeModuleResolution.import_attributes_cache_key",
+    "template": "JsRuntime.NodeModuleResolution.import_attributes_cache_key($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "loader_context": "importAttributes passed to hooks",
+    "cache": "attributes participate in internal module cache key where Node specifies",
+    "validation": "format-specific attributes can reject load"
+  },
+  "references": [
+    "https://nodejs.org/api/esm.html",
+    "https://nodejs.org/api/packages.html",
+    "https://nodejs.org/api/module.html"
+  ],
+  "tests": [
+    {
+      "name": "hook context",
+      "input": "// custom resolve/load sees context.importAttributes",
+      "expected_behavior": "attributes are observable to loader"
+    },
+    {
+      "name": "not discard",
+      "input": "// same specifier with materially different import attributes",
+      "expected_behavior": "translator must not blindly collapse loader/cache requests"
+    }
+  ]
+}
