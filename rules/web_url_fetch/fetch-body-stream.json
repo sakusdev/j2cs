@@ -1,0 +1,44 @@
+{
+  "id": "web.fetch.body-stream",
+  "category": "web_url_fetch",
+  "summary": "Represent Fetch request/response bodies as Web ReadableStream-backed bodies with backpressure, cancellation, locking, teeing, and disturbed state preserved.",
+  "source": {
+    "pattern": "$response.body",
+    "requirements": {
+      "web_stream_runtime_available": true,
+      "receiver": "intrinsic Fetch body"
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebFetch.BodyStream",
+    "template": "JsRuntime.WebFetch.BodyStream($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "body": "ReadableStream<Uint8Array> or null at the JS surface",
+    "locking": "reader lock affects clone/consume usability",
+    "disturbed": "reads mark body used",
+    "cancel": "stream cancellation must propagate to fetch/body source",
+    "tee": "clone creates branches with Streams semantics",
+    "backpressure": "must not be replaced by eager whole-body buffering when observable"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Body mixin",
+    "WHATWG Streams Standard ReadableStream"
+  ],
+  "tests": [
+    {
+      "name": "response body is readable stream",
+      "input": "const r=new Response(\"x\"); console.log(r.body instanceof ReadableStream);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "locked body is unusable for clone",
+      "input": "const r=new Response(\"x\"); const rd=r.body.getReader(); try { r.clone(); } catch(e) { console.log(e.name); } rd.releaseLock();",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

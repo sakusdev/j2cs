@@ -1,0 +1,41 @@
+{
+  "id": "web.url.parse",
+  "category": "web_url_fetch",
+  "summary": "Parse a WHATWG URL and return null for URL parse failure.",
+  "source": {
+    "pattern": "URL.parse($input, $base)",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.Parse",
+    "template": "WebUrl.Parse($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "URL object or null",
+    "conversion": "USVString conversion still applies",
+    "parse_failure": "null",
+    "success": "new canonical URL object"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard §6.1 URL.parse"
+  ],
+  "tests": [
+    {
+      "name": "relative with base parses",
+      "input": "console.log(URL.parse(\"../x\", \"https://example.com/a/b\").href);",
+      "expected_behavior": "prints https://example.com/x"
+    },
+    {
+      "name": "invalid URL returns null",
+      "input": "console.log(URL.parse(\"http://[::1\") === null);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

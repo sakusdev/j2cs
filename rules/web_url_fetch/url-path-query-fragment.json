@@ -1,0 +1,46 @@
+{
+  "id": "web.url.path-query-fragment",
+  "category": "web_url_fetch",
+  "summary": "Preserve pathname, search, and hash parsing/serialization rules.",
+  "source": {
+    "pattern": "$url.$component",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.PathQueryFragment",
+    "template": "WebUrl.PathQueryFragment($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "components": [
+      "pathname",
+      "search",
+      "hash"
+    ],
+    "pathname": "path-state parsing and percent-encoding",
+    "search": "query state with leading ? exposed by getter when non-empty",
+    "hash": "fragment state with leading # exposed by getter when non-empty",
+    "empty_assignment": "removes query/fragment when appropriate"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URL.pathname/search/hash"
+  ],
+  "tests": [
+    {
+      "name": "pathname setter percent encodes spaces",
+      "input": "const u=new URL(\"https://example.com/\"); u.pathname=\"/a b\"; console.log(u.pathname);",
+      "expected_behavior": "prints /a%20b"
+    },
+    {
+      "name": "empty search removes query",
+      "input": "const u=new URL(\"https://example.com/?a=1#x\"); u.search=\"\"; console.log(u.href);",
+      "expected_behavior": "prints https://example.com/#x"
+    }
+  ]
+}

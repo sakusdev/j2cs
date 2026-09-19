@@ -1,0 +1,41 @@
+{
+  "id": "web.url.can-parse",
+  "category": "web_url_fetch",
+  "summary": "Test whether input/base can be parsed as a WHATWG URL without throwing.",
+  "source": {
+    "pattern": "URL.canParse($input, $base)",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.CanParse",
+    "template": "WebUrl.CanParse($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "boolean",
+    "conversion": "arguments undergo USVString conversion",
+    "parse_failure": "returns false rather than throwing for URL parse failure",
+    "conversion_exception": "conversion itself can still throw"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard §6.1 URL.canParse"
+  ],
+  "tests": [
+    {
+      "name": "absolute URL is parseable",
+      "input": "console.log(URL.canParse(\"https://example.com/x\"));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "relative without base is not parseable",
+      "input": "console.log(URL.canParse(\"../x\"));",
+      "expected_behavior": "prints false"
+    }
+  ]
+}

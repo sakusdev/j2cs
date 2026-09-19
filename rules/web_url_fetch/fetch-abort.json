@@ -1,0 +1,42 @@
+{
+  "id": "web.fetch.abort",
+  "category": "web_url_fetch",
+  "summary": "Integrate AbortSignal with Fetch so pre-abort and in-flight abort reject with the signal reason and cancel associated work/body as specified.",
+  "source": {
+    "pattern": "fetch($input,{signal:$signal})",
+    "requirements": {
+      "binding": "intrinsic global fetch",
+      "host_fetch_runtime_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebFetch.FetchAbortable",
+    "template": "JsRuntime.WebFetch.FetchAbortable($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "pre_aborted": "fetch rejects without proceeding with ordinary fetch completion",
+    "in_flight": "abort propagates through fetch controller and body consumption",
+    "reason": "rejection follows AbortSignal reason rules",
+    "ordering": "abort algorithms/event and promise rejection ordering must follow DOM/Fetch"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard fetch abort steps",
+    "WHATWG DOM Standard AbortSignal"
+  ],
+  "tests": [
+    {
+      "name": "pre-aborted fetch rejects",
+      "input": "const c=new AbortController(); c.abort(\"stop\"); try { await fetch(\"data:text/plain,x\",{signal:c.signal}); } catch(e) { console.log(e); }",
+      "expected_behavior": "prints stop"
+    },
+    {
+      "name": "request signal follows source abort",
+      "input": "const c=new AbortController(); const r=new Request(\"data:text/plain,x\",{signal:c.signal}); c.abort(); console.log(r.signal.aborted);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "web.response.redirect",
+  "category": "web_url_fetch",
+  "summary": "Create a redirect Response with canonical Location and allowed redirect status.",
+  "source": {
+    "pattern": "Response.redirect($url,$status)",
+    "requirements": {
+      "binding": "intrinsic Response",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebResponse.Redirect",
+    "template": "WebResponse.Redirect($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default_status": 302,
+    "allowed_statuses": [
+      301,
+      302,
+      303,
+      307,
+      308
+    ],
+    "url": "USVString parsed as URL; failure throws TypeError",
+    "location": "serialized URL stored as Location header",
+    "guard": "immutable"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Response.redirect"
+  ],
+  "tests": [
+    {
+      "name": "redirect canonicalizes location",
+      "input": "const r=Response.redirect(\"https://EXAMPLE.com:443/a b\",301); console.log(r.status,r.headers.get(\"location\"));",
+      "expected_behavior": "prints 301 https://example.com/a%20b"
+    },
+    {
+      "name": "invalid redirect status throws",
+      "input": "try { Response.redirect(\"https://e.test/\",200); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints RangeError"
+    }
+  ]
+}

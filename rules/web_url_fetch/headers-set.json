@@ -1,0 +1,40 @@
+{
+  "id": "web.headers.set",
+  "category": "web_url_fetch",
+  "summary": "Replace all values for a header name subject to the Headers guard.",
+  "source": {
+    "pattern": "$headers.set($name,$value)",
+    "requirements": {
+      "receiver": "intrinsic Headers",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebHeaders.Set",
+    "template": "WebHeaders.Set($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutation": "replace matching header values with one normalized value or append if absent",
+    "return": "undefined",
+    "guard": "must preserve request/request-no-cors/response/immutable restrictions"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Headers.set"
+  ],
+  "tests": [
+    {
+      "name": "set replaces appended values",
+      "input": "const h=new Headers(); h.append(\"x\",\"1\"); h.append(\"x\",\"2\"); h.set(\"x\",\"3\"); console.log(h.get(\"x\"));",
+      "expected_behavior": "prints 3"
+    },
+    {
+      "name": "name matching is case-insensitive",
+      "input": "const h=new Headers({X:\"1\"}); h.set(\"x\",\"2\"); console.log([...h].length,h.get(\"X\"));",
+      "expected_behavior": "prints 1 2"
+    }
+  ]
+}

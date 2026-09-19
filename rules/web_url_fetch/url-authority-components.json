@@ -1,0 +1,51 @@
+{
+  "id": "web.url.authority-components",
+  "category": "web_url_fetch",
+  "summary": "Preserve WHATWG URL scheme, credentials, host, hostname, and port getter/setter behavior.",
+  "source": {
+    "pattern": "$url.$authorityComponent",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.AuthorityComponent",
+    "template": "WebUrl.AuthorityComponent($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "components": [
+      "protocol",
+      "username",
+      "password",
+      "host",
+      "hostname",
+      "port"
+    ],
+    "setters": "run component-specific basic URL parser states",
+    "default_port": "serialized port becomes empty for the scheme default",
+    "host": "includes non-empty port while hostname excludes it",
+    "credentials": "percent-encoded with URL userinfo rules"
+  },
+  "caveats": [
+    "Setter failure behavior differs by component; some invalid setter inputs are ignored instead of throwing."
+  ],
+  "references": [
+    "WHATWG URL Standard §6.1 URL class"
+  ],
+  "tests": [
+    {
+      "name": "default port disappears",
+      "input": "const u=new URL(\"http://user:pw@EXAMPLE.com:8080/\"); u.port=\"80\"; console.log(u.host,u.hostname,u.port);",
+      "expected_behavior": "prints example.com example.com and an empty port"
+    },
+    {
+      "name": "username is encoded",
+      "input": "const u=new URL(\"https://example.com/\"); u.username=\"a b\"; console.log(u.href);",
+      "expected_behavior": "href contains a%20b@example.com"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "web.urlsearchparams.has",
+  "category": "web_url_fetch",
+  "summary": "Test for tuples by name and optional value.",
+  "source": {
+    "pattern": "$params.has($name, $value)",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Has",
+    "template": "WebUrlSearchParams.Has($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "one_argument": "true when any tuple has matching name",
+    "two_arguments": "requires both name and value match",
+    "return": "boolean",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.has"
+  ],
+  "tests": [
+    {
+      "name": "name match",
+      "input": "const p=new URLSearchParams(\"a=1\"); console.log(p.has(\"a\"));",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "value-sensitive match",
+      "input": "const p=new URLSearchParams(\"a=1&a=2\"); console.log(p.has(\"a\",\"2\"),p.has(\"a\",\"3\"));",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

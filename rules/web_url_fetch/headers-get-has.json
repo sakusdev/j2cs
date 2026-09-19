@@ -1,0 +1,41 @@
+{
+  "id": "web.headers.get-has",
+  "category": "web_url_fetch",
+  "summary": "Read Fetch headers with ASCII case-insensitive names and combined values.",
+  "source": {
+    "pattern": "$headers.get($name)",
+    "requirements": {
+      "receiver": "intrinsic Headers",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebHeaders.Get",
+    "template": "WebHeaders.Get($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "get": "combined value for name or null",
+    "has": "boolean membership",
+    "case": "ASCII case-insensitive",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Headers.get/has"
+  ],
+  "tests": [
+    {
+      "name": "get is case-insensitive",
+      "input": "const h=new Headers({\"X-A\":\"v\"}); console.log(h.get(\"x-a\"));",
+      "expected_behavior": "prints v"
+    },
+    {
+      "name": "missing is null",
+      "input": "const h=new Headers(); console.log(h.get(\"x\")===null,h.has(\"x\"));",
+      "expected_behavior": "prints true false"
+    }
+  ]
+}

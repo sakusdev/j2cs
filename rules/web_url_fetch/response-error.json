@@ -1,0 +1,43 @@
+{
+  "id": "web.response.error",
+  "category": "web_url_fetch",
+  "summary": "Create the special network-error Response object returned by Response.error().",
+  "source": {
+    "pattern": "Response.error()",
+    "requirements": {
+      "binding": "intrinsic Response",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebResponse.Error",
+    "template": "WebResponse.Error($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "type": "error",
+    "status": 0,
+    "statusText": "",
+    "headers": "empty immutable response header list",
+    "body": null,
+    "ok": false
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Response.error"
+  ],
+  "tests": [
+    {
+      "name": "error response fields",
+      "input": "const r=Response.error(); console.log(r.type,r.status,r.ok,r.body===null);",
+      "expected_behavior": "prints error 0 false true"
+    },
+    {
+      "name": "error response status text empty",
+      "input": "console.log(JSON.stringify(Response.error().statusText));",
+      "expected_behavior": "prints \"\""
+    }
+  ]
+}

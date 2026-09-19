@@ -1,0 +1,41 @@
+{
+  "id": "web.request.body-method-restriction",
+  "category": "web_url_fetch",
+  "summary": "Reject non-null Request bodies for GET and HEAD while preserving BodyInit extraction for other methods.",
+  "source": {
+    "pattern": "new Request($input,{method:$method,body:$body})",
+    "requirements": {
+      "binding": "intrinsic Request constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebRequest.AttachBody",
+    "template": "WebRequest.AttachBody($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "GET_HEAD": "non-null body throws TypeError",
+    "other_methods": "extract BodyInit and infer content type where defined",
+    "stream_body": "must preserve stream disturbed/locked checks and duplex semantics"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Request constructor",
+    "WHATWG Fetch Standard BodyInit extraction"
+  ],
+  "tests": [
+    {
+      "name": "POST accepts string body",
+      "input": "const r=new Request(\"https://e.test/\",{method:\"POST\",body:\"abc\"}); console.log(r.headers.get(\"content-type\"));",
+      "expected_behavior": "content-type is text/plain;charset=UTF-8"
+    },
+    {
+      "name": "GET body rejected",
+      "input": "try { new Request(\"https://e.test/\",{method:\"GET\",body:\"x\"}); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

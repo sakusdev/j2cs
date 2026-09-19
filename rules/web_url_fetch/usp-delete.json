@@ -1,0 +1,41 @@
+{
+  "id": "web.urlsearchparams.delete",
+  "category": "web_url_fetch",
+  "summary": "Delete all tuples by name, or matching name/value when the optional value is present.",
+  "source": {
+    "pattern": "$params.delete($name, $value)",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Delete",
+    "template": "WebUrlSearchParams.Delete($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "one_argument": "remove all tuples whose name matches",
+    "two_arguments": "remove tuples whose name and value match",
+    "return": "undefined",
+    "order": "remaining tuples retain order"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.delete"
+  ],
+  "tests": [
+    {
+      "name": "one arg removes all same-name tuples",
+      "input": "const p=new URLSearchParams(\"a=1&a=2&b=3\"); p.delete(\"a\"); console.log(p.toString());",
+      "expected_behavior": "prints b=3"
+    },
+    {
+      "name": "value filters deletion",
+      "input": "const p=new URLSearchParams(\"a=1&a=2&a=1\"); p.delete(\"a\",\"1\"); console.log(p.toString());",
+      "expected_behavior": "prints a=2"
+    }
+  ]
+}

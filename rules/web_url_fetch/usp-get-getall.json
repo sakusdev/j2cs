@@ -1,0 +1,40 @@
+{
+  "id": "web.urlsearchparams.get-getall",
+  "category": "web_url_fetch",
+  "summary": "Retrieve first or all values for a URLSearchParams name without mutating it.",
+  "source": {
+    "pattern": "$params.get($name)",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Get",
+    "template": "WebUrlSearchParams.Get($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "get": "first matching value or null",
+    "getAll": "new list of every matching value in tuple order",
+    "mutation": false
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.get/getAll"
+  ],
+  "tests": [
+    {
+      "name": "get returns first duplicate",
+      "input": "const p=new URLSearchParams(\"a=1&a=2\"); console.log(p.get(\"a\"));",
+      "expected_behavior": "prints 1"
+    },
+    {
+      "name": "missing get is null and getAll empty",
+      "input": "const p=new URLSearchParams(); console.log(p.get(\"x\")===null,p.getAll(\"x\").length);",
+      "expected_behavior": "prints true 0"
+    }
+  ]
+}

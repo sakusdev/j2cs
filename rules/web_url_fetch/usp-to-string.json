@@ -1,0 +1,42 @@
+{
+  "id": "web.urlsearchparams.to-string",
+  "category": "web_url_fetch",
+  "summary": "Serialize URLSearchParams with application/x-www-form-urlencoded rules and no leading question mark.",
+  "source": {
+    "pattern": "$params.toString()",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Serialize",
+    "template": "WebUrlSearchParams.Serialize($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "format": "application/x-www-form-urlencoded serializer",
+    "space": "serialized as +",
+    "percent_encoding": "form-urlencoded percent-encode set",
+    "prefix": "no leading ?"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard §5.2 form-urlencoded serializer",
+    "WHATWG URL Standard URLSearchParams stringifier"
+  ],
+  "tests": [
+    {
+      "name": "space becomes plus and tilde encoded",
+      "input": "const p=new URLSearchParams(); p.set(\"q\",\"a b~\"); console.log(p.toString());",
+      "expected_behavior": "prints q=a+b%7E"
+    },
+    {
+      "name": "empty params serialize empty",
+      "input": "console.log(JSON.stringify(new URLSearchParams().toString()));",
+      "expected_behavior": "prints \"\""
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "web.request.properties",
+  "category": "web_url_fetch",
+  "summary": "Read Request metadata without collapsing Fetch-specific modes, credentials, cache, redirect, referrer, integrity, keepalive, and duplex.",
+  "source": {
+    "pattern": "$request.$property",
+    "requirements": {
+      "receiver": "intrinsic Request",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebRequest.GetProperty",
+    "template": "WebRequest.GetProperty($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "properties": [
+      "method",
+      "url",
+      "headers",
+      "destination",
+      "referrer",
+      "referrerPolicy",
+      "mode",
+      "credentials",
+      "cache",
+      "redirect",
+      "integrity",
+      "keepalive",
+      "isReloadNavigation",
+      "isHistoryNavigation",
+      "duplex",
+      "body",
+      "bodyUsed"
+    ],
+    "identity": "headers and signal are associated objects with stable API identity",
+    "bodyUsed": "derived from disturbed state"
+  },
+  "caveats": [
+    "Do not map Fetch credentials/cache/mode/redirect enums to unrelated HttpClient defaults."
+  ],
+  "references": [
+    "WHATWG Fetch Standard Request class"
+  ],
+  "tests": [
+    {
+      "name": "common defaults preserved",
+      "input": "const r=new Request(\"https://e.test/\"); console.log(r.credentials,r.redirect,r.cache,r.bodyUsed);",
+      "expected_behavior": "prints same-origin follow default false"
+    },
+    {
+      "name": "constructed request has empty destination",
+      "input": "console.log(JSON.stringify(new Request(\"https://e.test/\").destination));",
+      "expected_behavior": "prints \"\""
+    }
+  ]
+}

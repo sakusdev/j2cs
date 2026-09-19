@@ -1,0 +1,46 @@
+{
+  "id": "web.response.constructor",
+  "category": "web_url_fetch",
+  "summary": "Construct a synthetic Fetch Response with validated status, statusText, headers, and optional body.",
+  "source": {
+    "pattern": "new Response($body,$init)",
+    "requirements": {
+      "binding": "intrinsic Response constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebResponse.Construct",
+    "template": "WebResponse.Construct($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "default_status": 200,
+    "status_range": "200..599 for constructor",
+    "null_body_statuses": [
+      204,
+      205,
+      304
+    ],
+    "headers": "response guard",
+    "body": "BodyInit extraction and inferred content type"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard §5.5 Response class"
+  ],
+  "tests": [
+    {
+      "name": "default response",
+      "input": "const r=new Response(\"x\"); console.log(r.status,r.ok,r.headers.get(\"content-type\"));",
+      "expected_behavior": "prints 200 true text/plain;charset=UTF-8"
+    },
+    {
+      "name": "null-body status rejects body",
+      "input": "try { new Response(\"x\",{status:204}); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "web.fetch.redirect-cors-credentials",
+  "category": "web_url_fetch",
+  "summary": "Keep redirect mode, CORS mode, credentials, referrer, cache, integrity, and response filtering inside the Fetch host runtime.",
+  "source": {
+    "pattern": "fetch($input,$policyInit)",
+    "requirements": {
+      "binding": "intrinsic global fetch",
+      "host_fetch_runtime_available": true
+    }
+  },
+  "target": {
+    "kind": "runtime",
+    "helper": "JsRuntime.WebFetch.FetchWithPolicy",
+    "template": "JsRuntime.WebFetch.FetchWithPolicy($args)"
+  },
+  "strategy": "runtime",
+  "confidence": "high",
+  "semantics": {
+    "redirect": [
+      "follow",
+      "error",
+      "manual"
+    ],
+    "mode": [
+      "same-origin",
+      "cors",
+      "no-cors",
+      "navigate"
+    ],
+    "credentials": [
+      "omit",
+      "same-origin",
+      "include"
+    ],
+    "response_filtering": "basic/cors/opaque/opaqueredirect response types affect exposed status/headers/body",
+    "policy": "CSP/referrer/cache/integrity and environment settings may participate"
+  },
+  "caveats": [
+    "Do not emulate browser CORS or opaque responses by exposing raw HttpClient responses."
+  ],
+  "references": [
+    "WHATWG Fetch Standard request modes/credentials/redirect",
+    "WHATWG Fetch Standard filtered response"
+  ],
+  "tests": [
+    {
+      "name": "request captures explicit policy",
+      "input": "const r=new Request(\"https://e.test/\",{mode:\"cors\",credentials:\"include\",redirect:\"error\"}); console.log(r.mode,r.credentials,r.redirect);",
+      "expected_behavior": "prints cors include error"
+    },
+    {
+      "name": "invalid credentials enum rejected",
+      "input": "try { new Request(\"https://e.test/\",{credentials:\"bogus\"}); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

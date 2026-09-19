@@ -1,0 +1,42 @@
+{
+  "id": "web.response.clone",
+  "category": "web_url_fetch",
+  "summary": "Clone a Response while teeing body bytes/stream and preserving response metadata.",
+  "source": {
+    "pattern": "$response.clone()",
+    "requirements": {
+      "receiver": "intrinsic Response",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebResponse.Clone",
+    "template": "WebResponse.Clone($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "return": "new Response object",
+    "body": "teed into two branches when non-null",
+    "unusable": "throws TypeError if body is disturbed or locked",
+    "metadata": "status/statusText/headers/url/type/redirected preserved per clone algorithm"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG Fetch Standard Response.clone",
+    "WHATWG Streams tee"
+  ],
+  "tests": [
+    {
+      "name": "clone body independent branches",
+      "input": "const r=new Response(\"x\"); const c=r.clone(); console.log((await r.text())+(await c.text()));",
+      "expected_behavior": "prints xx"
+    },
+    {
+      "name": "used response cannot be cloned",
+      "input": "const r=new Response(\"x\"); await r.text(); try { r.clone(); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

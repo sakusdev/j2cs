@@ -1,0 +1,44 @@
+{
+  "id": "web.url.search-params-live",
+  "category": "web_url_fetch",
+  "summary": "Return the live URLSearchParams object associated with a URL and keep URL/query mutations synchronized.",
+  "source": {
+    "pattern": "$url.searchParams",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.SearchParams",
+    "template": "WebUrl.SearchParams($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "identity": "repeated getter calls return the same associated URLSearchParams object",
+    "url_to_params": "setting URL.search updates the associated list",
+    "params_to_url": "mutating the list updates URL query serialization",
+    "encoding": "URLSearchParams form encoding can change href serialization"
+  },
+  "caveats": [
+    "Do not lower searchParams to a detached dictionary snapshot."
+  ],
+  "references": [
+    "WHATWG URL Standard §6.1 URL.searchParams",
+    "WHATWG URL Standard §6.2 URLSearchParams"
+  ],
+  "tests": [
+    {
+      "name": "params mutation updates URL",
+      "input": "const u=new URL(\"https://e.test/?a=1\"); const p=u.searchParams; p.set(\"a\",\"2\"); console.log(u.search,p===u.searchParams);",
+      "expected_behavior": "prints ?a=2 true"
+    },
+    {
+      "name": "sort can change encoding",
+      "input": "const u=new URL(\"https://e.test/?a=b%20~\"); u.searchParams.sort(); console.log(u.href);",
+      "expected_behavior": "prints https://e.test/?a=b+%7E"
+    }
+  ]
+}

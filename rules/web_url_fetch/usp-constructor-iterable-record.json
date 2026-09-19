@@ -1,0 +1,42 @@
+{
+  "id": "web.urlsearchparams.constructor-iterable-record",
+  "category": "web_url_fetch",
+  "summary": "Construct URLSearchParams from another params object, pair iterable, or record using Web IDL conversions.",
+  "source": {
+    "pattern": "new URLSearchParams($init)",
+    "requirements": {
+      "binding": "intrinsic URLSearchParams constructor",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.FromInit",
+    "template": "WebUrlSearchParams.FromInit($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "params_input": "copies the source tuple list",
+    "iterable_input": "each item must contain exactly two items",
+    "record_input": "enumerates record entries using Web IDL record conversion",
+    "string_conversion": "names/values become USVString",
+    "duplicates": "iterables can retain duplicate names"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard §6.2 URLSearchParams constructor"
+  ],
+  "tests": [
+    {
+      "name": "iterable preserves duplicate keys",
+      "input": "console.log(new URLSearchParams([[\"a\",\"1\"],[\"a\",\"2\"]]).toString());",
+      "expected_behavior": "prints a=1&a=2"
+    },
+    {
+      "name": "bad pair length throws",
+      "input": "try { new URLSearchParams([[\"a\",\"1\",\"x\"]]); } catch(e) { console.log(e.name); }",
+      "expected_behavior": "prints TypeError"
+    }
+  ]
+}

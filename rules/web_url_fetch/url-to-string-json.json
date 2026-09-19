@@ -1,0 +1,40 @@
+{
+  "id": "web.url.to-string-json",
+  "category": "web_url_fetch",
+  "summary": "Serialize URL objects for toString(), toJSON(), and string conversion.",
+  "source": {
+    "pattern": "$url.toString()",
+    "requirements": {
+      "binding": "intrinsic WHATWG URL API",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrl.Serialize",
+    "template": "WebUrl.Serialize($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "toString": "same serialization as href getter",
+    "toJSON": "same serialization as href getter",
+    "primitive_string_conversion": "uses URL stringifier"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URL stringifier"
+  ],
+  "tests": [
+    {
+      "name": "toString equals href",
+      "input": "const u=new URL(\"https://example.com/a b\"); console.log(u.toString()===u.href);",
+      "expected_behavior": "prints true"
+    },
+    {
+      "name": "toJSON equals href",
+      "input": "const u=new URL(\"https://example.com/a b\"); console.log(u.toJSON()===u.href);",
+      "expected_behavior": "prints true"
+    }
+  ]
+}

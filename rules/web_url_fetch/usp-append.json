@@ -1,0 +1,40 @@
+{
+  "id": "web.urlsearchparams.append",
+  "category": "web_url_fetch",
+  "summary": "Append a name/value tuple without replacing existing tuples.",
+  "source": {
+    "pattern": "$params.append($name,$value)",
+    "requirements": {
+      "receiver": "intrinsic URLSearchParams",
+      "builtin_not_overridden": true
+    }
+  },
+  "target": {
+    "kind": "helper",
+    "helper": "WebUrlSearchParams.Append",
+    "template": "WebUrlSearchParams.Append($args)"
+  },
+  "strategy": "helper",
+  "confidence": "high",
+  "semantics": {
+    "mutation": "appends one converted tuple at list end",
+    "return": "undefined",
+    "url_link": "updates associated URL query when params belong to a URL"
+  },
+  "caveats": [],
+  "references": [
+    "WHATWG URL Standard URLSearchParams.append"
+  ],
+  "tests": [
+    {
+      "name": "append keeps duplicates",
+      "input": "const p=new URLSearchParams(\"a=1\"); p.append(\"a\",\"2\"); console.log(p.toString());",
+      "expected_behavior": "prints a=1&a=2"
+    },
+    {
+      "name": "append updates associated URL",
+      "input": "const u=new URL(\"https://e.test/\"); u.searchParams.append(\"x\",\"a b\"); console.log(u.search);",
+      "expected_behavior": "prints ?x=a+b"
+    }
+  ]
+}
